@@ -65,6 +65,7 @@ public class VRGameFog {
 	
 	public static void main(String[] args) throws Exception{
 		Log.printLine("Starting VRGame...");
+		System.out.println("test1");
 		
 		try {
 			Log.disable();
