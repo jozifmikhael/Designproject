@@ -400,7 +400,9 @@ public class DatacenterBroker extends SimEntity {
 	 */
 	@Override
 	public void shutdownEntity() {
-		Log.printLine(getName() + " is shutting down...");
+		Log.printLine(getName() + " is shutting down... at t=" + CloudSim.clock());
+		this.setState(SimEntity.FINISHED);
+		CloudSim.popEntity(this);
 	}
 
 	/*
