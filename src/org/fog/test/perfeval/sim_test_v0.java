@@ -220,11 +220,7 @@ public class sim_test_v0 {
 		String os = "Linux"; // operating system
 		String vmm = "Xen";
 		double time_zone = 10.0; // time zone this resource located
-<<<<<<< HEAD
 		double cost = ratePerMips; // the cost of using processing in this resource
-=======
-		double cost = 6.0; // the cost of using processing in this resource
->>>>>>> eb57d452eb0117ed339f411f2ca0bd111063003a
 		double costPerMem = 0.05; // the cost of using memory in this resource
 		double costPerStorage = 0.001; // the cost of using storage in this
 										// resource
