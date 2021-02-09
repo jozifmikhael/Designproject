@@ -168,14 +168,14 @@ public class VRGameFog {
 	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
 		mobile.setParentId(parentId);
-		Sensor eegSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
-		sensors.add(eegSensor);
-		Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
-		actuators.add(display);
-		eegSensor.setGatewayDeviceId(mobile.getId());
-		eegSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
-		display.setGatewayDeviceId(mobile.getId());
-		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
+//		Sensor eegSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
+//		sensors.add(eegSensor);
+//		Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
+//		actuators.add(display);
+//		eegSensor.setGatewayDeviceId(mobile.getId());
+//		eegSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
+//		display.setGatewayDeviceId(mobile.getId());
+//		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
 		return mobile;
 	}
 	
