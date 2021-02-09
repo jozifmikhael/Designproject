@@ -74,7 +74,6 @@ public class UtilizationModelPlanetLabInMemory implements UtilizationModel {
 		double delta = (utilization2 - utilization1) / ((time2 - time1) * getSchedulingInterval());
 		double utilization = utilization1 + delta * (time - time1 * getSchedulingInterval());
 		return utilization;
-
 	}
 
 	/**

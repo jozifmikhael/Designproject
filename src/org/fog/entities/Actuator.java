@@ -19,17 +19,7 @@ public class Actuator extends SimEntity{
 	private int userId;
 	private String actuatorType;
 	private Application app;
-	
-	public Actuator(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, String actuatorType, String srcModuleName) {
-		super(name);
-		this.setAppId(appId);
-		this.gatewayDeviceId = gatewayDeviceId;
-		this.geoLocation = geoLocation;
-		setUserId(userId);
-		setActuatorType(actuatorType);
-		setLatency(latency);
-	}
-	
+		
 	public Actuator(String name, int userId, String appId, String actuatorType) {
 		super(name);
 		this.setAppId(appId);
@@ -53,14 +43,13 @@ public class Actuator extends SimEntity{
 
 	private void processTupleArrival(SimEvent ev) {
 		Tuple tuple = (Tuple)ev.getData();
-		Logger.debug(getName(), "Received tuple "+tuple.getCloudletId()+"on "+tuple.getDestModuleName());
+		System.out.println("Actuator.java: " + getName() + " " + getActuatorType() + " received tuple "+tuple.getCloudletId()+" with dest "+tuple.getDestModuleName());
 		String srcModule = tuple.getSrcModuleName();
 		String destModule = tuple.getDestModuleName();
 		Application app = getApp();
 		
 		for(AppLoop loop : app.getLoops()){
 			if(loop.hasEdge(srcModule, destModule) && loop.isEndModule(destModule)){
-				
 				Double startTime = TimeKeeper.getInstance().getEmitTimes().get(tuple.getActualTupleId());
 				if(startTime==null)
 					break;

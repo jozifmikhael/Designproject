@@ -22,6 +22,7 @@ public class Tuple extends Cloudlet{
 	private int actuatorId;
 	private int sourceDeviceId;
 	private int sourceModuleId;
+	
 	/**
 	 * Map to keep track of which module instances has a tuple traversed.
 	 * 

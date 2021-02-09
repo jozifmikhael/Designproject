@@ -282,23 +282,14 @@ public class HostDynamicWorkload extends Host {
 	 * @param requestedMips the requested mips
 	 * @param isActive the is active
 	 */
-	public
-			void
-			addStateHistoryEntry(double time, double allocatedMips, double requestedMips, boolean isActive) {
-
+	public void	addStateHistoryEntry(double time, double allocatedMips, double requestedMips, boolean isActive) {
 		HostStateHistoryEntry newState = new HostStateHistoryEntry(
 				time,
 				allocatedMips,
 				requestedMips,
 				isActive);
-		if (!getStateHistory().isEmpty()) {
-			HostStateHistoryEntry previousState = getStateHistory().get(getStateHistory().size() - 1);
-			if (previousState.getTime() == time) {
-				getStateHistory().set(getStateHistory().size() - 1, newState);
-				return;
-			}
-		}
-		getStateHistory().add(newState);
+		if (getStateHistory().isEmpty()) {getStateHistory().add(newState); return;}
+		HostStateHistoryEntry previousState = getStateHistory().get(getStateHistory().size() - 1);
+		if (previousState.getTime() == time) getStateHistory().set(getStateHistory().size() - 1, newState);
 	}
-
 }

@@ -46,22 +46,6 @@ public class AppEdge {
 	 */
 	private boolean isPeriodic;
 	
-	public AppEdge(){
-		
-	}
-	
-//	public AppEdge(String source, String destination, double tupleCpuLength, 
-//			double tupleNwLength, String tupleType, int direction, int edgeType){
-//		setSource(source);
-//		setDestination(destination);
-//		setTupleCpuLength(tupleCpuLength);
-//		setTupleNwLength(tupleNwLength);
-//		setTupleType(tupleType);
-//		setDirection(direction);
-//		setEdgeType(edgeType);
-//		setPeriodic(false);
-//	}
-	
 	public AppEdge(String source, String destination, double periodicity, double tupleCpuLength, 
 			double tupleNwLength, String tupleType, int direction, int edgeType){
 		setSource(source);

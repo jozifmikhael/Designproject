@@ -111,20 +111,15 @@ public class VRGameFog {
 				// rest of the modules will be placed by the Edge-ward placement policy
 			}
 			
-			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-			controller.submitApplication(application, 0, 
-					(CLOUD)?(new ModulePlacementMapping(fogDevices, application, moduleMapping))
-							:(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
-			//controller.submitApplication(application, 0, new ModulePlacementMapping(fogDevices, application, moduleMapping));
-			
+			controller.submitApplication(application, 0, new ModulePlacementMapping(fogDevices, application, moduleMapping));
+			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
 			
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			System.out.println(moduleMapping.getModuleMapping());
 			CloudSim.startSimulation();
 			CloudSim.stopSimulation();
 			System.out.println("VRGame finished!");
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.printLine("Unwanted errors happen");
