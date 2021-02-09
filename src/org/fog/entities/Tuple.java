@@ -100,6 +100,7 @@ public class Tuple extends Cloudlet{
 	}
 
 	public int getSourceDeviceId() {
+		System.out.println("tuple src id" + sourceDeviceId);
 		return sourceDeviceId;
 	}
 
@@ -116,10 +117,12 @@ public class Tuple extends Cloudlet{
 	}
 
 	public int getSourceModuleId() {
+		//System.out.println("src mod id" + sourceModuleId);
 		return sourceModuleId;
 	}
 
 	public void setSourceModuleId(int sourceModuleId) {
+		//System.out.println("src mod id is set to " + sourceModuleId);
 		this.sourceModuleId = sourceModuleId;
 	}
 

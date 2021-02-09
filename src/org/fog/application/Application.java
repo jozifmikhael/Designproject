@@ -42,16 +42,6 @@ public class Application {
 	private Map<String, AppEdge> edgeMap;
 
 	/**
-	 * Creates a plain vanilla application with no modules and edges.
-	 * @param appId
-	 * @param userId
-	 * @return
-	 */
-	public static Application createApplication(String appId, int userId){
-		return new Application(appId, userId);
-	}
-	
-	/**
 	 * Adds an application module to the application.
 	 * @param moduleName
 	 * @param ram
@@ -73,35 +63,36 @@ public class Application {
 	 * Adds a non-periodic edge to the application model.
 	 * @param source
 	 * @param destination
+	 * @param periodicity TODO
 	 * @param tupleCpuLength
 	 * @param tupleNwLength
 	 * @param tupleType
 	 * @param direction
 	 * @param edgeType
 	 */
-	public void addAppEdge(String source, String destination, double tupleCpuLength, 
-			double tupleNwLength, String tupleType, int direction, int edgeType){
-		AppEdge edge = new AppEdge(source, destination, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
-		getEdges().add(edge);
-		getEdgeMap().put(edge.getTupleType(), edge);
-	}
-	
-	/**
-	 * Adds a periodic edge to the application model.
-	 * @param source
-	 * @param destination
-	 * @param tupleCpuLength
-	 * @param tupleNwLength
-	 * @param tupleType
-	 * @param direction
-	 * @param edgeType
-	 */
-	public void addAppEdge(String source, String destination, double periodicity, double tupleCpuLength, 
-			double tupleNwLength, String tupleType, int direction, int edgeType){
+	public void addAppEdge(String source, String destination, double periodicity, 
+			double tupleCpuLength, double tupleNwLength, String tupleType, int direction, int edgeType){
 		AppEdge edge = new AppEdge(source, destination, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
 		getEdges().add(edge);
 		getEdgeMap().put(edge.getTupleType(), edge);
 	}
+	
+//	/**
+//	 * Adds a periodic edge to the application model.
+//	 * @param source
+//	 * @param destination
+//	 * @param tupleCpuLength
+//	 * @param tupleNwLength
+//	 * @param tupleType
+//	 * @param direction
+//	 * @param edgeType
+//	 */
+//	public void addAppEdge(String source, String destination, double periodicity, double tupleCpuLength, 
+//			double tupleNwLength, String tupleType, int direction, int edgeType){
+//		AppEdge edge = new AppEdge(source, destination, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+//		getEdges().add(edge);
+//		getEdgeMap().put(edge.getTupleType(), edge);
+//	}
 	
 	/**
 	 * Define the input-output relationship of an application module for a given input tuple type.
@@ -139,18 +130,18 @@ public class Application {
 		setEdgeMap(new HashMap<String, AppEdge>());
 	}
 	
-	public Application(String appId, List<AppModule> modules,
-			List<AppEdge> edges, List<AppLoop> loops, GeoCoverage geoCoverage) {
-		setAppId(appId);
-		setModules(modules);
-		setEdges(edges);
-		setGeoCoverage(geoCoverage);
-		setLoops(loops);
-		setEdgeMap(new HashMap<String, AppEdge>());
-		for(AppEdge edge : edges){
-			getEdgeMap().put(edge.getTupleType(), edge);
-		}
-	}
+//	public Application(String appId, List<AppModule> modules,
+//			List<AppEdge> edges, List<AppLoop> loops, GeoCoverage geoCoverage) {
+//		setAppId(appId);
+//		setModules(modules);
+//		setEdges(edges);
+//		setGeoCoverage(geoCoverage);
+//		setLoops(loops);
+//		setEdgeMap(new HashMap<String, AppEdge>());
+//		for(AppEdge edge : edges){
+//			getEdgeMap().put(edge.getTupleType(), edge);
+//		}
+//	}
 
 	/**
 	 * Search and return an application module by its module name

@@ -71,7 +71,7 @@ public class CleanFromJson {
 	@SuppressWarnings({ "serial" })
 	private static Application createApplication(String appId, int userId){
 		
-		Application application = Application.createApplication(appId, userId);
+		Application application = new Application(appId, userId);
 		application.addAppModule("client", 10, 1000, 10000, 1000);
 		application.addAppModule("classifier", 10, 1000, 10000, 1000);
 		application.addAppModule("tuner", 10, 1000, 10000, 1000);
@@ -82,12 +82,12 @@ public class CleanFromJson {
 		application.addTupleMapping("classifier", "_SENSOR", "HISTORY", new FractionalSelectivity(0.1));
 		application.addTupleMapping("tuner", "HISTORY", "TUNING_PARAMS", new FractionalSelectivity(1.0));
 	
-		application.addAppEdge("TEMP", "client", 1000, 100, "TEMP", Tuple.UP, AppEdge.SENSOR);
-		application.addAppEdge("client", "classifier", 8000, 100, "_SENSOR", Tuple.UP, AppEdge.MODULE);
-		application.addAppEdge("classifier", "tuner", 1000000, 100, "HISTORY", Tuple.UP, AppEdge.MODULE);
-		application.addAppEdge("classifier", "client", 1000, 100, "CLASSIFICATION", Tuple.DOWN, AppEdge.MODULE);
-		application.addAppEdge("tuner", "classifier", 1000, 100, "TUNING_PARAMS", Tuple.DOWN, AppEdge.MODULE);
-		application.addAppEdge("client", "MOTOR", 1000, 100, "ACTUATOR", Tuple.DOWN, AppEdge.ACTUATOR);
+		application.addAppEdge("TEMP", "client", 0, 1000, 100, "TEMP", Tuple.UP, AppEdge.SENSOR);
+		application.addAppEdge("client", "classifier", 0, 8000, 100, "_SENSOR", Tuple.UP, AppEdge.MODULE);
+		application.addAppEdge("classifier", "tuner", 0, 1000000, 100, "HISTORY", Tuple.UP, AppEdge.MODULE);
+		application.addAppEdge("classifier", "client", 0, 1000, 100, "CLASSIFICATION", Tuple.DOWN, AppEdge.MODULE);
+		application.addAppEdge("tuner", "classifier", 0, 1000, 100, "TUNING_PARAMS", Tuple.DOWN, AppEdge.MODULE);
+		application.addAppEdge("client", "MOTOR", 0, 1000, 100, "ACTUATOR", Tuple.DOWN, AppEdge.ACTUATOR);
 		
 		
 		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("TEMP");add("client");add("classifier");add("client");add("MOTOR");}});

@@ -57,7 +57,6 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 	
 	@Override
 	protected void mapModules() {
-		
 		for(String deviceName : getModuleMapping().getModuleMapping().keySet()){
 			for(String moduleName : getModuleMapping().getModuleMapping().get(deviceName)){
 				int deviceId = CloudSim.getEntityId(deviceName);
