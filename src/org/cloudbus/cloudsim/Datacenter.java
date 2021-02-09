@@ -1016,6 +1016,7 @@ public class Datacenter extends SimEntity {
 	@Override
 	public void shutdownEntity() {
 		Log.printLine(getName() + " is shutting down...");
+		//CloudSim.popEntity(this);
 	}
 
 	/*

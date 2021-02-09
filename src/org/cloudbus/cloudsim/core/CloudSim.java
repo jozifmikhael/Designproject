@@ -484,6 +484,13 @@ public class CloudSim {
 			entitiesByName.put(e.getName(), e);
 		}
 	}
+	
+	public static void popEntity(SimEntity e) {
+		if (e.getId() != -1) { // Only add once!
+			entities.remove(e);
+			entitiesByName.remove(e.getName(), e);
+		}
+	}
 
 	/**
 	 * Internal method used to add a new entity to the simulation when the simulation is running. It
