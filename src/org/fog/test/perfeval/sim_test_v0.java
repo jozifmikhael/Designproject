@@ -1,10 +1,20 @@
 package org.fog.test.perfeval;
 
+import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+
+//Added by us
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
@@ -24,6 +34,7 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+import org.fog.entities.FogDevice;
 
 /**
  * A simple example showing how to create a data center with one host and run one cloudlet on it.
@@ -33,7 +44,10 @@ public class sim_test_v0 {
 	private static List<Cloudlet> cloudletList;
 	/** The vmlist. */
 	private static List<Vm> vmlist;
+	
+	static String sourceFile="test6.json";
 
+	private static List<FogDevice> fogDevices;
 	/**
 	 * Creates main() to run this example.
 	 *
@@ -48,54 +62,32 @@ public class sim_test_v0 {
 			int num_user = 1; // number of cloud users
 			Calendar calendar = Calendar.getInstance(); // Calendar whose fields have been initialized with the current date and time.
  			boolean trace_flag = false; // trace events
-
-			/* Comment Start - Dinesh Bhagwat 
-			 * Initialize the CloudSim library. 
-			 * init() invokes initCommonVariable() which in turn calls initialize() (all these 3 methods are defined in CloudSim.java).
-			 * initialize() creates two collections - an ArrayList of SimEntity Objects (named entities which denote the simulation entities) and 
-			 * a LinkedHashMap (named entitiesByName which denote the LinkedHashMap of the same simulation entities), with name of every SimEntity as the key.
-			 * initialize() creates two queues - a Queue of SimEvents (future) and another Queue of SimEvents (deferred). 
-			 * initialize() creates a HashMap of of Predicates (with integers as keys) - these predicates are used to select a particular event from the deferred queue. 
-			 * initialize() sets the simulation clock to 0 and running (a boolean flag) to false.
-			 * Once initialize() returns (note that we are in method initCommonVariable() now), a CloudSimShutDown (which is derived from SimEntity) instance is created 
-			 * (with numuser as 1, its name as CloudSimShutDown, id as -1, and state as RUNNABLE). Then this new entity is added to the simulation 
-			 * While being added to the simulation, its id changes to 0 (from the earlier -1). The two collections - entities and entitiesByName are updated with this SimEntity.
-			 * the shutdownId (whose default value was -1) is 0    
-			 * Once initCommonVariable() returns (note that we are in method init() now), a CloudInformationService (which is also derived from SimEntity) instance is created 
-			 * (with its name as CloudInformatinService, id as -1, and state as RUNNABLE). Then this new entity is also added to the simulation. 
-			 * While being added to the simulation, the id of the SimEntitiy is changed to 1 (which is the next id) from its earlier value of -1. 
-			 * The two collections - entities and entitiesByName are updated with this SimEntity.
-			 * the cisId(whose default value is -1) is 1
-			 * Comment End - Dinesh Bhagwat 
-			 */
+ 			
+ 			int pesNumber = 1;
+ 	        String vmm = "Xen";
+ 	        int vmid = 1;
+			 
 			CloudSim.init(num_user, calendar, trace_flag);
 
-			// Second step: Create Datacenters
-			// Datacenters are the resource providers in CloudSim. We need at
-			// list one of them to run a CloudSim simulation
-			Datacenter datacenter0 = createDatacenter("Datacenter_0");
+			
 
 			// Third step: Create Broker
+			String appId = "vr_game"; // identifier of the application
 			DatacenterBroker broker = createBroker();
 			int brokerId = broker.getId();
 
 			// Fourth step: Create one virtual machine
 			vmlist = new ArrayList<Vm>();
+			
+			JSONParser jsonParser = new JSONParser();
+			FileReader reader = new FileReader(sourceFile);
+            Object obj = jsonParser.parse(reader);
+            JSONObject nodeList = (JSONObject) obj;
+            JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
+            nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId));
+            JSONArray linkArr = (JSONArray) nodeList.get("links");
+            linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 
-			// VM description
-			int vmid = 0;
-			int mips = 1000;
-			long size = 10000; // image size (MB)
-			int ram = 512; // vm memory (MB)
-			long bw = 1000;
-			int pesNumber = 1; // number of cpus
-			String vmm = "Xen"; // VMM name
-
-			// create VM
-			Vm vm = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-
-			// add the VM to the vmList
-			vmlist.add(vm);
 
 			// submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -138,6 +130,47 @@ public class sim_test_v0 {
 			Log.printLine("Unwanted errors happen");
 		}
 	}
+	
+	private static void parseNodeObject(JSONObject node, int userId, String appId) {
+        double nodeBusyPower = (double) node.get("apower");
+        int nodeLevel = Integer.parseUnsignedInt(node.get("level").toString());
+        double nodeRatePerMips = (double) node.get("rate");
+        double nodeIdlePower = (double) node.get("ipower");
+        String nodeID = (String) node.get("name");
+        long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
+        long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
+        long nodeMips = (long) node.get("mips");
+        int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
+        int pesNumber = 1;
+        String vmm = "Xen";
+        
+        Datacenter datacenter0 = createDatacenter(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
+        fogDevices.add((FogDevice)datacenter0);
+        
+        // create VM
+		Vm vm = new Vm(1, userId, nodeMips, pesNumber, nodeRam, nodeUpBw, 10000, vmm, new CloudletSchedulerTimeShared());
+
+		// add the VM to the vmList
+		vmlist.add(vm);
+    }
+	
+	private static void parseLinkObject(JSONObject link) {
+		String srcID = (String) link.get("srcID");
+		String dstID = (String) link.get("dstID");
+		FogDevice src = null;
+		FogDevice dst = null;
+		double latency = (double) (link.get("latency"));
+		//double bw = (double) link.get("bw");
+
+		for(FogDevice device : fogDevices) {
+			if (device.getName()==srcID) src=device;
+			if (device.getName()==dstID) dst=device;
+		}
+		if(!(src==null || dst==null)) {
+			src.setParentId(dst.getId());
+			src.setUplinkLatency(latency);
+		}
+	}
 
 	/**
 	 * Creates the datacenter.
@@ -146,7 +179,8 @@ public class sim_test_v0 {
 	 *
 	 * @return the datacenter
 	 */
-	private static Datacenter createDatacenter(String name) {
+	private static Datacenter createDatacenter(String nodeName, long mips,
+			int ram, long upBw, long downBw, int level, double ratePerMips, double busyPower, double idlePower) {
 
 		// Here are the steps needed to create a PowerDatacenter:
 		// 1. We need to create a list to store
@@ -157,7 +191,6 @@ public class sim_test_v0 {
 		// In this example, it will have only one core.
 		List<Pe> peList = new ArrayList<Pe>();
 
-		int mips = 1000;
 
 		// 3. Create PEs and add these into a list.
 		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
@@ -165,7 +198,6 @@ public class sim_test_v0 {
 		// 4. Create Host with its id and list of PEs and add them to the list
 		// of machines
 		int hostId = 0;
-		int ram = 2048; // host memory (MB)
 		long storage = 1000000; // host storage
 		int bw = 10000;
 
@@ -188,11 +220,11 @@ public class sim_test_v0 {
 		String os = "Linux"; // operating system
 		String vmm = "Xen";
 		double time_zone = 10.0; // time zone this resource located
-		double cost = 3.0; // the cost of using processing in this resource
+		double cost = ratePerMips; // the cost of using processing in this resource
 		double costPerMem = 0.05; // the cost of using memory in this resource
 		double costPerStorage = 0.001; // the cost of using storage in this
 										// resource
-		double costPerBw = 0.0; // the cost of using bw in this resource
+		double costPerBw = cost; // the cost of using bw in this resource
 		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
 													// devices by now
 
@@ -203,7 +235,7 @@ public class sim_test_v0 {
 		// 6. Finally, we need to create a PowerDatacenter object.
 		Datacenter datacenter = null;
 		try {
-			datacenter = new Datacenter(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
+			datacenter = new Datacenter(nodeName, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
