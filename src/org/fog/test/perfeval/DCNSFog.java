@@ -230,10 +230,10 @@ public class DCNSFog {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("object_detector", 10);
-		application.addAppModule("motion_detector", 10);
-		application.addAppModule("object_tracker", 10);
-		application.addAppModule("user_interface", 10);
+		application.addAppModule("object_detector", 10, 1000, 10000, 1000);
+		application.addAppModule("motion_detector", 10, 1000, 10000, 1000);
+		application.addAppModule("object_tracker", 10, 1000, 10000, 1000);
+		application.addAppModule("user_interface", 10, 1000, 10000, 1000);
 		
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges

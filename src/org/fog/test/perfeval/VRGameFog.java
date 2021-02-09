@@ -45,8 +45,7 @@ import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
 
 /**
- * Simulation setup for case study 1 - EEG Beam Tractor Game
- * @author Harshit Gupta
+ * @author 
  *
  */
 public class VRGameFog {
@@ -56,10 +55,7 @@ public class VRGameFog {
 	
 	static boolean CLOUD = false;
 	static FogDevice cloud;
-	static int numOfDepts = 4;
-	static int numOfMobilesPerDept = 1;
 	static double EEG_TRANSMISSION_TIME = 5.1;
-	//static double EEG_TRANSMISSION_TIME = 10;
 	
 	static String sourceFile="test6.json";
 	
@@ -120,12 +116,14 @@ public class VRGameFog {
 			controller.submitApplication(application, 0, 
 					(CLOUD)?(new ModulePlacementMapping(fogDevices, application, moduleMapping))
 							:(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
-
+			//controller.submitApplication(application, 0, new ModulePlacementMapping(fogDevices, application, moduleMapping));
+			
+			
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			System.out.println(moduleMapping.getModuleMapping());
 			CloudSim.startSimulation();
 			CloudSim.stopSimulation();
-			Log.printLine("VRGame finished!");
+			System.out.println("VRGame finished!");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -166,20 +164,6 @@ public class VRGameFog {
 		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
 		fogDevices.add(mobile);
     }
-	
-	private static FogDevice addGw(String id, int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
-		FogDevice dept = createFogDevice("d-"+id, 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
-		fogDevices.add(dept);
-		dept.setParentId(cloud.getId());
-		dept.setUplinkLatency(4); // latency of connection between gateways and proxy server is 4 ms
-		for(int i=0;i<numOfMobilesPerDept;i++){
-			String mobileId = id+"-"+i;
-			FogDevice mobile = addMobile(userId, appId, dept.getId(), nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
-			mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
-			fogDevices.add(mobile);
-		}
-		return dept;
-	}
 	
 	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
@@ -271,9 +255,9 @@ public class VRGameFog {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("client", 10); // adding module Client to the application model
-		application.addAppModule("concentration_calculator", 10); // adding module Concentration Calculator to the application model
-		application.addAppModule("connector", 10); // adding module Connector to the application model
+		application.addAppModule("client", 10, 1000, 10000, 1000); // adding module Client to the application model
+		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); // adding module Concentration Calculator to the application model
+		application.addAppModule("connector", 10, 1000, 10000, 1000); // adding module Connector to the application model
 		
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges

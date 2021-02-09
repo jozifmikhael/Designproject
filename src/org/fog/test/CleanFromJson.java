@@ -72,9 +72,9 @@ public class CleanFromJson {
 	private static Application createApplication(String appId, int userId){
 		
 		Application application = Application.createApplication(appId, userId);
-		application.addAppModule("client", 10);
-		application.addAppModule("classifier", 10);
-		application.addAppModule("tuner", 10);
+		application.addAppModule("client", 10, 1000, 10000, 1000);
+		application.addAppModule("classifier", 10, 1000, 10000, 1000);
+		application.addAppModule("tuner", 10, 1000, 10000, 1000);
 		
 		application.addTupleMapping("client", "TEMP", "_SENSOR", new FractionalSelectivity(1.0));
 		application.addTupleMapping("client", "CLASSIFICATION", "ACTUATOR", new FractionalSelectivity(1.0));

@@ -271,9 +271,9 @@ public class TwoApps {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("client", 10); // adding module Client to the application model
-		application.addAppModule("concentration_calculator", 10); // adding module Concentration Calculator to the application model
-		application.addAppModule("connector", 10); // adding module Connector to the application model
+		application.addAppModule("client", 10, 1000, 10000, 1000); // adding module Client to the application model
+		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); // adding module Concentration Calculator to the application model
+		application.addAppModule("connector", 10, 1000, 10000, 1000); // adding module Connector to the application model
 		
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges
@@ -316,9 +316,9 @@ public class TwoApps {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("client_1", 10); // adding module Client to the application model
-		application.addAppModule("concentration_calculator_1", 10); // adding module Concentration Calculator to the application model
-		application.addAppModule("connector_1", 10); // adding module Connector to the application model
+		application.addAppModule("client_1", 10, 1000, 10000, 1000); // adding module Client to the application model
+		application.addAppModule("concentration_calculator_1", 10, 1000, 10000, 1000); // adding module Concentration Calculator to the application model
+		application.addAppModule("connector_1", 10, 1000, 10000, 1000); // adding module Connector to the application model
 		
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges
