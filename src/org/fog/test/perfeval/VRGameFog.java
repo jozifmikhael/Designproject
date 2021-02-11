@@ -18,6 +18,7 @@ import org.cloudbus.cloudsim.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
+import java.text.DecimalFormat;
 
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -25,6 +26,7 @@ import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.power.PowerHost;
+import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.cloudbus.cloudsim.sdn.overbooking.BwProvisionerOverbooking;
 import org.cloudbus.cloudsim.sdn.overbooking.PeProvisionerOverbooking;
@@ -80,7 +82,7 @@ public class VRGameFog {
 			
 			
 			String appId = "vr_game"; // identifier of the application
-			FogBroker broker = new FogBroker("broker");
+			PowerDatacenterBroker broker = new FogBroker("broker");
 			Application application = createApplication(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
@@ -117,7 +119,9 @@ public class VRGameFog {
 				vmlist.add(vm);
 			}
 			broker.submitCloudletList(cloudlets);
+			List<Cloudlet> newList = broker.getCloudletReceivedList();
 			broker.submitVmList(vmlist);
+			printCloudletList(newList);
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 			
@@ -313,5 +317,35 @@ public class VRGameFog {
 		application.setLoops(loops);
 		
 		return application;
+	}
+	
+	private static void printCloudletList(List<Cloudlet> list) {
+		int size = list.size();
+		Cloudlet cloudlet;
+
+		String indent = "    ";
+		System.out.println();
+		System.out.println("========== OUTPUT ==========");
+		System.out.println("Cloudlet ID" + indent + "STATUS" + indent
+				+ "Data center ID" + indent + "VM ID" + indent + "Time" + indent
+				+ "Start Time" + indent + "Finish Time");
+
+		DecimalFormat dft = new DecimalFormat("###.##");
+		for (int i = 0; i < size; i++) {
+			cloudlet = list.get(i);
+			System.out.println(indent + cloudlet.getCloudletId() + indent + indent);
+
+			if (cloudlet.getCloudletStatus() == Cloudlet.SUCCESS) {
+				System.out.println("SUCCESS");
+
+				System.out.println(indent + indent + cloudlet.getResourceId()
+						+ indent + indent + indent + cloudlet.getVmId()
+						+ indent + indent
+						+ dft.format(cloudlet.getActualCPUTime()) + indent
+						+ indent + dft.format(cloudlet.getExecStartTime())
+						+ indent + indent
+						+ dft.format(cloudlet.getFinishTime()));
+			}
+		}
 	}
 }
