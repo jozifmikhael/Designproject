@@ -58,13 +58,13 @@ public class VRGameFog {
 	static List<Sensor> sensors = new ArrayList<Sensor>();
 	static List<Actuator> actuators = new ArrayList<Actuator>();
 	static List<Cloudlet> cloudlets = new ArrayList<Cloudlet>();
+	private static List<Vm> vmlist;
 	
 	static boolean CLOUD = false;
 	static FogDevice cloud;
 	static double EEG_TRANSMISSION_TIME = 5.1;
 	
 	static String sourceFile="test6.json";
-	private static List<Vm> vmlist;
 	
 	public static void main(String[] args) throws Exception{
 		Log.printLine("Starting VRGame...");
@@ -109,9 +109,10 @@ public class VRGameFog {
 			String vmm = "Xen"; // VMM name
 			
 			// add the VM to the vmList
-			for(int i = 0; i<1000; i++) {
+			for(int i = 0; i<10000; i++) {
 				Cloudlet c = new Cloudlet(FogUtils.generateEntityId(), 1000, 1, 100, 100, null, null, null);
-				Vm vm = new Vm(vmid, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				Vm vm = new Vm(vmid+i, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				c.setVmId(vmid+i);
 				cloudlets.add(c);
 				vmlist.add(vm);
 			}
