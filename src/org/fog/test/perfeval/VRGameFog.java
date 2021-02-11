@@ -13,6 +13,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.VmAllocationPolicySimple;
+import org.cloudbus.cloudsim.VmSchedulerTimeShared;
+import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -58,10 +63,11 @@ public class VRGameFog {
 	static double EEG_TRANSMISSION_TIME = 5.1;
 	
 	static String sourceFile="test6.json";
+	private static List<Vm> vmlist;
 	
 	public static void main(String[] args) throws Exception{
 		Log.printLine("Starting VRGame...");
-		System.out.println("test1");
+		System.out.println(new DeterministicDistribution(5.1));
 		
 		try {
 			Log.disable();
@@ -70,6 +76,7 @@ public class VRGameFog {
 			boolean trace_flag = false; // mean trace events
 
 			CloudSim.init(num_user, calendar, trace_flag);
+			
 			
 			String appId = "vr_game"; // identifier of the application
 			FogBroker broker = new FogBroker("broker");
@@ -89,6 +96,23 @@ public class VRGameFog {
             nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId, cloud.getId()));
             JSONArray linkArr = (JSONArray) nodeList.get("links");
             linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+            
+            vmlist = new ArrayList<Vm>();
+			// VM description
+			int vmid = 0;
+			int mips = 1000;
+			long size = 10000; // image size (MB)
+			int ram = 512; // vm memory (MB)
+			long bw = 1000;
+			int pesNumber = 1; // number of cpus
+			String vmm = "Xen"; // VMM name
+			Vm vm = new Vm(vmid, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+			
+			// add the VM to the vmList
+			vmlist.add(vm);
+
+			// submit vm list to the broker
+			broker.submitVmList(vmlist);
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 			
@@ -163,12 +187,12 @@ public class VRGameFog {
 	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
 		mobile.setParentId(parentId);
-		Sensor eegSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
-		sensors.add(eegSensor);
+		Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
+		sensors.add(newSensor);
 		Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
 		actuators.add(display);
-		eegSensor.setGatewayDeviceId(mobile.getId());
-		eegSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
+		newSensor.setGatewayDeviceId(mobile.getId());
+		newSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
 		display.setGatewayDeviceId(mobile.getId());
 		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
 		return mobile;
@@ -250,34 +274,36 @@ public class VRGameFog {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("client", 10, 1000, 10000, 1000); // adding module Client to the application model
-		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); // adding module Concentration Calculator to the application model
-		application.addAppModule("connector", 10, 1000, 10000, 1000); // adding module Connector to the application model
-		
+		application.addAppModule("client", 10, 1000, 10000, 1000);
+		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); 
+		application.addAppModule("connector", 10, 1000, 10000, 1000); 
+		application.addAppModule("bus_stop", 10, 1000, 10000, 1000); 
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges
 		 */
-		application.addAppEdge("EEG", "client", 0, (EEG_TRANSMISSION_TIME==10)?2000:3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR); // adding edge from EEG (sensor) to Client module carrying tuples of type EEG
-		application.addAppEdge("client", "concentration_calculator", 0, 3500, 500, "_SENSOR", Tuple.UP, AppEdge.MODULE); // adding edge from Client to Concentration Calculator module carrying tuples of type _SENSOR
-		application.addAppEdge("concentration_calculator", "connector", 1, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Concentration Calculator to Connector module carrying tuples of type PLAYER_GAME_STATE
-		application.addAppEdge("concentration_calculator", "client", 0, 14, 500, "CONCENTRATION", Tuple.DOWN, AppEdge.MODULE);  // adding edge from Concentration Calculator to Client module carrying tuples of type CONCENTRATION
-		application.addAppEdge("connector", "client", 10000, 28, 1000, "GLOBAL_GAME_STATE", Tuple.DOWN, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Connector to Client module carrying tuples of type GLOBAL_GAME_STATE
-		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "SELF_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
-		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type GLOBAL_STATE_UPDATE
+		application.addAppEdge("EEG", "client", 0, (EEG_TRANSMISSION_TIME==10)?2000:3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR);
+		application.addAppEdge("client", "concentration_calculator", 0, 3500, 500, "sensor", Tuple.UP, AppEdge.MODULE);
+		application.addAppEdge("concentration_calculator", "connector", 1, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); 
+		application.addAppEdge("bus_stop", "client", 0, 14, 500, "bus", Tuple.DOWN, AppEdge.MODULE);  
+		application.addAppEdge("concentration_calculator", "bus_stop", 0, 14, 500, "CONCENTRATION", Tuple.DOWN, AppEdge.MODULE);  
+		application.addAppEdge("connector", "client", 10000, 28, 1000, "GLOBAL_GAME_STATE", Tuple.DOWN, AppEdge.MODULE);
+		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "SELF_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);
+		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);
 		
 		/*
 		 * Defining the input-output relationships (represented by selectivity) of the application modules. 
 		 */
-		application.addTupleMapping("client", "EEG", "_SENSOR", new FractionalSelectivity(1.0)); // 0.9 tuples of type _SENSOR are emitted by Client module per incoming tuple of type EEG 
-		application.addTupleMapping("client", "CONCENTRATION", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
-		application.addTupleMapping("concentration_calculator", "_SENSOR", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type _SENSOR 
+		application.addTupleMapping("client", "EEG", "sensor", new FractionalSelectivity(1.0)); // 0.9 tuples of type test are emitted by Client module per incoming tuple of type EEG 
+		application.addTupleMapping("client", "bus", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
+		application.addTupleMapping("concentration_calculator", "sensor", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type test 
+		application.addTupleMapping("bus_stop", "CONCENTRATION", "bus", new FractionalSelectivity(1.0));
 		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
 		
 		/*
 		 * Defining application loops to monitor the latency of. 
 		 * Here, we add only one loop for monitoring : EEG(sensor) -> Client -> Concentration Calculator -> Client -> DISPLAY (actuator)
 		 */
-		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("client");add("DISPLAY");}});
+		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("bus_stop");add("client");add("DISPLAY");}});
 		List<AppLoop> loops = new ArrayList<AppLoop>(){{add(loop1);}};
 		application.setLoops(loops);
 		

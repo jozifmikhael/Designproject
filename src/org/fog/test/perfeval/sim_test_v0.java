@@ -8,13 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 //Added by us
-import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
