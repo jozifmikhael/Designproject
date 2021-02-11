@@ -57,6 +57,7 @@ public class VRGameFog {
 	static List<FogDevice> fogDevices = new ArrayList<FogDevice>();
 	static List<Sensor> sensors = new ArrayList<Sensor>();
 	static List<Actuator> actuators = new ArrayList<Actuator>();
+	static List<Cloudlet> cloudlets = new ArrayList<Cloudlet>();
 	
 	static boolean CLOUD = false;
 	static FogDevice cloud;
@@ -106,12 +107,15 @@ public class VRGameFog {
 			long bw = 1000;
 			int pesNumber = 1; // number of cpus
 			String vmm = "Xen"; // VMM name
-			Vm vm = new Vm(vmid, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 			
 			// add the VM to the vmList
-			vmlist.add(vm);
-
-			// submit vm list to the broker
+			for(int i = 0; i<1000; i++) {
+				Cloudlet c = new Cloudlet(FogUtils.generateEntityId(), 1000, 1, 100, 100, null, null, null);
+				Vm vm = new Vm(vmid, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				cloudlets.add(c);
+				vmlist.add(vm);
+			}
+			broker.submitCloudletList(cloudlets);
 			broker.submitVmList(vmlist);
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
