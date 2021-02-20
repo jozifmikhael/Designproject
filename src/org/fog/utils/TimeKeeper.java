@@ -57,6 +57,7 @@ public class TimeKeeper {
 	
 	private TimeKeeper(){
 		count = 1;
+		System.out.println("started");
 		setEmitTimes(new HashMap<Integer, Double>());
 		setEndTimes(new HashMap<Integer, Double>());
 		setLoopIdToTupleIds(new HashMap<Integer, List<Integer>>());
@@ -134,6 +135,7 @@ public class TimeKeeper {
 	}
 
 	public Map<Integer, Double> getLoopIdToCurrentAverage() {
+		//System.out.println(loopIdToCurrentAverage);
 		return loopIdToCurrentAverage;
 	}
 
@@ -148,6 +150,4 @@ public class TimeKeeper {
 	public void setLoopIdToCurrentNum(Map<Integer, Integer> loopIdToCurrentNum) {
 		this.loopIdToCurrentNum = loopIdToCurrentNum;
 	}
-	
-	
 }

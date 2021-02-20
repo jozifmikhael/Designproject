@@ -87,7 +87,7 @@ public class VRGameFog {
 			Application application = createApplication(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
-			cloud = createFogDevice("cloud", 0, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
+			cloud = createFogDevice("cloud", 100000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
 			cloud.setParentId(-1);
 			fogDevices.add(cloud);
 			
@@ -130,8 +130,10 @@ public class VRGameFog {
 			//printCloudletList(newList);
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
-			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("client", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
 			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
@@ -274,35 +276,49 @@ public class VRGameFog {
 		 */
 		application.addAppModule("client", 					 10, 1000, 10000, 1000);
 		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); 
-		application.addAppModule("connector", 				 10, 1000, 10000, 1000); 
-		application.addAppModule("bus_stop", 				 10, 1000, 10000, 1000); 
+//		application.addAppModule("connector", 				 10, 1000, 10000, 1000); 
+//		application.addAppModule("bus_stop", 				 10, 1000, 10000, 1000); 
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges
 		 */
-		application.addAppEdge("EEG", "client", 0, (EEG_TRANSMISSION_TIME==10)?2000:3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR);
-		application.addAppEdge("client", "concentration_calculator", 0, 3500, 500, "sensor", Tuple.UP, AppEdge.MODULE);
-		application.addAppEdge("concentration_calculator", "connector", 1, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); 
-		application.addAppEdge("bus_stop", "client", 0, 14, 500, "bus", Tuple.DOWN, AppEdge.MODULE);  
-		application.addAppEdge("concentration_calculator", "bus_stop", 0, 14, 500, "CONCENTRATION", Tuple.DOWN, AppEdge.MODULE);  
-		application.addAppEdge("connector", "client", 10000, 28, 1000, "GLOBAL_GAME_STATE", Tuple.DOWN, AppEdge.MODULE);
-		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "SELF_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);
-		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);
+		
+
+		//node: client
+		application.addAppEdge("EEG", "client", 0, (EEG_TRANSMISSION_TIME==10)?2000:3000, 1, "EEG", Tuple.UP, AppEdge.SENSOR);
+		application.addAppEdge("client", "concentration_calculator", 0, 30000, 1, "sensor", Tuple.UP, AppEdge.MODULE);
+		application.addAppEdge("concentration_calculator", "DISPLAY", 0, 0, 1, "DISPLAY", Tuple.DOWN, AppEdge.ACTUATOR);
+
+		application.addTupleMapping("client", "EEG", "sensor", new FractionalSelectivity(1.0));
+		application.addTupleMapping("concentration_calculator", "sensor", "DISPLAY", new FractionalSelectivity(1.0));
+		
+//		application.addTupleMapping("client", "EEG", "sensor", new FractionalSelectivity(1.0)); // 0.9 tuples of type test are emitted by Client module per incoming tuple of type EEG 
+//		application.addTupleMapping("client", "bus", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
+//		application.addTupleMapping("concentration_calculator", "sensor", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type test 
+//		application.addTupleMapping("bus_stop", "CONCENTRATION", "bus", new FractionalSelectivity(1.0));
+//		application.addTupleMapping("client", "EEG", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0));
+//		application.addTupleMapping("client", "EEG", "gupdate", new FractionalSelectivity(1.0));
+//		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "gupdate", new FractionalSelectivity(1.0)); // 1.0 tuples of type gupdate are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
 		
 		/*
 		 * Defining the input-output relationships (represented by selectivity) of the application modules. 
 		 */
-		application.addTupleMapping("client", "EEG", "sensor", new FractionalSelectivity(1.0)); // 0.9 tuples of type test are emitted by Client module per incoming tuple of type EEG 
-		application.addTupleMapping("client", "bus", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
-		application.addTupleMapping("concentration_calculator", "sensor", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type test 
-		application.addTupleMapping("bus_stop", "CONCENTRATION", "bus", new FractionalSelectivity(1.0));
-		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
-		
 		/*
 		 * Defining application loops to monitor the latency of. 
 		 * Here, we add only one loop for monitoring : EEG(sensor) -> Client -> Concentration Calculator -> Client -> DISPLAY (actuator)
 		 */
-		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("bus_stop");add("client");add("DISPLAY");}});
-		List<AppLoop> loops = new ArrayList<AppLoop>(){{add(loop1);}};
+		
+		boolean flag = true;
+		List<AppLoop> loops = new ArrayList<AppLoop>();
+		if (flag){
+			final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");}});
+			final AppLoop loop2 = new AppLoop(new ArrayList<String>(){{add("client");add("concentration_calculator");}});
+			final AppLoop loop3 = new AppLoop(new ArrayList<String>(){{add("concentration_calculator");add("DISPLAY");}});
+			loops.add(loop1); loops.add(loop2); loops.add(loop3);
+		}else{
+			final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("DISPLAY");}});
+			loops.add(loop1);
+		}
+			
 		application.setLoops(loops);
 		
 		return application;

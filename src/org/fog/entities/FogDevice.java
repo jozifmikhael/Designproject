@@ -665,8 +665,8 @@ public class FogDevice extends PowerDatacenter {
 				tuple.setVmId(vmId);
 				//Logger.error(getName(), "Executing tuple for operator " + moduleName);
 				
+
 				updateTimingsOnReceipt(tuple);
-				
 				executeTuple(ev, tuple.getDestModuleName());
 			}else if(tuple.getDestModuleName()!=null){
 				if(tuple.getDirection() == Tuple.UP)
@@ -790,7 +790,7 @@ public class FogDevice extends PowerDatacenter {
 	
 	protected void sendUpFreeLink(Tuple tuple){
 		double networkDelay = tuple.getCloudletFileSize()/getUplinkBandwidth();
-		setNorthLinkBusy(true);
+		setNorthLinkBusy(false);
 		send(getId(), networkDelay, FogEvents.UPDATE_NORTH_TUPLE_QUEUE);
 		send(parentId, networkDelay+getUplinkLatency(), FogEvents.TUPLE_ARRIVAL, tuple);
 		NetworkUsageMonitor.sendingTuple(getUplinkLatency(), tuple.getCloudletFileSize());
