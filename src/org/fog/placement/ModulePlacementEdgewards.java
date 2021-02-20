@@ -59,6 +59,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 	protected void mapModules() {
 		for(String deviceName : getModuleMapping().getModuleMapping().keySet()){
 			for(String moduleName : getModuleMapping().getModuleMapping().get(deviceName)){
+				System.out.println("--ModulePlacementEdgewards.java: Device=" + deviceName + " Module=" + moduleName);
 				int deviceId = CloudSim.getEntityId(deviceName);
 				getCurrentModuleMap().get(deviceId).add(moduleName);
 				getCurrentModuleLoadMap().get(deviceId).put(moduleName, 0.0);
@@ -67,13 +68,17 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 		}
 		
 		List<List<Integer>> leafToRootPaths = getLeafToRootPaths();
-		
 		for(List<Integer> path : leafToRootPaths){
+			System.out.println("--ModulePlacementEdgewards.java: Path="+path);
+			for(Integer i : path) {
+				//System.out.println("\tDevice ID"+ i +"="+getDeviceById(i).getName());
+			}
 			placeModulesInPath(path);
 		}
 		
 		for(int deviceId : getCurrentModuleMap().keySet()){
 			for(String module : getCurrentModuleMap().get(deviceId)){
+				//System.out.println("-ModulePlacementEdgewards.java: Device=" + deviceId + " Module=" + module);
 				createModuleInstanceOnDevice(getApplication().getModuleByName(module), getFogDeviceById(deviceId));
 			}
 		}
@@ -152,7 +157,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 					}
 				}
 			}
-						
+			
 			/*
 			 * Updating the AppEdge rates for the entire application based on knowledge so far
 			 */
@@ -230,7 +235,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 					else{
 						Logger.debug("ModulePlacementEdgeward", "Placement of operator "+moduleName+ " on device "+device.getName() + " successful.");
 						getCurrentCpuLoad().put(deviceId, totalCpuLoad + getCurrentCpuLoad().get(deviceId));
-						System.out.println("Placement of operator "+moduleName+ " on device "+device.getName() + " successful.");
+						System.out.println("Placement of operator " + moduleName+ " on device "+device.getName() + " successful, new load = " + getCurrentCpuLoad().get(deviceId));
 
 						if(!currentModuleMap.containsKey(deviceId))
 							currentModuleMap.put(deviceId, new ArrayList<String>());
@@ -253,7 +258,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 			
 				modulesToPlace.remove(moduleName);
 			}
-			
+			System.out.println("-" + device.getName() + " Placement Finished\n");
 		}
 		
 	}

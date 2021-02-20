@@ -64,6 +64,7 @@ public class VRGameFog {
 	
 	static boolean CLOUD = false;
 	static FogDevice cloud;
+	static FogDevice proxy;
 	static double EEG_TRANSMISSION_TIME = 5.1;
 	
 	static String sourceFile="test6.json";
@@ -90,6 +91,11 @@ public class VRGameFog {
 			cloud.setParentId(-1);
 			fogDevices.add(cloud);
 			
+//			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
+//			proxy.setParentId(cloud.getId());
+//			fogDevices.add(proxy);
+			
+			
 			//Parse JSON file and initialize nodes
 			JSONParser jsonParser = new JSONParser();
 			FileReader reader = new FileReader(sourceFile);
@@ -100,59 +106,42 @@ public class VRGameFog {
             JSONArray linkArr = (JSONArray) nodeList.get("links");
             linkArr.forEach(l -> parseLinkObject((JSONObject) l));
             
-            vmlist = new ArrayList<Vm>();
+//            vmlist = new ArrayList<Vm>();
 			// VM description
-			int vmid = 0;
-			int mips = 1000;
-			long size = 10000; // image size (MB)
-			int ram = 512; // vm memory (MB)
-			long bw = 1000;
-			int pesNumber = 1; // number of cpus
-			String vmm = "Xen"; // VMM name
+//			int vmid = 0;
+//			int mips = 1000;
+//			long size = 10000; // image size (MB)
+//			int ram = 512; // vm memory (MB)
+//			long bw = 1000;
+//			int pesNumber = 1; // number of cpus
+//			String vmm = "Xen"; // VMM name
 			
 			// add the VM to the vmList
-			for(int i = 0; i<10000; i++) {
-				Cloudlet c = new Cloudlet(FogUtils.generateEntityId(), 1000, 1, 100, 100, null, null, null);
-				Vm vm = new Vm(vmid+i, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-				c.setVmId(vmid+i);
-				cloudlets.add(c);
-				vmlist.add(vm);
-			}
-			broker.submitCloudletList(cloudlets);
-			List<Cloudlet> newList = broker.getCloudletReceivedList();
-			broker.submitVmList(vmlist);
-			printCloudletList(newList);
+//			for(int i = 0; i<10000; i++) {
+//				Cloudlet c = new Cloudlet(FogUtils.generateEntityId(), 1000, 1, 100, 100, null, null, null);
+//				Vm vm = new Vm(vmid+i, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+//				c.setVmId(vmid+i);
+//				cloudlets.add(c);
+//				vmlist.add(vm);
+//			}
+//			broker.submitCloudletList(cloudlets);
+//			List<Cloudlet> newList = broker.getCloudletReceivedList();
+//			broker.submitVmList(vmlist);
+			//printCloudletList(newList);
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-			
-			if(CLOUD){
-				// if the mode of deployment is cloud-based
-				/*moduleMapping.addModuleToDevice("connector", "cloud", numOfDepts*numOfMobilesPerDept); // fixing all instances of the Connector module to the Cloud
-				moduleMapping.addModuleToDevice("concentration_calculator", "cloud", numOfDepts*numOfMobilesPerDept); // fixing all instances of the Concentration Calculator module to the Cloud
-*/				moduleMapping.addModuleToDevice("connector", "cloud"); // fixing all instances of the Connector module to the Cloud
-				moduleMapping.addModuleToDevice("concentration_calculator", "cloud"); // fixing all instances of the Concentration Calculator module to the Cloud
-				for(FogDevice device : fogDevices){
-					if(device.getName().startsWith("m")){
-						//moduleMapping.addModuleToDevice("client", device.getName(), 1);  // fixing all instances of the Client module to the Smartphones
-						moduleMapping.addModuleToDevice("client", device.getName());  // fixing all instances of the Client module to the Smartphones
-					}
-				}
-			}else{
-				// if the mode of deployment is cloud-based
-				//moduleMapping.addModuleToDevice("connector", "cloud", numOfDepts*numOfMobilesPerDept); // fixing all instances of the Connector module to the Cloud
-				moduleMapping.addModuleToDevice("connector", "cloud"); // fixing all instances of the Connector module to the Cloud
-				// rest of the modules will be placed by the Edge-ward placement policy
-			}
+			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
+			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-			controller.submitApplication(application, 0, new ModulePlacementMapping(fogDevices, application, moduleMapping));
 			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
 			
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			System.out.println(moduleMapping.getModuleMapping());
 			CloudSim.startSimulation();
-			CloudSim.stopSimulation();
-			System.out.println("VRGame finished!");
+			
+			//CloudSim.stopSimulation();
+			//System.out.println("VRGame finished!");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.printLine("Unwanted errors happen");
@@ -188,7 +177,7 @@ public class VRGameFog {
         long nodeMips = (long) node.get("mips");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
-		FogDevice mobile = addMobile(userId, appId, cloud.getId(), nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
+		FogDevice mobile = addMobile(userId, appId, cloudid, nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
 		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
 		fogDevices.add(mobile);
     }
@@ -283,10 +272,10 @@ public class VRGameFog {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("client", 10, 1000, 10000, 1000);
+		application.addAppModule("client", 					 10, 1000, 10000, 1000);
 		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); 
-		application.addAppModule("connector", 10, 1000, 10000, 1000); 
-		application.addAppModule("bus_stop", 10, 1000, 10000, 1000); 
+		application.addAppModule("connector", 				 10, 1000, 10000, 1000); 
+		application.addAppModule("bus_stop", 				 10, 1000, 10000, 1000); 
 		/*
 		 * Connecting the application modules (vertices) in the application model (directed graph) with edges
 		 */
@@ -317,35 +306,5 @@ public class VRGameFog {
 		application.setLoops(loops);
 		
 		return application;
-	}
-	
-	private static void printCloudletList(List<Cloudlet> list) {
-		int size = list.size();
-		Cloudlet cloudlet;
-
-		String indent = "    ";
-		System.out.println();
-		System.out.println("========== OUTPUT ==========");
-		System.out.println("Cloudlet ID" + indent + "STATUS" + indent
-				+ "Data center ID" + indent + "VM ID" + indent + "Time" + indent
-				+ "Start Time" + indent + "Finish Time");
-
-		DecimalFormat dft = new DecimalFormat("###.##");
-		for (int i = 0; i < size; i++) {
-			cloudlet = list.get(i);
-			System.out.println(indent + cloudlet.getCloudletId() + indent + indent);
-
-			if (cloudlet.getCloudletStatus() == Cloudlet.SUCCESS) {
-				System.out.println("SUCCESS");
-
-				System.out.println(indent + indent + cloudlet.getResourceId()
-						+ indent + indent + indent + cloudlet.getVmId()
-						+ indent + indent
-						+ dft.format(cloudlet.getActualCPUTime()) + indent
-						+ indent + dft.format(cloudlet.getExecStartTime())
-						+ indent + indent
-						+ dft.format(cloudlet.getFinishTime()));
-			}
-		}
 	}
 }
