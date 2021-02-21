@@ -132,7 +132,7 @@ public class VRGameFog {
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 //			moduleMapping.addModuleToDevice("client", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("concen", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
@@ -271,6 +271,7 @@ public class VRGameFog {
 	private static Application createApplication(String appId, int userId){
 		Application application = new Application(appId, userId); // creates an empty application model (empty directed graph)
 		
+<<<<<<< HEAD
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
@@ -296,28 +297,24 @@ public class VRGameFog {
 		application.addTupleMapping("concentration_calculator", "_SENSOR", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type _SENSOR 
 		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
 	
+=======
+		application.addAppModule("client", 		10, 1000, 10000, 1000);
+		application.addAppModule("concen", 		10, 1000, 10000, 1000); 
+		application.addAppModule("connector", 	10, 1000, 10000, 1000);
 		
-		/*
-		 * Defining the input-output relationships (represented by selectivity) of the application modules. 
-		 */
-		/*
-		 * Defining application loops to monitor the latency of. 
-		 * Here, we add only one loop for monitoring : EEG(sensor) -> Client -> Concentration Calculator -> Client -> DISPLAY (actuator)
-		 */
+		application.addAppEdge("EEG", "client", 	0, (EEG_TRANSMISSION_TIME==10)?2000:3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR);
+		application.addAppEdge("client", "concen",  0, 3500, 500, "_SENSOR", Tuple.UP, AppEdge.MODULE); // adding edge from Client to Concentration Calculator module carrying tuples of type _SENSOR
+		application.addAppEdge("concen", "connector", 100, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Concentration Calculator to Connector module carrying tuples of type PLAYER_GAME_STATE
+		application.addAppEdge("concen", "client",  0, 14, 500, "CONCENTRATION", Tuple.DOWN, AppEdge.MODULE);  // adding edge from Concentration Calculator to Client module carrying tuples of type CONCENTRATION
+		application.addAppEdge("connector", "client", 100, 28, 1000, "GLOBAL_GAME_STATE", Tuple.DOWN, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Connector to Client module carrying tuples of type GLOBAL_GAME_STATE
+		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "SELF_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
+		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type GLOBAL_STATE_UPDATE
+>>>>>>> AppEdge/TupleMapping Investigation Setup
 		
-		boolean flag = true;
-		List<AppLoop> loops = new ArrayList<AppLoop>();
-		if (flag){
-			final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");}});
-			final AppLoop loop2 = new AppLoop(new ArrayList<String>(){{add("client");add("concentration_calculator");}});
-			final AppLoop loop3 = new AppLoop(new ArrayList<String>(){{add("concentration_calculator");add("DISPLAY");}});
-			loops.add(loop1); loops.add(loop2); loops.add(loop3);
-		}else{
-			final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("DISPLAY");}});
-			loops.add(loop1);
-		}
-			
-		application.setLoops(loops);
+		application.addTupleMapping("client", "EEG", "_SENSOR", new FractionalSelectivity(1.0)); // 0.9 tuples of type _SENSOR are emitted by Client module per incoming tuple of type EEG 
+		application.addTupleMapping("client", "CONCENTRATION", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
+		application.addTupleMapping("concen", "_SENSOR", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type _SENSOR 
+		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
 		
 		return application;
 	}
