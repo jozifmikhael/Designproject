@@ -7,18 +7,18 @@ import java.util.List;
 
 // Added by us
 import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+//import java.io.FileNotFoundException;
+//import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
+//import org.cloudbus.cloudsim.VmAllocationPolicySimple;
+//import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import java.text.DecimalFormat;
+//import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
+//import java.text.DecimalFormat;
 
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -84,7 +84,7 @@ public class VRGameFog {
 			
 			String appId = "vr_game"; // identifier of the application
 			PowerDatacenterBroker broker = new FogBroker("broker");
-			Application application = createApplication(appId, broker.getId());
+			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
 			cloud = createFogDevice("cloud", 100000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
@@ -105,6 +105,11 @@ public class VRGameFog {
             nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId, cloud.getId()));
             JSONArray linkArr = (JSONArray) nodeList.get("links");
             linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+            JSONArray modArr = (JSONArray) nodeList.get("Modules");
+            modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
+            JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
+            edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
+            
             
 //            vmlist = new ArrayList<Vm>();
 			// VM description
@@ -132,7 +137,7 @@ public class VRGameFog {
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 //			moduleMapping.addModuleToDevice("client", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("concen", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
@@ -183,6 +188,49 @@ public class VRGameFog {
 		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
 		fogDevices.add(mobile);
     }
+	
+	private static void parseModuleObject(JSONObject module, Application application) {
+		String name = (String) module.get("name");
+		int ram = Integer.parseUnsignedInt(module.get("ram").toString());
+		int mips = Integer.parseUnsignedInt(module.get("mips").toString());
+		long size = Long.parseUnsignedLong(module.get("size").toString());
+		long bw = Long.parseUnsignedLong(module.get("bw").toString());
+		
+		application.addAppModule(name, ram, mips, size, bw);
+		
+		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
+		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
+		
+	}
+	
+	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
+		String inTuple = (String) tuplemaps.get("inTuple");
+		String outTuple = (String) tuplemaps.get("outTuple");
+		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
+		
+		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
+	}
+	
+	private static void parseEdgeObject(JSONObject edges, Application application) {
+		String src = (String) edges.get("src");
+		String dest = (String) edges.get("dest");
+		double periodicity = (double) edges.get("periodicity");
+		double tupleCpuLength = (double) edges.get("tupleCpuLength");
+		double tupleNwLength = (double) edges.get("tupleNwLength");
+		String tupleType = (String) edges.get("tupleType");
+		int direction = Integer.parseUnsignedInt(edges.get("direction").toString());
+		int edgeType = Integer.parseUnsignedInt(edges.get("edgeType").toString());
+		
+		if(edgeType == 1) {
+			application.addAppEdge("EEG", dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		}
+		else if(edgeType == 2) {
+			application.addAppEdge(src, "DISPLAY", periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		}
+		else {
+			application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		}
+	}
 	
 	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
@@ -240,8 +288,8 @@ public class VRGameFog {
 		String vmm = "Xen";
 		double time_zone = 10.0; // time zone this resource located
 		double cost = ratePerMips; // the cost of using processing in this resource
-		double costPerMem = 0.05; // the cost of using memory in this resource
-		double costPerStorage = 0.001; // the cost of using storage in this resource
+		double costPerMem = 5000; // the cost of using memory in this resource
+		double costPerStorage = 1000; // the cost of using storage in this resource
 		double costPerBw = cost; // the cost of using bw in this resource
 		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN devices by now
 
@@ -259,39 +307,5 @@ public class VRGameFog {
 		
 		fogdevice.setLevel(level);
 		return fogdevice;
-	}
-
-	/**
-	 * Function to create the EEG Tractor Beam game application in the DDF model. 
-	 * @param appId unique identifier of the application
-	 * @param userId identifier of the user of the application
-	 * @return
-	 */
-	@SuppressWarnings({"serial"})
-	private static Application createApplication(String appId, int userId){
-		Application application = new Application(appId, userId); // creates an empty application model (empty directed graph)
-		
-		application.addAppModule("client", 		10, 1000, 10000, 1000);
-		application.addAppModule("concen", 		10, 1000, 10000, 1000); 
-		application.addAppModule("connector", 	10, 1000, 10000, 1000);
-		
-		application.addAppEdge("EEG", "client", 	0, (EEG_TRANSMISSION_TIME==10)?2000:3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR);
-		application.addAppEdge("client", "concen",  0, 3500, 500, "_SENSOR", Tuple.UP, AppEdge.MODULE); // adding edge from Client to Concentration Calculator module carrying tuples of type _SENSOR
-		application.addAppEdge("concen", "connector", 100, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Concentration Calculator to Connector module carrying tuples of type PLAYER_GAME_STATE
-		application.addAppEdge("concen", "client",  0, 14, 500, "CONCENTRATION", Tuple.DOWN, AppEdge.MODULE);  // adding edge from Concentration Calculator to Client module carrying tuples of type CONCENTRATION
-		application.addAppEdge("connector", "client", 100, 28, 1000, "GLOBAL_GAME_STATE", Tuple.DOWN, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Connector to Client module carrying tuples of type GLOBAL_GAME_STATE
-		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "SELF_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
-		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type GLOBAL_STATE_UPDATE
-		
-//		application.addAppEdge("client", "DISPLAY", 0, 1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type GLOBAL_STATE_UPDATE
-
-		application.addTupleMapping("client", "EEG", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 0.9 tuples of type _SENSOR are emitted by Client module per incoming tuple of type EEG 
-		
-		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
-		application.addTupleMapping("client", "CONCENTRATION", 	   "SELF_STATE_UPDATE",   new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
-		application.addTupleMapping("client", "EEG", "_SENSOR", new FractionalSelectivity(1.0)); // 0.9 tuples of type _SENSOR are emitted by Client module per incoming tuple of type EEG 
-		application.addTupleMapping("concen", "_SENSOR", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type _SENSOR 
-//		
-		return application;
 	}
 }
