@@ -7,18 +7,18 @@ import java.util.List;
 
 // Added by us
 import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+//import java.io.FileNotFoundException;
+//import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
+//import org.cloudbus.cloudsim.VmAllocationPolicySimple;
+//import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import java.text.DecimalFormat;
+//import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
+//import java.text.DecimalFormat;
 
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -84,7 +84,7 @@ public class VRGameFog {
 			
 			String appId = "vr_game"; // identifier of the application
 			PowerDatacenterBroker broker = new FogBroker("broker");
-			Application application = createApplication(appId, broker.getId());
+			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
 			cloud = createFogDevice("cloud", 100000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
@@ -105,6 +105,11 @@ public class VRGameFog {
             nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId, cloud.getId()));
             JSONArray linkArr = (JSONArray) nodeList.get("links");
             linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+            JSONArray modArr = (JSONArray) nodeList.get("Modules");
+            modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
+            JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
+            edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
+            
             
 //            vmlist = new ArrayList<Vm>();
 			// VM description
@@ -184,6 +189,49 @@ public class VRGameFog {
 		fogDevices.add(mobile);
     }
 	
+	private static void parseModuleObject(JSONObject module, Application application) {
+		String name = (String) module.get("name");
+		int ram = Integer.parseUnsignedInt(module.get("ram").toString());
+		int mips = Integer.parseUnsignedInt(module.get("mips").toString());
+		long size = Long.parseUnsignedLong(module.get("size").toString());
+		long bw = Long.parseUnsignedLong(module.get("bw").toString());
+		
+		application.addAppModule(name, ram, mips, size, bw);
+		
+		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
+		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
+		
+	}
+	
+	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
+		String inTuple = (String) tuplemaps.get("inTuple");
+		String outTuple = (String) tuplemaps.get("outTuple");
+		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
+		
+		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
+	}
+	
+	private static void parseEdgeObject(JSONObject edges, Application application) {
+		String src = (String) edges.get("src");
+		String dest = (String) edges.get("dest");
+		double periodicity = (double) edges.get("periodicity");
+		double tupleCpuLength = (double) edges.get("tupleCpuLength");
+		double tupleNwLength = (double) edges.get("tupleNwLength");
+		String tupleType = (String) edges.get("tupleType");
+		int direction = Integer.parseUnsignedInt(edges.get("direction").toString());
+		int edgeType = Integer.parseUnsignedInt(edges.get("edgeType").toString());
+		
+		if(edgeType == 1) {
+			application.addAppEdge("EEG", dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		}
+		else if(edgeType == 2) {
+			application.addAppEdge(src, "DISPLAY", periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		}
+		else {
+			application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		}
+	}
+	
 	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
 		mobile.setParentId(parentId);
@@ -240,8 +288,8 @@ public class VRGameFog {
 		String vmm = "Xen";
 		double time_zone = 10.0; // time zone this resource located
 		double cost = ratePerMips; // the cost of using processing in this resource
-		double costPerMem = 0.05; // the cost of using memory in this resource
-		double costPerStorage = 0.001; // the cost of using storage in this resource
+		double costPerMem = 5000; // the cost of using memory in this resource
+		double costPerStorage = 1000; // the cost of using storage in this resource
 		double costPerBw = cost; // the cost of using bw in this resource
 		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN devices by now
 
@@ -274,12 +322,11 @@ public class VRGameFog {
 		/*
 		 * Adding modules (vertices) to the application model (directed graph)
 		 */
-		application.addAppModule("client", 					 10, 1000, 10000, 1000);
+		
 		application.addAppModule("concentration_calculator", 10, 1000, 10000, 1000); 
 		application.addAppModule("connector", 				 10, 1000, 10000, 1000); 
 		
 
-		
 		application.addAppEdge("EEG", "client", 0,  (EEG_TRANSMISSION_TIME==10)?2000:3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR);
 		application.addAppEdge("client", "concentration_calculator", 0, 3500, 500, "_SENSOR", Tuple.UP, AppEdge.MODULE); // adding edge from Client to Concentration Calculator module carrying tuples of type _SENSOR
 		application.addAppEdge("concentration_calculator", "connector", 100, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Concentration Calculator to Connector module carrying tuples of type PLAYER_GAME_STATE
@@ -295,7 +342,6 @@ public class VRGameFog {
 		application.addTupleMapping("client", "CONCENTRATION", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
 		application.addTupleMapping("concentration_calculator", "_SENSOR", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type _SENSOR 
 		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
-	
 		
 		/*
 		 * Defining the input-output relationships (represented by selectivity) of the application modules. 
