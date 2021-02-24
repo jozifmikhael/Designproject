@@ -167,17 +167,28 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 				Map<AppEdge, Double> rateMap = new HashMap<AppEdge, Double>(appEdgeToRate);
 				for(AppEdge edge : rateMap.keySet()){
 					AppModule destModule = getApplication().getModuleByName(edge.getDestination());
-					if(destModule == null)continue;
+					if(destModule==null) continue;
+					
+					System.out.println("ModulePlacementEdgewards.java: " + destModule.getName());
 					Map<Pair<String, String>, SelectivityModel> map = destModule.getSelectivityMap();
+					
 					for(Pair<String, String> pair : map.keySet()){
+						System.out.println("\t"+pair.getFirst()+" "+pair.getSecond());
 						if(pair.getFirst().equals(edge.getTupleType())){
 							double outputRate = appEdgeToRate.get(edge)*map.get(pair).getMeanRate(); // getting mean rate from SelectivityModel
 							AppEdge outputEdge = getApplication().getEdgeMap().get(pair.getSecond());
-							if(!appEdgeToRate.containsKey(outputEdge) || appEdgeToRate.get(outputEdge)!=outputRate){
-								// if some new information is available
+							if(!appEdgeToRate.containsKey(outputEdge)){
 								changed = true;
+								appEdgeToRate.put(outputEdge, outputRate);
 							}
-							appEdgeToRate.put(outputEdge, outputRate);
+//							else if(appEdgeToRate.get(outputEdge)!=outputRate) {
+//								changed = true;
+//								appEdgeToRate.put(outputEdge, outputRate);
+//							}
+							else if(appEdgeToRate.get(outputEdge)%outputRate!=0) {
+								changed = true;
+								appEdgeToRate.put(outputEdge, appEdgeToRate.get(outputEdge)*outputRate);
+							}
 						}
 					}
 				}
