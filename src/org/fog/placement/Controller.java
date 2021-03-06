@@ -106,9 +106,10 @@ public class Controller extends SimEntity{
 			printCostDetails();
 			printNetworkUsageDetails();
 			printNodeCosts();
-			System.exit(0);
+			CloudSim.stopSimulation();
+			CloudSim.terminateSimulation();
+//			System.exit(0);
 			break;
-			
 		}
 	}
 	
