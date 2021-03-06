@@ -77,6 +77,7 @@ public class VRGameFog_src {
 	
 	public VRGameFog_src(String filePath) throws Exception{
 		Log.printLine("Starting VRGame...");
+		System.out.println("File path given is", filePath);
 		try {
 			Log.disable();
 			sourceFile = filePath;
