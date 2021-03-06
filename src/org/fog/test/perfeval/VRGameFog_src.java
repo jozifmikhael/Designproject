@@ -75,11 +75,11 @@ public class VRGameFog_src {
 
 	static String sourceFile="test6.json";
 	
-	public VRGameFog_src() throws Exception{
+	public VRGameFog_src(String filePath) throws Exception{
 		Log.printLine("Starting VRGame...");
 		try {
 			Log.disable();
-//			sourceFile = filePath;
+			sourceFile = filePath;
 			int num_user = 1; // number of cloud users
 			Calendar calendar = Calendar.getInstance();
 			boolean trace_flag = false; // mean trace events
