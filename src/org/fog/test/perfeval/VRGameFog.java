@@ -4,14 +4,22 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Optional;
+import java.io.BufferedWriter;
 // Added by us
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 //import java.io.FileNotFoundException;
 //import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import application.TxtParser;
+import application.createJsonController;
+
 //import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
 //import org.cloudbus.cloudsim.VmAllocationPolicySimple;
@@ -44,6 +52,7 @@ import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.placement.ModulePlacementMapping;
+import org.fog.placement.ModulePlacementOnlyCloud;
 import org.fog.policy.AppModuleAllocationPolicy;
 import org.fog.scheduler.StreamOperatorScheduler;
 import org.fog.utils.FogLinearPowerModel;
@@ -66,13 +75,14 @@ public class VRGameFog {
 	static FogDevice cloud;
 	static FogDevice proxy;
 	static double EEG_TRANSMISSION_TIME = 5.1;
-	
+
 	static String sourceFile="test6.json";
+	static String testout="blob.json";
 	
 	public static void main(String[] args) throws Exception{
 		Log.printLine("Starting VRGame...");
 		System.out.println(new DeterministicDistribution(5.1));
-		
+		testOut();
 		try {
 			Log.disable();
 			int num_user = 1; // number of cloud users
@@ -141,7 +151,8 @@ public class VRGameFog {
 //			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
+//			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
+			controller.submitApplication(application, 0, new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application));
 			
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			System.out.println(moduleMapping.getModuleMapping());
@@ -153,6 +164,21 @@ public class VRGameFog {
 			e.printStackTrace();
 			Log.printLine("Unwanted errors happen");
 		}
+	}
+	
+	private static void testOut() {
+		FileWriter file_writer;
+        try {
+            file_writer = new FileWriter("blob.txt");
+//            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+         //   buffered_Writer.write(line);
+            file_writer.write("whatever Im writing");
+            file_writer.close();
+//            buffered_Writer.flush();
+//            buffered_Writer.close();
+        } catch (IOException e) {
+            System.out.println("Add line failed!" +e);
+        }
 	}
 		
 	private static void parseLinkObject(JSONObject link) {
