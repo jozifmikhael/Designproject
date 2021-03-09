@@ -72,7 +72,7 @@ public class VRGameFog_src {
 	static FogDevice cloud;
 	static FogDevice proxy;
 	static double EEG_TRANSMISSION_TIME = 5.1;
-
+	
 	static String sourceFile="test6.json";
 	
 	public VRGameFog_src(String filePath) throws Exception{
@@ -127,7 +127,7 @@ public class VRGameFog_src {
 	
 	public static void main(String[] args) throws Exception{
 		System.out.println("Start?");
-		VRGameFog_src testObj = new VRGameFog_src();
+		VRGameFog_src testObj = new VRGameFog_src("test6.json");
 		System.out.println("Exited?");
 	}
 		
