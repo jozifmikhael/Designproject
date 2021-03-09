@@ -15,14 +15,32 @@ import org.fog.application.Application;
 import org.fog.entities.Actuator;
 import org.fog.entities.FogDevice;
 import org.fog.entities.Sensor;
+import org.fog.test.perfeval.TextParser;
 import org.fog.utils.Config;
 import org.fog.utils.FogEvents;
 import org.fog.utils.FogUtils;
 import org.fog.utils.NetworkUsageMonitor;
 import org.fog.utils.TimeKeeper;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class Controller extends SimEntity{
 	
+	double texec=0;
+	double totalLoopTime;
+		
 	public static boolean ONLY_CLOUD = false;
 		
 	private List<FogDevice> fogDevices;
@@ -101,20 +119,46 @@ public class Controller extends SimEntity{
 			break;
 		case FogEvents.STOP_SIMULATION:
 			CloudSim.stopSimulation();
+			emptyMethod();
 			printTimeDetails();
 			printPowerDetails();
 			printCostDetails();
 			printNetworkUsageDetails();
 			printNodeCosts();
-			CloudSim.stopSimulation();
-			CloudSim.terminateSimulation();
+			CloudSim.stopSimulation();	
+			CloudSim.terminateSimulation();	
 //			System.exit(0);
 			break;
+			
 		}
 	}
+	private void emptyMethod() {
+	String emptyLine = "";
+	FileWriter file_writer;
+    try {
+        file_writer = new FileWriter("consolefile.txt",false);
+        BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+        buffered_Writer.write(emptyLine);
+        buffered_Writer.flush();
+        buffered_Writer.close();
+    } catch (IOException e) {
+        System.out.println("Add line failed!" +e);
+    }
 	
+	}
 	private void printNetworkUsageDetails() {
 		System.out.println("Total network usage = "+NetworkUsageMonitor.getNetworkUsage()/Config.MAX_SIMULATION_TIME + "\n");		
+		String NetworkUsageLine = NetworkUsageMonitor.getNetworkUsage()/Config.MAX_SIMULATION_TIME + " ";
+		FileWriter file_writer;
+        try {
+            file_writer = new FileWriter("consolefile.txt",true);
+            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+            buffered_Writer.write(NetworkUsageLine);
+            buffered_Writer.flush();
+            buffered_Writer.close();
+        } catch (IOException e) {
+            System.out.println("Add line failed!" +e);
+        }
 	}
 
 	private FogDevice getCloud(){
@@ -131,9 +175,40 @@ public class Controller extends SimEntity{
 			if(!fogDevice.getName().equals("cloud")) {
 				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
 				System.out.println(fogDevice.getName() + " : Cost = " + fogDevice.getTotalCost());
+				String FogDeviceLine = fogDevice.getName() + " " + fogDevice.getTotalCost() + " ";
+				FileWriter file_writer;
+		        try {
+		            file_writer = new FileWriter("consolefile.txt",true);
+		            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+		            buffered_Writer.write(FogDeviceLine);
+		            buffered_Writer.flush();
+		            buffered_Writer.close();
+		        } catch (IOException e) {
+		            System.out.println("Add line failed!" +e);
+		        }
 			}
 		}
 		System.out.println("Total cost of execution in the nodes = "+ totalNodeCosts);
+		String TotalNodeCostLine = totalNodeCosts + " ";
+		FileWriter file_writer;
+        try {
+            file_writer = new FileWriter("consolefile.txt",true);
+            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+            buffered_Writer.write(TotalNodeCostLine);
+            buffered_Writer.flush();
+            buffered_Writer.close();
+        } catch (IOException e) {
+            System.out.println("Add line failed!" +e);
+        }
+        try {
+			TextParser();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}	
 	
 	
@@ -147,9 +222,32 @@ public class Controller extends SimEntity{
 			if(!fogDevice.getName().equals("cloud")) {
 				totalNodePower = totalNodePower + fogDevice.getEnergyConsumption();
 				System.out.println(fogDevice.getName() + " : Energy Consumed = "+fogDevice.getEnergyConsumption());
+				String NodePowerLine = fogDevice.getName() + " " + fogDevice.getEnergyConsumption() + " ";
+				FileWriter file_writer;
+		        try {
+		            file_writer = new FileWriter("consolefile.txt",true);
+		            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+		            buffered_Writer.write(NodePowerLine);
+		            buffered_Writer.flush();
+		            buffered_Writer.close();
+		        } catch (IOException e) {
+		            System.out.println("Add line failed!" +e);
+		        }
+				
 			}
 		}
 		System.out.println("Total energy usage in the nodes = "+ totalNodePower+"\n");
+		String TotalNodePowerLine = totalNodePower + " ";
+		FileWriter file_writer;
+        try {
+            file_writer = new FileWriter("consolefile.txt",true);
+            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+            buffered_Writer.write(TotalNodePowerLine);
+            buffered_Writer.flush();
+            buffered_Writer.close();
+        } catch (IOException e) {
+            System.out.println("Add line failed!" +e);
+        }
 	}
 
 	private String getStringForLoopId(int loopId){
@@ -170,7 +268,9 @@ public class Controller extends SimEntity{
 		System.out.println("=========================================");
 		System.out.println("APPLICATION LOOP DELAYS");
 		System.out.println("=========================================");
+		texec = (Calendar.getInstance().getTimeInMillis() - TimeKeeper.getInstance().getSimulationStartTime());
 		double totalLoopTime=0;
+		double totalLoopTimeCTT = 0;
 		for(Integer loopId : TimeKeeper.getInstance().getLoopIdToTupleIds().keySet()){
 			/*double average = 0, count = 0;
 			for(int tupleId : TimeKeeper.getInstance().getLoopIdToTupleIds().get(loopId)){
@@ -184,6 +284,7 @@ public class Controller extends SimEntity{
 			System.out.println(getStringForLoopId(loopId) + " ---> "+(average/count));*/
 			System.out.println(getStringForLoopId(loopId) + " ---> "+TimeKeeper.getInstance().getLoopIdToCurrentAverage().get(loopId));
 			totalLoopTime+=TimeKeeper.getInstance().getLoopIdToCurrentAverage().get(loopId);
+			totalLoopTimeCTT = TimeKeeper.getInstance().getLoopIdToCurrentAverage().get(loopId);
 		}
 		System.out.println("Calculated total time: " + totalLoopTime);
 		System.out.println("=========================================");
@@ -193,10 +294,33 @@ public class Controller extends SimEntity{
 		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
 			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
 			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
+			String TupleTimeLine  = tupleType + " " + TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType) + " ";
+			FileWriter file_writer;
+	        try {
+	            file_writer = new FileWriter("consolefile.txt",true);
+	            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+	            buffered_Writer.write(TupleTimeLine);
+	            buffered_Writer.flush();
+	            buffered_Writer.close();
+	        } catch (IOException e) {
+	            System.out.println("Add line failed!" +e);
+	        }
 		}
 
 		System.out.println("Calculated total time with delays: " + totalLoopTime);
 		System.out.println("=========================================");
+		
+		String TimeLine = texec + " " + totalLoopTimeCTT + " " + totalLoopTime + " ";
+		FileWriter file_writer;
+        try {
+            file_writer = new FileWriter("consolefile.txt",true);
+            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+            buffered_Writer.write(TimeLine);
+            buffered_Writer.flush();
+            buffered_Writer.close();
+        } catch (IOException e) {
+            System.out.println("Add line failed!" +e);
+        }
 	}
 
 	protected void manageResources(){
@@ -262,6 +386,7 @@ public class Controller extends SimEntity{
 			}
 		}
 	}
+	
 
 	public List<FogDevice> getFogDevices() {
 		return fogDevices;
@@ -312,4 +437,13 @@ public class Controller extends SimEntity{
 	public void setAppModulePlacementPolicy(Map<String, ModulePlacement> appModulePlacementPolicy) {
 		this.appModulePlacementPolicy = appModulePlacementPolicy;
 	}
+	
+	
+	public void TextParser() throws Exception, IOException {
+			String sourceFileName = "consolefile.txt";
+			String jsonFileName = "output.json";			
+	    	TextParser textfile = new TextParser();
+	    		textfile.getInput(sourceFileName);
+	    		textfile.writeJSON(jsonFileName);
+	    }
 }
