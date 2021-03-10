@@ -38,17 +38,20 @@ import org.json.simple.JSONObject;
 
 public class Controller extends SimEntity{
 	
+	TextParser textfile = new TextParser();
+	double totalEnergyUsage = 0;
+	double totalNodeCost = 0;
+	
 	double texec=0;
 	double totalLoopTime;
-	static int counter =0;
 		
 	public static boolean ONLY_CLOUD = false;
+	double networkUsage = 0;
 		
 	private List<FogDevice> fogDevices;
 	private List<Sensor> sensors;
 	private List<Actuator> actuators;
 	
-	private double totalNodeCost;
 	
 	private Map<String, Application> applications;
 	private Map<String, Integer> appLaunchDelays;
@@ -98,14 +101,19 @@ public class Controller extends SimEntity{
 		}
 
 		send(getId(), Config.RESOURCE_MANAGE_INTERVAL, FogEvents.CONTROLLER_RESOURCE_MANAGE);
-		
+//		for(FogDevice dev : getFogDevices()) {	
+//			System.out.println("Controller.java: Sending res call to : " + dev.getName());	
+//			sendNow(dev.getId(), FogEvents.RESOURCE_MGMT);	
+//		}
 		send(getId(), Config.MAX_SIMULATION_TIME, FogEvents.STOP_SIMULATION);
 		
-		for(FogDevice dev : getFogDevices()) {
-			System.out.println("Controller.java: Sending res call to : " + dev.getName());
+		for(FogDevice dev : getFogDevices())
 			sendNow(dev.getId(), FogEvents.RESOURCE_MGMT);
-			}
 
+	}
+	
+	private void printCostDetails(){	
+		//System.out.println("Cost of execution in cloud = "+getCloud().getTotalCost());	
 	}
 
 	@Override
@@ -125,9 +133,16 @@ public class Controller extends SimEntity{
 			emptyMethod();
 			printTimeDetails();
 			printPowerDetails();
-			printCostDetails();
 			printNetworkUsageDetails();
 			printNodeCosts();
+			for(FogDevice fogDevice : getFogDevices()){
+				if(!fogDevice.getName().equals("cloud")) {
+					totalEnergyUsage += fogDevice.getEnergyConsumption();
+					totalNodeCost += fogDevice.getTotalCost();
+				}
+			}
+			System.out.println("Total Cost = " + totalNodeCost + " Total Engery Usage = " + totalEnergyUsage);
+    		textfile.writeJSON("output.json");
 			CloudSim.stopSimulation();	
 			CloudSim.terminateSimulation();	
 //			System.exit(0);
@@ -135,20 +150,23 @@ public class Controller extends SimEntity{
 			
 		}
 	}
-	private void emptyMethod() {
-	String emptyLine = "";
-	FileWriter file_writer;
-    try {
-        file_writer = new FileWriter("consolefile.txt",false);
-        BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-        buffered_Writer.write(emptyLine);
-        buffered_Writer.flush();
-        buffered_Writer.close();
-    } catch (IOException e) {
-        System.out.println("Add line failed!" +e);
-    }
 	
-	}
+	private void emptyMethod() {
+		String emptyLine = "";
+		 FileWriter file_writer;
+	        try {
+	            file_writer = new FileWriter("output.json",false);
+	            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
+	            buffered_Writer.flush();
+	            buffered_Writer.close();
+
+
+	        } catch (IOException e) {
+	            System.out.println("Overwrite Null failed" +e);
+	        }
+		
+}
+
 	private void printNetworkUsageDetails() {
 		System.out.println("Total network usage = "+NetworkUsageMonitor.getNetworkUsage()/Config.MAX_SIMULATION_TIME + "\n");		
 		String NetworkUsageLine = NetworkUsageMonitor.getNetworkUsage()/Config.MAX_SIMULATION_TIME + " ";
@@ -179,78 +197,31 @@ public class Controller extends SimEntity{
 				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
 				System.out.println(fogDevice.getName() + " : Cost = " + fogDevice.getTotalCost());
 				String FogDeviceLine = fogDevice.getName() + " " + fogDevice.getTotalCost() + " ";
-				FileWriter file_writer;
-		        try {
-		            file_writer = new FileWriter("consolefile.txt",true);
-		            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-		            buffered_Writer.write(FogDeviceLine);
-		            buffered_Writer.flush();
-		            buffered_Writer.close();
-		        } catch (IOException e) {
-		            System.out.println("Add line failed!" +e);
-		        }
 			}
 		}
 		System.out.println("Total cost of execution in the nodes = "+ totalNodeCosts);
-		String TotalNodeCostLine = totalNodeCosts + " ";
-		FileWriter file_writer;
-        try {
-            file_writer = new FileWriter("consolefile.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(TotalNodeCostLine);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
-        try {
-			TextParser();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}	
 	
-	
-	private void printCostDetails(){
-		//System.out.println("Cost of execution in cloud = "+getCloud().getTotalCost());
-	}
-	
 	private void printPowerDetails() {
+		double totalNodeCosts = 0;
 		double totalNodePower = 0;
 		for(FogDevice fogDevice : getFogDevices()){
 			if(!fogDevice.getName().equals("cloud")) {
 				totalNodePower = totalNodePower + fogDevice.getEnergyConsumption();
+				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
 				System.out.println(fogDevice.getName() + " : Energy Consumed = "+fogDevice.getEnergyConsumption());
-				String NodePowerLine = fogDevice.getName() + " " + fogDevice.getEnergyConsumption() + " ";
-				FileWriter file_writer;
-		        try {
-		            file_writer = new FileWriter("consolefile.txt",true);
-		            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-		            buffered_Writer.write(NodePowerLine);
-		            buffered_Writer.flush();
-		            buffered_Writer.close();
-		        } catch (IOException e) {
-		            System.out.println("Add line failed!" +e);
-		        }
-				
+				String NodeLine = fogDevice.getName() + " "+ fogDevice.getTotalCost() + " "  + fogDevice.getEnergyConsumption() + "\n";
+				try {
+					textfile.getNodespec(NodeLine);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		System.out.println("Total energy usage in the nodes = "+ totalNodePower+"\n");
-		String TotalNodePowerLine = totalNodePower + " ";
-		FileWriter file_writer;
-        try {
-            file_writer = new FileWriter("consolefile.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(TotalNodePowerLine);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
 	}
 
 	private String getStringForLoopId(int loopId){
@@ -297,38 +268,62 @@ public class Controller extends SimEntity{
 		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
 			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
 			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
-			String TupleTimeLine  = tupleType + " " + TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType) + " ";
-			FileWriter file_writer;
+			String TupleTimeLine  = tupleType + " " + TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType) +"\n";
 	        try {
-	            file_writer = new FileWriter("consolefile.txt",true);
-	            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-	            buffered_Writer.write(TupleTimeLine);
-	            buffered_Writer.flush();
-	            buffered_Writer.close();
-	        } catch (IOException e) {
-	            System.out.println("Add line failed!" +e);
-	        }
+				textfile.getTuples(TupleTimeLine);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		System.out.println("Calculated total time with delays: " + totalLoopTime);
 		System.out.println("=========================================");
-		
-		String TimeLine = texec + " " + totalLoopTimeCTT + " " + totalLoopTime + " ";
-		FileWriter file_writer;
-        try {
-            file_writer = new FileWriter("consolefile.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(TimeLine);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
 	}
 
 	protected void manageResources(){
-		send(getId(), Config.RESOURCE_MANAGE_INTERVAL, FogEvents.CONTROLLER_RESOURCE_MANAGE);
 //		System.out.println("Controller.java: Counter " + counter++);
+		send(getId(), Config.RESOURCE_MANAGE_INTERVAL, FogEvents.CONTROLLER_RESOURCE_MANAGE);
+		networkUsage =  (NetworkUsageMonitor.getNetworkUsage()/Config.MAX_SIMULATION_TIME) - networkUsage;
+		if(networkUsage < 0) {
+			networkUsage = networkUsage * -1;
+		}
+		String networkLine = CloudSim.clock() + " " + + networkUsage + "\n";
+		//System.out.println("Network Usage:        " + networkUsage + "       total usage"  + total);
+		
+		try {
+			textfile.getNetwork(networkLine);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		for(FogDevice fogDevice : getFogDevices()){
+			if(!fogDevice.getName().equals("cloud")) {
+				totalEnergyUsage += fogDevice.getEnergyConsumption();
+				totalNodeCost += fogDevice.getTotalCost();
+			}
+			String EnergyLine = fogDevice.getName() + " "+ fogDevice.getEnergyConsumption() + " "  + CloudSim.clock() + " " +fogDevice.getTotalCost()+ "\n";
+			fogDevice.setEnergyConsumption(0);
+			fogDevice.setTotalCost(0);
+			try {
+				textfile.getEnergy(EnergyLine);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 	private void processTupleFinished(SimEvent ev) {
@@ -441,13 +436,4 @@ public class Controller extends SimEntity{
 	public void setAppModulePlacementPolicy(Map<String, ModulePlacement> appModulePlacementPolicy) {
 		this.appModulePlacementPolicy = appModulePlacementPolicy;
 	}
-	
-	
-	public void TextParser() throws Exception, IOException {
-			String sourceFileName = "consolefile.txt";
-			String jsonFileName = "output.json";			
-	    	TextParser textfile = new TextParser();
-	    		textfile.getInput(sourceFileName);
-	    		textfile.writeJSON(jsonFileName);
-	    }
 }
