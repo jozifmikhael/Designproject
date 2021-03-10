@@ -223,7 +223,6 @@ public class VRGameFog {
 		
 		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
 		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
-		
 	}
 	
 	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {

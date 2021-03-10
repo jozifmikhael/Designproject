@@ -1,2 +1,0 @@
-default_mobile 999 0 0 0 0 0 0 0
-default_mobile 999 0 0 0 0 0 0 0
