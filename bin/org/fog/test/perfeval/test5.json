@@ -1,0 +1,10 @@
+{"nodes":[{"apower":3.0,
+"level":3,
+"rate":4.0,
+"ipower":1.0,
+"name":"1",
+"down_bw":850,
+"mips":12500,
+"up_bw":850,
+"ram":10240}],
+"links":[]}
