@@ -83,7 +83,7 @@ public class VmSchedulerTimeSharedOverSubscription extends VmSchedulerTimeShared
 				}
 				mipsShareAllocated.add(mipsRequested);
 			}
-			//System.out.println("Setting MIPS of "+vmUid+" to "+mipsShareAllocated);
+//			System.out.println("Setting MIPS of "+vmUid+" to "+mipsShareAllocated);
 
 			getMipsMap().put(vmUid, mipsShareAllocated);
 			setAvailableMips(getAvailableMips() - totalRequestedMips);

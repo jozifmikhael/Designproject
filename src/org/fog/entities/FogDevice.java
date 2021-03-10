@@ -52,6 +52,7 @@ public class FogDevice extends PowerDatacenter {
 	protected Map<Integer, Integer> cloudTrafficMap;
 	
 	protected double lockTime;
+	static double globalSum=0;
 	
 	/**	
 	 * ID of the parent Fog Device
@@ -95,6 +96,8 @@ public class FogDevice extends PowerDatacenter {
 	
 	protected Map<String, Map<String, Integer>> moduleInstanceCount;
 	
+	private String thisName="";
+	
 	public FogDevice(
 			String name, 
 			FogDeviceCharacteristics characteristics,
@@ -103,6 +106,7 @@ public class FogDevice extends PowerDatacenter {
 			double schedulingInterval,
 			double uplinkBandwidth, double downlinkBandwidth, double uplinkLatency, double ratePerMips) throws Exception {
 		super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
+		thisName = name;
 		setCharacteristics(characteristics);
 		setVmAllocationPolicy(vmAllocationPolicy);
 		setLastProcessTime(0.0);
@@ -280,6 +284,7 @@ public class FogDevice extends PowerDatacenter {
 			updateModuleInstanceCount(ev);
 			break;
 		case FogEvents.RESOURCE_MGMT:
+//			System.out.println("FogDevice.java: Got RESOURCE_MGMT on " + thisName);
 			manageResources(ev);
 		default:
 			break;
@@ -548,8 +553,8 @@ public class FogDevice extends PowerDatacenter {
 		
 		double timeNow = CloudSim.clock();
 		double currentEnergyConsumption = getEnergyConsumption();
-		double newEnergyConsumption = currentEnergyConsumption + (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
-		setEnergyConsumption(newEnergyConsumption);
+		double newEnergyConsumption = (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
+		setEnergyConsumption(newEnergyConsumption + currentEnergyConsumption);
 	
 		/*if(getName().equals("d-0")){
 			System.out.println("------------------------");
@@ -559,8 +564,10 @@ public class FogDevice extends PowerDatacenter {
 		}*/
 		
 		double currentCost = getTotalCost();
-		double newcost = currentCost + (timeNow-lastUtilizationUpdateTime)*getRatePerMips()*lastUtilization*getHost().getTotalMips();
-		setTotalCost(newcost);
+		double newcost = (timeNow-lastUtilizationUpdateTime)*getRatePerMips()*lastUtilization*getHost().getTotalMips();
+		setTotalCost(newcost + currentCost);
+		globalSum += newEnergyConsumption;
+		System.out.println("FogDevice.java: " + CloudSim.clock() + " @" + thisName + " - " + newEnergyConsumption + " E:" + globalSum);
 		
 		lastUtilization = Math.min(1, totalMipsAllocated/getHost().getTotalMips());
 		lastUtilizationUpdateTime = timeNow;

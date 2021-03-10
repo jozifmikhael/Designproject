@@ -40,6 +40,7 @@ public class Controller extends SimEntity{
 	
 	double texec=0;
 	double totalLoopTime;
+	static int counter =0;
 		
 	public static boolean ONLY_CLOUD = false;
 		
@@ -100,8 +101,10 @@ public class Controller extends SimEntity{
 		
 		send(getId(), Config.MAX_SIMULATION_TIME, FogEvents.STOP_SIMULATION);
 		
-		for(FogDevice dev : getFogDevices())
+		for(FogDevice dev : getFogDevices()) {
+			System.out.println("Controller.java: Sending res call to : " + dev.getName());
 			sendNow(dev.getId(), FogEvents.RESOURCE_MGMT);
+			}
 
 	}
 
@@ -325,6 +328,7 @@ public class Controller extends SimEntity{
 
 	protected void manageResources(){
 		send(getId(), Config.RESOURCE_MANAGE_INTERVAL, FogEvents.CONTROLLER_RESOURCE_MANAGE);
+//		System.out.println("Controller.java: Counter " + counter++);
 	}
 	
 	private void processTupleFinished(SimEvent ev) {

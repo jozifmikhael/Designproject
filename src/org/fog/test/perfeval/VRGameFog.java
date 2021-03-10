@@ -94,7 +94,7 @@ public class VRGameFog {
 			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
-			cloud = createFogDevice("cloud", 100000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
+			cloud = createFogDevice("cloud", 1000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
 			cloud.setParentId(-1);
 			fogDevices.add(cloud);
 			

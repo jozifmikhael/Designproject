@@ -125,11 +125,11 @@ public class VRGameFog_src {
 		}
 	}
 	
-	public static void main(String[] args) throws Exception{
-		System.out.println("Start?");
-		VRGameFog_src testObj = new VRGameFog_src("test6.json");
-		System.out.println("Exited?");
-	}
+//	public static void main(String[] args) throws Exception{
+//		System.out.println("Start?");
+//		VRGameFog_src testObj = new VRGameFog_src("test6.json");
+//		System.out.println("Exited?");
+//	}
 		
 	private static void parseLinkObject(JSONObject link) {
 		String srcID = (String) link.get("srcID");
