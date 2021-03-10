@@ -567,7 +567,7 @@ public class FogDevice extends PowerDatacenter {
 		double newcost = (timeNow-lastUtilizationUpdateTime)*getRatePerMips()*lastUtilization*getHost().getTotalMips();
 		setTotalCost(newcost + currentCost);
 		globalSum += newEnergyConsumption;
-		System.out.println("FogDevice.java: " + CloudSim.clock() + " @" + thisName + " - " + newEnergyConsumption + " E:" + globalSum);
+		//System.out.println("FogDevice.java: " + CloudSim.clock() + " @" + thisName + " - " + newEnergyConsumption + " E:" + globalSum);
 		
 		lastUtilization = Math.min(1, totalMipsAllocated/getHost().getTotalMips());
 		lastUtilizationUpdateTime = timeNow;
