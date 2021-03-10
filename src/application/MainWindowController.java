@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import javax.swing.event.ChangeListener;
+
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -134,6 +137,7 @@ public class MainWindowController implements Initializable{
 		//will refer to the Node's x/y/r vals
 		//for nodes
 		//gc.fillOval(node.x, node.y, node.r+r, r+r);
+		
 
 		double clickX=mEvent.getX();
 		double clickY=mEvent.getY();
@@ -144,6 +148,17 @@ public class MainWindowController implements Initializable{
 		double r=40;
 		gc.fillOval(clickX-r, clickY-r, r+r, r+r);
     	System.out.println(clickX+", "+clickY);
+    }
+    
+    
+    @FXML    
+    private void screenDragHandler() {
+    	System.out.println("Updated canvas size");
+        GraphicsContext gc = topoField.getGraphicsContext2D();
+    	gc.setFill(Color.WHITE);
+		topoField.setHeight(backPane.getHeight());
+		topoField.setWidth(backPane.getWidth());
+		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
     }
     
     @FXML
@@ -157,6 +172,22 @@ public class MainWindowController implements Initializable{
     		stage.setScene(scene);
     		stage.setTitle("Create New Design File");
     		stage.show();
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    @FXML
+    void showController(ActionEvent event) {
+    	try {	
+    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
+    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("OutputController.fxml"));
+    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		NodeController saveNewNodeController = addNewNodeLoader.getController();
+    		stage.setTitle("Output");
+    		stage.showAndWait();
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
