@@ -84,9 +84,12 @@ public class MainWindowController implements Initializable{
 
     @FXML
     private Button deleteButton;
-    
+
     @FXML
     private Canvas topoField;
+    
+    @FXML
+    private Canvas graphArea;
     
     @FXML
     private MenuItem addNodeMenu;
