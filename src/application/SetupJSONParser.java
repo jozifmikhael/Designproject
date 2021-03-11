@@ -145,8 +145,10 @@ public class SetupJSONParser {
 		
 		
 		public String toString() {
-			String str = this.name + " " + this.parent;
-			return str;
+			String str = this.id+ " " + this.name + " " + this.parent + " " +this.type + " " 
+		+ this.upbw + " " + this.downbw + " " + this.mips + " " + this.ram + " " + this.level + " " + this.rate + " " + this.ipower + " " + this.apower + "\n";
+			String str1 = "--------------------------------------------------------------------------------";
+			return str+str1;
 		}
 		
 		
@@ -191,6 +193,13 @@ public class SetupJSONParser {
 			return obj;
 		}
 		
+		public String toString() {
+			String str = this.parent+ " " + this.child + " " + this.tupleType + " " 
+		+this.periodicity + " " + this.cpuLength + " " + this.newLength + " " + this.edgeType + " " + this.direction + "\n";
+			String str1 = "--------------------------------------------------------------------------------";
+			return str+str1;
+		}
+		
 		public ModuEdgeSpec(String parent, String child, String tupleType, double periodicity, double cpuLength,
 				double newLength, String edgeType, int direction) {
 			this.parent = parent;
@@ -230,6 +239,13 @@ public class SetupJSONParser {
 			obj.put("MIPS", module.MIPS);
 			obj.put("Fractional Sensitivity", module.fractionalSensitivity);
 			return obj;
+		}
+		
+		public String toString() {
+			String str = this.nodeName+ " " + this.moduleName + " " + this.modRam + " " +this.bandwidth + " " 
+		+ this.inTuple + " " + this.outTuple + " " + this.size + " " + this.MIPS + " "+ this.fractionalSensitivity + "\n";
+			String str1 = "--------------------------------------------------------------------------------";
+			return str+str1;
 		}
 		
 		public ModuSpec(String nodeName, int modRam, long bandwidth, String inTuple, String outTuple,
