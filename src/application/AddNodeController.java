@@ -61,7 +61,7 @@ public class AddNodeController {
 			name.setText("default_device");
 		}
 		if (parentName.getText().trim().isEmpty()) {
-			name.setText("default_parent");
+			parentName.setText("default_parent");
 		}
 		if (mips.getText().trim().isEmpty()) {
 			mips.setText("0");

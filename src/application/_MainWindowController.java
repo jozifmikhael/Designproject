@@ -125,10 +125,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	class dispLink{
 		dispNode src, dst;
 		void draw() {
-	    	gc.beginPath();
-	    	gc.moveTo(src.x + src.sz, src.y + src.sz);
-			gc.lineTo(dst.x + dst.sz, dst.y + dst.sz);
-			gc.stroke();
+			double x1=0; double y1=0;
+			double x2=0; double y2=0;
+			if(src!=null) {x1=src.x+src.sz; y1= src.y + src.sz;}
+			if(dst!=null) {x2=dst.x+dst.sz; y2= dst.y + dst.sz;}
+			if(src!=null&&dst!=null) {
+				gc.beginPath();
+		    	gc.moveTo(x1, y1);
+				gc.lineTo(x2, y2);
+				gc.stroke();
+			}
 		}
 		dispLink(dispNode _src, dispNode _dst){this.src=_src; this.dst=_dst;}
 		dispLink(DeviceSpec _src, DeviceSpec _dst) {
@@ -136,18 +142,25 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
 		}
 		dispLink(DeviceSpec _device) {
-	    	for(dispNode dn : dispNodesList) if(dn.name==_device.name)	 {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name==_device.parent) {this.dst=dn;}
+			for (dispNode dn : dispNodesList)
+				if (dn.name == _device.name) {
+					this.src = dn;
+				} else {
+					System.out.println("New Name" + dn.name + " != " + _device.name);
+				}
+			for (dispNode dn : dispNodesList) {
+				if (dn.name == _device.parent) {
+					this.dst = dn;
+				} else {
+					System.out.println("New Name" + dn.name + " != " + _device.parent);
+				}
+			}
+				
 		}
-//		dispLink(ModuSpec _src, ModuSpec _dst) {
-//	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
-//	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
-//		}
-		
-//		dispLink(ModuSpec _src, ModuSpec _dst) {
-//			this.src = _src;
-//			this.dst = _dst;
-//		}
+		dispLink(ModuEdgeSpec _spec) {
+	    	for(dispNode dn : dispNodesList) if(dn.name==_spec.name)   {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_spec.parent) {this.dst=dn;}
+		}
 	}
 	
 	public List<dispNode> dispNodesList = new ArrayList<dispNode>();
@@ -234,6 +247,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
+		System.out.println(dispNodesList.size() + " " + dispLinksList.size());
+		for(dispLink link : dispLinksList) {
+			String srcName = link.src!=null?link.src.name:"";
+			String dstName = link.dst!=null?link.dst.name:"";
+			System.out.println("Link src " + srcName + " dst " + dstName);
+			link.draw();
+		}
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
@@ -284,6 +304,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				devicesList.add(d);
 				deviceNamesList.add(name);
 				dispNodesList.add(newDevice);
+				dispLinksList.add(new dispLink(d));
 			}
 			System.out.println(d.toString());
 //    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
