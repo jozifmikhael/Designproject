@@ -269,7 +269,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     dispNode addDevice() {
     	try {
-    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("NodeInputBox.fxml"));
+    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
     		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
     		Stage stage = new Stage();
     		stage.setScene(scene);
