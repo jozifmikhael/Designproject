@@ -151,16 +151,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @Override
 	public void handle(KeyEvent event) {
-    	if (event.getCode() == KeyCode.DIGIT1)
-    		System.out.println("1");
-    	if (event.getCode() == KeyCode.DIGIT2)
-    		System.out.println("2");
-    	if (event.getCode() == KeyCode.DIGIT3)
-    		System.out.println("3");
-    	if (event.getCode() == KeyCode.Z)
-    		System.out.println("Z");
-    	if (event.getCode() == KeyCode.DELETE)
-    		System.out.println("Delete");
+    	switch(event.getCode()) {
+			case DIGIT1: System.out.println("1"); break;
+			case DIGIT2: System.out.println("2"); break;
+			case DIGIT3: System.out.println("3"); break;
+			case DIGIT4: System.out.println("4"); break;
+			case Z	   : System.out.println("z"); break;
+			case DELETE: System.out.println("Del"); break;
+			default: break;
+    	}
 	}
 
 	double clickX=0;
@@ -186,13 +185,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
-    	//I want a textbox to pop up here to ask for a string
-    	
+    	addNode();
     	nodeList.add(draggingNode);
     	System.out.println("There are #" + nodeList.size() + " nodes");
     	System.out.println("MousePos ("+mEvent.getX()+","+mEvent.getY()+")");
     	System.out.println("MousePos ("+draggingNode.getX()+","+draggingNode.getY()+")");
-    	
     	draggingNode = null;
     	redrawNodes();
     }
@@ -205,8 +202,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		redrawNodes();
     	}
     }
-    
-    
+        
     private void drawNode(Node _node) {
     	gc.fillOval(_node.x, _node.y, R+R, R+R);
 	}
@@ -281,7 +277,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void addNode(ActionEvent event) {
+    void addNode() {
     	try {	
     		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
     		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("InputBox.fxml"));
