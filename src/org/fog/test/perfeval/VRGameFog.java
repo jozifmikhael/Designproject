@@ -94,7 +94,7 @@ public class VRGameFog {
 			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
-			cloud = createFogDevice("cloud", 100000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
+			cloud = createFogDevice("cloud", 1000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
 			cloud.setParentId(-1);
 			fogDevices.add(cloud);
 			
@@ -148,8 +148,8 @@ public class VRGameFog {
 //			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-//			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
-			controller.submitApplication(application, 0, new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application));
+			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
+//			controller.submitApplication(application, 0, new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application));
 			
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			System.out.println(moduleMapping.getModuleMapping());

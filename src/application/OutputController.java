@@ -129,11 +129,13 @@ public class OutputController {
 	
 	@FXML
 	void NetworkLineChart() {
-		final NumberAxis xAxis = new NumberAxis();
-	    final NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Time");
-        yAxis.setLabel("Network Usage");
+		//final NumberAxis xAxis = new NumberAxis();
+	    //final NumberAxis yAxis = new NumberAxis();
+        //xAxis.setLabel("Time");
+        //yAxis.setLabel("Network Usage");
         NetworkUsage.setTitle("Time vs Network Usage");
+        NetworkUsage.setCreateSymbols(false);
+      //  NetworkUsage.getStyleClass().add("thick-chart");
         XYChart.Series series = new XYChart.Series();
         series.setName("Network Usages"); 
         for(int i = 0; i < timeNetworkList.size(); i++) {

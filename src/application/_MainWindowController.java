@@ -11,6 +11,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.fog.test.perfeval.VRGameFog_src;
+
 import application.SetupJSONParser.*;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -156,10 +158,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<dispLink> dispLinksList = new ArrayList<dispLink>();
 	public List<String> deviceNamesList = new ArrayList<String>();
 	public List<String> moduleNamesList = new ArrayList<String>();
-
+	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
+	
+	public int state = 0;
 	
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -197,7 +201,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         	draggingNode = newNode;
         	redrawNodes();
         }else {
-        	System.out.println("Picked up node...");
+//        	System.out.println("Picked up node...");
         	//dispNodesList.remove(tempNode);
         	draggingNode = tempNode;
         }
@@ -205,8 +209,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
-    	addDevice().setPos(mEvent);
-    	if(devicesList.contains(draggingNode)) System.out.println("Pre-existing");
+    	if(dispNodesList.indexOf(draggingNode)<0) addDevice().setPos(mEvent);
+    	else draggingNode.setPos(mEvent);
     	draggingNode=null;
     	redrawNodes();
     }
@@ -237,11 +241,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		System.out.println(dispNodesList.size() + " " + dispLinksList.size());
 		for(dispLink link : dispLinksList) {
 			String srcName = link.src!=null?link.src.name:"";
 			String dstName = link.dst!=null?link.dst.name:"";
-			System.out.println("Link src " + srcName + " dst " + dstName);
 			link.draw();
 		}
 		for(dispNode node : dispNodesList) node.draw();
@@ -325,7 +327,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				moduleNamesList.add(name);
 				dispNodesList.add(newMod);
 			}
-    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
+//    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
     		return newMod;
     	} catch(Exception e) {
     		e.printStackTrace();
@@ -393,24 +395,28 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void startSim(ActionEvent event) throws IOException {
-    	String policy = simulationTime.getText()+" "+policyView.getText();
-    	FileWriter file_writer;
-    	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-//     	textfile.writeJSON(jsonDestinationFileName + ".json");
+    void startSim(ActionEvent event) throws Exception {
+//    	String policy = policyView.getText();
+//    	String time = simulationTime.getText();
+//    	String destFile = createJsonController.jsonDestinationFileName + ".json";
+//     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, policy);
+//     	VRGameFog_src simObj = new VRGameFog_src("test6.json");
+     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
+        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Output");
+        stage.showAndWait();
     }
-     
     @FXML
     public void createJson(ActionEvent event) {
-    	try {	
+    	try {
     		BorderPane root = FXMLLoader.load(getClass().getResource("createJsonBox.fxml"));
     		Scene scene = new Scene(root,414,139);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		stage.setTitle("Create New Design File");
-    		stage.show();    		
-    		//stage.close();
-    		
+    		stage.show();
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -428,8 +434,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
          //   buffered_Writer.write(line);
             buffered_Writer.flush();
             buffered_Writer.close();
-            
-
         } catch (IOException e) {
             System.out.println("Add line failed!" +e);
         }

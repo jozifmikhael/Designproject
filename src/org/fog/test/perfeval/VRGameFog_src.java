@@ -75,28 +75,31 @@ public class VRGameFog_src {
 	
 	static String sourceFile="test6.json";
 	
-	public VRGameFog_src(String filePath) throws Exception{
+	public VRGameFog_src(String inp) throws Exception{
 		Log.printLine("Starting VRGame...");
-		System.out.println("File path given is"+ filePath);
+		System.out.println("File path given is"+ inp);
 		try {
 			Log.disable();
-			sourceFile = filePath;
 			int num_user = 1; // number of cloud users
 			Calendar calendar = Calendar.getInstance();
 			boolean trace_flag = false; // mean trace events
 
 			CloudSim.init(num_user, calendar, trace_flag);
 			
+			
 			String appId = "vr_game"; // identifier of the application
 			PowerDatacenterBroker broker = new FogBroker("broker");
 			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
-			cloud = createFogDevice("cloud", 100000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
+			cloud = createFogDevice("cloud", 1000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
 			cloud.setParentId(-1);
 			fogDevices.add(cloud);
-
-			System.out.println("Here?");
+			
+//			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
+//			proxy.setParentId(cloud.getId());
+//			fogDevices.add(proxy);
+			
 			
 			//Parse JSON file and initialize nodes
 			JSONParser jsonParser = new JSONParser();
@@ -111,25 +114,58 @@ public class VRGameFog_src {
             modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
             JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
             edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
-
-			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping();
+            
+            
+//            vmlist = new ArrayList<Vm>();
+			// VM description
+//			int vmid = 0;
+//			int mips = 1000;
+//			long size = 10000; // image size (MB)
+//			int ram = 512; // vm memory (MB)
+//			long bw = 1000;
+//			int pesNumber = 1; // number of cpus
+//			String vmm = "Xen"; // VMM name
+			
+			// add the VM to the vmList
+//			for(int i = 0; i<10000; i++) {
+//				Cloudlet c = new Cloudlet(FogUtils.generateEntityId(), 1000, 1, 100, 100, null, null, null);
+//				Vm vm = new Vm(vmid+i, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+//				c.setVmId(vmid+i);
+//				cloudlets.add(c);
+//				vmlist.add(vm);
+//			}
+//			broker.submitCloudletList(cloudlets);
+//			List<Cloudlet> newList = broker.getCloudletReceivedList();
+//			broker.submitVmList(vmlist);
+			//printCloudletList(newList);
+            
+			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
+//			moduleMapping.addModuleToDevice("client", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
+//			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
+			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
+//			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
 			controller.submitApplication(application, 0, new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application));
 			
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			System.out.println(moduleMapping.getModuleMapping());
 			CloudSim.startSimulation();
+			
+			//CloudSim.stopSimulation();
+			//System.out.println("VRGame finished!");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.printLine("Unwanted errors happen");
 		}
 	}
 	
-//	public static void main(String[] args) throws Exception{
-//		System.out.println("Start?");
-//		VRGameFog_src testObj = new VRGameFog_src("test6.json");
-//		System.out.println("Exited?");
-//	}
+	public static void main(String[] args) throws Exception{
+		System.out.println("Start?");
+		VRGameFog_src testObj = new VRGameFog_src("test6.json");
+		System.out.println("Exited?");
+	}
 		
 	private static void parseLinkObject(JSONObject link) {
 		String srcID = (String) link.get("srcID");
