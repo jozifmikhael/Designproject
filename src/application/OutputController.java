@@ -49,14 +49,9 @@ public class OutputController {
 			this.EnergyConsumptionList = EnergyConsumptionList;
 		}
 	}
-	
-    void addToEnergyList(String name, List<Double> timeList, List<Double> EnergyConsumptionList) {
-    	Energy energyOBJ = new Energy(name, timeList, EnergyConsumptionList);
-    	energyOBJ.name = name;
-    	Energylist.add(energyOBJ);
-    }
     
-    void Parsing() throws IOException, ParseException {
+	@FXML
+    void ParsingEnergy() throws IOException, ParseException {
     	JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(sourceFile);
         Object obj = jsonParser.parse(reader);
@@ -67,6 +62,20 @@ public class OutputController {
         timeE.forEach(l -> parsetimeEData((JSONObject) l));
         JSONArray network = (JSONArray) nodeList.get("listNetwork");
         network.forEach(l -> parseNetworkUsage((JSONObject) l));
+        EnergyConsuptionGraph();
+//        NetworkLineChart();
+    }
+	
+	@FXML
+    void ParsingNetwork() throws IOException, ParseException {
+    	JSONParser jsonParser = new JSONParser();
+		FileReader reader = new FileReader(sourceFile);
+        Object obj = jsonParser.parse(reader);
+        JSONObject nodeList = (JSONObject) obj;
+        JSONArray network = (JSONArray) nodeList.get("listNetwork");
+        network.forEach(l -> parseNetworkUsage((JSONObject) l));
+        //EnergyConsuptionGraph();
+        NetworkLineChart();
     }
     
 	private static void parseNodeData(JSONObject link) {
@@ -75,12 +84,13 @@ public class OutputController {
 		List<Double> tempEnergylist = new ArrayList<Double>();
 		List<Double> tempTimeList = new ArrayList<Double>();
 		Energy energyOBJ = new Energy(nodeName, tempTimeList, tempEnergylist);
+		Energylist.add(energyOBJ);
 	}
 	
 	private static void parsetimeEData(JSONObject link) {
 		String nodeName = (String) link.get("name");
 		for(Energy temp: Energylist) {
-			if(nodeName == temp.name) {
+			if(nodeName.equals(temp.name)) {
 				temp.EnergyConsumptionList.add((double) link.get("energy"));
 				temp.timeList.add((double) link.get("time"));
 			}
@@ -90,19 +100,18 @@ public class OutputController {
 	private void parseNetworkUsage(JSONObject link){
 		double time = (double) link.get("time");
 		double networkUsage = (double) link.get("networkUsage");
-		
 		timeNetworkList.add(time);
 		NetworkUsageList.add(networkUsage);
 	}
 	
 	@FXML
 	void EnergyConsuptionGraph() {
+
 		final NumberAxis xAxis = new NumberAxis();
 	    final NumberAxis yAxis = new NumberAxis();
-		StackedAreaChart<String, Number> areaChart = new StackedAreaChart(xAxis, yAxis);
         xAxis.setLabel("Time");
         yAxis.setLabel("Energy Consumption");
-        areaChart.setTitle("Time vs Energy Consumption");
+        EnergyConsumption.setTitle("Time vs Energy Consumption");
         
         for(Energy energylist : Energylist) {
         	XYChart.Series temp = new XYChart.Series();
@@ -113,7 +122,7 @@ public class OutputController {
         	seriesList.add(temp);
         }
         for(int i= 0; i<seriesList.size(); i++) {
-        	 areaChart.getData().add(seriesList.get(i));
+        	EnergyConsumption.getData().add(seriesList.get(i));
         }
         
 	}
@@ -122,15 +131,16 @@ public class OutputController {
 	void NetworkLineChart() {
 		final NumberAxis xAxis = new NumberAxis();
 	    final NumberAxis yAxis = new NumberAxis();
-		StackedAreaChart<String, Number> lineChart = new StackedAreaChart(xAxis, yAxis);
         xAxis.setLabel("Time");
         yAxis.setLabel("Network Usage");
-        lineChart.setTitle("Time vs Energy Consumption");
+        NetworkUsage.setTitle("Time vs Network Usage");
         XYChart.Series series = new XYChart.Series();
+        series.setName("Network Usages"); 
         for(int i = 0; i < timeNetworkList.size(); i++) {
-        	 series.getData().add(new XYChart.Data(timeNetworkList.get(i), NetworkUsageList.get(i)));
+        	//series.getData().add(new XYChart.Data("test", 10));
+        	 series.getData().add(new XYChart.Data(timeNetworkList.get(i).toString(), NetworkUsageList.get(i)));
         }
-        lineChart.getData().add(series);
+        NetworkUsage.getData().add(series);
 	}
 	
     @FXML

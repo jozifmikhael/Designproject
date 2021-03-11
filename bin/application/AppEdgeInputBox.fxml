@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="316.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AppEdgeController">
+<BorderPane prefHeight="316.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddEdgeController">
    <center>
       <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>

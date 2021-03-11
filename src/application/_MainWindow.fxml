@@ -30,7 +30,7 @@
                         <items>
                               <MenuItem fx:id="popNodemenu" mnemonicParsing="false" text="Delete" />
                           <MenuItem fx:id="resetCacheMenu" mnemonicParsing="false" onAction="#resetCache" text="Reset All Devices" />
-                              <MenuItem fx:id="addNodeMenu" mnemonicParsing="false" onAction="#addNode" text="Add Node" />
+                              <MenuItem fx:id="addNodeMenu" mnemonicParsing="false" onAction="#addDevice" text="Add Node" />
                               <MenuItem fx:id="addModuleMenu" mnemonicParsing="false" onAction="#addModule" text="Add Module" />
                               <MenuItem fx:id="addEdgeMenu" mnemonicParsing="false" onAction="#addEdge" text="Add Edge" />
                         </items>
@@ -60,7 +60,7 @@
                         <Text layoutX="42.0" layoutY="17.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Simulation Time" textAlignment="CENTER" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="43.0" />
                         <TextField fx:id="policyView" layoutX="160.0" layoutY="21.0" prefWidth="150.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="170.0" />
                         <Text layoutX="182.0" layoutY="18.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Policy Selected" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="208.0" />
-                        <Button fx:id="startButton" layoutX="309.0" layoutY="21.0" mnemonicParsing="false" onAction="#startSim" text="Start" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="330.0" />
+                        <Button fx:id="startButton" layoutX="309.0" layoutY="21.0" mnemonicParsing="false" onAction="#showController" text="Start" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="330.0" />
                         <Button fx:id="deleteButton" layoutX="772.0" layoutY="21.0" mnemonicParsing="false" onAction="#deleteHandler" prefWidth="100.0" text="Delete" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
                         <Button fx:id="editButton" layoutX="677.0" layoutY="21.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#editHandler" prefWidth="100.0" text="Edit" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="120.0" />
                      </children>

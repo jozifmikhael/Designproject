@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="478.0" prefWidth="874.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OutputContoller">
+<BorderPane prefHeight="478.0" prefWidth="874.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OutputController">
    <center>
       <AnchorPane prefHeight="500.0" prefWidth="500.0" BorderPane.alignment="CENTER">
          <children>
@@ -18,7 +18,7 @@
                 <AnchorPane fx:id="backPane" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #ffffff;">
                      <children>
                         <Canvas fx:id="graphArea" height="441.0" onContextMenuRequested="#EnergyConsuptionGraph" onMouseClicked="#EnergyConsuptionGraph" width="870.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
-                        <StackedAreaChart fx:id="areaChart" layoutX="5.0" onMouseClicked="#EnergyConsuptionGraph" prefHeight="307.0" prefWidth="865.0">
+                        <StackedAreaChart fx:id="EnergyConsumption" layoutX="5.0" onMouseClicked="#ParsingEnergy" prefHeight="307.0" prefWidth="865.0">
                           <xAxis>
                             <NumberAxis side="BOTTOM" />
                           </xAxis>
@@ -26,7 +26,7 @@
                             <NumberAxis side="LEFT" />
                           </yAxis>
                         </StackedAreaChart>
-                        <LineChart layoutX="6.0" layoutY="292.0" prefHeight="150.0" prefWidth="855.0">
+                        <LineChart fx:id="NetworkUsage" layoutX="6.0" layoutY="292.0" onMouseClicked="#ParsingNetwork" prefHeight="150.0" prefWidth="855.0">
                           <xAxis>
                             <CategoryAxis side="BOTTOM" />
                           </xAxis>

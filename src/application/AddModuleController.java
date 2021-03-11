@@ -14,7 +14,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class AppModuleController {
+public class AddModuleController {
 	private String newStr;
 	TxtParser textfile = new TxtParser();
 	public void setName(String inp) {

@@ -38,42 +38,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-
-
-public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{
-	int globalID=0;
-	double R=50;
-	public class Node {
-		String name="err";
-		double x=100;
-		double y=100;
-		double d=R;
-		int id;
-		
-		Node(String _name, double _x, double _y, double _r){
-			name=_name;
-			x=_x;
-			y=_y;
-			d=_r;
-			id=globalID++;
-		}
-		
-		Node(String _name){
-			name=_name;
-		}
-		
-		public void stick() {
-			//TODO get the mouse's pos and update after adjusting for scene offsets etc.
-		}
-		
-		public double getX() {return this.x;}
-		public double getY() {return this.y;}
-	}
-	public List<Node> nodeList = new ArrayList<Node>();
-	public List<String> moduleList = new ArrayList<String>();
-	
-	public int someNumber = 0;
-	
+public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{	
 	@FXML
     private TextField deviceField;
 	
@@ -105,7 +70,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private Canvas graphArea;
     
     @FXML
-    private MenuItem addNodeMenu;
+    private MenuItem addDeviceMenu;
 
     @FXML
     private MenuItem addModuleMenu;
@@ -118,17 +83,47 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private MenuItem newJSONMenu;
-
-    private ObservableList<String> devices = FXCollections.observableArrayList();
-    //private ObservableList<String> sensors= FXCollections.observableArrayList();
-    //private ObservableList<String> actuators= FXCollections.observableArrayList();
     
     @FXML
     private ListView<String> policyList;
     
     @FXML
     private AnchorPane backPane;
-        
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
+    int globalID=0;
+	double R=50;
+	double xCenter=100;
+	double yCenter=100;
+	Color phyColor=Color.RED;
+	Color virColor=Color.BLUE;
+    GraphicsContext gc;
+	double clickX=0;
+	double clickY=0;
+	Node draggingNode = null;
+	
+	class Node {
+		String name = "err";
+		double x,y,sz;
+		int id;
+		Color c;
+		
+		Node(String _name, Color _c) {this(_name, xCenter, yCenter, R+R, _c);}
+		Node(String _name, double _x, double _y, double _r, Color _c) {
+			name = _name;
+			x = _x;
+			y = _y;
+			sz = _r;
+			c = _c;
+			id = globalID++;
+		}
+	}
+	
+	public List<Node> nodeList = new ArrayList<Node>();
+	public List<String> deviceList = new ArrayList<String>();
+	public List<String> moduleList = new ArrayList<String>();
+	
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 //    	System.out.println("Init");
@@ -140,7 +135,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	
     }
     
-    GraphicsContext gc;
     public void setupListeners(Stage parentStage, Scene scene) {
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenDragHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
@@ -150,21 +144,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @Override
-	public void handle(KeyEvent event) {
-    	switch(event.getCode()) {
-			case DIGIT1: System.out.println("1"); break;
-			case DIGIT2: System.out.println("2"); break;
-			case DIGIT3: System.out.println("3"); break;
-			case DIGIT4: System.out.println("4"); break;
-			case Z	   : System.out.println("z"); break;
-			case DELETE: System.out.println("Del"); break;
-			default: break;
-    	}
+	public void handle(KeyEvent event) {    	
+		switch (event.getCode()){
+			case ESCAPE -> System.out.println("z");	 // Select Pointer Tool | Escape Menu Without Saving
+			case DIGIT1 -> System.out.println("1");	 // Select Node Placer
+			case DIGIT2 -> System.out.println("2");	 // Select Module Placer
+			case DIGIT3 -> System.out.println("3");	 // Select Edge Placer
+			case Z 		-> System.out.println("Z");	 // Undo Last Action
+			case E 		-> System.out.println("E");	 // Edit Object Selected
+			case F5 	-> System.out.println("F5"); // Save File
+			case DELETE -> System.out.println("Del");// Delete Object Selected
+			default -> {} // Nothing
+		}
 	}
 
-	double clickX=0;
-	double clickY=0;
-	Node draggingNode = null;
     @FXML
     private void mouseClickHandler(MouseEvent mEvent){
         clickX=mEvent.getX();
@@ -173,7 +166,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         Node tempNode = getNodeOnClick(mEvent);
         if(tempNode==null) {
         	System.out.println("Making new node...");
-        	Node newNode = new Node("something", clickX-R, clickY-R, R+R);
+        	Node newNode = new Node("something", clickX-R, clickY-R, R+R, phyColor);
         	draggingNode = newNode;
         	redrawNodes();
         }else {
@@ -185,11 +178,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
-    	addNode();
+    	addDevice();
     	nodeList.add(draggingNode);
     	System.out.println("There are #" + nodeList.size() + " nodes");
     	System.out.println("MousePos ("+mEvent.getX()+","+mEvent.getY()+")");
-    	System.out.println("MousePos ("+draggingNode.getX()+","+draggingNode.getY()+")");
+    	System.out.println("MousePos ("+draggingNode.x+","+draggingNode.y+")");
     	draggingNode = null;
     	redrawNodes();
     }
@@ -208,16 +201,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	}
     
 	private Node getNodeOnClick(MouseEvent mEvent) {
-		for(Node n : nodeList) if(Math.pow(Math.pow(n.x+(0.5*n.d)-mEvent.getX(),2)+Math.pow(n.y+(0.5*n.d)-mEvent.getY(),2),0.5)<=0.5*n.d) return n;
+		for(Node n : nodeList) if(Math.pow(Math.pow(n.x+(0.5*n.sz)-mEvent.getX(),2)+Math.pow(n.y+(0.5*n.sz)-mEvent.getY(),2),0.5)<=0.5*n.sz) return n;
 		return null;
 	}
 
 	private void screenDragHandler() {
     	System.out.println("Updated canvas size");
-    	gc.setFill(Color.WHITE);
-		topoField.setHeight(backPane.getHeight());
-		topoField.setWidth(backPane.getWidth());
-		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
+    	double w=backPane.getWidth(); double h=backPane.getHeight();
+		xCenter=0.5*w; yCenter=0.5*h;
+		topoField.setWidth(w); topoField.setHeight(h);
+    	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
 		redrawNodes();
     }
     
@@ -231,9 +224,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	@FXML
     void newJSON(ActionEvent event) {
-    	// menu item implementation
-    	try {	
-//    		BorderPane root = FXMLLoader.load(getClass().getResource("createJsonBox.fxml"));
+    	try {
     		FXMLLoader root = new FXMLLoader(getClass().getResource("createJsonBox.fxml"));
     		Scene scene = new Scene(root.load(),414,139);
     		Stage stage = new Stage();
@@ -245,27 +236,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
     
-//    @FXML
-//    void showController(ActionEvent event) {
-//    	try {	
-//    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-//    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("OutputController.fxml"));
-//    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
-//    		Stage stage = new Stage();
-//    		stage.setScene(scene);
-//    		NodeController saveNewNodeController = addNewNodeLoader.getController();
-//    		stage.setTitle("Output");
-//    		stage.showAndWait();
-//    	} catch(Exception e) {
-//    		e.printStackTrace();
-//    	}
-//    }
-    
     @FXML
     void showController(ActionEvent event) {
         try {
-            //BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-            FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("OutputController.fxml"));
+            //BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("NodeInputBox.fxml"));
+            FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
             Scene scene = new Scene(addNewNodeLoader.load(),900,600);
             Stage stage = new Stage();
             stage.setScene(scene);
@@ -277,33 +252,43 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void addNode() {
+    void addDevice() {
     	try {	
-    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("InputBox.fxml"));
+    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("NodeInputBox.fxml"));
     		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
     		Stage stage = new Stage();
     		stage.setScene(scene);
-    		NodeController saveNewNodeController = addNewNodeLoader.getController();
-    		stage.setTitle("Add Mobile Node");
+    		AddNodeController saveNewNodeController = addNewNodeLoader.getController();
+    		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		if (saveNewNodeController.getNodeName()!=null) {
-				nodeList.add(new Node(saveNewNodeController.getNodeName().toString()));
+				nodeList.add(new Node(saveNewNodeController.getNodeName().toString(), xCenter, yCenter, R+R, phyColor));
 				for(Node node : nodeList) {
-					System.out.println(node.name);
+					System.out.println("Node IDs: " + node.id);
 				}
     		}
-    		/*if (node == null || node.isEmpty()) {
-            	node = Optional.of("");
-           }*/
-    		/* if(node.isPresent()) {
-    			devices.add(node.get());	
-    			policyList.setItems(devices); 
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    @FXML
+    void addModule(ActionEvent event) {
+    	try {
+    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
+    		Scene scene = new Scene(dataFXML.load(),414,346);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		AddModuleController controller = dataFXML.getController();
+    		controller.populateList(nodeList.stream().map(n->n.name).collect(Collectors.toList()));
+    		stage.setTitle("Add Module");
+    		stage.showAndWait();
+    		//TODO Validity check needs to be better than just checking if the name is null
+    		if (controller.getAppModuleName()!=null) {
+    			moduleList.add(controller.getAppModuleName().toString());
+        		System.out.println("Added module" + controller.getAppModuleName().toString());
+        		String module = controller.getAppModuleName();
     		}
-    		else {
-    			
-    		}*/
-    		//policyList.setItems(devices); 
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -312,46 +297,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void addEdge(ActionEvent event) {
 	    try {
-	    	//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-			FXMLLoader addAppEdgeLoader = new FXMLLoader(getClass().getResource("AppEdgeInputBox.fxml"));
-			Scene scene = new Scene(addAppEdgeLoader.load(),414,346);
+			FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("EdgeInputBox.fxml"));
+			Scene scene = new Scene(dataFXML.load(),414,346);
 			Stage stage = new Stage();
 			stage.setScene(scene);
-			AppEdgeController saveNewNodeController = addAppEdgeLoader.getController();
-			saveNewNodeController.populateParentList(moduleList);
-			saveNewNodeController.populateChildList(moduleList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
+			AddEdgeController saveNewNodeController = dataFXML.getController();
+			saveNewNodeController.populateParentList(moduleList);
+			saveNewNodeController.populateChildList(moduleList);
 			String edge = saveNewNodeController.getAppEdgeName();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-    }
-    
-    @FXML
-    void addModule(ActionEvent event) {
-    	try {
-        	//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-    		FXMLLoader addAppModuleLoader = new FXMLLoader(getClass().getResource("AppModuleInputBox.fxml"));
-    		Scene scene = new Scene(addAppModuleLoader.load(),414,346);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		AppModuleController saveNewNodeController = addAppModuleLoader.getController();
-    		saveNewNodeController.populateList(nodeList.stream().map(n->n.name).collect(Collectors.toList()));
-    		stage.setTitle("Add App Module");
-    		stage.showAndWait();
-    		if (saveNewNodeController.getAppModuleName()!=null) {
-    			moduleList.add(saveNewNodeController.getAppModuleName().toString());
-        		System.out.println("Added module" + saveNewNodeController.getAppModuleName().toString());
-        		String module = saveNewNodeController.getAppModuleName();
-    		}
-    		/*if(module.isPresent()) {
-    			devices.add(module.get());	
-    		}
-    		policyList.setItems(devices); */
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
     }
     
     @FXML
@@ -363,7 +321,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void editHandler(ActionEvent event) {
     	
     }
-    
     
     @FXML
     void exitApp(ActionEvent event) {

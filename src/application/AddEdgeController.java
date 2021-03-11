@@ -14,7 +14,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class AppEdgeController {
+public class AddEdgeController {
 	String appEdgeName;
 	TxtParser textfile = new TxtParser();
 	

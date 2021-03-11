@@ -16,7 +16,7 @@ import org.fog.test.perfeval.TextParser;
 
 import java.io.IOException;
 
-public class NodeController {
+public class AddNodeController {
 	public String nodeName;
 	TxtParser textfile = new TxtParser();
 	@FXML

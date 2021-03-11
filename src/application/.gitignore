@@ -14,3 +14,7 @@
 /OutputContoller.class
 /OutputController$Energy.class
 /OutputController.class
+/StringBoxController.class
+/AddEdgeController.class
+/AddModuleController.class
+/AddNodeController.class
