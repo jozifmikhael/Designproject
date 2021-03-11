@@ -18,3 +18,12 @@
 /AddEdgeController.class
 /AddModuleController.class
 /AddNodeController.class
+/TxtParser$ModuSpec.class
+/_MainWindowController$dispLink.class
+/_MainWindowController$dispNode.class
+/SetupJSONParser$EdgeSpec.class
+/SetupJSONParser$HostSpec.class
+/SetupJSONParser$LinkSpec.class
+/SetupJSONParser$ModuSpec.class
+/SetupJSONParser$NodeSpec.class
+/SetupJSONParser.class
