@@ -127,8 +127,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		void draw() {
 			double x1=0; double y1=0;
 			double x2=0; double y2=0;
-			if(src!=null) {x1=src.x+src.sz; y1= src.y + src.sz;}
-			if(dst!=null) {x2=dst.x+dst.sz; y2= dst.y + dst.sz;}
+			if(src!=null) {x1=src.x+0.5*src.sz; y1= src.y+0.5*src.sz;}
+			if(dst!=null) {x2=dst.x+0.5*dst.sz; y2= dst.y+0.5*dst.sz;}
 			if(src!=null&&dst!=null) {
 				gc.beginPath();
 		    	gc.moveTo(x1, y1);
@@ -147,8 +147,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.parent)) this.dst = dn;
 		}
 		dispLink(ModuEdgeSpec _spec) {
-	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_device.name)) {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_device.name)) {this.dst=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.child)) this.src=dn;
+	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.parent)) this.dst=dn;
 		}
 	}
 	
@@ -198,7 +198,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         	redrawNodes();
         }else {
         	System.out.println("Picked up node...");
-        	dispNodesList.remove(tempNode);
+        	//dispNodesList.remove(tempNode);
         	draggingNode = tempNode;
         }
     }
@@ -206,6 +206,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
     	addDevice().setPos(mEvent);
+    	if(devicesList.contains(draggingNode)) System.out.println("Pre-existing");
     	draggingNode=null;
     	redrawNodes();
     }
