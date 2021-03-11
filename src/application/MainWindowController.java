@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import javax.swing.event.ChangeListener;
 
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -28,7 +27,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.canvas.*;
-
+import javafx.beans.value.ChangeListener;
+import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 
 
 
@@ -38,7 +39,6 @@ public class MainWindowController implements Initializable{
 		double posX=100;
 		double posY=100;
 		double r=40;
-		boolean dragging=false;
 		
 		Node(String _name, double _posX, double _posY, double _r){
 			name=_name;
@@ -124,47 +124,86 @@ public class MainWindowController implements Initializable{
 //    	moduleList.add("test1");
 //    	moduleList.add("test2");
 //    	topoField.addEventHandler(MouseEvent.MOUSE_CLICKED, mEvent->mouseClickHandler(mEvent));
+    	
     }
     
+    public void setupListeners(Stage parentStage) {
+//    	parentStage.widthProperty().addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
+//                System.out.println("Changed!"); 
+//            }
+//        });
+    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenDragHandler();
+    	parentStage.widthProperty().addListener(stageSizeListener);
+    	parentStage.heightProperty().addListener(stageSizeListener);
+    }
+
+	double clickX=0;
+	double clickY=0;
+	double R=40;
+	Node draggingNode = null;
     @FXML
     private void mouseClickHandler(MouseEvent mEvent){
-        GraphicsContext gc = topoField.getGraphicsContext2D();
-		gc.setFill(Color.WHITE);
-		System.out.println(backPane.getHeight() + "" + backPane.getWidth());
-		topoField.setHeight(backPane.getHeight());
-		topoField.setWidth(backPane.getWidth());
-		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		gc.setFill(Color.RED);
-		
-		//TODO this will be a for-loop over the nodeList to iteratively draw
-		//will refer to the Node's x/y/r vals
-		//for nodes
-		//gc.fillOval(node.x, node.y, node.r+r, r+r);
-		
-
-		double clickX=mEvent.getX();
-		double clickY=mEvent.getY();
-		//TODO here well do a check to see if its a pre-existing Node's bounding box
-		//if so well start editing that nodes x y pos onto the mouse's pos
-		
-		//placeholder
-		double r=40;
-		gc.fillOval(clickX-r, clickY-r, r+r, r+r);
-    	System.out.println(clickX+", "+clickY);
+        redrawNodes();
+        clickX=mEvent.getX();
+        clickY=mEvent.getY();
+        
+        Node tempNode = getNodeOnClick(mEvent);
+        if(tempNode==null) {
+        	Node newNode = new Node("something", clickX-R, clickY-R, R+R);
+        	drawNode(newNode);
+        	draggingNode = newNode;
+        }else {
+        	nodeList.remove(tempNode);
+        	draggingNode = tempNode;
+        }
+    }
+    
+    private void mouseReleaseHandler() {
+    	nodeList.add(draggingNode);
+    	draggingNode = null;
+    }
+    
+    private void mouseMoveHandler() {
+    	GraphicsContext gc = topoField.getGraphicsContext2D();
+    	if(draggingNode != null){
+    		//draw the thing again at mouse pos
+    	}
     }
     
     
-    @FXML    
-    private void screenDragHandler() {
+    private void drawNode(Node newNode) {
+    	GraphicsContext gc = topoField.getGraphicsContext2D();
+		// TODO Auto-generated method stub
+    	gc.fillOval(clickX-R, clickY-R, R+R, R+R);
+    	System.out.println(clickX+", "+clickY);
+	}
+
+	private Node getNodeOnClick(MouseEvent mEvent) {
+		// Hanza
+		return null;
+	}
+
+	private void screenDragHandler() {
     	System.out.println("Updated canvas size");
         GraphicsContext gc = topoField.getGraphicsContext2D();
     	gc.setFill(Color.WHITE);
 		topoField.setHeight(backPane.getHeight());
 		topoField.setWidth(backPane.getWidth());
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
+		redrawNodes();
     }
     
-    @FXML
+    private void redrawNodes() {
+    	GraphicsContext gc = topoField.getGraphicsContext2D();
+		gc.setFill(Color.WHITE);
+		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
+		gc.setFill(Color.RED);
+		for(Node node : nodeList) drawNode(node);
+	}
+
+	@FXML
     void newJSON(ActionEvent event) {
     	// menu item implementation
     	try {	

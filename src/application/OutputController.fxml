@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.StackedAreaChart?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -48,7 +52,23 @@
                   </MenuBar>
                 <AnchorPane fx:id="backPane" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #ffffff;">
                      <children>
-                        <Canvas fx:id="graphArea" height="383.0" onContextMenuRequested="#mouseClickHandler" onMouseClicked="#mouseClickHandler" width="870.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                        <Canvas fx:id="graphArea" height="441.0" onContextMenuRequested="#mouseClickHandler" onMouseClicked="#mouseClickHandler" width="870.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                        <StackedAreaChart layoutX="5.0" prefHeight="307.0" prefWidth="865.0">
+                          <xAxis>
+                            <NumberAxis side="BOTTOM" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" />
+                          </yAxis>
+                        </StackedAreaChart>
+                        <LineChart layoutX="6.0" layoutY="292.0" prefHeight="150.0" prefWidth="855.0">
+                          <xAxis>
+                            <CategoryAxis side="BOTTOM" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" />
+                          </yAxis>
+                        </LineChart>
                      </children>
                   </AnchorPane>
               </items>

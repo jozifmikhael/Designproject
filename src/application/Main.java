@@ -1,8 +1,12 @@
 package application;
-	
+
+import javafx.beans.value.ChangeListener;
 import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.beans.value.ObservableValue;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -24,11 +28,12 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
-			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("_MainWindow.fxml"));
+			BorderPane root = (BorderPane)loader.load();
 			Scene scene = new Scene(root,900,500);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-//			primaryStage.widthProperty().addListener(null);
+			MainWindowController controller = (MainWindowController)loader.getController();
+			controller.setupListeners(primaryStage);
 			
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Policy Placement Application");
