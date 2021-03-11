@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+import application.SetupJSONParser.*;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -107,11 +107,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		double x,y,sz;
 		int id;
 		Color c;
+		NodeSpec data;
 
 		void setPos(MouseEvent mEvent) {this.x=mEvent.getX()-0.5*this.sz; this.y=mEvent.getY()-0.5*this.sz;}
 		void draw() {gc.setFill(c); gc.fillOval(this.x, this.y, this.sz, this.sz);}
-		dispNode(String _name, Color _c) {this(_name, xCenter, yCenter, R+R, _c);}
-		dispNode(String _name, double _x, double _y, double _r, Color _c) {
+		dispNode(String _name, NodeSpec _n, Color _c) {this(_name, _n, xCenter, yCenter, R+R, _c);}
+		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r, Color _c) {
 			name = _name;
 			x = _x;
 			y = _y;
@@ -130,19 +131,39 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			gc.stroke();
 		}
 		dispLink(dispNode _src, dispNode _dst){this.src=_src; this.dst=_dst;}
+		dispLink(DeviceSpec _src, DeviceSpec _dst) {
+	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
+		}
+		dispLink(DeviceSpec _device) {
+	    	for(dispNode dn : dispNodesList) if(dn.name==_device.name)	 {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_device.parent) {this.dst=dn;}
+		}
+//		dispLink(ModuSpec _src, ModuSpec _dst) {
+//	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
+//	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
+//		}
+		
+//		dispLink(ModuSpec _src, ModuSpec _dst) {
+//			this.src = _src;
+//			this.dst = _dst;
+//		}
 	}
-
+	
 	public List<dispNode> dispNodesList = new ArrayList<dispNode>();
 	public List<dispLink> dispLinksList = new ArrayList<dispLink>();
-	public List<String> devicesList = new ArrayList<String>();
-	public List<String> modulesList = new ArrayList<String>();
+	public List<String> deviceNamesList = new ArrayList<String>();
+	public List<String> moduleNamesList = new ArrayList<String>();
+
+	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
+	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
+	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
 	
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
     	
     }
-    
-    @Override
+	@Override
 	public void handle(KeyEvent event) { 	
 		switch (event.getCode()){
 			case ESCAPE : System.out.println("Esc"); break;	 // Select Pointer Tool | Escape Menu Without Saving
@@ -170,7 +191,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	dispNode tempNode = getNodeOnClick(mEvent);
         if(tempNode==null) {
         	System.out.println("Making new node...");
-        	dispNode newNode = new dispNode("dispItem", mEvent.getX()-R, mEvent.getY()-R, R+R, phyColor);
+        	dispNode newNode = new dispNode("dispItem", null, mEvent.getX()-R, mEvent.getY()-R, R+R, phyColor);
         	draggingNode = newNode;
         	redrawNodes();
         }else {
@@ -234,7 +255,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void showOutput(ActionEvent event) {
         try {
-            //BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("NodeInputBox.fxml"));
             FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
             Scene scene = new Scene(addNewNodeLoader.load(),900,600);
             Stage stage = new Stage();
@@ -256,11 +276,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		AddNodeController controller = addNewNodeLoader.getController();
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
-    		String name = controller.getNodeName()==null?"Error":controller.getNodeName().toString();
-    		dispNode newNode = new dispNode(name, xCenter, yCenter, R+R, phyColor);
-    		if(name!="Error"&&devicesList.indexOf(name)<0) {devicesList.add(name); dispNodesList.add(newNode);}
-    		System.out.println("_MainWindowController.java: " + devicesList.toString());
-    		return newNode;
+    		DeviceSpec d = controller.getSpec();
+    		String name = d==null?"Error":d.name;
+    		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R, phyColor);
+			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
+				devicesList.add(d);
+				deviceNamesList.add(name);
+				dispNodesList.add(newDevice);
+			}
+			System.out.println(d.toString());
+//    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
+    		return newDevice;
     	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
@@ -268,24 +294,30 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void addModule(ActionEvent event) {
+    dispNode addModule() {
     	try {
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
     		Scene scene = new Scene(dataFXML.load(),414,346);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
-    		controller.populateList(dispNodesList.stream().map(n->n.name).collect(Collectors.toList()));
+    		controller.populateList(deviceNamesList);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
+    		ModuSpec m = controller.getSpec();
     		//TODO Validity check needs to be better than just checking if the name is null
-    		if (controller.getAppModuleName()!=null) {
-    			modulesList.add(controller.getAppModuleName().toString());
-        		System.out.println("Added module" + controller.getAppModuleName().toString());
-        		String module = controller.getAppModuleName();
-    		}
+    		String name = m.name==null?"Error":m.name;
+    		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R, virColor);
+			if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
+				modulesList.add(m);
+				moduleNamesList.add(name);
+				dispNodesList.add(newMod);
+			}
+    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
+    		return newMod;
     	} catch(Exception e) {
     		e.printStackTrace();
+    		return null;
     	}
     }
     
@@ -296,12 +328,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Scene scene = new Scene(dataFXML.load(),414,346);
 			Stage stage = new Stage();
 			stage.setScene(scene);
+			AddEdgeController controller = dataFXML.getController();
+			controller.populateList(moduleNamesList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
-			AddEdgeController saveNewNodeController = dataFXML.getController();
-			saveNewNodeController.populateParentList(modulesList);
-			saveNewNodeController.populateChildList(modulesList);
-			String edge = saveNewNodeController.getAppEdgeName();
+    		ModuEdgeSpec v = controller.getSpec();
+    		moduleEdgesList.add(v);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -353,7 +385,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	String policy = simulationTime.getText()+" "+policyView.getText();
     	FileWriter file_writer;
     	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-     	textfile.writeJSON(jsonDestinationFileName + ".json");
+//     	textfile.writeJSON(jsonDestinationFileName + ".json");
     }
      
     @FXML

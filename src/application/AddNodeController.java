@@ -13,13 +13,19 @@ import java.io.PrintWriter;
 
 import org.fog.test.perfeval.TextParser;
 
+import application.SetupJSONParser.DeviceSpec;
+
 import java.io.IOException;
 
 public class AddNodeController {
-	public String nodeName;
+	DeviceSpec h;
 	SetupJSONParser textfile = new SetupJSONParser();
+
 	@FXML
-	private TextField name = new TextField();
+	private TextField name;
+	
+	@FXML
+	private TextField parentName;
 	
 	@FXML
 	private TextField mips;
@@ -49,10 +55,13 @@ public class AddNodeController {
 	private TextField idlePower;
 	
 	@FXML
-	void saveNodeHandler(ActionEvent event) {
+	void saveNodeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveNode.getScene().getWindow();
 		if (name.getText().trim().isEmpty()) {
 			name.setText("default_device");
+		}
+		if (parentName.getText().trim().isEmpty()) {
+			name.setText("default_parent");
 		}
 		if (mips.getText().trim().isEmpty()) {
 			mips.setText("0");
@@ -78,33 +87,10 @@ public class AddNodeController {
 		if (idlePower.getText().trim().isEmpty()) {
 			idlePower.setText("0");
 		}
-		
-		nodeName = name.getText();
-		addLine();
-		String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
+		h = textfile.createDevice(name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
+		+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
+		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() + "\n");
 		stage.close();
 	}
-	
-	private void addLine() {
-		String nodeLine = name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
-				+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
-				+ busyPower.getText() + " " + idlePower.getText() + "\n";
-		
-		try {
-			textfile.createTopology(nodeLine);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-	
-	public String getNodeName() {
-		return nodeName;
-	}
-	
+	public DeviceSpec getSpec() {return h;}
 }

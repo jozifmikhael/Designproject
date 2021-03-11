@@ -27,3 +27,6 @@
 /SetupJSONParser$ModuSpec.class
 /SetupJSONParser$NodeSpec.class
 /SetupJSONParser.class
+/SetupJSONParser$VirtualEdgeSpec.class
+/SetupJSONParser$DeviceSpec.class
+/SetupJSONParser$ModuEdgeSpec.class

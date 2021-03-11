@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import application.SetupJSONParser.DeviceSpec;
+import application.SetupJSONParser.ModuSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,15 +17,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddModuleController {
-	private String newStr;
+	ModuSpec m;
 	SetupJSONParser textfile = new SetupJSONParser();
-	
-	public void setName(String inp) {
-		newStr = inp;
-		System.out.println("Set str to " + inp);
-	}
-	
-	String appModuleName;
 	
 	@FXML
 	private TextField nodeName;
@@ -59,7 +54,7 @@ public class AddModuleController {
 	private TextField MIPS;
 	
 	@FXML
-	void saveModuleHandler(ActionEvent event) {
+	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveModule.getScene().getWindow();
 		if (nodeBox.getSelectionModel().getSelectedItem() == null
 				|| nodeBox.getSelectionModel().getSelectedItem().trim().isEmpty()) {
@@ -89,8 +84,9 @@ public class AddModuleController {
 		if (fractionalSensitivity.getText().trim().isEmpty()) {
 			fractionalSensitivity.setText("0");
 		}
-		String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-		textfile.writeJSON(jsonDestinationFileName + ".json");
+		m = textfile.createModule(nodeBox.getSelectionModel().getSelectedItem() + " " + moduleName.getText() + " "
+				+ ram.getText() + " " + bandwidth.getText() + " " + inTuple.getText() + " " + outTuple.getText() + " "
+				+ size.getText() + " " + MIPS.getText() + " " + fractionalSensitivity.getText() + "\n");
 		stage.close();
 	}
 	
@@ -99,25 +95,5 @@ public class AddModuleController {
 		items.addAll(str_list);
 		nodeBox.setItems(items);
 	}
-	
-	private void addLine() {
-		String moduleLine = nodeBox.getSelectionModel().getSelectedItem() + " " + moduleName.getText() + " "
-				+ ram.getText() + " " + bandwidth.getText() + " " + inTuple.getText() + " " + outTuple.getText() + " "
-				+ size.getText() + " " + MIPS.getText() + " " + fractionalSensitivity.getText() + "\n";
-		try {
-			textfile.createModuleTopology(moduleLine);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-	
-	public String getAppModuleName() {
-		return appModuleName;
-	}
+	public ModuSpec getSpec() {return m;}
 }

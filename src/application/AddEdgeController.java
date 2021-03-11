@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import application.SetupJSONParser.ModuEdgeSpec;
+import application.SetupJSONParser.ModuSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,7 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddEdgeController {
-	String appEdgeName;
+	ModuEdgeSpec v;
 	SetupJSONParser textfile = new SetupJSONParser();
 	
 	@FXML
@@ -52,8 +54,7 @@ public class AddEdgeController {
 	private ChoiceBox<String> childChoice;
 	
 	@FXML
-	void saveAppEdgeHandler(ActionEvent event) {
-		
+	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
 		
 		if (parentChoice.getSelectionModel().getSelectedItem() == null
@@ -82,48 +83,22 @@ public class AddEdgeController {
 		if (edgeType.getText().trim().isEmpty()) {
 			edgeType.setText("0");
 		}
-		
-		appEdgeName = parentChoice.getSelectionModel().getSelectedItem().trim() + "-"
-				+ childChoice.getSelectionModel().getSelectedItem().trim() + " edge";
-		addLine();
-		String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-		textfile.writeJSON(jsonDestinationFileName + ".json");
-		
+
+		v = textfile.createModuleEdge(parentChoice.getSelectionModel().getSelectedItem() + " "
+				+ childChoice.getSelectionModel().getSelectedItem() + " " + tupleType.getText() + " "
+				+ periodicity.getText() + " " + cpuLength.getText() + " " + newLength.getText() + " "
+				+ edgeType.getText() + " " + direction.getText() + "\n");
 		stage.close();
 	}
 	
-	void populateParentList(List<String> str_list) {
+	void populateList(List<String> str_list) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		items.addAll(str_list);
 		parentChoice.setItems(items);
-	}
-	
-	void populateChildList(List<String> str_list) {
-		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
 		childChoice.setItems(items);
 	}
 	
-	private void addLine() {
-//    	parent.setText("default_edge"); child.setText("0"); periodicity.setText("0"); cpuLength.setText("0"); newLength.setText("0"); tupleType.setText("0"); direction.setText("0"); edgeType.setText("0");
-		String edgeLine = parentChoice.getSelectionModel().getSelectedItem() + " "
-				+ childChoice.getSelectionModel().getSelectedItem() + " " + tupleType.getText() + " "
-				+ periodicity.getText() + " " + cpuLength.getText() + " " + newLength.getText() + " "
-				+ edgeType.getText() + " " + direction.getText() + "\n";
-		try {
-			textfile.createEdgeTopology(edgeLine);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-	
-	public String getAppEdgeName() {
-		return appEdgeName;
+	public ModuEdgeSpec getSpec() {
+		return v;
 	}
 }
