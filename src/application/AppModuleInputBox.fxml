@@ -31,8 +31,7 @@
                   <TextField fx:id="MIPS" layoutX="309.0" layoutY="131.0" prefHeight="25.0" prefWidth="98.0" />
                   <TextField fx:id="fractionalSensitivity" layoutX="309.0" layoutY="164.0" prefHeight="25.0" prefWidth="98.0" />
                   <Text layoutX="211.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensitivity:" />
-                  <TextField fx:id="nodeName" layoutX="103.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
-                  <ChoiceBox fx:id="nodeBox" layoutX="180.0" layoutY="210.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="nodeBox" layoutX="104.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="16.0" />
                </children>
             </AnchorPane>
          </children>

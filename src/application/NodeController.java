@@ -11,11 +11,14 @@ import javafx.stage.Stage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+
+import org.fog.test.perfeval.TextParser;
+
 import java.io.IOException;
 
 public class NodeController {
 	public String nodeName;
-	
+	TxtParser textfile = new TxtParser();
 	@FXML
 	private TextField name = new TextField();
 
@@ -53,7 +56,7 @@ public class NodeController {
  		   name.setText("default_mobile");
  	   		 } 
  	   if (mips.getText().trim().isEmpty()) {
- 	    	 mips.setText("999");
+ 	    	 mips.setText("0");
  	         } 
  	   if (ram.getText().trim().isEmpty()) {
  		   ram.setText("0");
@@ -76,46 +79,29 @@ public class NodeController {
  	   if (idlePower.getText().trim().isEmpty()) {
  		   idlePower.setText("0");
  	         } 
- 	   
+ 	
  	nodeName = name.getText();
  	addLine();
+ 	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
+ 	textfile.writeJSON(jsonDestinationFileName + ".json");
  	stage.close();
     }
     
     private void addLine() {
-        String line = name.getText().toString() +" " +mips.getText() +" " +ram.getText() +" " +upbw.getText() +" " +downbw.getText()+" " +nodelvl.getText()+" " +ratePerMIPS.getText() +" " +busyPower.getText()+" " +idlePower.getText() +"\n";
-// https://stackoverflow.com/questions/53020451/how-to-create-javafx-save-read-information-from-text-file-and-letting-user-to-e
-         FileWriter file_writer;
+    	String nodeLine = name.getText().toString() +" " +mips.getText() +" " +ram.getText() +" " +upbw.getText() +" " +downbw.getText()+" " +nodelvl.getText()+" " +ratePerMIPS.getText() +" " +busyPower.getText()+" " +idlePower.getText() +"\n";
+
         try {
-            file_writer = new FileWriter("instances.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(line);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
-        	try {
-				TxtParser();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			textfile.createTopology(nodeLine);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-    
-    public void TxtParser() throws Exception, IOException {
-		String sourceFileName = "instances.txt";
-		//String jsonFileName = "test6.json";
-		String jsonFileName = jsonDestinationFileName + ".json";
-    	TxtParser textfile = new TxtParser();
-    		textfile.createTopology(sourceFileName);
-    		textfile.writeJSON(jsonFileName);
-    }
     
 	public String getNodeName() {
         return nodeName;

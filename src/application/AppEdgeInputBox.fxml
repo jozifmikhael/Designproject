@@ -16,7 +16,6 @@
                   <Text layoutX="12.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Module:" AnchorPane.leftAnchor="12.0" AnchorPane.topAnchor="20.0" />
                   <Text layoutX="22.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tuple Type:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="100.05078125" />
                   <Text layoutX="15.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Child Module:" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="58.0" />
-                  <TextField fx:id="child" layoutX="103.0" layoutY="64.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="54.0" />
                   <TextField fx:id="tupleType" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="96.0" />
                   <Button fx:id="saveAppEdge" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveAppEdgeHandler" text="Save App Edge" />
                   <TextField fx:id="periodicity" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" AnchorPane.topAnchor="136.0" />
@@ -29,9 +28,8 @@
                   <Text layoutX="207.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edge Type:" />
                   <TextField fx:id="direction" layoutX="281.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
                   <Text layoutX="207.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Direction:" />
-                  <TextField fx:id="parent" layoutX="103.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
-                  <ChoiceBox fx:id="parentChoice" layoutX="232.0" layoutY="163.0" prefWidth="150.0" />
-                  <ChoiceBox fx:id="childChoice" layoutX="232.0" layoutY="210.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="parentChoice" layoutX="103.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
+                  <ChoiceBox fx:id="childChoice" layoutX="103.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
                </children>
             </AnchorPane>
          </children>

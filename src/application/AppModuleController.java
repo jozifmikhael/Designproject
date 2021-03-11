@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 public class AppModuleController {
 	private String newStr;
+	TxtParser textfile = new TxtParser();
 	public void setName(String inp) {
 		newStr=inp;
 		System.out.println("Set str to " + inp);
@@ -59,38 +60,35 @@ public class AppModuleController {
     @FXML
     void saveModuleHandler(ActionEvent event) {
     	Stage stage = (Stage) saveModule.getScene().getWindow();
-    	
-		if (nodeName.getText().trim().isEmpty()) {
-			nodeName.setText("default_module");
-		   		 } 
-		   if (moduleName.getText().trim().isEmpty()) {
-			  moduleName.setText("0");
-		         } 
-		   if (ram.getText().trim().isEmpty()) {
-			   ram.setText("0");
-		         } 
-		   if (MIPS.getText().trim().isEmpty()) {
-			  MIPS.setText("0");
-		         } 
-		   if (size.getText().trim().isEmpty()) {
-			  size.setText("0");
-		         } 
-		   if (bandwidth.getText().trim().isEmpty()) {
-			  bandwidth.setText("0");
-		         } 
-		   if (inTuple.getText().trim().isEmpty()) {
-			  inTuple.setText("0");
-		         } 
-		   if (outTuple.getText().trim().isEmpty()) {
-			  outTuple.setText("0");
-		         } 
-		   if (fractionalSensitivity.getText().trim().isEmpty()) {
-			  fractionalSensitivity.setText("0");
-		 } 
-
-    	appModuleName = moduleName.getText();
-    	addLine();
-    	
+    	if (nodeBox.getSelectionModel().getSelectedItem() == null || nodeBox.getSelectionModel().getSelectedItem().trim().isEmpty()) {
+    		nodeBox.setValue("Module_default_node");
+    	} 
+    	if(moduleName.getText().trim().isEmpty()){
+    		moduleName.setText("0");
+    	}
+		if(ram.getText().trim().isEmpty()){
+			ram.setText("0");
+		}
+		if(MIPS.getText().trim().isEmpty()){
+			MIPS.setText("0");
+		}
+		if(size.getText().trim().isEmpty()){
+			size.setText("0");
+		}
+		if(bandwidth.getText().trim().isEmpty()){
+			bandwidth.setText("0");
+		}
+		if(inTuple.getText().trim().isEmpty()){
+			inTuple.setText("0");
+		}
+		if(outTuple.getText().trim().isEmpty()){
+			outTuple.setText("0");
+		}
+		if(fractionalSensitivity.getText().trim().isEmpty()){
+			fractionalSensitivity.setText("0");
+		}
+		String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
+		textfile.writeJSON(jsonDestinationFileName + ".json");
     	stage.close();
     }
     
@@ -101,38 +99,19 @@ public class AppModuleController {
     }
     
     private void addLine() {
-        String line = nodeName.getText() +" " +moduleName.getText() +" " +ram.getText() +" " +MIPS.getText() +" " +size.getText()+" " +bandwidth.getText()+" "+ inTuple.getText()+" " +outTuple.getText() +" "+fractionalSensitivity.getText() +"\n";
-        FileWriter file_writer;
+    	String moduleLine = nodeBox.getSelectionModel().getSelectedItem() + " " +moduleName.getText() +" " +ram.getText()+ " " +bandwidth.getText() + " " + inTuple.getText()+ " " + outTuple.getText() + " " + size.getText() + " " + MIPS.getText() + " " + fractionalSensitivity.getText() +"\n";
         try {
-            file_writer = new FileWriter("modules.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(line);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
-        	try {
-				TxtParser();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			textfile.createModuleTopology(moduleLine);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-    
-    public void TxtParser() throws Exception, IOException {
-		String sourceFileName = "modules.txt";
-		String jsonFileName = jsonDestinationFileName + ".json";
-		//String jsonFileName = "test6.json";
-    	TxtParser textfile = new TxtParser();
-    		textfile.createTopology(sourceFileName);
-    		textfile.writeJSON(jsonFileName);
-    }
     
     public String getAppModuleName() {
         return appModuleName;

@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 
 public class AppEdgeController {
 	String appEdgeName;
+	TxtParser textfile = new TxtParser();
+	
     @FXML
     private TextField parent;
 
@@ -54,12 +56,12 @@ public class AppEdgeController {
     	
     	Stage stage = (Stage) saveAppEdge.getScene().getWindow();
     	
-    	if (parent.getText().trim().isEmpty()) {
-    		parent.setText("default_edge");
+    	if (parentChoice.getSelectionModel().getSelectedItem() == null || parentChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
+    		parentChoice.setValue("default_parent_edge");
  	   		 } 
- 	   if (child.getText().trim().isEmpty()) {
- 		  child.setText("0");
- 	         } 
+ 	   if (childChoice.getSelectionModel().getSelectedItem() == null || childChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
+ 		  childChoice.setValue("default_child_edge");
+ 	   }
  	   if (periodicity.getText().trim().isEmpty()) {
  		  periodicity.setText("0");
  	         } 
@@ -79,8 +81,10 @@ public class AppEdgeController {
  		  edgeType.setText("0");
  	         } 
  	  
-    	appEdgeName = parent.getText()+"-"+child.getText()+" edge";
-    	addLine();
+ 	  appEdgeName = parentChoice.getSelectionModel().getSelectedItem().trim()+"-"+childChoice.getSelectionModel().getSelectedItem().trim()+" edge";
+  	addLine();
+  	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
+   	textfile.writeJSON(jsonDestinationFileName + ".json");
     	
     	stage.close();
     }
@@ -100,40 +104,19 @@ public class AppEdgeController {
     
     private void addLine() {
 //    	parent.setText("default_edge"); child.setText("0"); periodicity.setText("0"); cpuLength.setText("0"); newLength.setText("0"); tupleType.setText("0"); direction.setText("0"); edgeType.setText("0");
-        String line = parent.getText() +" " +child.getText() +" "+periodicity.getText()+" " +cpuLength.getText() +" " +newLength.getText()+" " +tupleType.getText()+" " +direction.getText() +" " +edgeType.getText()+"\n";
-        FileWriter file_writer;
+    	String edgeLine = parentChoice.getSelectionModel().getSelectedItem() +" " +childChoice.getSelectionModel().getSelectedItem() +" " +tupleType.getText() + " " + periodicity.getText() + " " + cpuLength.getText() +" " + newLength.getText() + " " + edgeType.getText() + " " + direction.getText() +"\n";
         try {
-            file_writer = new FileWriter("edges.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(line);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-            
-
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
-        	try {
-				TxtParser();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			textfile.createEdgeTopology(edgeLine);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-    
-    public void TxtParser() throws Exception, IOException {
-		String sourceFileName = "edges.txt";
-		String jsonFileName = jsonDestinationFileName + ".json";
-		//String jsonFileName = "test6.json";
-    	TxtParser textfile = new TxtParser();
-    		textfile.createTopology(sourceFileName);
-    		textfile.writeJSON(jsonFileName);
-    }
 
     public String getAppEdgeName() {
         return appEdgeName;

@@ -287,9 +287,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		NodeController saveNewNodeController = addNewNodeLoader.getController();
     		stage.setTitle("Add Mobile Node");
     		stage.showAndWait();
-    		nodeList.add(new Node(saveNewNodeController.getNodeName().toString()));
-    		for(Node node : nodeList) {
-    			System.out.println(node.name);
+    		if (saveNewNodeController.getNodeName()!=null) {
+				nodeList.add(new Node(saveNewNodeController.getNodeName().toString()));
+				for(Node node : nodeList) {
+					System.out.println(node.name);
+				}
     		}
     		/*if (node == null || node.isEmpty()) {
             	node = Optional.of("");
@@ -337,11 +339,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		AppModuleController saveNewNodeController = addAppModuleLoader.getController();
     		saveNewNodeController.populateList(nodeList.stream().map(n->n.name).collect(Collectors.toList()));
     		stage.setTitle("Add App Module");
-    		saveNewNodeController.setName("ss");
     		stage.showAndWait();
-    		moduleList.add(saveNewNodeController.getAppModuleName().toString());
-    		System.out.println("Added module" + saveNewNodeController.getAppModuleName().toString());
-    		String module = saveNewNodeController.getAppModuleName();
+    		if (saveNewNodeController.getAppModuleName()!=null) {
+    			moduleList.add(saveNewNodeController.getAppModuleName().toString());
+        		System.out.println("Added module" + saveNewNodeController.getAppModuleName().toString());
+        		String module = saveNewNodeController.getAppModuleName();
+    		}
     		/*if(module.isPresent()) {
     			devices.add(module.get());	
     		}
@@ -393,23 +396,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
     
+    TxtParser textfile = new TxtParser();
     @FXML
     void startSim(ActionEvent event) throws IOException {
     	String policy = simulationTime.getText()+" "+policyView.getText();
     	FileWriter file_writer;
-        try {
-            file_writer = new FileWriter("simTime.txt",true);
-            BufferedWriter buffered_Writer = new BufferedWriter(file_writer);
-            buffered_Writer.write(policy);
-            buffered_Writer.flush();
-            buffered_Writer.close();
-        } catch (IOException e) {
-            System.out.println("Add line failed!" +e);
-        }
-    	String command = "AutoClicker.exe";
-           // Running the above command 
-           Runtime run  = Runtime.getRuntime(); 
-           Process proc = run.exec(command);
+    	String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
+     	textfile.writeJSON(jsonDestinationFileName + ".json");
     }
      
     @FXML
