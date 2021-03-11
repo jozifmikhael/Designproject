@@ -33,7 +33,7 @@ public class Main extends Application {
 			Scene scene = new Scene(root,900,500);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			_MainWindowController controller = (_MainWindowController)loader.getController();
-			controller.setupListeners(primaryStage);
+			controller.setupListeners(primaryStage, scene);
 			
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Policy Placement Application");

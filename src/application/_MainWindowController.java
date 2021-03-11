@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -26,14 +28,19 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import javafx.scene.canvas.*;
 import javafx.beans.value.ChangeListener;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 
-public class _MainWindowController implements Initializable{
+
+public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{
 	int globalID=0;
 	double R=50;
 	public class Node {
@@ -62,7 +69,6 @@ public class _MainWindowController implements Initializable{
 		public double getX() {return this.x;}
 		public double getY() {return this.y;}
 	}
-	private static boolean initFlag = true;
 	public List<Node> nodeList = new ArrayList<Node>();
 	public List<String> moduleList = new ArrayList<String>();
 	
@@ -80,7 +86,6 @@ public class _MainWindowController implements Initializable{
     @FXML
     private MenuItem LowestPowerItem;
     
-
     @FXML
     private TextField simulationTime;
 
@@ -126,7 +131,7 @@ public class _MainWindowController implements Initializable{
         
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-    	System.out.println("Init");
+//    	System.out.println("Init");
 //    	nodeList.add("test1");
 //    	nodeList.add("test2");
 //    	moduleList.add("test1");
@@ -136,12 +141,27 @@ public class _MainWindowController implements Initializable{
     }
     
     GraphicsContext gc;
-    public void setupListeners(Stage parentStage) {
+    public void setupListeners(Stage parentStage, Scene scene) {
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenDragHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
     	gc = topoField.getGraphicsContext2D();
+    	scene.setOnKeyPressed(this); // uses handle method
     }
+    
+    @Override
+	public void handle(KeyEvent event) {
+    	if (event.getCode() == KeyCode.DIGIT1)
+    		System.out.println("1");
+    	if (event.getCode() == KeyCode.DIGIT2)
+    		System.out.println("2");
+    	if (event.getCode() == KeyCode.DIGIT3)
+    		System.out.println("3");
+    	if (event.getCode() == KeyCode.Z)
+    		System.out.println("Z");
+    	if (event.getCode() == KeyCode.DELETE)
+    		System.out.println("Delete");
+	}
 
 	double clickX=0;
 	double clickY=0;
@@ -166,6 +186,8 @@ public class _MainWindowController implements Initializable{
     
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
+    	//I want a textbox to pop up here to ask for a string
+    	
     	nodeList.add(draggingNode);
     	System.out.println("There are #" + nodeList.size() + " nodes");
     	System.out.println("MousePos ("+mEvent.getX()+","+mEvent.getY()+")");
@@ -227,20 +249,35 @@ public class _MainWindowController implements Initializable{
     	}
     }
     
+//    @FXML
+//    void showController(ActionEvent event) {
+//    	try {	
+//    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
+//    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("OutputController.fxml"));
+//    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
+//    		Stage stage = new Stage();
+//    		stage.setScene(scene);
+//    		NodeController saveNewNodeController = addNewNodeLoader.getController();
+//    		stage.setTitle("Output");
+//    		stage.showAndWait();
+//    	} catch(Exception e) {
+//    		e.printStackTrace();
+//    	}
+//    }
+    
     @FXML
     void showController(ActionEvent event) {
-    	try {	
-    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("OutputController.fxml"));
-    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		NodeController saveNewNodeController = addNewNodeLoader.getController();
-    		stage.setTitle("Output");
-    		stage.showAndWait();
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
+        try {
+            //BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
+            FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("OutputController.fxml"));
+            Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Output");
+            stage.showAndWait();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
     
     @FXML
@@ -276,26 +313,21 @@ public class _MainWindowController implements Initializable{
     
     @FXML
     void addEdge(ActionEvent event) {
-    try {
-    	//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-		FXMLLoader addAppEdgeLoader = new FXMLLoader(getClass().getResource("AppEdgeInputBox.fxml"));
-		Scene scene = new Scene(addAppEdgeLoader.load(),414,346);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		AppEdgeController saveNewNodeController = addAppEdgeLoader.getController();
-		saveNewNodeController.populateParentList(moduleList);
-		saveNewNodeController.populateChildList(moduleList);
-		stage.setTitle("Add App Edge");
-		stage.showAndWait();
-		String edge = saveNewNodeController.getAppEdgeName();
-		/*if(edge.isPresent()) {
-			devices.add(edge.get());	
+	    try {
+	    	//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
+			FXMLLoader addAppEdgeLoader = new FXMLLoader(getClass().getResource("AppEdgeInputBox.fxml"));
+			Scene scene = new Scene(addAppEdgeLoader.load(),414,346);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			AppEdgeController saveNewNodeController = addAppEdgeLoader.getController();
+			saveNewNodeController.populateParentList(moduleList);
+			saveNewNodeController.populateChildList(moduleList);
+			stage.setTitle("Add App Edge");
+			stage.showAndWait();
+			String edge = saveNewNodeController.getAppEdgeName();
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
-		policyList.setItems(devices);*/
-	} catch(Exception e) {
-		e.printStackTrace();
-	}
-	
     }
     
     @FXML
@@ -339,9 +371,7 @@ public class _MainWindowController implements Initializable{
     	Stage stage;
     	stage = (Stage) ((Button)event.getSource()).getScene().getWindow();
     	stage.close();
-    }
-
-    
+    }    
     
     @FXML
     void displaySelected(MouseEvent event) {
