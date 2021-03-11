@@ -277,6 +277,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
+    		if (d==null) return null;
     		String name = d==null?"Error":d.name;
     		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R, phyColor);
 			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
@@ -305,7 +306,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Add Module");
     		stage.showAndWait();
     		ModuSpec m = controller.getSpec();
-    		//TODO Validity check needs to be better than just checking if the name is null
+    		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
     		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R, virColor);
 			if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
@@ -333,7 +334,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
     		ModuEdgeSpec v = controller.getSpec();
-    		moduleEdgesList.add(v);
+    		if(v!=null) moduleEdgesList.add(v);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
