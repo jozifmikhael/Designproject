@@ -141,6 +141,7 @@ public class _MainWindowController implements Initializable{
 	Node draggingNode = null;
     @FXML
     private void mouseClickHandler(MouseEvent mEvent){
+    	System.out.println();
         redrawNodes();
         clickX=mEvent.getX();
         clickY=mEvent.getY();
@@ -159,13 +160,16 @@ public class _MainWindowController implements Initializable{
     @FXML
     private void mouseReleaseHandler() {
     	nodeList.add(draggingNode);
+    	System.out.println("There are #" + nodeList.size() + " nodes");
     	draggingNode = null;
     }
     
     @FXML
-    private void mouseMoveHandler() {
+    private void mouseMoveHandler(MouseEvent mEvent) {
     	if(draggingNode != null){
-    		//draw the thing again at mouse pos
+    		draggingNode.posX = mEvent.getX()-R;
+    		draggingNode.posY = mEvent.getY()-R;
+    		redrawNodes();
     	}
     }
     
@@ -193,6 +197,7 @@ public class _MainWindowController implements Initializable{
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
 		gc.setFill(Color.RED);
 		for(Node node : nodeList) drawNode(node);
+		if (draggingNode!=null) drawNode(draggingNode);
 	}
 
 	@FXML
