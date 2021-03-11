@@ -33,7 +33,7 @@ import javafx.beans.value.ObservableValue;
 
 
 
-public class MainWindowController implements Initializable{
+public class _MainWindowController implements Initializable{
 	public class Node {
 		String name="err";
 		double posX=100;

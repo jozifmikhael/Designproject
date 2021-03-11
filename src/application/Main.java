@@ -32,7 +32,7 @@ public class Main extends Application {
 			BorderPane root = (BorderPane)loader.load();
 			Scene scene = new Scene(root,900,500);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			MainWindowController controller = (MainWindowController)loader.getController();
+			_MainWindowController controller = (_MainWindowController)loader.getController();
 			controller.setupListeners(primaryStage);
 			
 			primaryStage.setScene(scene);

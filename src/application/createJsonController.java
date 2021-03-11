@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class createJsonController extends MainWindowController {
+public class createJsonController extends _MainWindowController {
 	public static String jsonDestinationFileName = "default";
 	
     @FXML
