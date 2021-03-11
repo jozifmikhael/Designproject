@@ -127,16 +127,12 @@ public class _MainWindowController implements Initializable{
     	
     }
     
+    GraphicsContext gc;
     public void setupListeners(Stage parentStage) {
-//    	parentStage.widthProperty().addListener(new ChangeListener<Number>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-//                System.out.println("Changed!"); 
-//            }
-//        });
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenDragHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
+    	gc = topoField.getGraphicsContext2D();
     }
 
 	double clickX=0;
@@ -160,24 +156,22 @@ public class _MainWindowController implements Initializable{
         }
     }
     
+    @FXML
     private void mouseReleaseHandler() {
     	nodeList.add(draggingNode);
     	draggingNode = null;
     }
     
+    @FXML
     private void mouseMoveHandler() {
-    	GraphicsContext gc = topoField.getGraphicsContext2D();
     	if(draggingNode != null){
     		//draw the thing again at mouse pos
     	}
     }
     
     
-    private void drawNode(Node newNode) {
-    	GraphicsContext gc = topoField.getGraphicsContext2D();
-		// TODO Auto-generated method stub
-    	gc.fillOval(clickX-R, clickY-R, R+R, R+R);
-    	System.out.println(clickX+", "+clickY);
+    private void drawNode(Node _node) {
+    	gc.fillOval(_node.posX, _node.posY, R+R, R+R);
 	}
 
 	private Node getNodeOnClick(MouseEvent mEvent) {
@@ -187,7 +181,6 @@ public class _MainWindowController implements Initializable{
 
 	private void screenDragHandler() {
     	System.out.println("Updated canvas size");
-        GraphicsContext gc = topoField.getGraphicsContext2D();
     	gc.setFill(Color.WHITE);
 		topoField.setHeight(backPane.getHeight());
 		topoField.setWidth(backPane.getWidth());
@@ -196,7 +189,6 @@ public class _MainWindowController implements Initializable{
     }
     
     private void redrawNodes() {
-    	GraphicsContext gc = topoField.getGraphicsContext2D();
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
 		gc.setFill(Color.RED);
