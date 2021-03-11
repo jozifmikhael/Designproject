@@ -34,17 +34,21 @@ import javafx.beans.value.ObservableValue;
 
 
 public class _MainWindowController implements Initializable{
+	int globalID=0;
+	double R=50;
 	public class Node {
 		String name="err";
-		double posX=100;
-		double posY=100;
-		double r=40;
+		double x=100;
+		double y=100;
+		double d=R;
+		int id;
 		
-		Node(String _name, double _posX, double _posY, double _r){
+		Node(String _name, double _x, double _y, double _r){
 			name=_name;
-			posX=_posX;
-			posY=_posY;
-			r=_r;
+			x=_x;
+			y=_y;
+			d=_r;
+			id=globalID++;
 		}
 		
 		Node(String _name){
@@ -54,10 +58,15 @@ public class _MainWindowController implements Initializable{
 		public void stick() {
 			//TODO get the mouse's pos and update after adjusting for scene offsets etc.
 		}
+		
+		public double getX() {return this.x;}
+		public double getY() {return this.y;}
 	}
 	private static boolean initFlag = true;
 	public List<Node> nodeList = new ArrayList<Node>();
 	public List<String> moduleList = new ArrayList<String>();
+	
+	public int someNumber = 0;
 	
 	@FXML
     private TextField deviceField;
@@ -70,7 +79,6 @@ public class _MainWindowController implements Initializable{
 
     @FXML
     private MenuItem LowestPowerItem;
-    
     
 
     @FXML
@@ -137,49 +145,52 @@ public class _MainWindowController implements Initializable{
 
 	double clickX=0;
 	double clickY=0;
-	double R=40;
 	Node draggingNode = null;
     @FXML
     private void mouseClickHandler(MouseEvent mEvent){
-    	System.out.println();
-        redrawNodes();
         clickX=mEvent.getX();
         clickY=mEvent.getY();
         
         Node tempNode = getNodeOnClick(mEvent);
         if(tempNode==null) {
+        	System.out.println("Making new node...");
         	Node newNode = new Node("something", clickX-R, clickY-R, R+R);
-        	drawNode(newNode);
         	draggingNode = newNode;
+        	redrawNodes();
         }else {
+        	System.out.println("Picked up node...");
         	nodeList.remove(tempNode);
         	draggingNode = tempNode;
         }
     }
     
     @FXML
-    private void mouseReleaseHandler() {
+    private void mouseReleaseHandler(MouseEvent mEvent) {
     	nodeList.add(draggingNode);
     	System.out.println("There are #" + nodeList.size() + " nodes");
+    	System.out.println("MousePos ("+mEvent.getX()+","+mEvent.getY()+")");
+    	System.out.println("MousePos ("+draggingNode.getX()+","+draggingNode.getY()+")");
+    	
     	draggingNode = null;
+    	redrawNodes();
     }
     
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
     	if(draggingNode != null){
-    		draggingNode.posX = mEvent.getX()-R;
-    		draggingNode.posY = mEvent.getY()-R;
+    		draggingNode.x = mEvent.getX()-R;
+    		draggingNode.y = mEvent.getY()-R;
     		redrawNodes();
     	}
     }
     
     
     private void drawNode(Node _node) {
-    	gc.fillOval(_node.posX, _node.posY, R+R, R+R);
+    	gc.fillOval(_node.x, _node.y, R+R, R+R);
 	}
-
+    
 	private Node getNodeOnClick(MouseEvent mEvent) {
-		// Hanza
+		for(Node n : nodeList) if(Math.pow(Math.pow(n.x+(0.5*n.d)-mEvent.getX(),2)+Math.pow(n.y+(0.5*n.d)-mEvent.getY(),2),0.5)<=0.5*n.d) return n;
 		return null;
 	}
 
@@ -322,68 +333,6 @@ public class _MainWindowController implements Initializable{
     	
     }
     
-   /* @FXML
-    void addActuator(ActionEvent event) {
-    	try {	
-    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("ActuatorBox.fxml"));
-    		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
-    		Scene scene = new Scene(addNewActuatorLoader.load(),450,320);
-    		ActuatorInputController saveNewNodeController = addNewActuatorLoader.getController();
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		stage.setTitle("Add Actuator");
-    		stage.showAndWait();
-    		Optional<String> node = saveNewNodeController.getActuatorName();
-    		if(node.isPresent()) {
-    			devices.add(node.get());	
-    		}
-    		policyList.setItems(devices);
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    }*/
-    
-    /*@FXML
-    void addCloud(ActionEvent event) {
-    	try {	
-    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("InputBox.fxml"));
-    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		InputBoxController saveNewNodeController = addNewNodeLoader.getController();
-    		stage.setTitle("Add Cloud Node");
-    		stage.showAndWait();
-    		Optional<String> node = saveNewNodeController.getNodeName();
-    		if(node.isPresent()) {
-    			devices.add(node.get());	
-    		}
-    		policyList.setItems(devices);
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    }*/
-
-    /*@FXML
-    void addComputer(ActionEvent event) {
-    	try {	
-    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("InputBox.fxml"));
-    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("InputBox.fxml"));
-    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		InputBoxController saveNewNodeController = addNewNodeLoader.getController();
-    		stage.setTitle("Add Computer Node");
-    		stage.showAndWait();
-    		Optional<String> node = saveNewNodeController.getNodeName();
-    		if(node.isPresent()) {
-    			devices.add(node.get());	
-    		}
-    		policyList.setItems(devices);
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    }*/
     
     @FXML
     void exitApp(ActionEvent event) {
@@ -393,27 +342,6 @@ public class _MainWindowController implements Initializable{
     }
 
     
-
-   /* @FXML
-    void addSensor(ActionEvent event) {
-    	try {	
-    		//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("SensorBox.fxml"));
-    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-    		Scene scene = new Scene(addNewSensorLoader.load(),450,320);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		SensorInputController saveNewNodeController = addNewSensorLoader.getController();
-    		stage.setTitle("Add Sensor");
-    		stage.showAndWait();
-    		Optional<String> node = saveNewNodeController.getSensorName();
-    		if(node.isPresent()) {
-    			devices.add(node.get());	
-    		}
-    		policyList.setItems(devices);
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    }*/
     
     @FXML
     void displaySelected(MouseEvent event) {
@@ -434,7 +362,6 @@ public class _MainWindowController implements Initializable{
     		stage.setScene(scene);
     		stage.setTitle("Add Sensor");
     		stage.show();
-    		
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -453,7 +380,6 @@ public class _MainWindowController implements Initializable{
         } catch (IOException e) {
             System.out.println("Add line failed!" +e);
         }
-
     	String command = "AutoClicker.exe";
            // Running the above command 
            Runtime run  = Runtime.getRuntime(); 
