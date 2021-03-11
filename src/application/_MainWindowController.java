@@ -142,20 +142,32 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
 		}
 		dispLink(DeviceSpec _device) {
-			for (dispNode dn : dispNodesList)
-				if (dn.name == _device.name) {
-					this.src = dn;
-				} else {
-					System.out.println("New Name" + dn.name + " != " + _device.name);
-				}
-			for (dispNode dn : dispNodesList) {
-				if (dn.name == _device.parent) {
-					this.dst = dn;
-				} else {
-					System.out.println("New Name" + dn.name + " != " + _device.parent);
+			System.out.println("Given Spec's SrcName: " + _device.name + " DstName: " + _device.parent);
+			//for (dispNode dn : dispNodesList) System.out.print("'"+dn.name + "' ");
+			System.out.println("-");
+			for (int i=0; i<dispNodesList.size(); i++) {
+				if(dispNodesList.get(i).name==_device.name) System.out.println("Src@"+i);
+			}
+			for (int i=0; i<dispNodesList.size(); i++) {
+				if(dispNodesList.get(i).name.matches(_device.parent)) {
+					System.out.println("Dst@"+i);
+				}else {
+					System.out.println("No Match with " + dispNodesList.get(i).name);
 				}
 			}
-				
+//			for (dispNode dn : dispNodesList)
+//				if (dn.name == _device.name) {
+//					this.src = dn;
+//				} else {
+//					System.out.println("New Name " + dn.name + " != " + _device.name);
+//				}
+//			for (dispNode dn : dispNodesList) {
+//				if (dn.name == _device.parent) {
+//					this.dst = dn;
+//				} else {
+//					System.out.println("New Name " + dn.name + " != " + _device.parent);
+//				}
+//			}
 		}
 		dispLink(ModuEdgeSpec _spec) {
 	    	for(dispNode dn : dispNodesList) if(dn.name==_spec.name)   {this.src=dn;}
@@ -306,7 +318,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				dispNodesList.add(newDevice);
 				dispLinksList.add(new dispLink(d));
 			}
-			System.out.println(d.toString());
+//			System.out.println(d.toString());
 //    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
     		return newDevice;
     	} catch(Exception e) {

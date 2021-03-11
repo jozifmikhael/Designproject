@@ -89,7 +89,7 @@ public class AddNodeController {
 		}
 		h = textfile.createDevice(name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
 		+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
-		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() + "\n");
+		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() + " \n");
 		stage.close();
 	}
 	public DeviceSpec getSpec() {return h;}

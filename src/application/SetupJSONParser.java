@@ -145,11 +145,11 @@ public class SetupJSONParser {
 		
 		
 		public String toString() {
-			String str = this.id+ " " + this.name + " " + this.parent + " " +this.type + " " 
-		+ this.upbw + " " + this.downbw + " " + this.mips + " " + this.ram + " " + this.level + " " + this.rate + " " + this.ipower + " " + this.apower + "\n";
-			String str1 = "--------------------------------------------------------------------------------";
-			return str+str1;
-		}
+            String str = "Node ID: " + this.id+ "\nNode Name: " + this.name + "\nNode Parent Name:  " + this.parent + "\nUp Bandwidth: " 
+        + this.upbw + "\nDown Bandwidth:  " + this.downbw + "\nMIPS: " + this.mips + "\nRAM: " + this.ram + "\nLevel: " + this.level + "\nRate: " + this.rate + "\nIdle Power: " + this.ipower + "\nActive Power: " + this.apower + "\n";
+            String str1 = "--------------------------------------------------------------------------------";
+            return str+str1;
+        }
 		
 		
 		public DeviceSpec(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate, double apower,
