@@ -145,15 +145,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @Override
 	public void handle(KeyEvent event) { 	
 		switch (event.getCode()){
-			case ESCAPE -> System.out.println("z");	 // Select Pointer Tool | Escape Menu Without Saving
-			case DIGIT1 -> System.out.println("1");	 // Select Node Placer
-			case DIGIT2 -> System.out.println("2");	 // Select Module Placer
-			case DIGIT3 -> System.out.println("3");	 // Select Edge Placer
-			case Z 		-> System.out.println("Z");	 // Undo Last Action
-			case E 		-> System.out.println("E");	 // Edit Object Selected
-			case F5 	-> System.out.println("F5"); // Save File
-			case DELETE -> System.out.println("Del");// Delete Object Selected
-			default -> {} // Nothing
+			case ESCAPE : System.out.println("Esc"); break;	 // Select Pointer Tool | Escape Menu Without Saving
+			case DIGIT1 : System.out.println("1"); break;	 // Select Node Placer
+			case DIGIT2 : System.out.println("2"); break;	 // Select Module Placer
+			case DIGIT3 : System.out.println("3"); break;	 // Select Edge Placer
+			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
+			case E 		: System.out.println("E"); break;	 // Edit Object Selected
+			case F5 	: System.out.println("F5"); break; // Save File
+			case DELETE : System.out.println("Del"); break;// Delete Object Selected
+			default : {} // Nothing
 		}
 	}
     

@@ -82,7 +82,6 @@ public class AddNodeController {
 		nodeName = name.getText();
 		addLine();
 		String jsonDestinationFileName = createJsonController.jsonDestinationFileName;
-		textfile.writeJSON(jsonDestinationFileName + ".json");
 		stage.close();
 	}
 	
