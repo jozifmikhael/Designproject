@@ -1,9 +1,13 @@
 package application;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +16,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fog.test.perfeval.VRGameFog_src;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import application.SetupJSONParser.*;
 import javafx.application.Platform;
@@ -32,6 +39,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.scene.canvas.*;
@@ -377,13 +385,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
 	
+	@FXML
 	void loadJson(ActionEvent event) {
 		JSONParser parser = new JSONParser();
 		Stage stage = new Stage();
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Open JSON File");
-		File deafultDirectory = new File("C:\\Users\\Jozif\\eclipse-workspace\\iFogSim");
-		chooser.setInitialDirectory(deafultDirectory);
+//		File deafultDirectory = new File("C:\\Users\\Jozif\\eclipse-workspace\\iFogSim");
+//		chooser.setInitialDirectory(deafultDirectory);
+		System.out.println(Path.toAbsolutePath().toString());
 		File selectedDirectory = chooser.showOpenDialog(stage);
 		if (selectedDirectory != null) {
 			System.out.println("Loaded Json: "+selectedDirectory.getName());
