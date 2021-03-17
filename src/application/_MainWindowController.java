@@ -29,6 +29,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.scene.canvas.*;
@@ -98,9 +100,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	double R=50;
 	double xCenter=100;
 	double yCenter=100;
+	int fontSize = 16;
+	String font = "monospaced";
 	Color deviceColor=Color.RED;
 	Color moduleColor=Color.BLUE;
-	Color _errorColor=Color.BLACK;
+	Color transpColor=Color.TRANSPARENT;
+	Color _errorColor=Color.GREEN;
     GraphicsContext gc;
     SetupJSONParser textfile = new SetupJSONParser();
 	
@@ -111,8 +116,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		Color c;
 		NodeSpec data;
 
+		void draw() {
+			gc.setFill(c);
+			gc.fillOval(this.x, this.y, this.sz, this.sz);
+			gc.strokeOval(this.x, this.y, this.sz, this.sz);
+			gc.setFill(Color.BLACK);
+			gc.strokeText(this.name, this.x+0.5*this.sz, this.y+0.5*this.sz+0.4*fontSize);
+		}
 		void setPos(MouseEvent mEvent) {this.x=mEvent.getX()-0.5*this.sz; this.y=mEvent.getY()-0.5*this.sz;}
-		void draw() {gc.setFill(c); gc.fillOval(this.x, this.y, this.sz, this.sz);}
 		dispNode(String _name, NodeSpec _n) {this(_name, _n, xCenter, yCenter, R+R);}
 		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r) {
 			name = _name;
@@ -181,12 +192,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public int state = 1;
 	@Override
 	public void handle(KeyEvent event) {
-		System.out.print("_MainWindowController.java: KeyPress ");
+//		System.out.print("_MainWindowController.java: KeyPress ");
 		switch (event.getCode()){
-			case ESCAPE : state=0; System.out.println("Esc"); break;	 // Select Pointer Tool | Escape Menu Without Saving
-			case DIGIT1 : state=1; System.out.println("1"); break;	 // Select Node Placer
-			case DIGIT2 : state=2; System.out.println("2"); break;	 // Select Module Placer
-			case DIGIT3 : state=3; System.out.println("3"); break;	 // Select Edge Placer
+			case ESCAPE : state=0; break;	 // Select Pointer Tool | Escape Menu Without Saving
+			case DIGIT1 : state=1; break;	 // Select Node Placer
+			case DIGIT2 : state=2; break;	 // Select Module Placer
+			case DIGIT3 : state=3; break;	 // Select Edge Placer
 			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
 			case E 		: System.out.println("E"); break;	 // Edit Object Selected
 			case F5 	: System.out.println("F5"); break;   // Save File
@@ -200,21 +211,24 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
     	gc = topoField.getGraphicsContext2D();
+		gc.setTextAlign(TextAlignment.CENTER);
+		gc.setFont(new Font(font, fontSize));
     	scene.setOnKeyPressed(this); // uses handle method
     }
 
 	dispNode draggingNode = null;
+	dispLink draggingLink = null;
 	dispNode linkSrcNode = null;
     @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
-    	System.out.println("_MainWindowController.java: MClick State is " + state);
+//    	System.out.println("_MainWindowController.java: MClick State is " + state);
 		dispNode selNode = getNodeOnClick(mEvent);
 		if (state == 0) {
 			draggingNode = selNode;
 		} else if (state == 1) {
 			if (selNode == null) {
 				System.out.println("_MainWindowController.java.java: Making new device node...");
-				dispNode newNode = new dispNode("dispItem", deviceColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
@@ -222,44 +236,76 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		} else if (state == 2) {
 			if (selNode == null) {
 				System.out.println("_MainWindowController.java.java: Making new module node...");
-				dispNode newNode = new dispNode("dispItem", moduleColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 3) {
 			linkSrcNode = selNode;
+			System.out.println("_MainWindowController.java.java: Making link...");
+			dispNode newNode = new dispNode("", transpColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+			draggingNode = newNode;
+			draggingLink = new dispLink(linkSrcNode, draggingNode);
 		}
 		redrawNodes();
 	}
     
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
-    	System.out.println("_MainWindowController.java: MRelease State is " + state);
+//    	System.out.println("_MainWindowController.java: MRelease State is " + state);
     	if (state==0) {
     		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
     	} else if (state==1) {
-    		if(dispNodesList.indexOf(draggingNode)<0) addDevice().setPos(mEvent);
+    		if(dispNodesList.indexOf(draggingNode)<0) {
+    			dispNode newDevice=addDevice();
+    			if(newDevice!=null) newDevice.setPos(mEvent);
+    		}
         	else draggingNode.setPos(mEvent);
         	draggingNode=null;
     	} else if (state==2) {
-    		if(dispNodesList.indexOf(draggingNode)<0) addModule().setPos(mEvent);
+    		if(dispNodesList.indexOf(draggingNode)<0) {
+    			dispNode newModule = addModule();
+    			if(newModule!=null) newModule.setPos(mEvent);
+    		}
         	else draggingNode.setPos(mEvent);
         	draggingNode=null;
     	} else if (state == 3) {
+        	draggingLink=null;
+        	draggingNode=null;
     		dispNode linkDstNode = getNodeOnClick(mEvent);
 			if(linkSrcNode!=null && linkDstNode!=null) {
+	    		System.out.println("Got dstNode " + linkDstNode.name);
 				String srcType = linkSrcNode.data.type;
 				String dstType = linkSrcNode.data.type;
-				if(srcType.equals("device") && srcType.equals(dstType)) {
-					
-				}
-				//make sure its node-node or mod-mod
-				//if node-node pop the old src's link
-				//if node-node change the old src
+				if(srcType.equals(dstType)) {
+					if(srcType.equals("device")) {
+						DeviceSpec srcDev = getDevice(linkSrcNode.name);
+						srcDev.parent = linkDstNode.name;
+						DeviceSpec dstDev = getDevice(srcDev.parent);
+						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
+						if(srcLink!=null) srcLink.dst = linkDstNode;
+						else dispLinksList.add(new dispLink(srcDev, dstDev));
+					}
+				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
+			} else if (linkSrcNode==null) {
+				System.out.println("_MainWindowController.java: Linker Src is null");
+			} else if (linkDstNode==null) {
+				System.out.println("_MainWindowController.java: Linker Dst is null");
 			}
 		}
     	redrawNodes();
+    }
+    
+    public DeviceSpec getDevice(String _name) {
+    	if (_name==null) return null;
+    	for (DeviceSpec d : devicesList) if (d.name.equals(_name)) return d;
+		return null;
+    }
+    public dispLink getLinkBySrc(String _src) {
+    	if (_src==null) return null;
+    	for (dispLink l : dispLinksList) if (l.src.equals(_src)) return l;
+		return null;
     }
     
     @FXML
@@ -272,7 +318,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
 	private void screenDragHandler() {
-    	System.out.println("Updated canvas size");
+//    	System.out.println("_MainWindowController.java: Updated canvas size");
     	double w=backPane.getWidth(); double h=backPane.getHeight();
 		xCenter=0.5*w; yCenter=0.5*h;
 		topoField.setWidth(w); topoField.setHeight(h);
@@ -288,11 +334,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for(dispLink link : dispLinksList) {
-//			String srcName = link.src!=null?link.src.name:"";
-//			String dstName = link.dst!=null?link.dst.name:"";
-			link.draw();
-		}
+		for(dispLink link : dispLinksList) link.draw();
+		if (draggingLink!=null) draggingLink.draw();
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
