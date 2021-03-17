@@ -56,7 +56,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private MenuItem LowestPowerItem;
     
     @FXML
-    private TextField simulationTime;
+    private MenuItem SetRunTimeGranularity;
+    
+    @FXML
+    private MenuItem SetRunTimeItem;
 
     @FXML
     private TextField policyView;
@@ -317,7 +320,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     public dispLink getLinkBySrc(String _src) {
     	if (_src==null) return null;
-    	for (dispLink l : dispLinksList) if (l.src.equals(_src)) return l;
+    	for (dispLink l : dispLinksList) if (l.src.name.equals(_src)) return l;
 		return null;
     }
     

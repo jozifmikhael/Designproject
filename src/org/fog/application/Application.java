@@ -12,6 +12,7 @@ import org.fog.entities.Tuple;
 import org.fog.scheduler.TupleScheduler;
 import org.fog.utils.FogUtils;
 import org.fog.utils.GeoCoverage;
+import org.cloudbus.cloudsim.core.CloudSim;
 
 /**
  * Class represents an application in the Distributed Dataflow Model.
@@ -195,8 +196,7 @@ public class Application {
 							tuple.setTupleType(edge.getTupleType());
 							tuple.setSourceDeviceId(sourceDeviceId);
 							tuple.setSourceModuleId(sourceModuleId);
-							//tuple.setActuatorId(actuatorId);
-							
+							tuple.setSendTime(CloudSim.clock());
 							tuples.add(tuple);
 						//}
 					}else{
@@ -216,8 +216,8 @@ public class Application {
 						tuple.setSrcModuleName(edge.getSource());
 						tuple.setDirection(edge.getDirection());
 						tuple.setTupleType(edge.getTupleType());
+						tuple.setSendTime(CloudSim.clock());
 						tuple.setSourceModuleId(sourceModuleId);
-
 						tuples.add(tuple);
 					}
 				}
@@ -254,6 +254,7 @@ public class Application {
 				tuple.setSourceDeviceId(sourceDeviceId);
 				tuple.setActuatorId(actuatorId);
 				tuple.setSourceModuleId(sourceModuleId);
+				tuple.setSendTime(CloudSim.clock());
 
 				return tuple;
 			}
@@ -275,6 +276,7 @@ public class Application {
 			tuple.setDirection(edge.getDirection());
 			tuple.setTupleType(edge.getTupleType());
 			tuple.setSourceModuleId(sourceModuleId);
+			tuple.setSendTime(CloudSim.clock());
 
 			return tuple;
 		}

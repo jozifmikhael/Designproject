@@ -29,7 +29,9 @@ public class OutputController {
 	private static List<String> nodeList = new ArrayList<String>();
 	private static List<Double> timeNetworkList = new ArrayList<Double>();
 	private static List<Double> NetworkUsageList = new ArrayList<Double>();
+	private List<TupleMetrics> tupleList = new ArrayList<TupleMetrics>();
 	public List<XYChart.Series> seriesList = new ArrayList<XYChart.Series>();
+	
 	static String sourceFile="output.json";
 	
 	@FXML
@@ -49,6 +51,20 @@ public class OutputController {
 			this.EnergyConsumptionList = EnergyConsumptionList;
 		}
 	}
+	
+	public class TupleMetrics{
+		String tupleType;
+		String tupleSRC;
+		String tupleDEST;
+		double tupleLatency;
+		
+		TupleMetrics(String tupleType, String tupleSRC, String tupleDEST, double tupleLatency){
+			this.tupleType = tupleType;
+			this.tupleSRC = tupleSRC;
+			this.tupleDEST = tupleDEST;	
+			this.tupleLatency = tupleLatency;
+		}
+	}
     
 	@FXML
     void ParsingEnergy() throws IOException, ParseException {
@@ -60,10 +76,7 @@ public class OutputController {
         nodeArr.forEach(l -> parseNodeData((JSONObject) l));
         JSONArray timeE = (JSONArray) nodeList.get("listEnergy");
         timeE.forEach(l -> parsetimeEData((JSONObject) l));
-        JSONArray network = (JSONArray) nodeList.get("listNetwork");
-        network.forEach(l -> parseNetworkUsage((JSONObject) l));
         EnergyConsuptionGraph();
-//        NetworkLineChart();
     }
 	
 	@FXML
@@ -74,9 +87,18 @@ public class OutputController {
         JSONObject nodeList = (JSONObject) obj;
         JSONArray network = (JSONArray) nodeList.get("listNetwork");
         network.forEach(l -> parseNetworkUsage((JSONObject) l));
-        //EnergyConsuptionGraph();
         NetworkLineChart();
     }
+	
+	@FXML
+	void ParsingTuples() throws IOException, ParseException {
+		JSONParser jsonParser = new JSONParser();
+		FileReader reader = new FileReader(sourceFile);
+        Object obj = jsonParser.parse(reader);
+        JSONObject nodeList = (JSONObject) obj;
+        JSONArray tuples = (JSONArray) nodeList.get("tuples");
+        tuples.forEach(l -> parseTuples((JSONObject) l));
+	}
     
 	private static void parseNodeData(JSONObject link) {
 		String nodeName = (String) link.get("name");
@@ -104,6 +126,15 @@ public class OutputController {
 		NetworkUsageList.add(networkUsage);
 	}
 	
+	private void parseTuples(JSONObject link){
+		String tupleType = (String) link.get("tupleType");
+		String tupleSCR = (String) link.get("tupleSCR");
+		String tupleDEST = (String) link.get("tupleDEST");
+		double TupleLatency = (double) link.get("TupleLatency");
+		TupleMetrics tupleOBJ = new TupleMetrics(tupleType, tupleSCR, tupleDEST, TupleLatency);
+		tupleList.add(tupleOBJ);
+	}
+	
 	@FXML
 	void EnergyConsuptionGraph() {
 
@@ -129,13 +160,11 @@ public class OutputController {
 	
 	@FXML
 	void NetworkLineChart() {
-		//final NumberAxis xAxis = new NumberAxis();
-	    //final NumberAxis yAxis = new NumberAxis();
-        //xAxis.setLabel("Time");
-        //yAxis.setLabel("Network Usage");
+		final NumberAxis xAxis = new NumberAxis();
+	    final NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Time");
+        yAxis.setLabel("Network Usage");
         NetworkUsage.setTitle("Time vs Network Usage");
-        NetworkUsage.setCreateSymbols(false);
-      //  NetworkUsage.getStyleClass().add("thick-chart");
         XYChart.Series series = new XYChart.Series();
         series.setName("Network Usages"); 
         for(int i = 0; i < timeNetworkList.size(); i++) {

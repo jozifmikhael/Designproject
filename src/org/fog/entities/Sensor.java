@@ -91,7 +91,7 @@ public class Sensor extends SimEntity{
 				new UtilizationModelFull(), new UtilizationModelFull(), new UtilizationModelFull());
 		tuple.setUserId(getUserId());
 		tuple.setTupleType(getTupleType());
-		
+		tuple.setSendTime(CloudSim.clock());
 		tuple.setDestModuleName(_edge.getDestination());
 		tuple.setSrcModuleName(getSensorName());
 		Logger.debug(getName(), "Sending tuple with tupleId = "+tuple.getCloudletId());

@@ -1,5 +1,6 @@
 package org.fog.entities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import org.fog.application.AppModule;
 import org.fog.application.Application;
 import org.fog.policy.AppModuleAllocationPolicy;
 import org.fog.scheduler.StreamOperatorScheduler;
+import org.fog.test.perfeval.TextParser;
 import org.fog.utils.Config;
 import org.fog.utils.FogEvents;
 import org.fog.utils.FogUtils;
@@ -37,6 +39,7 @@ import org.fog.utils.Logger;
 import org.fog.utils.ModuleLaunchConfig;
 import org.fog.utils.NetworkUsageMonitor;
 import org.fog.utils.TimeKeeper;
+import org.fog.placement.Controller;
 
 public class FogDevice extends PowerDatacenter {
 	protected Queue<Tuple> northTupleQueue;
@@ -47,7 +50,7 @@ public class FogDevice extends PowerDatacenter {
 	protected Map<String, Application> applicationMap;
 	protected Map<String, List<String>> appToModulesMap;
 	protected Map<Integer, Double> childToLatencyMap;
- 
+	TextParser textfile = Controller.getTextParser();
 	
 	protected Map<Integer, Integer> cloudTrafficMap;
 	
@@ -332,7 +335,6 @@ public class FogDevice extends PowerDatacenter {
 		AppEdge edge = (AppEdge)ev.getData();
 		String srcModule = edge.getSource();
 		AppModule module = getModuleByName(srcModule);
-		
 		if(module == null)
 			return;
 		
@@ -342,9 +344,11 @@ public class FogDevice extends PowerDatacenter {
 		 */
 		for(int i = 0;i<((edge.getDirection()==Tuple.UP)?instanceCount:1);i++){
 			//System.out.println(CloudSim.clock()+" : Sending periodic tuple "+edge.getTupleType());
+
 			Tuple tuple = applicationMap.get(module.getAppId()).createTuple(edge, getId(), module.getId());
+			tuple.setSendTime(CloudSim.clock());
 			updateTimingsOnSending(tuple);
-			sendToSelf(tuple);			
+			sendToSelf(tuple);
 		}
 		send(getId(), edge.getPeriodicity(), FogEvents.SEND_PERIODIC_TUPLE, edge);
 	}
@@ -380,7 +384,6 @@ public class FogDevice extends PowerDatacenter {
 		double minTime = Double.MAX_VALUE;
 		double timeDiff = currentTime - getLastProcessTime();
 		double timeFrameDatacenterEnergy = 0.0;
-
 		for (PowerHost host : this.<PowerHost> getHostList()) {
 			Log.printLine();
 
@@ -489,6 +492,7 @@ public class FogDevice extends PowerDatacenter {
 	protected void updateTimingsOnSending(Tuple resTuple) {
 		// TODO ADD CODE FOR UPDATING TIMINGS WHEN A TUPLE IS GENERATED FROM A PREVIOUSLY RECIEVED TUPLE. 
 		// WILL NEED TO CHECK IF A NEW LOOP STARTS AND INSERT A UNIQUE TUPLE ID TO IT.
+		//System.out.println("test");
 		String srcModule = resTuple.getSrcModuleName();
 		String destModule = resTuple.getDestModuleName();
 		for(AppLoop loop : getApplicationMap().get(resTuple.getAppId()).getLoops()){
@@ -499,7 +503,6 @@ public class FogDevice extends PowerDatacenter {
 					TimeKeeper.getInstance().getLoopIdToTupleIds().put(loop.getLoopId(), new ArrayList<Integer>());
 				TimeKeeper.getInstance().getLoopIdToTupleIds().get(loop.getLoopId()).add(tupleId);
 				TimeKeeper.getInstance().getEmitTimes().put(tupleId, CloudSim.clock());
-				
 				//Logger.debug(getName(), "\tSENDING\t"+tuple.getActualTupleId()+"\tSrc:"+srcModule+"\tDest:"+destModule);
 				
 			}
@@ -622,11 +625,23 @@ public class FogDevice extends PowerDatacenter {
 	int numClients=0;
 	protected void processTupleArrival(SimEvent ev){
 		Tuple tuple = (Tuple)ev.getData();
-		
-		if(getName().equals("cloud")){
-			updateCloudTraffic();
+		//System.out.println(CloudSim.clock() +" : tuple arrived "+tuple.getTupleType() + " Source " + CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination())); 
+		tuple.setArrivalTime(CloudSim.clock());
+		String tupleLine = tuple.getTupleType() + " " + CloudSim.getEntityName(ev.getSource()).toString() + " " + CloudSim.getEntityName(ev.getDestination()).toString() + " " + tuple.getsendTime() + " " + tuple.getArrivalTime() + "\n";
+		textfile = Controller.getTextParser();
+		if(level == 0) {
+            updateCloudTraffic();
+        }
+		try {
+			textfile.getTuples(tupleLine);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
+		Controller.setTextParser(textfile);
 		/*if(getName().equals("d-0") && tuple.getTupleType().equals("_SENSOR")){
 			System.out.println(++numClients);
 		}*/
@@ -653,7 +668,7 @@ public class FogDevice extends PowerDatacenter {
 		}
 		
 		
-		if(getName().equals("cloud") && tuple.getDestModuleName()==null){
+		if(tuple.getDestModuleName()==null){
 			sendNow(getControllerId(), FogEvents.TUPLE_FINISHED, null);
 		}
 		

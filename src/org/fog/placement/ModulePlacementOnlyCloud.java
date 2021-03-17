@@ -27,13 +27,19 @@ public class ModulePlacementOnlyCloud extends ModulePlacement{
 		this.setModuleToDeviceMap(new HashMap<String, List<Integer>>());
 		this.setDeviceToModuleMap(new HashMap<Integer, List<AppModule>>());
 		this.setModuleInstanceCountMap(new HashMap<Integer, Map<String, Integer>>());
-		this.cloudId = CloudSim.getEntityId("cloud");
+		String topNode = null;
+		for(FogDevice temp : fogDevices) {
+			if(temp.getLevel() == 0) {
+				topNode = temp.getName();
+			}
+		}
+		this.cloudId = CloudSim.getEntityId(topNode);
 		mapModules();
-		computeModuleInstanceCounts();
+		computeModuleInstanceCounts(topNode);
 	}
 	
-	private void computeModuleInstanceCounts(){
-		FogDevice cloud = getDeviceById(CloudSim.getEntityId("cloud"));
+	private void computeModuleInstanceCounts(String topNode){
+		FogDevice cloud = getDeviceById(CloudSim.getEntityId(topNode));
 		getModuleInstanceCountMap().put(cloud.getId(), new HashMap<String, Integer>());
 		
 		for(Sensor sensor : getSensors()){

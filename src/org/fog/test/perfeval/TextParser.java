@@ -19,11 +19,19 @@ public class TextParser {
 	public void getTuples(String line) throws NumberFormatException, IOException {
 		
 		double TupleLatency;
+		double arrivalTime;
+		double sendTime;
 		
 		String stParts[] = line.split(" ");
-		String tuplename = stParts[0];			
-		TupleLatency = Double.parseDouble(stParts[1]);
-		TupleSpec h = addTuple(tuplename, TupleLatency);	
+		String tupleTyple = stParts[0];
+		String tupleSRC = stParts[1];
+		String tupleDEST = stParts[2];
+		sendTime = Double.parseDouble(stParts[3]);
+		arrivalTime = Double.parseDouble(stParts[4]);
+		TupleLatency = arrivalTime - sendTime;
+		//System.out.println("Source " + tupleSRC + " " + "DEST " + tupleDEST + " " +TupleLatency);
+		
+		TupleSpec h = addTuple(tupleTyple, tupleSRC, tupleDEST, TupleLatency);	
 	}
 	
 	public void getNodespec(String line) throws NumberFormatException, IOException {
@@ -33,22 +41,8 @@ public class TextParser {
 		
 		String stParts[] = line.split(" ");
 		String nodeName = stParts[0];			
-		cost = Double.parseDouble(stParts[1]);
-		energy = Double.parseDouble(stParts[2]);
-		NodeSpecs n = addNode(nodeName, cost, energy);	
+		NodeSpecs n = addNode(nodeName);	
 	}
-	
-	public void getOthers(String line) throws NumberFormatException, IOException {
-		
-		double cost;
-		double energy;
-		
-		String stParts[] = line.split(" ");
-		String nodeName = stParts[0];			
-		cost = Double.parseDouble(stParts[1]);
-		energy = Double.parseDouble(stParts[2]);
-		NodeSpecs n = addNode(nodeName, cost, energy);	
-	}	
 	
 	public void getEnergy(String line) throws NumberFormatException, IOException {
 		
@@ -75,15 +69,15 @@ public class TextParser {
 		NetworkSpec w = addNetwork(time, networkUsage);	
 	}
 	
-	public TupleSpec addTuple(String name, double TupleLatency) {
-		TupleSpec tuple = new TupleSpec(name, TupleLatency);
-		tuple.name = name;
+	public TupleSpec addTuple(String tupleTyple, String tupleSRC, String tupleDEST, double TupleLatency) {
+		TupleSpec tuple = new TupleSpec(tupleTyple,tupleSRC,tupleDEST, TupleLatency);
+		tuple.tupleTyple = tupleTyple;
 		tuples.add(tuple);
 		return tuple;
 	}
 	
-	public NodeSpecs addNode(String nodeName, double cost, double energy) {
-		NodeSpecs node = new NodeSpecs(nodeName, cost, energy);
+	public NodeSpecs addNode(String nodeName) {
+		NodeSpecs node = new NodeSpecs(nodeName);
 		node.nodeName = nodeName;
 		nodes.add(node);
 		return node;
@@ -103,43 +97,44 @@ public class TextParser {
 	}
 	
 	class TupleSpec{
-		String name;
+		String tupleTyple;
+		String tupleSRC; 
+		String tupleDEST;
 		double TupleLatency;
+		
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
 			TupleSpec t = this;
 			JSONObject obj = new JSONObject();
-			obj.put("name", t.name);
+			obj.put("tupleType", t.tupleTyple);
+			obj.put("tupleSRC", t.tupleSRC);
+			obj.put("tupleDEST", t.tupleDEST);
 			obj.put("TupleLatency", t.TupleLatency);
 			return obj;
 		}
 		
-		public TupleSpec(String name, double TupleLatency) {
-			this.name = name;
+		public TupleSpec(String tupleTyple, String tupleSRC, String tupleDEST, double TupleLatency) {
+			this.tupleTyple = tupleTyple;
+			this.tupleSRC = tupleSRC;
+			this.tupleDEST = tupleDEST;
 			this.TupleLatency = TupleLatency;			
 		}
 	}
 	
 	class NodeSpecs{
 		String nodeName;
-		double cost;
-		double energy;
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
 			NodeSpecs n = this;
 			JSONObject obj = new JSONObject();
 			obj.put("name", n.nodeName);
-			obj.put("cost", n.cost);
-			obj.put("energy", n.energy);
 			return obj;
 		}
 		
-		public NodeSpecs(String nodeName, double cost, double energy) {
-			this.nodeName = nodeName;
-			this.cost = cost;		
-			this.energy = energy;			
+		public NodeSpecs(String nodeName) {
+			this.nodeName = nodeName;		
 		}
 	}
 	

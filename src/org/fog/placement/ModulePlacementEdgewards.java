@@ -59,7 +59,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 	protected void mapModules() {
 		for(String deviceName : getModuleMapping().getModuleMapping().keySet()){
 			for(String moduleName : getModuleMapping().getModuleMapping().get(deviceName)){
-				System.out.println("--ModulePlacementEdgewards.java: Device=" + deviceName + " Module=" + moduleName);
+				//System.out.println("--ModulePlacementEdgewards.java: Device=" + deviceName + " Module=" + moduleName);
 				int deviceId = CloudSim.getEntityId(deviceName);
 				getCurrentModuleMap().get(deviceId).add(moduleName);
 				getCurrentModuleLoadMap().get(deviceId).put(moduleName, 0.0);
@@ -69,7 +69,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 		
 		List<List<Integer>> leafToRootPaths = getLeafToRootPaths();
 		for(List<Integer> path : leafToRootPaths){
-			System.out.println("--ModulePlacementEdgewards.java: Path="+path);
+			//System.out.println("--ModulePlacementEdgewards.java: Path="+path);
 			for(Integer i : path) {
 				//System.out.println("\tDevice ID"+ i +"="+getDeviceById(i).getName());
 			}
@@ -169,11 +169,11 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 					AppModule destModule = getApplication().getModuleByName(edge.getDestination());
 					if(destModule==null) continue;
 					
-					System.out.println("ModulePlacementEdgewards.java: " + destModule.getName());
+					//System.out.println("ModulePlacementEdgewards.java: " + destModule.getName());
 					Map<Pair<String, String>, SelectivityModel> map = destModule.getSelectivityMap();
 					
 					for(Pair<String, String> pair : map.keySet()){
-						System.out.println("\t"+pair.getFirst()+" "+pair.getSecond());
+						//System.out.println("\t"+pair.getFirst()+" "+pair.getSecond());
 						if(pair.getFirst().equals(edge.getTupleType())){
 							double outputRate = appEdgeToRate.get(edge)*map.get(pair).getMeanRate(); // getting mean rate from SelectivityModel
 							AppEdge outputEdge = getApplication().getEdgeMap().get(pair.getSecond());
@@ -246,7 +246,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 					else{
 						Logger.debug("ModulePlacementEdgeward", "Placement of operator "+moduleName+ " on device "+device.getName() + " successful.");
 						getCurrentCpuLoad().put(deviceId, totalCpuLoad + getCurrentCpuLoad().get(deviceId));
-						System.out.println("Placement of operator " + moduleName+ " on device "+device.getName() + " successful, new load = " + getCurrentCpuLoad().get(deviceId));
+						//System.out.println("Placement of operator " + moduleName+ " on device "+device.getName() + " successful, new load = " + getCurrentCpuLoad().get(deviceId));
 
 						if(!currentModuleMap.containsKey(deviceId))
 							currentModuleMap.put(deviceId, new ArrayList<String>());
@@ -269,7 +269,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 			
 				modulesToPlace.remove(moduleName);
 			}
-			System.out.println("-" + device.getName() + " Placement Finished\n");
+			//System.out.println("-" + device.getName() + " Placement Finished\n");
 		}
 		
 	}
@@ -281,7 +281,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 	 * @param deviceId
 	 */
 	private List<String> shiftModuleNorth(String moduleName, double cpuLoad, Integer deviceId, List<String> operatorsToPlace) {
-		System.out.println(CloudSim.getEntityName(deviceId)+" is shifting "+moduleName+" north.");
+		//System.out.println(CloudSim.getEntityName(deviceId)+" is shifting "+moduleName+" north.");
 		List<String> modulesToShift = findModulesToShift(moduleName, deviceId);
 		
 		Map<String, Integer> moduleToNumInstances = new HashMap<String, Integer>(); // Map of number of instances of modules that need to be shifted
@@ -474,7 +474,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 	protected List<List<Integer>> getLeafToRootPaths(){
 		FogDevice cloud=null;
 		for(FogDevice device : getFogDevices()){
-			if(device.getName().equals("cloud"))
+			if(device.getLevel() == 0)
 				cloud = device;
 		}
 		return getPaths(cloud.getId());

@@ -22,6 +22,8 @@ public class Tuple extends Cloudlet{
 	private int actuatorId;
 	private int sourceDeviceId;
 	private int sourceModuleId;
+	private double sendTime;
+	private double arrivalTime;
 	
 	/**
 	 * Map to keep track of which module instances has a tuple traversed.
@@ -125,6 +127,22 @@ public class Tuple extends Cloudlet{
 	public void setSourceModuleId(int sourceModuleId) {
 		//System.out.println("src mod id is set to " + sourceModuleId);
 		this.sourceModuleId = sourceModuleId;
+	}
+	
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+	
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+	
+	public void setSendTime(double sendTime) {
+		this.sendTime = sendTime;
+	}
+	
+	public double getsendTime() {
+		return sendTime;
 	}
 
 }

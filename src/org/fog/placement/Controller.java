@@ -38,7 +38,7 @@ import org.json.simple.JSONObject;
 
 public class Controller extends SimEntity{
 	
-	TextParser textfile = new TextParser();
+	static TextParser textfile = new TextParser();
 	double totalEnergyUsage = 0;
 	double totalNodeCost = 0;
 	
@@ -136,7 +136,7 @@ public class Controller extends SimEntity{
 			printNetworkUsageDetails();
 			printNodeCosts();
 			for(FogDevice fogDevice : getFogDevices()){
-				if(!fogDevice.getName().equals("cloud")) {
+				if(!(fogDevice.getLevel() == 0)) {
 					totalEnergyUsage += fogDevice.getEnergyConsumption();
 					totalNodeCost += fogDevice.getTotalCost();
 				}
@@ -183,9 +183,14 @@ public class Controller extends SimEntity{
 	}
 
 	private FogDevice getCloud(){
+		int level;
+		FogDevice tempDev = null;
 		for(FogDevice dev : getFogDevices())
-			if(dev.getName().equals("cloud"))
-				return dev;
+			tempDev = dev;
+			level = tempDev.getLevel();
+			if (level == 0) {
+				return tempDev;
+			}
 		return null;
 	}
 	
@@ -193,7 +198,7 @@ public class Controller extends SimEntity{
 	private void printNodeCosts() {
 		double totalNodeCosts = 0;
 		for(FogDevice fogDevice : getFogDevices()) {
-			if(!fogDevice.getName().equals("cloud")) {
+			if(!(fogDevice.getLevel() == 0)) {
 				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
 				System.out.println(fogDevice.getName() + " : Cost = " + fogDevice.getTotalCost());
 				String FogDeviceLine = fogDevice.getName() + " " + fogDevice.getTotalCost() + " ";
@@ -206,11 +211,11 @@ public class Controller extends SimEntity{
 		double totalNodeCosts = 0;
 		double totalNodePower = 0;
 		for(FogDevice fogDevice : getFogDevices()){
-			if(!fogDevice.getName().equals("cloud")) {
+			if(!(fogDevice.getLevel() == 0)) {
 				totalNodePower = totalNodePower + fogDevice.getEnergyConsumption();
 				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
 				System.out.println(fogDevice.getName() + " : Energy Consumed = "+fogDevice.getEnergyConsumption());
-				String NodeLine = fogDevice.getName() + " "+ fogDevice.getTotalCost() + " "  + fogDevice.getEnergyConsumption() + "\n";
+				String NodeLine = fogDevice.getName();
 				try {
 					textfile.getNodespec(NodeLine);
 				} catch (IOException e) {
@@ -264,20 +269,13 @@ public class Controller extends SimEntity{
 		System.out.println("=========================================");
 		System.out.println("TUPLE CPU EXECUTION DELAY");
 		System.out.println("=========================================");
+		for(String tupleTyple : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
+			System.out.println(tupleTyple + " ---> "+TimeKeeper.getInstance().getEmitTimes());
+		}
 		
 		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
 			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
 			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
-			String TupleTimeLine  = tupleType + " " + TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType) +"\n";
-	        try {
-				textfile.getTuples(TupleTimeLine);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 
 		System.out.println("Calculated total time with delays: " + totalLoopTime);
@@ -306,7 +304,7 @@ public class Controller extends SimEntity{
 		
 		
 		for(FogDevice fogDevice : getFogDevices()){
-			if(!fogDevice.getName().equals("cloud")) {
+			if(!(fogDevice.getLevel() == 0)) {
 				totalEnergyUsage += fogDevice.getEnergyConsumption();
 				totalNodeCost += fogDevice.getTotalCost();
 			}
@@ -323,6 +321,7 @@ public class Controller extends SimEntity{
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 	private void processTupleFinished(SimEvent ev) {
@@ -434,5 +433,13 @@ public class Controller extends SimEntity{
 
 	public void setAppModulePlacementPolicy(Map<String, ModulePlacement> appModulePlacementPolicy) {
 		this.appModulePlacementPolicy = appModulePlacementPolicy;
+	}
+	
+	public static TextParser getTextParser() {
+		return textfile;
+	}
+	
+	public static void setTextParser(TextParser text) {
+		textfile = text;
 	}
 }
