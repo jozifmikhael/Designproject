@@ -380,6 +380,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setScene(scene);
     		stage.setTitle("Create New Design File");
     		stage.show();
+        	String destFile = "saves/"+ createJsonController.jsonDestinationFileName + ".json";
+         	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 10000, "test");
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -391,9 +393,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		Stage stage = new Stage();
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Open JSON File");
-//		File deafultDirectory = new File("C:\\Users\\Jozif\\eclipse-workspace\\iFogSim");
-//		chooser.setInitialDirectory(deafultDirectory);
-		System.out.println(Path.toAbsolutePath().toString());
+		chooser.setInitialDirectory(new File("saves"));
 		File selectedDirectory = chooser.showOpenDialog(stage);
 		if (selectedDirectory != null) {
 			System.out.println("Loaded Json: "+selectedDirectory.getName());

@@ -266,7 +266,7 @@ public class SetupJSONParser {
 	@SuppressWarnings("unchecked")
 	public void writeJSON(String jsonFileName,
 			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList,
-			String policy, String time) {
+			int i, String time) {
 		JSONObject obj = new JSONObject();
 		JSONArray nodeList = new JSONArray();
 		JSONArray edgeList = new JSONArray();
@@ -279,7 +279,7 @@ public class SetupJSONParser {
 		obj.put("nodes", nodeList);
 		obj.put("modules", moduleList);
 		obj.put("edges", edgeList);
-		obj.put("policy", policy);
+		obj.put("policy", i);
 		obj.put("time", time);
 		
 		try {
