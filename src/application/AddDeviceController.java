@@ -17,7 +17,7 @@ import application.SetupJSONParser.DeviceSpec;
 
 import java.io.IOException;
 
-public class AddNodeController {
+public class AddDeviceController {
 	DeviceSpec h;
 	SetupJSONParser textfile = new SetupJSONParser();
 

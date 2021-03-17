@@ -323,7 +323,6 @@ public class Controller extends SimEntity{
 				e.printStackTrace();
 			}
 		}
-		
 	}
 	
 	private void processTupleFinished(SimEvent ev) {

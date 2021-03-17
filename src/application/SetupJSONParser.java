@@ -92,7 +92,7 @@ public class SetupJSONParser {
 		insMIPS = (int) Double.parseDouble(stParts[7]);
 		insFractionalSensitivity = Double.parseDouble(stParts[8]);
 		
-		ModuSpec m = new ModuSpec(insNodeName, insRam, insBandwidth, insInTuple, insOutTuple, insSize, insMIPS,
+		ModuSpec m = new ModuSpec(insNodeName, insModuleName, insRam, insBandwidth, insInTuple, insOutTuple, insSize, insMIPS,
 				insFractionalSensitivity);
 		return m;
 	}
@@ -139,13 +139,12 @@ public class SetupJSONParser {
 			obj.put("rate", o.rate);
 			obj.put("apower", o.apower);
 			obj.put("ipower", o.ipower);
-			
 			return obj;
 		}
 		
 		
 		public String toString() {
-            String str = "Node ID: " + this.id+ "\nNode Name: " + this.name + "\nNode Parent Name:  " + this.parent + "\nUp Bandwidth: " 
+            String str = this.type + " ID: " + this.id+ "\nNode Name: " + this.name + "\nNode Parent Name:  " + this.parent + "\nUp Bandwidth: " 
         + this.upbw + "\nDown Bandwidth:  " + this.downbw + "\nMIPS: " + this.mips + "\nRAM: " + this.ram + "\nLevel: " + this.level + "\nRate: " + this.rate + "\nIdle Power: " + this.ipower + "\nActive Power: " + this.apower + "\n";
             String str1 = "--------------------------------------------------------------------------------";
             return str+str1;
@@ -165,6 +164,56 @@ public class SetupJSONParser {
 			this.rate = rate;
 			this.apower = apower;
 			this.ipower = ipower;
+			this.type = "device";
+		}
+	}
+	
+	class ModuSpec extends NodeSpec {
+		String nodeName;
+		int modRam;
+		long bandwidth;
+		String inTuple;
+		String outTuple;
+		long size;
+		int MIPS;
+		double fractionalSensitivity;
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			ModuSpec module = this;
+			JSONObject obj = new JSONObject();
+			obj.put("Node Name", module.nodeName);
+			obj.put("Module Name", module.name);
+			obj.put("RAM", module.modRam);
+			obj.put("Bandwidth", module.bandwidth);
+			obj.put("inTuple", module.inTuple);
+			obj.put("outTuple", module.outTuple);
+			obj.put("Size", module.size);
+			obj.put("MIPS", module.MIPS);
+			obj.put("Fractional Sensitivity", module.fractionalSensitivity);
+			return obj;
+		}
+		
+		public String toString() {
+			String str = this.type+" Node: " + this.nodeName + "\nModule: " + this.name + "\nRAM: " + this.modRam + "\nBW: " +this.bandwidth + "\nIn Tuple: " 
+		+ this.inTuple + "OutTuple: " + this.outTuple + "Size: " + this.size + "MIPs: " + this.MIPS + "Sens: "+ this.fractionalSensitivity + "\n";
+			String str1 = "--------------------------------------------------------------------------------";
+			return str+str1;
+		}
+		
+		public ModuSpec(String nodeName, String moduleName, int modRam, long bandwidth, String inTuple, String outTuple,
+				long size, int MIPS, double fractionalSensitivity) {
+			this.nodeName = nodeName;
+			this.name = moduleName;
+			this.modRam = modRam;
+			this.bandwidth = bandwidth;
+			this.inTuple = inTuple;
+			this.outTuple = outTuple;
+			this.size = size;
+			this.MIPS = MIPS;
+			this.fractionalSensitivity = fractionalSensitivity;
+			this.id = getID();
+			this.type = "module";
 		}
 	}
 	
@@ -210,55 +259,6 @@ public class SetupJSONParser {
 			this.newLength = newLength;
 			this.edgeType = edgeType;
 			this.direction = direction;
-			this.id = getID();
-		}
-	}
-	
-	class ModuSpec extends NodeSpec {
-		String nodeName;
-		String moduleName;
-		int modRam;
-		long bandwidth;
-		String inTuple;
-		String outTuple;
-		long size;
-		int MIPS;
-		double fractionalSensitivity;
-		
-		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			ModuSpec module = this;
-			JSONObject obj = new JSONObject();
-			obj.put("Node Name", module.nodeName);
-			obj.put("Module Name", module.moduleName);
-			obj.put("RAM", module.modRam);
-			obj.put("Bandwidth", module.bandwidth);
-			obj.put("inTuple", module.inTuple);
-			obj.put("outTuple", module.outTuple);
-			obj.put("Size", module.size);
-			obj.put("MIPS", module.MIPS);
-			obj.put("Fractional Sensitivity", module.fractionalSensitivity);
-			return obj;
-		}
-		
-		public String toString() {
-			String str = this.nodeName+ " " + this.moduleName + " " + this.modRam + " " +this.bandwidth + " " 
-		+ this.inTuple + " " + this.outTuple + " " + this.size + " " + this.MIPS + " "+ this.fractionalSensitivity + "\n";
-			String str1 = "--------------------------------------------------------------------------------";
-			return str+str1;
-		}
-		
-		public ModuSpec(String nodeName, int modRam, long bandwidth, String inTuple, String outTuple,
-				long size, int MIPS, double fractionalSensitivity) {
-			this.nodeName = nodeName;
-			this.name = moduleName;
-			this.modRam = modRam;
-			this.bandwidth = bandwidth;
-			this.inTuple = inTuple;
-			this.outTuple = outTuple;
-			this.size = size;
-			this.MIPS = MIPS;
-			this.fractionalSensitivity = fractionalSensitivity;
 			this.id = getID();
 		}
 	}

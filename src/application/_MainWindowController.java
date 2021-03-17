@@ -98,10 +98,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	double R=50;
 	double xCenter=100;
 	double yCenter=100;
-	Color phyColor=Color.RED;
-	Color virColor=Color.BLUE;
+	Color deviceColor=Color.RED;
+	Color moduleColor=Color.BLUE;
+	Color _errorColor=Color.BLACK;
     GraphicsContext gc;
-	dispNode draggingNode = null;
     SetupJSONParser textfile = new SetupJSONParser();
 	
 	class dispNode {
@@ -113,14 +113,24 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 		void setPos(MouseEvent mEvent) {this.x=mEvent.getX()-0.5*this.sz; this.y=mEvent.getY()-0.5*this.sz;}
 		void draw() {gc.setFill(c); gc.fillOval(this.x, this.y, this.sz, this.sz);}
-		dispNode(String _name, NodeSpec _n, Color _c) {this(_name, _n, xCenter, yCenter, R+R, _c);}
-		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r, Color _c) {
+		dispNode(String _name, NodeSpec _n) {this(_name, _n, xCenter, yCenter, R+R);}
+		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r) {
+			name = _name;
+			x = _x;
+			y = _y;
+			sz = _r;
+			data = _n;
+			if(data.type.equals("device")) c = deviceColor;
+			else if(data.type.equals("module")) c = moduleColor;
+			else c = _errorColor;
+			id = globalID++;
+		}
+		dispNode(String _name, Color _c, double _x, double _y, double _r) {
 			name = _name;
 			x = _x;
 			y = _y;
 			sz = _r;
 			c = _c;
-			id = globalID++;
 		}
 	}
 	
@@ -139,14 +149,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			}
 		}
 		dispLink(dispNode _src, dispNode _dst){this.src=_src; this.dst=_dst;}
-		dispLink(DeviceSpec _src, DeviceSpec _dst) {
-	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
-		}
-		
 		dispLink(DeviceSpec _device) {
 			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.name)) this.src = dn;
 			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.parent)) this.dst = dn;
+		}
+		dispLink(DeviceSpec _src, DeviceSpec _dst) {
+	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
 		}
 		dispLink(ModuEdgeSpec _spec) {
 	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.child)) this.src=dn;
@@ -163,23 +172,25 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
 	
-	public int state = 0;
 	
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
     	
     }
+
+	public int state = 1;
 	@Override
-	public void handle(KeyEvent event) { 	
+	public void handle(KeyEvent event) {
+		System.out.print("_MainWindowController.java: KeyPress ");
 		switch (event.getCode()){
-			case ESCAPE : System.out.println("Esc"); break;	 // Select Pointer Tool | Escape Menu Without Saving
-			case DIGIT1 : System.out.println("1"); break;	 // Select Node Placer
-			case DIGIT2 : System.out.println("2"); break;	 // Select Module Placer
-			case DIGIT3 : System.out.println("3"); break;	 // Select Edge Placer
+			case ESCAPE : state=0; System.out.println("Esc"); break;	 // Select Pointer Tool | Escape Menu Without Saving
+			case DIGIT1 : state=1; System.out.println("1"); break;	 // Select Node Placer
+			case DIGIT2 : state=2; System.out.println("2"); break;	 // Select Module Placer
+			case DIGIT3 : state=3; System.out.println("3"); break;	 // Select Edge Placer
 			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
 			case E 		: System.out.println("E"); break;	 // Edit Object Selected
-			case F5 	: System.out.println("F5"); break; // Save File
-			case DELETE : System.out.println("Del"); break;// Delete Object Selected
+			case F5 	: System.out.println("F5"); break;   // Save File
+			case DELETE : System.out.println("Del"); break;  // Delete Object Selected
 			default : {} // Nothing
 		}
 	}
@@ -191,27 +202,63 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	gc = topoField.getGraphicsContext2D();
     	scene.setOnKeyPressed(this); // uses handle method
     }
-    
+
+	dispNode draggingNode = null;
+	dispNode linkSrcNode = null;
     @FXML
-    private void mouseClickHandler(MouseEvent mEvent){
-    	dispNode tempNode = getNodeOnClick(mEvent);
-        if(tempNode==null) {
-        	System.out.println("Making new node...");
-        	dispNode newNode = new dispNode("dispItem", null, mEvent.getX()-R, mEvent.getY()-R, R+R, phyColor);
-        	draggingNode = newNode;
-        	redrawNodes();
-        }else {
-//        	System.out.println("Picked up node...");
-        	//dispNodesList.remove(tempNode);
-        	draggingNode = tempNode;
-        }
-    }
+	private void mouseClickHandler(MouseEvent mEvent) {
+    	System.out.println("_MainWindowController.java: MClick State is " + state);
+		dispNode selNode = getNodeOnClick(mEvent);
+		if (state == 0) {
+			draggingNode = selNode;
+		} else if (state == 1) {
+			if (selNode == null) {
+				System.out.println("_MainWindowController.java.java: Making new device node...");
+				dispNode newNode = new dispNode("dispItem", deviceColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				draggingNode = newNode;
+			} else {
+				draggingNode = selNode;
+			}
+		} else if (state == 2) {
+			if (selNode == null) {
+				System.out.println("_MainWindowController.java.java: Making new module node...");
+				dispNode newNode = new dispNode("dispItem", moduleColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				draggingNode = newNode;
+			} else {
+				draggingNode = selNode;
+			}
+		} else if (state == 3) {
+			linkSrcNode = selNode;
+		}
+		redrawNodes();
+	}
     
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
-    	if(dispNodesList.indexOf(draggingNode)<0) addDevice().setPos(mEvent);
-    	else draggingNode.setPos(mEvent);
-    	draggingNode=null;
+    	System.out.println("_MainWindowController.java: MRelease State is " + state);
+    	if (state==0) {
+    		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
+    	} else if (state==1) {
+    		if(dispNodesList.indexOf(draggingNode)<0) addDevice().setPos(mEvent);
+        	else draggingNode.setPos(mEvent);
+        	draggingNode=null;
+    	} else if (state==2) {
+    		if(dispNodesList.indexOf(draggingNode)<0) addModule().setPos(mEvent);
+        	else draggingNode.setPos(mEvent);
+        	draggingNode=null;
+    	} else if (state == 3) {
+    		dispNode linkDstNode = getNodeOnClick(mEvent);
+			if(linkSrcNode!=null && linkDstNode!=null) {
+				String srcType = linkSrcNode.data.type;
+				String dstType = linkSrcNode.data.type;
+				if(srcType.equals("device") && srcType.equals(dstType)) {
+					
+				}
+				//make sure its node-node or mod-mod
+				//if node-node pop the old src's link
+				//if node-node change the old src
+			}
+		}
     	redrawNodes();
     }
     
@@ -242,8 +289,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
 		for(dispLink link : dispLinksList) {
-			String srcName = link.src!=null?link.src.name:"";
-			String dstName = link.dst!=null?link.dst.name:"";
+//			String srcName = link.src!=null?link.src.name:"";
+//			String dstName = link.dst!=null?link.dst.name:"";
 			link.draw();
 		}
 		for(dispNode node : dispNodesList) node.draw();
@@ -285,21 +332,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
     		Stage stage = new Stage();
     		stage.setScene(scene);
-    		AddNodeController controller = addNewNodeLoader.getController();
+    		AddDeviceController controller = addNewNodeLoader.getController();
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
     		if (d==null) return null;
     		String name = d==null?"Error":d.name;
-    		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R, phyColor);
+    		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R);
 			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
 				devicesList.add(d);
 				deviceNamesList.add(name);
 				dispNodesList.add(newDevice);
 				dispLinksList.add(new dispLink(d));
 			}
-//			System.out.println(d.toString());
-//    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
+			redrawNodes();
     		return newDevice;
     	} catch(Exception e) {
     		e.printStackTrace();
@@ -310,6 +356,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     dispNode addModule() {
     	try {
+    		System.out.println("_MainWindowController.java ln313: Adding module\n");
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
     		Scene scene = new Scene(dataFXML.load(),414,346);
     		Stage stage = new Stage();
@@ -321,13 +368,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ModuSpec m = controller.getSpec();
     		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
-    		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R, virColor);
+    		System.out.println("Mod name: " + name + "\n");
+    		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R);
 			if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
+//				System.out.println("_MainWindowController.java ln328: Adding to lists?");
 				modulesList.add(m);
 				moduleNamesList.add(name);
 				dispNodesList.add(newMod);
 			}
-//    		System.out.println("_MainWindowController.java: " + deviceNamesList.toString());
+    		System.out.println("_MainWindowController.java ln333: dispNodesList contains:\n");
+    		for (dispNode d : dispNodesList) {
+        		System.out.println("\t" + d.name + "\n");
+    		}
+    		redrawNodes();
     		return newMod;
     	} catch(Exception e) {
     		e.printStackTrace();
@@ -347,7 +400,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
     		ModuEdgeSpec v = controller.getSpec();
-    		if(v!=null) moduleEdgesList.add(v);
+    		if(v!=null) {
+    			moduleEdgesList.add(v);
+    			dispLinksList.add(new dispLink(v));
+    		}
+    		redrawNodes();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
