@@ -56,14 +56,13 @@ public class AddEdgeController {
 	@FXML
 	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
-		
 		if (parentChoice.getSelectionModel().getSelectedItem() == null
 				|| parentChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			parentChoice.setValue("default_parent_edge");
+			parentChoice.setValue("No Mods Found");
 		}
 		if (childChoice.getSelectionModel().getSelectedItem() == null
 				|| childChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			childChoice.setValue("default_child_edge");
+			childChoice.setValue("No Mods Found");
 		}
 		if (periodicity.getText().trim().isEmpty()) {
 			periodicity.setText("0");
@@ -96,6 +95,10 @@ public class AddEdgeController {
 		items.addAll(str_list);
 		parentChoice.setItems(items);
 		childChoice.setItems(items);
+		if(items.size()>1) {
+			parentChoice.setValue(items.get(0));
+			childChoice.setValue(items.get(1));
+		}
 	}
 	
 	public ModuEdgeSpec getSpec() {

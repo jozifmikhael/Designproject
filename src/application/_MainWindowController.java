@@ -103,7 +103,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	int fontSize = 16;
 	String font = "monospaced";
 	Color deviceColor=Color.RED;
-	Color moduleColor=Color.BLUE;
+	Color moduleColor=Color.CYAN;
 	Color transpColor=Color.TRANSPARENT;
 	Color _errorColor=Color.GREEN;
     GraphicsContext gc;
@@ -119,7 +119,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		void draw() {
 			gc.setFill(c);
 			gc.fillOval(this.x, this.y, this.sz, this.sz);
-			gc.strokeOval(this.x, this.y, this.sz, this.sz);
+			if(c!=transpColor) gc.strokeOval(this.x, this.y, this.sz, this.sz);
 			gc.setFill(Color.BLACK);
 			gc.strokeText(this.name, this.x+0.5*this.sz, this.y+0.5*this.sz+0.4*fontSize);
 		}
@@ -172,12 +172,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.child)) this.src=dn;
 	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.parent)) this.dst=dn;
 		}
+		public dispLink(ModuSpec _src, ModuSpec _dst) {
+			for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
+		}
 	}
 	
 	public List<dispNode> dispNodesList = new ArrayList<dispNode>();
 	public List<dispLink> dispLinksList = new ArrayList<dispLink>();
 	public List<String> deviceNamesList = new ArrayList<String>();
 	public List<String> moduleNamesList = new ArrayList<String>();
+	public List<String> selectedModulesList = new ArrayList<String>();
 	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
@@ -227,7 +232,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			draggingNode = selNode;
 		} else if (state == 1) {
 			if (selNode == null) {
-				System.out.println("_MainWindowController.java.java: Making new device node...");
+//				System.out.println("_MainWindowController.java.java: Making new device node...");
 				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
 			} else {
@@ -235,15 +240,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			}
 		} else if (state == 2) {
 			if (selNode == null) {
-				System.out.println("_MainWindowController.java.java: Making new module node...");
+//				System.out.println("_MainWindowController.java.java: Making new module node...");
 				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 3) {
+//			System.out.println("_MainWindowController.java.java: Making link...");
 			linkSrcNode = selNode;
-			System.out.println("_MainWindowController.java.java: Making link...");
 			dispNode newNode = new dispNode("", transpColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 			draggingNode = newNode;
 			draggingLink = new dispLink(linkSrcNode, draggingNode);
@@ -275,7 +280,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         	draggingNode=null;
     		dispNode linkDstNode = getNodeOnClick(mEvent);
 			if(linkSrcNode!=null && linkDstNode!=null) {
-	    		System.out.println("Got dstNode " + linkDstNode.name);
 				String srcType = linkSrcNode.data.type;
 				String dstType = linkSrcNode.data.type;
 				if(srcType.equals(dstType)) {
@@ -286,6 +290,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
 						if(srcLink!=null) srcLink.dst = linkDstNode;
 						else dispLinksList.add(new dispLink(srcDev, dstDev));
+					}else if(srcType.equals("module")) {
+						selectedModulesList.add(linkDstNode.name);
+						selectedModulesList.add(linkSrcNode.name);
+						addEdge();
 					}
 				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
 			} else if (linkSrcNode==null) {
@@ -297,6 +305,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	redrawNodes();
     }
     
+    public ModuSpec getModule(String _name) {
+    	if (_name==null) return null;
+    	for (ModuSpec m : modulesList) if (m.name.equals(_name)) return m;
+		return null;
+    }
     public DeviceSpec getDevice(String _name) {
     	if (_name==null) return null;
     	for (DeviceSpec d : devicesList) if (d.name.equals(_name)) return d;
@@ -399,7 +412,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     dispNode addModule() {
     	try {
-    		System.out.println("_MainWindowController.java ln313: Adding module\n");
+//    		System.out.println("_MainWindowController.java ln313: Adding module\n");
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
     		Scene scene = new Scene(dataFXML.load(),414,346);
     		Stage stage = new Stage();
@@ -411,18 +424,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ModuSpec m = controller.getSpec();
     		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
-    		System.out.println("Mod name: " + name + "\n");
     		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R);
 			if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
-//				System.out.println("_MainWindowController.java ln328: Adding to lists?");
 				modulesList.add(m);
 				moduleNamesList.add(name);
 				dispNodesList.add(newMod);
 			}
-    		System.out.println("_MainWindowController.java ln333: dispNodesList contains:\n");
-    		for (dispNode d : dispNodesList) {
-        		System.out.println("\t" + d.name + "\n");
-    		}
     		redrawNodes();
     		return newMod;
     	} catch(Exception e) {
@@ -432,14 +439,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void addEdge(ActionEvent event) {
+    ModuEdgeSpec addEdge() {
 	    try {
 			FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("EdgeInputBox.fxml"));
 			Scene scene = new Scene(dataFXML.load(),414,346);
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			AddEdgeController controller = dataFXML.getController();
-			controller.populateList(moduleNamesList);
+			if(selectedModulesList.isEmpty()) controller.populateList(moduleNamesList);
+			else controller.populateList(selectedModulesList);
+			selectedModulesList.removeAll(selectedModulesList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
     		ModuEdgeSpec v = controller.getSpec();
@@ -448,8 +457,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     			dispLinksList.add(new dispLink(v));
     		}
     		redrawNodes();
+    		return v;
 		} catch(Exception e) {
 			e.printStackTrace();
+			return null;
 		}
     }
     

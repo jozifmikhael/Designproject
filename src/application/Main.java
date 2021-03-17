@@ -45,7 +45,7 @@ public class Main extends Application {
 	
 	@Override
 	public void stop(){
-	    System.out.println("Default JSON Design File Self-Destructing...");
+//	    System.out.println("Default JSON Design File Self-Destructing...");
 	    FileWriter file_writer;
         try {
             file_writer = new FileWriter("default.json",false);
