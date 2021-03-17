@@ -164,6 +164,8 @@ public class OutputController {
 	    final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Time");
         yAxis.setLabel("Network Usage");
+        NetworkUsage.setCreateSymbols(false);
+        NetworkUsage.getStyleClass().add("thick-chart");
         NetworkUsage.setTitle("Time vs Network Usage");
         XYChart.Series series = new XYChart.Series();
         series.setName("Network Usages"); 

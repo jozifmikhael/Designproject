@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fog.test.perfeval.VRGameFog_src;
+import org.json.simple.JSONObject;
 
 import application.SetupJSONParser.*;
 import javafx.application.Platform;
