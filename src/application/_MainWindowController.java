@@ -77,6 +77,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private Canvas graphArea;
     
     @FXML
+    private MenuItem addSensorMenu;
+    
+    @FXML
+    private MenuItem addActuatorMenu;
+    
+    @FXML
     private MenuItem addDeviceMenu;
 
     @FXML
@@ -369,6 +375,118 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		e.printStackTrace();
     	}
     }
+	
+	void loadJson(ActionEvent event) {
+		JSONParser parser = new JSONParser();
+		Stage stage = new Stage();
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Open JSON File");
+		File deafultDirectory = new File("C:\\Users\\Jozif\\eclipse-workspace\\iFogSim");
+		chooser.setInitialDirectory(deafultDirectory);
+		File selectedDirectory = chooser.showOpenDialog(stage);
+		if (selectedDirectory != null) {
+			System.out.println("Loaded Json: "+selectedDirectory.getName());
+			try {
+				Object obj = parser.parse(new FileReader(selectedDirectory.getName()));
+				JSONObject jsonObject = (JSONObject) obj;
+				JSONArray deviceList = (JSONArray) jsonObject.get("nodes");
+				for (int i = 0; i < deviceList.size(); i++) {
+					JSONObject device = (JSONObject) deviceList.get(i);
+					parseDeviceObj(device);
+				}
+				JSONArray edgeList = (JSONArray) jsonObject.get("edges");
+				for (int i = 0; i < edgeList.size(); i++) {
+					JSONObject edge = (JSONObject) edgeList.get(i);
+					parseEdgeObj(edge);
+				}
+				JSONArray moduleList = (JSONArray) jsonObject.get("modules");
+				for (int i = 0; i < moduleList.size(); i++) {
+					JSONObject module = (JSONObject) moduleList.get(i);
+					parseModuleObj(module);
+				}
+			}
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}	         
+			//System.out.println(deviceList + "\n"+edgeList+"\n"+moduleList);
+		}
+	}
+	static void parseDeviceObj(JSONObject device) {
+		//JSONObject deviceObj = (JSONObject) device.get("nodes");
+		String parent = (String) device.get("parent");
+		String name = (String) device.get("name");
+		double apower = (double) device.get("apower");
+		long level = (long) device.get("level");
+		double rate = (double) device.get("rate");
+		double ipower = (double) device.get("ipower");
+		long downbw = (long) device.get("down_bw");
+		long upbw = (long) device.get("up_bw");
+		long ram = (long) device.get("ram");
+		long mips = (long) device.get("mips");
+		System.out.println("Parent: "+parent);
+		System.out.println("name: "+name);
+		System.out.println("apower: "+apower);
+		System.out.println("level: "+level);
+		System.out.println("rate: "+rate);
+		System.out.println("ipower: "+ipower);
+		System.out.println("downbw: "+downbw);
+		System.out.println("upbw: "+upbw);
+		System.out.println("ram: "+ram);
+		System.out.println("mips: "+mips);
+		System.out.println("---------------------------");
+	}
+	
+	static void parseEdgeObj(JSONObject edge) {
+		//JSONObject edgeObj = (JSONObject) edgeList.get("nodes");
+		String src = (String) edge.get("src");
+		String dest = (String) edge.get("dest");
+		double tupleCpuLength = (double) edge.get("tupleCpuLength");
+		String edgeType = (String) edge.get("edgeType");
+		double periodicity = (double) edge.get("periodicity");
+		String tupleType = (String) edge.get("typleType");
+		double tupleNwLength = (double) edge.get("tupleNwLength");
+		long direction = (long) edge.get("direction");
+		String time = (String) edge.get("time");
+		System.out.println("src: "+src);
+		System.out.println("dest: "+dest);
+		System.out.println("tupleCpuLength: "+tupleCpuLength);
+		System.out.println("edgeType: "+edgeType);
+		System.out.println("periodicity: "+periodicity);
+		System.out.println("tupleType: "+tupleType);
+		System.out.println("tupleNwLength: "+tupleNwLength);
+		System.out.println("direction: "+direction);
+		System.out.println("time: "+time);
+		System.out.println("---------------------------");
+	}
+	
+	static void parseModuleObj(JSONObject module) {
+		//JSONObject moduleObj = (JSONObject) moduleList.get("nodes");
+		String nodeName = (String) module.get("Node Name");
+		String moduleName = (String) module.get("Module Name");
+		long Size = (long) module.get("Size");
+		long Bandwidth = (long) module.get("Bandwidth");
+		double FractionalSensitivity = (double) module.get("Fractional Sensitivity");
+		String inTuple = (String) module.get("inTuple");
+		long MIPS = (long) module.get("MIPS");
+		String outTuple = (String) module.get("outTuple");
+		long RAM = (long) module.get("RAM");
+		System.out.println("nodeName: "+nodeName);
+		System.out.println("moduleName: "+moduleName);
+		System.out.println("Size: "+Size);
+		System.out.println("Bandwidth: "+Bandwidth);
+		System.out.println("FractionalSensitivity: "+FractionalSensitivity);
+		System.out.println("inTuple: "+inTuple);
+		System.out.println("MIPS: "+MIPS);
+		System.out.println("outTuple: "+outTuple);
+		System.out.println("RAM: "+RAM);
+		System.out.println("---------------------------");
+	}
 	
     @FXML
     void showOutput(ActionEvent event) {
