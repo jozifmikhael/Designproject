@@ -346,7 +346,7 @@ public class FogDevice extends PowerDatacenter {
 			//System.out.println(CloudSim.clock()+" : Sending periodic tuple "+edge.getTupleType());
 
 			Tuple tuple = applicationMap.get(module.getAppId()).createTuple(edge, getId(), module.getId());
-			tuple.setSendTime(CloudSim.clock());
+//			tuple.setSendTime(CloudSim.clock());
 			updateTimingsOnSending(tuple);
 			sendToSelf(tuple);
 		}
@@ -558,7 +558,8 @@ public class FogDevice extends PowerDatacenter {
 		double currentEnergyConsumption = getEnergyConsumption();
 		double newEnergyConsumption = (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
 		setEnergyConsumption(newEnergyConsumption + currentEnergyConsumption);
-	
+//		double newEnergyConsumption = currentEnergyConsumption + (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
+//		setEnergyConsumption(newEnergyConsumption);
 		/*if(getName().equals("d-0")){
 			System.out.println("------------------------");
 			System.out.println("Utilization = "+lastUtilization);

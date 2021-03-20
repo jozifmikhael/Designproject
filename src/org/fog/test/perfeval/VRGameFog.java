@@ -73,7 +73,7 @@ public class VRGameFog {
 	static FogDevice proxy;
 	static double EEG_TRANSMISSION_TIME = 5.1;
 
-	static String sourceFile="test6.json";
+	static String sourceFile="test7.json";
 	static String testout="blob.json";
 	
 	public static void main(String[] args) throws Exception{
@@ -94,14 +94,25 @@ public class VRGameFog {
 			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
 			
-			cloud = createFogDevice("cloud", 1000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
+			cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
 			cloud.setParentId(-1);
 			fogDevices.add(cloud);
 			
-//			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
-//			proxy.setParentId(cloud.getId());
-//			fogDevices.add(proxy);
+			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
+			proxy.setParentId(cloud.getId());
+			fogDevices.add(proxy);
 			
+			FogDevice gateway1 = createFogDevice("gateway1", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			fogDevices.add(gateway1);
+			
+			FogDevice gateway2 = createFogDevice("gateway2", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			fogDevices.add(gateway2);
+			
+			FogDevice gateway3 = createFogDevice("gateway3", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			fogDevices.add(gateway3);
+			
+			FogDevice gateway4 = createFogDevice("gateway4", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			fogDevices.add(gateway4);
 			
 			//Parse JSON file and initialize nodes
 			JSONParser jsonParser = new JSONParser();
@@ -142,7 +153,7 @@ public class VRGameFog {
 			//printCloudletList(newList);
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-//			moduleMapping.addModuleToDevice("client", "node1"); // fixing all instances of the Connector module to the Cloud
+			moduleMapping.addModuleToDevice("connector", "cloud"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
@@ -309,10 +320,10 @@ public class VRGameFog {
 		String os = "Linux"; // operating system
 		String vmm = "Xen";
 		double time_zone = 10.0; // time zone this resource located
-		double cost = ratePerMips; // the cost of using processing in this resource
-		double costPerMem = 5000; // the cost of using memory in this resource
-		double costPerStorage = 1000; // the cost of using storage in this resource
-		double costPerBw = cost; // the cost of using bw in this resource
+		double cost = 3.0; // the cost of using processing in this resource
+		double costPerMem = 0.05; // the cost of using memory in this resource
+		double costPerStorage = 0.001; // the cost of using storage in this resource
+		double costPerBw = 0.0; // the cost of using bw in this resource
 		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN devices by now
 
 		FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(

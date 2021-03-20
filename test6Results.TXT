@@ -1,0 +1,44 @@
+Starting VRGame...
+org.fog.utils.distribution.DeterministicDistribution@7852e922
+Creating connector on device cloud
+Creating client on device node1
+Creating concentration_calculator on device node1
+Creating connector on device node1
+Creating client on device node2
+Creating client on device node3
+started
+{}
+0.0 Submitted application vr_game
+=========================================
+============== RESULTS ==================
+=========================================
+EXECUTION TIME : 611
+=========================================
+APPLICATION LOOP DELAYS
+=========================================
+Calculated total time: 0.0
+=========================================
+TUPLE CPU EXECUTION DELAY
+=========================================
+PLAYER_GAME_STATE ---> {}
+EEG ---> {}
+CONCENTRATION ---> {}
+_SENSOR ---> {}
+GLOBAL_GAME_STATE ---> {}
+PLAYER_GAME_STATE ---> 1.9094697406940646
+EEG ---> 2.003931442706744
+CONCENTRATION ---> 0.10509091152061262
+_SENSOR ---> 2.090908328298868
+GLOBAL_GAME_STATE ---> 0.2920224212141899
+Calculated total time with delays: 6.401422844434479
+=========================================
+node1 : Energy Consumed = 24.799999999999272
+node2 : Energy Consumed = 15.0
+node3 : Energy Consumed = 9.836734694429651
+Total network usage = 451.1
+
+node1 : Cost = 2722499.9999999
+node2 : Cost = 36000.0
+node3 : Cost = 47400.000005410584
+Total cost of execution in the nodes = 2805900.0000053104
+Total Cost = 2.72035805080527E9 Total Engery Usage = 47851.14744426076

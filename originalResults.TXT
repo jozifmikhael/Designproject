@@ -1,0 +1,49 @@
+=========================================
+============== RESULTS ==================
+=========================================
+EXECUTION TIME : 7067
+=========================================
+APPLICATION LOOP DELAYS
+=========================================
+[EEG, client, concentration_calculator, client, DISPLAY] ---> 1297.7560421443318
+=========================================
+TUPLE CPU EXECUTION DELAY
+=========================================
+PLAYER_GAME_STATE ---> 1.171428582071589
+EEG ---> 4.099997833591323
+CONCENTRATION ---> 0.12940274594221057
+_SENSOR ---> 0.470875594858542
+GLOBAL_GAME_STATE ---> 0.005914551093483921
+=========================================
+cloud : Energy Consumed = 1.6337092035830993E7
+proxy-server : Energy Consumed = 834332.9999999987
+d-0 : Energy Consumed = 834332.9999999987
+m-0-0 : Energy Consumed = 874804.122020198
+m-0-1 : Energy Consumed = 873504.9402429982
+m-0-2 : Energy Consumed = 874523.6019413924
+m-0-3 : Energy Consumed = 874240.0889415034
+m-0-4 : Energy Consumed = 874749.1296607543
+m-0-5 : Energy Consumed = 874716.3093407451
+d-1 : Energy Consumed = 834332.9999999987
+m-1-0 : Energy Consumed = 873211.9394832735
+m-1-1 : Energy Consumed = 874549.5711211599
+m-1-2 : Energy Consumed = 873978.7988820055
+m-1-3 : Energy Consumed = 874615.9854405677
+m-1-4 : Energy Consumed = 874695.4098006982
+m-1-5 : Energy Consumed = 874677.0858003562
+d-2 : Energy Consumed = 834332.9999999987
+m-2-0 : Energy Consumed = 874425.426021145
+m-2-1 : Energy Consumed = 874383.148481565
+m-2-2 : Energy Consumed = 874673.7773005797
+m-2-3 : Energy Consumed = 874699.8381008356
+m-2-4 : Energy Consumed = 874787.6304204789
+m-2-5 : Energy Consumed = 873557.1229228113
+d-3 : Energy Consumed = 834332.9999999987
+m-3-0 : Energy Consumed = 874062.6515417956
+m-3-1 : Energy Consumed = 874766.9446605996
+m-3-2 : Energy Consumed = 874644.6930408282
+m-3-3 : Energy Consumed = 874823.6269003298
+m-3-4 : Energy Consumed = 873593.8625429923
+m-3-5 : Energy Consumed = 874488.1144618264
+Cost of execution in cloud = 4277396.303959725
+Total network usage = 546604.7

@@ -133,6 +133,7 @@ public class Controller extends SimEntity{
 			emptyMethod();
 			printTimeDetails();
 			printPowerDetails();
+			//printCostDetails();
 			printNetworkUsageDetails();
 			printNodeCosts();
 			for(FogDevice fogDevice : getFogDevices()){
@@ -309,8 +310,8 @@ public class Controller extends SimEntity{
 				totalNodeCost += fogDevice.getTotalCost();
 			}
 			String EnergyLine = fogDevice.getName() + " "+ fogDevice.getEnergyConsumption() + " "  + CloudSim.clock() + " " +fogDevice.getTotalCost()+ "\n";
-			fogDevice.setEnergyConsumption(0);
-			fogDevice.setTotalCost(0);
+			//fogDevice.setEnergyConsumption(0);
+			//fogDevice.setTotalCost(0);
 			try {
 				textfile.getEnergy(EnergyLine);
 			} catch (IOException e) {
