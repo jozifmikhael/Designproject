@@ -1,0 +1,299 @@
+{
+	"nodes": [{"name": "node1","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node2","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node3","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node4","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node5","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node6","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node7","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node8","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node9","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node10","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node11","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node12","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node13","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node14","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node15","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node16","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node17","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node18","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node19","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node20","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node21","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node22","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node23","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53},
+{"name": "node24","mips": 1000,"ram": 1000,"up_bw": 10000,"down_bw": 270,"level": 3,"rate": 0.0,"ipower": 82.44,"apower": 87.53}],
+	"links": [
+		{
+			"srcID": "node1",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node2",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node3",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node4",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node5",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node6",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node7",
+			"dstID": "gateway2",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node8",
+			"dstID": "gateway2",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node9",
+			"dstID": "gateway2",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node10",
+			"dstID": "gateway2",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node11",
+			"dstID": "gateway2",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node12",
+			"dstID": "gateway2",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node13",
+			"dstID": "gateway3",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node14",
+			"dstID": "gateway3",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node15",
+			"dstID": "gateway3",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node16",
+			"dstID": "gateway3",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node17",
+			"dstID": "gateway3",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node18",
+			"dstID": "gateway3",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node19",
+			"dstID": "gateway4",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node20",
+			"dstID": "gateway4",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node21",
+			"dstID": "gateway4",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node22",
+			"dstID": "gateway4",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node23",
+			"dstID": "gateway4",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node24",
+			"dstID": "gateway4",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "gateway1",
+			"dstID": "proxy-server",
+			"latency": 4.0	
+		},
+		{
+			"srcID": "gateway2",
+			"dstID": "proxy-server",
+			"latency": 4.0	
+		},
+		{
+			"srcID": "gateway3",
+			"dstID": "proxy-server",
+			"latency": 4.0	
+		},
+		{
+			"srcID": "gateway4",
+			"dstID": "proxy-server",
+			"latency": 4.0	
+		},
+		{
+			"srcID": "proxy-server",
+			"dstID": "cloud",
+			"latency": 100.0	
+		}
+	],
+	"Modules": [
+		{
+			"name": "client",
+			"ram": 10,
+			"mips": 1000,
+			"size": 10000,
+			"bw": 1000,
+			"TupleMaps": [
+				{
+					"inTuple": "EEG",
+					"outTuple": "_SENSOR",
+					"fractionalSensitivity": 1.0
+				},
+				{
+					"inTuple": "CONCENTRATION",
+					"outTuple": "SELF_STATE_UPDATE",
+					"fractionalSensitivity": 1.0
+				},
+				{
+					"inTuple": "GLOBAL_GAME_STATE",
+					"outTuple": "GLOBAL_STATE_UPDATE",
+					"fractionalSensitivity": 1.0
+				}
+			]
+		},
+		{
+			"name": "concentration_calculator",
+			"ram": 10,
+			"mips": 1000,
+			"size": 10000,
+			"bw": 1000,
+			"TupleMaps": [
+				{
+					"inTuple": "_SENSOR",
+					"outTuple": "CONCENTRATION",
+					"fractionalSensitivity": 1.0
+				}
+			]
+		},
+		{
+			"name": "connector",
+			"ram": 10,
+			"mips": 1000,
+			"size": 10000,
+			"bw": 1000,
+			"TupleMaps": [
+				{
+					"inTuple": "",
+					"outTuple": "",
+					"fractionalSensitivity": 0.0
+				}
+			]
+		}
+	],
+	"Edges": [
+		{
+			"src": "EEG",
+			"dest": "client",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 1
+		},
+		{
+			"src": "client",
+			"dest": "concentration_calculator",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3500.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "_SENSOR",
+			"direction": 1,
+			"edgeType": 3
+		},
+		{
+			"src": "concentration_calculator",
+			"dest": "connector",
+			"periodicity": 100.0,
+			"tupleCpuLength": 1000.0,
+			"tupleNwLength": 1000.0,
+			"tupleType": "PLAYER_GAME_STATE",
+			"direction": 1,
+			"edgeType": 3
+		},
+		{
+			"src": "concentration_calculator",
+			"dest": "client",
+			"periodicity": 0.0,
+			"tupleCpuLength": 14.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "CONCENTRATION",
+			"direction": 2,
+			"edgeType": 3
+		},
+		{
+			"src": "connector",
+			"dest": "client",
+			"periodicity": 100.0,
+			"tupleCpuLength": 28.0,
+			"tupleNwLength": 1000.0,
+			"tupleType": "GLOBAL_GAME_STATE",
+			"direction": 2,
+			"edgeType": 3
+		},
+		{
+			"src": "client",
+			"dest": "DISPLAY",
+			"periodicity": 0.0,
+			"tupleCpuLength": 100.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "SELF_STATE_UPDATE",
+			"direction": 2,
+			"edgeType": 2
+		},
+		{
+			"src": "client",
+			"dest": "DISPLAY",
+			"periodicity": 0.0,
+			"tupleCpuLength": 100.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "GLOBAL_STATE_UPDATE",
+			"direction": 2,
+			"edgeType": 2
+		}
+	]
+}
