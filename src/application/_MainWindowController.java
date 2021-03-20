@@ -424,10 +424,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
-			}	         
+			}
 			//System.out.println(deviceList + "\n"+edgeList+"\n"+moduleList);
 		}
 	}
+	
 	static void parseDeviceObj(JSONObject device) {
 		//JSONObject deviceObj = (JSONObject) device.get("nodes");
 		String parent = (String) device.get("parent");
