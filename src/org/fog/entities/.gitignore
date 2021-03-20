@@ -7,3 +7,6 @@
 /PhysicalTopology.class
 /Sensor.class
 /Tuple.class
+/Actuator.class
+/FogBroker.class
+/FogDevice.class

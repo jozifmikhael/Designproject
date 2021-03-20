@@ -31,3 +31,7 @@
 /SetupJSONParser$DeviceSpec.class
 /SetupJSONParser$ModuEdgeSpec.class
 /AddDeviceController.class
+/ActuatorInputController.class
+/Main.class
+/OutputController$TupleMetrics.class
+/SensorInputController.class

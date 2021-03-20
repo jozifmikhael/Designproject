@@ -196,10 +196,10 @@ public class TextParser {
 		for (EnergySpec e:listEnergy) energyList.add(e.toJSON());
 		for (NetworkSpec w:listNetwork) networkList.add(w.toJSON());
 		
-		System.out.println("Tuples:\n"+tuples.toString()+"\n");
-		System.out.println("Nodes:\n"+nodes.toString()+"\n");
-		System.out.println("Energy:\n"+listEnergy.toString()+"\n");
-		System.out.println("Network:\n"+listNetwork.toString()+"\n");
+//		System.out.println("Tuples:\n"+tuples.toString()+"\n");
+//		System.out.println("Nodes:\n"+nodes.toString()+"\n");
+//		System.out.println("Energy:\n"+listEnergy.toString()+"\n");
+//		System.out.println("Network:\n"+listNetwork.toString()+"\n");
 		
 		obj.put("tuples", tupleList);
 		obj.put("nodes", nodeList);

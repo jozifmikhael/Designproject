@@ -103,7 +103,7 @@ public class Tuple extends Cloudlet{
 	}
 
 	public int getSourceDeviceId() {
-		System.out.println("tuple src id" + sourceDeviceId);
+//		System.out.println("tuple src id" + sourceDeviceId);
 		return sourceDeviceId;
 	}
 

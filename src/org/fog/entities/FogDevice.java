@@ -313,7 +313,7 @@ public class FogDevice extends PowerDatacenter {
 		if(!moduleInstanceCount.containsKey(appId))
 			moduleInstanceCount.put(appId, new HashMap<String, Integer>());
 		moduleInstanceCount.get(appId).put(config.getModule().getName(), config.getInstanceCount());
-		System.out.println(getName()+ " Creating "+config.getInstanceCount()+" instances of module "+config.getModule().getName());
+//		System.out.println(getName()+ " Creating "+config.getInstanceCount()+" instances of module "+config.getModule().getName());
 	}
 
 	private AppModule getModuleByName(String moduleName){
@@ -556,10 +556,11 @@ public class FogDevice extends PowerDatacenter {
 		
 		double timeNow = CloudSim.clock();
 		double currentEnergyConsumption = getEnergyConsumption();
-		double newEnergyConsumption = (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
-		setEnergyConsumption(newEnergyConsumption + currentEnergyConsumption);
-//		double newEnergyConsumption = currentEnergyConsumption + (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
-//		setEnergyConsumption(newEnergyConsumption);
+//		double newEnergyConsumption = (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
+//		setEnergyConsumption(newEnergyConsumption + currentEnergyConsumption);
+		double newEnergyConsumption = currentEnergyConsumption + (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
+		setEnergyConsumption(newEnergyConsumption);
+		System.out.println();
 		/*if(getName().equals("d-0")){
 			System.out.println("------------------------");
 			System.out.println("Utilization = "+lastUtilization);

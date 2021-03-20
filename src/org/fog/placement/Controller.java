@@ -143,7 +143,7 @@ public class Controller extends SimEntity{
 				}
 			}
 			System.out.println("Total Cost = " + totalNodeCost + " Total Engery Usage = " + totalEnergyUsage);
-    		textfile.writeJSON("output.json");
+//    		textfile.writeJSON("output.json");
 			CloudSim.stopSimulation();	
 			CloudSim.terminateSimulation();	
 //			System.exit(0);
@@ -201,11 +201,11 @@ public class Controller extends SimEntity{
 		for(FogDevice fogDevice : getFogDevices()) {
 			if(!(fogDevice.getLevel() == 0)) {
 				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
-				System.out.println(fogDevice.getName() + " : Cost = " + fogDevice.getTotalCost());
+//				System.out.println(fogDevice.getName() + " : Cost = " + fogDevice.getTotalCost());
 				String FogDeviceLine = fogDevice.getName() + " " + fogDevice.getTotalCost() + " ";
 			}
 		}
-		System.out.println("Total cost of execution in the nodes = "+ totalNodeCosts);
+//		System.out.println("Total cost of execution in the nodes = "+ totalNodeCosts);
 	}	
 	
 	private void printPowerDetails() {

@@ -78,7 +78,6 @@ public class VRGameFog {
 	
 	public static void main(String[] args) throws Exception{
 		Log.printLine("Starting VRGame...");
-		System.out.println(new DeterministicDistribution(5.1));
 		testOut();
 		try {
 			Log.disable();
@@ -102,16 +101,20 @@ public class VRGameFog {
 			proxy.setParentId(cloud.getId());
 			fogDevices.add(proxy);
 			
-			FogDevice gateway1 = createFogDevice("gateway1", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			FogDevice gateway1 = createFogDevice("gateway1", 2800, 4000, 10000, 10000, 2, 0.0, 107.339, 83.4333);
+			gateway1.setUplinkLatency(4.0);
 			fogDevices.add(gateway1);
 			
-			FogDevice gateway2 = createFogDevice("gateway2", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			FogDevice gateway2 = createFogDevice("gateway2", 2800, 4000, 10000, 10000, 2, 0.0, 107.339, 83.4333);
+			gateway2.setUplinkLatency(4.0);
 			fogDevices.add(gateway2);
 			
-			FogDevice gateway3 = createFogDevice("gateway3", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			FogDevice gateway3 = createFogDevice("gateway3", 2800, 4000, 10000, 10000, 2, 0.0, 107.339, 83.4333);
+			gateway3.setUplinkLatency(4.0);
 			fogDevices.add(gateway3);
 			
-			FogDevice gateway4 = createFogDevice("gateway4", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+			FogDevice gateway4 = createFogDevice("gateway4", 2800, 4000, 10000, 10000, 2, 0.0, 107.339, 83.4333);
+			gateway4.setUplinkLatency(4.0);
 			fogDevices.add(gateway4);
 			
 			//Parse JSON file and initialize nodes
@@ -154,8 +157,7 @@ public class VRGameFog {
             
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 			moduleMapping.addModuleToDevice("connector", "cloud"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
+			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
 //			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
 			
 			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
