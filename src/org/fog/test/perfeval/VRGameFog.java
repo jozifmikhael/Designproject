@@ -109,42 +109,32 @@ public class VRGameFog {
 			FileReader reader = new FileReader(sourceFile);
             Object obj = jsonParser.parse(reader);
             JSONObject nodeList = (JSONObject) obj;
+            
+            boolean jsonNode=true;
+            if(jsonNode) {
+            	addOnlyGw("gateway1", broker.getId(), appId, proxy.getId());
+            	addOnlyGw("gateway2", broker.getId(), appId, proxy.getId());
+            	addOnlyGw("gateway3", broker.getId(), appId, proxy.getId());
+            	addOnlyGw("gateway4", broker.getId(), appId, proxy.getId());
+            	JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
+				nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId, cloud.getId()));
+            }
+            else createFogDevices(broker.getId(), appId);
+            
+            JSONArray linkArr = (JSONArray) nodeList.get("links");
+            linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 			JSONArray modArr = (JSONArray) nodeList.get("Modules");
 	        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
 	        JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
 	        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
 			
-			createFogDevices(broker.getId(), appId);
-			
 			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
+			moduleMapping.addModuleToDevice("connector", "cloud");
 			
-			if(CLOUD){
-				// if the mode of deployment is cloud-based
-				/*moduleMapping.addModuleToDevice("connector", "cloud", numOfDepts*numOfMobilesPerDept); // fixing all instances of the Connector module to the Cloud
-				moduleMapping.addModuleToDevice("concentration_calculator", "cloud", numOfDepts*numOfMobilesPerDept); // fixing all instances of the Concentration Calculator module to the Cloud
-*/				moduleMapping.addModuleToDevice("connector", "cloud"); // fixing all instances of the Connector module to the Cloud
-				moduleMapping.addModuleToDevice("concentration_calculator", "cloud"); // fixing all instances of the Concentration Calculator module to the Cloud
-				for(FogDevice device : fogDevices){
-					if(device.getName().startsWith("m")){
-						//moduleMapping.addModuleToDevice("client", device.getName(), 1);  // fixing all instances of the Client module to the Smartphones
-						moduleMapping.addModuleToDevice("client", device.getName());  // fixing all instances of the Client module to the Smartphones
-					}
-				}
-			}else{
-				// if the mode of deployment is cloud-based
-				//moduleMapping.addModuleToDevice("connector", "cloud", numOfDepts*numOfMobilesPerDept); // fixing all instances of the Connector module to the Cloud
-				moduleMapping.addModuleToDevice("connector", "cloud"); // fixing all instances of the Connector module to the Cloud
-				// rest of the modules will be placed by the Edge-ward placement policy
-			}
+			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
 			
+			controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
 			
-			Controller controller = new Controller("master-controller", fogDevices, sensors, 
-					actuators);
-			
-			controller.submitApplication(application, 0, 
-					(CLOUD)?(new ModulePlacementMapping(fogDevices, application, moduleMapping))
-							:(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
-
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 			
 			CloudSim.startSimulation();
@@ -157,13 +147,40 @@ public class VRGameFog {
 			Log.printLine("Unwanted errors happen");
 		}
 	}
-
-	/**
-	 * Creates the fog devices in the physical topology of the simulation.
-	 * @param userId
-	 * @param appId
-	 */
 	
+	private static void parseNodeObject(JSONObject node, int userId, String appId, int cloudid) {
+        double nodeBusyPower = (double) node.get("apower");
+        int nodeLevel = Integer.parseUnsignedInt(node.get("level").toString());
+        double nodeRatePerMips = (double) node.get("rate");
+        double nodeIdlePower = (double) node.get("ipower");
+        String nodeID = (String) node.get("name");
+        long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
+        long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
+        long nodeMips = (long) node.get("mips");
+        int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
+        
+		FogDevice mobile = addMobile(userId, appId, cloudid, nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
+		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
+		fogDevices.add(mobile);
+    }
+	
+	private static void parseLinkObject(JSONObject link) {
+		String srcID = (String) link.get("srcID");
+		String dstID = (String) link.get("dstID");
+		FogDevice src = null;
+		FogDevice dst = null;
+		double latency = (double) (link.get("latency"));
+		//double bw = (double) link.get("bw");
+
+		for(FogDevice device : fogDevices) {
+			if (device.getName().equals(srcID)) src=device;
+			if (device.getName().equals(dstID)) dst=device;
+		}
+		if(!(src==null || dst==null)) {
+			src.setParentId(dst.getId());
+			src.setUplinkLatency(latency);
+		}else System.out.println("Error src/dst not found");
+	}
 	
 	private static void parseModuleObject(JSONObject module, Application application) {
 		String name = (String) module.get("name");
@@ -205,9 +222,17 @@ public class VRGameFog {
 			application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
 		}
 	}
-
+	
+	private static FogDevice addOnlyGw(String id, int userId, String appId, int parentId){
+		FogDevice dept = createFogDevice(id, 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+		fogDevices.add(dept);
+		dept.setParentId(parentId);
+		dept.setUplinkLatency(4); // latency of connection between gateways and proxy server is 4 ms
+		return dept;
+	}
+	
 	private static FogDevice addGw(String id, int userId, String appId, int parentId){
-		FogDevice dept = createFogDevice("d-"+id, 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
+		FogDevice dept = createFogDevice(id, 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
 		fogDevices.add(dept);
 		dept.setParentId(parentId);
 		dept.setUplinkLatency(4); // latency of connection between gateways and proxy server is 4 ms
@@ -229,6 +254,19 @@ public class VRGameFog {
 		actuators.add(display);
 		eegSensor.setGatewayDeviceId(mobile.getId());
 		eegSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
+		display.setGatewayDeviceId(mobile.getId());
+		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
+		return mobile;
+	}
+	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
+		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
+		mobile.setParentId(parentId);
+		Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
+		sensors.add(newSensor);
+		Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
+		actuators.add(display);
+		newSensor.setGatewayDeviceId(mobile.getId());
+		newSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
 		display.setGatewayDeviceId(mobile.getId());
 		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
 		return mobile;

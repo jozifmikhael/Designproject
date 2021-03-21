@@ -110,7 +110,7 @@ public class FogDevice extends PowerDatacenter {
 			double uplinkBandwidth, double downlinkBandwidth, double uplinkLatency, double ratePerMips) throws Exception {
 		super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
 		//Dude, Java, lmao
-		System.out.println("Made " + name + " with " + vmAllocationPolicy.getHostList().get(0).getPeList().get(0).getMips());
+		System.out.println("FogDevice.java: Made " + name + " with " + vmAllocationPolicy.getHostList().get(0).getPeList().get(0).getMips());
 		thisName = name;
 		setCharacteristics(characteristics);
 		setVmAllocationPolicy(vmAllocationPolicy);
