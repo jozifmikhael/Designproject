@@ -83,7 +83,7 @@ public class RootSwitch extends Switch {
 				}
 			}
 			if (aggSwtichid < 0) {
-				System.out.println(" No destination for this packet");
+//				System.out.println(" No destination for this packet");
 			} else {
 				List<NetworkPacket> pktlist = downlinkswitchpktlist.get(aggSwtichid);
 				if (pktlist == null) {

@@ -246,7 +246,7 @@ public class Switch extends SimEntity {
 				}
 			}
 			if (aggSwtichid < 0) {
-				System.out.println(" No destination for this packet");
+//				System.out.println(" No destination for this packet");
 			} else {
 				List<NetworkPacket> pktlist = downlinkswitchpktlist.get(aggSwtichid);
 				if (pktlist == null) {

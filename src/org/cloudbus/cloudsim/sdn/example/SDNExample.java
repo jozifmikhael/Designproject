@@ -206,7 +206,7 @@ public class SDNExample {
 		System.out.println("Virtual Machine and Network requests (Virtual Topology) : "+ virtual);
 		System.out.println("Workloads: ");
 		for(String work:workloads)
-			System.out.println("  "+work);		
+//			System.out.println("  "+work);		
 	}
 	
 	/**

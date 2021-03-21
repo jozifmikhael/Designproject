@@ -891,7 +891,7 @@ public class CloudSim {
 			}
 			// this block allows termination of simulation at a specific time
 			if (terminateAt > 0.0 && clock >= terminateAt) {
-				System.out.println("test");
+//				System.out.println("test");
 				terminateSimulation();
 				clock = terminateAt;
 				break;

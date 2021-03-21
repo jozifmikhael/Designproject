@@ -344,7 +344,7 @@ public class NetDatacenterBroker extends SimEntity {
 								CloudSimTags.CLOUDLET_SUBMIT,
 								app.clist.get(i));
 					}
-					System.out.println("app" + (k++));
+//					System.out.println("app" + (k++));
 				}
 			}
 

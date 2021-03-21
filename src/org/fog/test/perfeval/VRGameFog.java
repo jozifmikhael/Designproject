@@ -31,6 +31,7 @@ import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.power.PowerHost;
+import org.cloudbus.cloudsim.power.PowerDatacenter;
 import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.cloudbus.cloudsim.sdn.overbooking.BwProvisionerOverbooking;
@@ -73,6 +74,9 @@ public class VRGameFog {
 	static double EEG_TRANSMISSION_TIME = 5.1;
 	static String sourceFile="test7.json";
 	
+	static FogDevice cloud;
+	static FogDevice proxy;
+	
 	public static void main(String[] args) {
 
 		Log.printLine("Starting VRGame...");
@@ -87,7 +91,15 @@ public class VRGameFog {
 
 			String appId = "vr_game"; // identifier of the application
 			
-			FogBroker broker = new FogBroker("broker");
+			PowerDatacenterBroker broker = new FogBroker("broker");
+			cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
+			cloud.setParentId(-1);
+			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
+			proxy.setParentId(cloud.getId()); // setting Cloud as parent of the Proxy Server
+			proxy.setUplinkLatency(100); // latency of connection from Proxy Server to the Cloud is 100 ms
+			
+			fogDevices.add(cloud);
+			fogDevices.add(proxy);
 			
 			Application application = new Application(appId, broker.getId());
 			application.setUserId(broker.getId());
@@ -97,10 +109,10 @@ public class VRGameFog {
 			FileReader reader = new FileReader(sourceFile);
             Object obj = jsonParser.parse(reader);
             JSONObject nodeList = (JSONObject) obj;
-			   JSONArray modArr = (JSONArray) nodeList.get("Modules");
-	            modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
-	            JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
-	            edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
+			JSONArray modArr = (JSONArray) nodeList.get("Modules");
+	        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
+	        JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
+	        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
 			
 			createFogDevices(broker.getId(), appId);
 			
@@ -134,7 +146,7 @@ public class VRGameFog {
 							:(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
 
 			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
-
+			
 			CloudSim.startSimulation();
 
 			CloudSim.stopSimulation();
@@ -151,21 +163,7 @@ public class VRGameFog {
 	 * @param userId
 	 * @param appId
 	 */
-	private static void createFogDevices(int userId, String appId) {
-		FogDevice cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
-		cloud.setParentId(-1);
-		FogDevice proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
-		proxy.setParentId(cloud.getId()); // setting Cloud as parent of the Proxy Server
-		proxy.setUplinkLatency(100); // latency of connection from Proxy Server to the Cloud is 100 ms
-		
-		fogDevices.add(cloud);
-		fogDevices.add(proxy);
-		
-		for(int i=0;i<numOfDepts;i++){
-			addGw(i+"", userId, appId, proxy.getId()); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
-		}
-		
-	}
+	
 	
 	private static void parseModuleObject(JSONObject module, Application application) {
 		String name = (String) module.get("name");
@@ -235,6 +233,11 @@ public class VRGameFog {
 		display.setGatewayDeviceId(mobile.getId());
 		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
 		return mobile;
+	}
+	private static void createFogDevices(int userId, String appId) {
+		for(int i=0;i<numOfDepts;i++){
+			addGw(i+"", userId, appId, proxy.getId()); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
+		}
 	}
 	
 	/**

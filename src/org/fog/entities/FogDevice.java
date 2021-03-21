@@ -560,7 +560,7 @@ public class FogDevice extends PowerDatacenter {
 //		setEnergyConsumption(newEnergyConsumption + currentEnergyConsumption);
 		double newEnergyConsumption = currentEnergyConsumption + (timeNow-lastUtilizationUpdateTime)*getHost().getPowerModel().getPower(lastUtilization);
 		setEnergyConsumption(newEnergyConsumption);
-		System.out.println();
+//		System.out.println();
 		/*if(getName().equals("d-0")){
 			System.out.println("------------------------");
 			System.out.println("Utilization = "+lastUtilization);

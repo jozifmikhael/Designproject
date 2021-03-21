@@ -243,6 +243,6 @@ public class PhysicalTopologyGenerator {
 			e.printStackTrace();
 		}
 	 
-		System.out.println(obj);
+//		System.out.println(obj);
 	}
 }

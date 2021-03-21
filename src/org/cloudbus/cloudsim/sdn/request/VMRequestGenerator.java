@@ -139,7 +139,7 @@ public class VMRequestGenerator {
 			e.printStackTrace();
 		}
 	 
-		System.out.println(obj);
+//		System.out.println("VMRequestGenerator.java " +obj.toString());
 	}
 	
 	enum VMtype {

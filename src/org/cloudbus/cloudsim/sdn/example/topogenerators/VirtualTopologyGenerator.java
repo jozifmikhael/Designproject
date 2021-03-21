@@ -172,12 +172,12 @@ public class VirtualTopologyGenerator {
 			e.printStackTrace();
 		}
 	 
-		System.out.println(obj);
+//		System.out.println(obj);
 		
 		System.out.println("===============WORKLOAD=============");
 		System.out.println("start, source, z, w1, link, dest, psize, w2");
 		for(DummyWorkloadSpec wl:this.dummyWorkload) {
-			System.out.println(wl);
+//			System.out.println(wl);
 		}
 	}
 }
