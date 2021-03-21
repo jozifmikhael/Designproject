@@ -265,128 +265,172 @@
 			"mips": 1000,
 			"up_bw": 10000,
 			"ram": 1000
+		},
+		{
+			"apower": 107.339,
+			"level": 1,
+			"rate": 0.0,
+			"ipower": 83.4333,
+			"name": "gateway1",
+			"down_bw": 10000,
+			"mips": 2800,
+			"up_bw": 10000,
+			"ram": 4000
+		},
+		{
+			"apower": 107.339,
+			"level": 1,
+			"rate": 0.0,
+			"ipower": 83.4333,
+			"name": "gateway2",
+			"down_bw": 10000,
+			"mips": 2800,
+			"up_bw": 10000,
+			"ram": 4000
+		},
+		{
+			"apower": 107.339,
+			"level": 1,
+			"rate": 0.0,
+			"ipower": 83.4333,
+			"name": "gateway3",
+			"down_bw": 10000,
+			"mips": 2800,
+			"up_bw": 10000,
+			"ram": 4000
+		},
+		{
+			"apower": 107.339,
+			"level": 1,
+			"rate": 0.0,
+			"ipower": 83.4333,
+			"name": "gateway4",
+			"down_bw": 10000,
+			"mips": 2800,
+			"up_bw": 10000,
+			"ram": 4000
 		}
 	],
 	"links": [
 		{
 			"srcID": "node1",
 			"dstID": "gateway1",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node2",
 			"dstID": "gateway1",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node3",
 			"dstID": "gateway1",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node4",
 			"dstID": "gateway1",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node5",
 			"dstID": "gateway1",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node6",
 			"dstID": "gateway1",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node7",
 			"dstID": "gateway2",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node8",
 			"dstID": "gateway2",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node9",
 			"dstID": "gateway2",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node10",
 			"dstID": "gateway2",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node11",
 			"dstID": "gateway2",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node12",
 			"dstID": "gateway2",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node13",
 			"dstID": "gateway3",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node14",
 			"dstID": "gateway3",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node15",
 			"dstID": "gateway3",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node16",
 			"dstID": "gateway3",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node17",
 			"dstID": "gateway3",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node18",
 			"dstID": "gateway3",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node19",
 			"dstID": "gateway4",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node20",
 			"dstID": "gateway4",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node21",
 			"dstID": "gateway4",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node22",
 			"dstID": "gateway4",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node23",
 			"dstID": "gateway4",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "node24",
 			"dstID": "gateway4",
-			"latency": 4.0	
+			"latency": 2.0	
 		},
 		{
 			"srcID": "gateway1",

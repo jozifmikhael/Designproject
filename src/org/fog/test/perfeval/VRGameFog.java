@@ -77,6 +77,9 @@ public class VRGameFog {
 	static FogDevice cloud;
 	static FogDevice proxy;
 	
+	static int userId;
+	static String appId;
+	
 	public static void main(String[] args) {
 
 		Log.printLine("Starting VRGame...");
@@ -89,9 +92,10 @@ public class VRGameFog {
 
 			CloudSim.init(num_user, calendar, trace_flag);
 
-			String appId = "vr_game"; // identifier of the application
+			appId = "vr_game"; // identifier of the application
 			
 			PowerDatacenterBroker broker = new FogBroker("broker");
+			userId = broker.getId();
 			cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
 			cloud.setParentId(-1);
 			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
@@ -110,17 +114,14 @@ public class VRGameFog {
             Object obj = jsonParser.parse(reader);
             JSONObject nodeList = (JSONObject) obj;
             
-            boolean jsonNode=true;
-            if(jsonNode) {
-            	addOnlyGw("gateway1", broker.getId(), appId, proxy.getId());
-            	addOnlyGw("gateway2", broker.getId(), appId, proxy.getId());
-            	addOnlyGw("gateway3", broker.getId(), appId, proxy.getId());
-            	addOnlyGw("gateway4", broker.getId(), appId, proxy.getId());
-            	JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
-				nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId, cloud.getId()));
-            }
-            else createFogDevices(broker.getId(), appId);
-            
+//            boolean jsonNode=true;
+//            if(jsonNode) {
+//	            
+//            }
+//            else createFogDevices(broker.getId(), appId);
+
+        	JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
+			nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
             JSONArray linkArr = (JSONArray) nodeList.get("links");
             linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 			JSONArray modArr = (JSONArray) nodeList.get("Modules");
@@ -148,7 +149,7 @@ public class VRGameFog {
 		}
 	}
 	
-	private static void parseNodeObject(JSONObject node, int userId, String appId, int cloudid) {
+	private static void parseNodeObject(JSONObject node) {
         double nodeBusyPower = (double) node.get("apower");
         int nodeLevel = Integer.parseUnsignedInt(node.get("level").toString());
         double nodeRatePerMips = (double) node.get("rate");
@@ -159,17 +160,17 @@ public class VRGameFog {
         long nodeMips = (long) node.get("mips");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
-		FogDevice mobile = addMobile(userId, appId, cloudid, nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
+		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
+//        FogDevice mobile = addMobile(nodeID, 5);
 		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
 		fogDevices.add(mobile);
     }
-	
 	private static void parseLinkObject(JSONObject link) {
+		double latency = (double) (link.get("latency"));
 		String srcID = (String) link.get("srcID");
 		String dstID = (String) link.get("dstID");
 		FogDevice src = null;
 		FogDevice dst = null;
-		double latency = (double) (link.get("latency"));
 		//double bw = (double) link.get("bw");
 
 		for(FogDevice device : fogDevices) {
@@ -193,15 +194,7 @@ public class VRGameFog {
 		
 		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
 		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
-	}
-	
-	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
-		String inTuple = (String) tuplemaps.get("inTuple");
-		String outTuple = (String) tuplemaps.get("outTuple");
-		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
-		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
-	}
-	
+	}	
 	private static void parseEdgeObject(JSONObject edges, Application application) {
 		String src = (String) edges.get("src");
 		String dest = (String) edges.get("dest");
@@ -222,45 +215,14 @@ public class VRGameFog {
 			application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
 		}
 	}
-	
-	private static FogDevice addOnlyGw(String id, int userId, String appId, int parentId){
-		FogDevice dept = createFogDevice(id, 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
-		fogDevices.add(dept);
-		dept.setParentId(parentId);
-		dept.setUplinkLatency(4); // latency of connection between gateways and proxy server is 4 ms
-		return dept;
+	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
+		String inTuple = (String) tuplemaps.get("inTuple");
+		String outTuple = (String) tuplemaps.get("outTuple");
+		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
+		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
 	}
-	
-	private static FogDevice addGw(String id, int userId, String appId, int parentId){
-		FogDevice dept = createFogDevice(id, 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333);
-		fogDevices.add(dept);
-		dept.setParentId(parentId);
-		dept.setUplinkLatency(4); // latency of connection between gateways and proxy server is 4 ms
-		for(int i=0;i<numOfMobilesPerDept;i++){
-			String mobileId = id+"-"+i;
-			FogDevice mobile = addMobile(mobileId, userId, appId, dept.getId()); // adding mobiles to the physical topology. Smartphones have been modeled as fog devices as well.
-			mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
-			fogDevices.add(mobile);
-		}
-		return dept;
-	}
-	
-	private static FogDevice addMobile(String id, int userId, String appId, int parentId){
-		FogDevice mobile = createFogDevice("m-"+id, 1000, 1000, 10000, 270, 3, 0, 87.53, 82.44);
-		mobile.setParentId(parentId);
-		Sensor eegSensor = new Sensor("s-"+id, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
-		sensors.add(eegSensor);
-		Actuator display = new Actuator("a-"+id, userId, appId, "DISPLAY");
-		actuators.add(display);
-		eegSensor.setGatewayDeviceId(mobile.getId());
-		eegSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
-		display.setGatewayDeviceId(mobile.getId());
-		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
-		return mobile;
-	}
-	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
+	private static FogDevice addMobile(String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
-		mobile.setParentId(parentId);
 		Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
 		sensors.add(newSensor);
 		Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
@@ -270,11 +232,6 @@ public class VRGameFog {
 		display.setGatewayDeviceId(mobile.getId());
 		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
 		return mobile;
-	}
-	private static void createFogDevices(int userId, String appId) {
-		for(int i=0;i<numOfDepts;i++){
-			addGw(i+"", userId, appId, proxy.getId()); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
-		}
 	}
 	
 	/**
