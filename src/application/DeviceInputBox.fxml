@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane prefHeight="316.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddDeviceController">
+   <center>
+      <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane prefHeight="346.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <TextField fx:id="name" layoutX="103.0" layoutY="30.0" prefHeight="25.0" prefWidth="97.0" text="node1" AnchorPane.topAnchor="16.0" />
+                  <Text layoutX="19.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" AnchorPane.leftAnchor="19.0" AnchorPane.topAnchor="20.05078125" />
+                  <Text layoutX="22.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ram:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="100.05078125" />
+                  <Text layoutX="22.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MIPS:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="58.0" />
+                  <TextField fx:id="mips" layoutX="103.0" layoutY="64.0" prefHeight="25.0" prefWidth="99.0" text="1500" AnchorPane.topAnchor="54.0" />
+                  <TextField fx:id="ram" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" text="10240" AnchorPane.topAnchor="96.0" />
+                  <Button fx:id="saveNode" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveNodeHandler" text="Save Node" />
+                  <TextField fx:id="upbw" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" text="850" />
+                  <TextField fx:id="downbw" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" text="850" />
+                  <TextField fx:id="nodelvl" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" text="1" />
+                  <TextField fx:id="ratePerMIPS" layoutX="291.0" layoutY="54.0" prefHeight="25.0" prefWidth="117.0" text="50.0" />
+                  <Text layoutX="14.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Up Bandwidth:" />
+                  <Text layoutX="8.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Down Bandwidth:" />
+                  <Text layoutX="22.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Level:" />
+                  <Text layoutX="206.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Rate per MIPS:" />
+                  <TextField fx:id="busyPower" layoutX="291.0" layoutY="96.0" prefHeight="25.0" prefWidth="117.0" text="3.0" />
+                  <TextField fx:id="idlePower" layoutX="291.0" layoutY="139.0" prefHeight="25.0" prefWidth="117.0" text="1.0" />
+                  <Text layoutX="214.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Busy Power:" />
+                  <Text layoutX="216.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Idle Power:" />
+                  <TextField fx:id="parentName" layoutX="291.0" layoutY="16.0" prefHeight="25.0" prefWidth="116.0" text="node1" />
+                  <Text layoutX="228.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent:" />
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>
