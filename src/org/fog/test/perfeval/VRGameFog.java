@@ -182,7 +182,6 @@ public class VRGameFog {
 		String inTuple = (String) tuplemaps.get("inTuple");
 		String outTuple = (String) tuplemaps.get("outTuple");
 		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
-		
 		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
 	}
 	

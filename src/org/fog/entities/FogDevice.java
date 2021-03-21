@@ -109,6 +109,8 @@ public class FogDevice extends PowerDatacenter {
 			double schedulingInterval,
 			double uplinkBandwidth, double downlinkBandwidth, double uplinkLatency, double ratePerMips) throws Exception {
 		super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
+		//Dude, Java, lmao
+		System.out.println("Made " + name + " with " + vmAllocationPolicy.getHostList().get(0).getPeList().get(0).getMips());
 		thisName = name;
 		setCharacteristics(characteristics);
 		setVmAllocationPolicy(vmAllocationPolicy);
@@ -155,89 +157,89 @@ public class FogDevice extends PowerDatacenter {
 		setChildToLatencyMap(new HashMap<Integer, Double>());
 	}
 
-	public FogDevice(
-			String name, long mips, int ram, 
-			double uplinkBandwidth, double downlinkBandwidth, double ratePerMips, PowerModel powerModel) throws Exception {
-		super(name, null, null, new LinkedList<Storage>(), 0);
-		
-		List<Pe> peList = new ArrayList<Pe>();
-
-		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-
-		int hostId = FogUtils.generateEntityId();
-		long storage = 1000000; // host storage
-		int bw = 10000;
-
-		PowerHost host = new PowerHost(
-				hostId,
-				new RamProvisionerSimple(ram),
-				new BwProvisionerOverbooking(bw),
-				storage,
-				peList,
-				new StreamOperatorScheduler(peList),
-				powerModel
-			);
-
-		List<Host> hostList = new ArrayList<Host>();
-		hostList.add(host);
-
-		setVmAllocationPolicy(new AppModuleAllocationPolicy(hostList));
-		
-		String arch = Config.FOG_DEVICE_ARCH; 
-		String os = Config.FOG_DEVICE_OS; 
-		String vmm = Config.FOG_DEVICE_VMM;
-		double time_zone = Config.FOG_DEVICE_TIMEZONE;
-		double cost = Config.FOG_DEVICE_COST; 
-		double costPerMem = Config.FOG_DEVICE_COST_PER_MEMORY;
-		double costPerStorage = Config.FOG_DEVICE_COST_PER_STORAGE;
-		double costPerBw = Config.FOG_DEVICE_COST_PER_BW;
-
-		FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(
-				arch, os, vmm, host, time_zone, cost, costPerMem,
-				costPerStorage, costPerBw);
-
-		setCharacteristics(characteristics);
-		
-		setLastProcessTime(0.0);
-		setVmList(new ArrayList<Vm>());
-		setUplinkBandwidth(uplinkBandwidth);
-		setDownlinkBandwidth(downlinkBandwidth);
-		setUplinkLatency(uplinkLatency);
-		setAssociatedActuatorIds(new ArrayList<Pair<Integer, Double>>());
-		for (Host host1 : getCharacteristics().getHostList()) {
-			host1.setDatacenter(this);
-		}
-		setActiveApplications(new ArrayList<String>());
-		if (getCharacteristics().getNumberOfPes() == 0) {
-			throw new Exception(super.getName()
-					+ " : Error - this entity has no PEs. Therefore, can't process any Cloudlets.");
-		}
-		
-		
-		getCharacteristics().setId(super.getId());
-		
-		applicationMap = new HashMap<String, Application>();
-		appToModulesMap = new HashMap<String, List<String>>();
-		northTupleQueue = new LinkedList<Tuple>();
-		southTupleQueue = new LinkedList<Pair<Tuple, Integer>>();
-		setNorthLinkBusy(false);
-		setSouthLinkBusy(false);
-		
-		
-		setChildrenIds(new ArrayList<Integer>());
-		setChildToOperatorsMap(new HashMap<Integer, List<String>>());
-		
-		this.cloudTrafficMap = new HashMap<Integer, Integer>();
-		
-		this.lockTime = 0;
-		
-		this.energyConsumption = 0;
-		this.lastUtilization = 0;
-		setTotalCost(0);
-		setChildToLatencyMap(new HashMap<Integer, Double>());
-		setModuleInstanceCount(new HashMap<String, Map<String, Integer>>());
-	}
+//	public FogDevice(
+//			String name, long mips, int ram, 
+//			double uplinkBandwidth, double downlinkBandwidth, double ratePerMips, PowerModel powerModel) throws Exception {
+//		super(name, null, null, new LinkedList<Storage>(), 0);
+//		System.out.println("Constructor w/o alloc");
+//		List<Pe> peList = new ArrayList<Pe>();
+//
+//		// 3. Create PEs and add these into a list.
+//		peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
+//
+//		int hostId = FogUtils.generateEntityId();
+//		long storage = 1000000; // host storage
+//		int bw = 10000;
+//
+//		PowerHost host = new PowerHost(
+//				hostId,
+//				new RamProvisionerSimple(ram),
+//				new BwProvisionerOverbooking(bw),
+//				storage,
+//				peList,
+//				new StreamOperatorScheduler(peList),
+//				powerModel
+//			);
+//
+//		List<Host> hostList = new ArrayList<Host>();
+//		hostList.add(host);
+//
+//		setVmAllocationPolicy(new AppModuleAllocationPolicy(hostList));
+//		
+//		String arch = Config.FOG_DEVICE_ARCH; 
+//		String os = Config.FOG_DEVICE_OS; 
+//		String vmm = Config.FOG_DEVICE_VMM;
+//		double time_zone = Config.FOG_DEVICE_TIMEZONE;
+//		double cost = Config.FOG_DEVICE_COST; 
+//		double costPerMem = Config.FOG_DEVICE_COST_PER_MEMORY;
+//		double costPerStorage = Config.FOG_DEVICE_COST_PER_STORAGE;
+//		double costPerBw = Config.FOG_DEVICE_COST_PER_BW;
+//
+//		FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(
+//				arch, os, vmm, host, time_zone, cost, costPerMem,
+//				costPerStorage, costPerBw);
+//
+//		setCharacteristics(characteristics);
+//		
+//		setLastProcessTime(0.0);
+//		setVmList(new ArrayList<Vm>());
+//		setUplinkBandwidth(uplinkBandwidth);
+//		setDownlinkBandwidth(downlinkBandwidth);
+//		setUplinkLatency(uplinkLatency);
+//		setAssociatedActuatorIds(new ArrayList<Pair<Integer, Double>>());
+//		for (Host host1 : getCharacteristics().getHostList()) {
+//			host1.setDatacenter(this);
+//		}
+//		setActiveApplications(new ArrayList<String>());
+//		if (getCharacteristics().getNumberOfPes() == 0) {
+//			throw new Exception(super.getName()
+//					+ " : Error - this entity has no PEs. Therefore, can't process any Cloudlets.");
+//		}
+//		
+//		
+//		getCharacteristics().setId(super.getId());
+//		
+//		applicationMap = new HashMap<String, Application>();
+//		appToModulesMap = new HashMap<String, List<String>>();
+//		northTupleQueue = new LinkedList<Tuple>();
+//		southTupleQueue = new LinkedList<Pair<Tuple, Integer>>();
+//		setNorthLinkBusy(false);
+//		setSouthLinkBusy(false);
+//		
+//		
+//		setChildrenIds(new ArrayList<Integer>());
+//		setChildToOperatorsMap(new HashMap<Integer, List<String>>());
+//		
+//		this.cloudTrafficMap = new HashMap<Integer, Integer>();
+//		
+//		this.lockTime = 0;
+//		
+//		this.energyConsumption = 0;
+//		this.lastUtilization = 0;
+//		setTotalCost(0);
+//		setChildToLatencyMap(new HashMap<Integer, Double>());
+//		setModuleInstanceCount(new HashMap<String, Map<String, Integer>>());
+//	}
 	
 	/**
 	 * Overrides this method when making a new and different type of resource. <br>
