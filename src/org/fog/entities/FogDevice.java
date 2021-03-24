@@ -630,12 +630,12 @@ public class FogDevice extends PowerDatacenter {
 	}
 	
 	
-
+	TextParser textParserObj = new TextParser();
 	protected void processTupleArrival(SimEvent ev){
 		Tuple tuple = (Tuple)ev.getData();
 		//System.out.println(CloudSim.clock() +" : tuple arrived "+tuple.getTupleType() + " Source " + CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination())); 
 		tuple.setArrivalTime(CloudSim.clock());
-		TextParser.logTuple(tuple.getTupleType(), CloudSim.getEntityName(ev.getSource()), CloudSim.getEntityName(ev.getDestination()), tuple.getsendTime(), tuple.getArrivalTime());
+		textParserObj.logTuple(tuple.getTupleType(), CloudSim.getEntityName(ev.getSource()), CloudSim.getEntityName(ev.getDestination()), tuple.getsendTime(), tuple.getArrivalTime());
 		
 		Logger.debug(getName(), "Received tuple "+tuple.getCloudletId()+"with tupleType = "+tuple.getTupleType()+"\t| Source : "+
 		CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination()));

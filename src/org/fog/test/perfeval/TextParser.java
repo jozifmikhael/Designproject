@@ -149,8 +149,8 @@ public class TextParser {
 		}
 		
 	}
-	public static void logTuple(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
-//		(tType, tSrc, tDst, tSent, tArriv);
+	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
+		this.new TupleSpec(tupleType, tupleSRC, tupleDEST, sentTime, arrivalTime);
 	}
 	
 	class NodeSpecs{
