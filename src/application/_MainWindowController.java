@@ -124,6 +124,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	Color moduleColor=Color.CYAN;
 	Color transpColor=Color.TRANSPARENT;
 	Color _errorColor=Color.GREEN;
+	Color sensorColor=Color.PINK;
     GraphicsContext gc;
     SetupJSONParser textfile = new SetupJSONParser();
 	
@@ -202,6 +203,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<String> moduleNamesList = new ArrayList<String>();
 	public List<String> selectedModulesList = new ArrayList<String>();
 	
+	public List<String> sensorNameList = new ArrayList<String>();
+	public List<SensorSpec> sensorList = new ArrayList<SensorSpec>();
+	public List<String> transmissionTypeList = new ArrayList<String>();
+	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
@@ -221,6 +226,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case DIGIT1 : state=1; break;	 // Select Node Placer
 			case DIGIT2 : state=2; break;	 // Select Module Placer
 			case DIGIT3 : state=3; break;	 // Select Edge Placer
+			case DIGIT4 : state=4; break;    // Select Sensor Placer
 			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
 			case E 		: System.out.println("E"); break;	 // Edit Object Selected
 			case F5 	: System.out.println("F5"); break;   // Save File
@@ -237,6 +243,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		gc.setTextAlign(TextAlignment.CENTER);
 		gc.setFont(new Font(font, fontSize));
     	scene.setOnKeyPressed(this); // uses handle method
+    	
+    	transmissionTypeList.add("Deterministic");
+    	transmissionTypeList.add("Normal");
+    	transmissionTypeList.add("Uniform");
     }
 
 	dispNode draggingNode = null;
@@ -270,6 +280,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			dispNode newNode = new dispNode("", transpColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 			draggingNode = newNode;
 			draggingLink = new dispLink(linkSrcNode, draggingNode);
+		}else if (state == 4) {
+			if (selNode == null) {
+//				System.out.println("_MainWindowController.java.java: Making new Sensor node...");
+				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				draggingNode = newNode;
+			} else {
+				draggingNode = selNode;
+			}
 		}
 		redrawNodes();
 	}
@@ -319,7 +337,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			} else if (linkDstNode==null) {
 				System.out.println("_MainWindowController.java: Linker Dst is null");
 			}
-		}
+		} else if (state==4) {
+    		if(dispNodesList.indexOf(draggingNode)<0) {
+    			dispNode newSensor = addSensor();
+    			if(newSensor!=null) newSensor.setPos(mEvent);
+    		}
+        	else draggingNode.setPos(mEvent);
+        	draggingNode=null;
+    	}
     	redrawNodes();
     }
     
@@ -565,6 +590,33 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			}
     		redrawNodes();
     		return newMod;
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
+    @FXML
+    dispNode addSensor() {
+    	try {
+    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
+    		Scene scene = new Scene(addNewSensorLoader.load(),450,320);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		AddSensorController sensorController = addNewSensorLoader.getController();
+    		stage.setTitle("Add Sensor");
+    		stage.showAndWait();
+    		SensorSpec s = sensorController.getSpec();
+    		if (s==null) return null;
+    		String name = s==null?"Error":s.name;
+    		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
+			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
+				sensorList.add(s);
+				sensorNameList.add(name);
+				dispNodesList.add(newDevice);
+			}
+			redrawNodes();
+    		return newDevice;
     	} catch(Exception e) {
     		e.printStackTrace();
     		return null;

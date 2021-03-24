@@ -212,20 +212,18 @@ public class Controller extends SimEntity{
 		double totalNodeCosts = 0;
 		double totalNodePower = 0;
 		for(FogDevice fogDevice : getFogDevices()){
-			if(!(fogDevice.getLevel() == 0)) {
-				totalNodePower = totalNodePower + fogDevice.getEnergyConsumption();
-				totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
-				System.out.println(fogDevice.getName() + " : Energy Consumed = "+fogDevice.getEnergyConsumption());
-				String NodeLine = fogDevice.getName();
-				try {
-					textfile.getNodespec(NodeLine);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			totalNodePower = totalNodePower + fogDevice.getEnergyConsumption();
+			totalNodeCosts = totalNodeCosts + fogDevice.getTotalCost();
+			System.out.println(fogDevice.getName() + " : Energy Consumed = "+fogDevice.getEnergyConsumption());
+			String NodeLine = fogDevice.getName();
+			try {
+				textfile.getNodespec(NodeLine);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
