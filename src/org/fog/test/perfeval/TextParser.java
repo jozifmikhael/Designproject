@@ -201,7 +201,7 @@ public class TextParser {
 //		System.out.println("Energy:\n"+listEnergy.toString()+"\n");
 //		System.out.println("Network:\n"+listNetwork.toString()+"\n");
 		
-		obj.put("tuples", tupleList);
+		//obj.put("tuples", tupleList);
 		obj.put("nodes", nodeList);
 		obj.put("listEnergy", energyList);
 		obj.put("listNetwork", networkList);

@@ -143,7 +143,7 @@ public class Controller extends SimEntity{
 				}
 			}
 			System.out.println("Total Cost = " + totalNodeCost + " Total Engery Usage = " + totalEnergyUsage);
-//    		textfile.writeJSON("output.json");
+    		textfile.writeJSON("output.json");
 			CloudSim.stopSimulation();	
 			CloudSim.terminateSimulation();	
 //			System.exit(0);
