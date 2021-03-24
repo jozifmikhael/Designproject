@@ -30,6 +30,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -69,6 +70,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private MenuItem SetRunTimeItem;
+    
+    @FXML
+    private MenuItem SetSimParams;
 
     @FXML
     private TextField policyView;
@@ -78,7 +82,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
     @FXML
     private Button deleteButton;
-
+    
+    @FXML
+    private Button startButton;
+    
     @FXML
     private Canvas topoField;
     
@@ -113,7 +120,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private AnchorPane backPane;
     
     ////////////////////////////////////////////////////////////////////////////
-    
+    String policyChoice = ("ProfitAwareDEFAULT");
     int globalID=0;
 	double R=50;
 	double xCenter=100;
@@ -206,6 +213,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
 	
+	public List<String> placementPolicyList = new ArrayList<String>();
+	
 	
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -237,6 +246,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		gc.setTextAlign(TextAlignment.CENTER);
 		gc.setFont(new Font(font, fontSize));
     	scene.setOnKeyPressed(this); // uses handle method
+    	
+    	placementPolicyList.add("Policy 1 l250 mc");
+    	placementPolicyList.add("Policy 2 l250 mc");
+    	placementPolicyList.add("Policy 3 l250 mc");
     }
 
 	dispNode draggingNode = null;
@@ -624,14 +637,84 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
     
+    // ------------------------------------------------------------------------------------
     @FXML
-    void confirmPolicy(ActionEvent event) {
+    void setParams(ActionEvent event) {
+    	try {	
+    		BorderPane root = FXMLLoader.load(getClass().getResource("setSimParamsBox.fxml"));
+    		Scene scene = new Scene(root,414,207);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		stage.setTitle("Setting Parameters");    		
+    		setParamsController paramsController = new setParamsController();
+    		paramsController.populateList(placementPolicyList);
+    		stage.show();
+    		       
+    		
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+        
+    @FXML
+    void confirmPolicy1(ActionEvent event) {
     	try {	
     		BorderPane root = FXMLLoader.load(getClass().getResource("PolicySelectionBox.fxml"));
     		Scene scene = new Scene(root,276,200);
     		Stage stage = new Stage();
     		stage.setScene(scene);
-    		stage.setTitle("Add Sensor");
+    		stage.setTitle("Policy Selected");
+    		stage.show();
+    		String policyChoice = ("ProfitAware");    	
+    		this.policyChoice = policyChoice.toString();
+    		
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    @FXML
+    void confirmPolicy2(ActionEvent event) {
+    	try {	
+    		BorderPane root = FXMLLoader.load(getClass().getResource("PolicySelectionBox.fxml"));
+    		Scene scene = new Scene(root,276,200);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		stage.setTitle("Policy Selected");
+    		stage.show();
+    		String policyChoice = ("QoS");
+    		this.policyChoice = policyChoice.toString();
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    @FXML
+    void confirmPolicy3(ActionEvent event) {
+    	try {	
+    		BorderPane root = FXMLLoader.load(getClass().getResource("PolicySelectionBox.fxml"));
+    		Scene scene = new Scene(root,276,200);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		stage.setTitle("Policy Selected");
+    		stage.show();
+    		String policyChoice = ("LowestPowerUsage");
+    		this.policyChoice = policyChoice.toString();
+    		
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    @FXML
+    void setSimTime(ActionEvent event) {
+    	try {
+    		BorderPane root = FXMLLoader.load(getClass().getResource("setSimTimeBox.fxml"));
+    		Scene scene = new Scene(root,414,98);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		stage.setTitle("Simulation Duration");
     		stage.show();
     	} catch(Exception e) {
     		e.printStackTrace();
@@ -639,12 +722,38 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
+    void setSimGran(ActionEvent event) {
+    	try {
+    		BorderPane root = FXMLLoader.load(getClass().getResource("setGranBox.fxml"));
+    		Scene scene = new Scene(root,414,98);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		stage.setTitle("Simulation Granularity");
+    		stage.show();
+    		
+    		
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+//    @FXML
+//    void startSim(ActionEvent event) throws Exception {
+//    	String policy = policyView.getText();
+//    	String time = simulationTime.getText();
+//    	String destFile = createJsonController.jsonDestinationFileName + ".json";
+//     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, policy);
+//     	VRGameFog_src simObj = new VRGameFog_src("test6.json");
+    	
+   @FXML
     void startSim(ActionEvent event) throws Exception {
-    	//String policy = policyView.getText();
-    	//String time = simulationTime.getText();
+    	
+    	String policy = policyChoice;
+    	int time = setSimTimeController.simulationTime;  //100; //simulationTime.getText();
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
-     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 1, "500");
-     	VRGameFog simObj = new VRGameFog("test7.json");
+     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, policy);
+  //   	VRGameFog_src simObj = new VRGameFog_src("test6.json");   	
+     	testmethod();
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();
@@ -681,6 +790,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         } catch (IOException e) {
             System.out.println("Add line failed!" +e);
         }
+    }
+    
+    void testmethod() {
+    	double testgran = org.fog.utils.Config.RESOURCE_MGMT_INTERVAL;
+    	int testsimtime = org.fog.utils.Config.MAX_SIMULATION_TIME;
+    	String testtopnode = org.fog.utils.Config.TOP_NODE;
+    	System.out.print("TEST Maxtime" + testsimtime);
+    	System.out.print("\n TEST Gran: " + testgran);
+    	System.out.print("\n TEST Top Node: " + testtopnode);
     }
     
     @FXML

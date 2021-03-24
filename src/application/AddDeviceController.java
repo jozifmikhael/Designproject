@@ -20,6 +20,7 @@ import java.io.IOException;
 public class AddDeviceController {
 	DeviceSpec h;
 	SetupJSONParser textfile = new SetupJSONParser();
+	public static String hardcodedtopnode = "Node1";
 
 	@FXML
 	private TextField name;
