@@ -205,7 +205,7 @@ public class SDNExample {
 		System.out.println("Data center infrastructure (Physical Topology) : "+ physical);
 		System.out.println("Virtual Machine and Network requests (Virtual Topology) : "+ virtual);
 		System.out.println("Workloads: ");
-		for(String work:workloads)
+//		for(String work:workloads)
 //			System.out.println("  "+work);		
 	}
 	

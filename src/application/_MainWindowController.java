@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.fog.test.perfeval.VRGameFog_src;
+import org.fog.test.perfeval.VRGameFog;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -640,11 +640,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void startSim(ActionEvent event) throws Exception {
-//    	String policy = policyView.getText();
-//    	String time = simulationTime.getText();
-//    	String destFile = createJsonController.jsonDestinationFileName + ".json";
-//     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, policy);
-//     	VRGameFog_src simObj = new VRGameFog_src("test6.json");
+    	//String policy = policyView.getText();
+    	//String time = simulationTime.getText();
+    	String destFile = createJsonController.jsonDestinationFileName + ".json";
+     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 1, "500");
+     	VRGameFog simObj = new VRGameFog("test7.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

@@ -55,6 +55,9 @@ public class AddDeviceController {
 	private TextField idlePower;
 	
 	@FXML
+    private TextField transmissionTime;
+	
+	@FXML
 	void saveNodeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveNode.getScene().getWindow();
 		if (name.getText().trim().isEmpty()) {
@@ -89,7 +92,7 @@ public class AddDeviceController {
 		}
 		h = textfile.createDevice(name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
 		+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
-		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() + " \n");
+		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() +  " " + transmissionTime.getText().toString()+" \n");
 		stage.close();
 	}
 	public DeviceSpec getSpec() {return h;}
