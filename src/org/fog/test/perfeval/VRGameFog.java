@@ -149,6 +149,10 @@ public class VRGameFog {
 		}
 	}
 	
+	public static void main() {
+		VRGameFog simObj = new VRGameFog("test9.json");
+	}
+	
 	private static void parseNodeObject(JSONObject node) {
         double nodeBusyPower = (double) node.get("apower");
         int nodeLevel = Integer.parseUnsignedInt(node.get("level").toString());

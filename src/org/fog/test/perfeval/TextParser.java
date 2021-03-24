@@ -78,7 +78,7 @@ public class TextParser {
 		}
 		public filterableTuples ofType(String reqType){
 			filterableTuples temp = new filterableTuples();
-			for(TupleSpec t : this.localList) if(t.tupleType.equals(reqType)) temp.localList.remove(t);
+			for(TupleSpec t : this.localList) if(!(t.tupleType.equals(reqType))) temp.localList.remove(t);
 			return temp;
 		}
 		public filterableTuples ofSrc(String reqSrc){
@@ -120,11 +120,22 @@ public class TextParser {
 			System.out.println(var/this.localList.size());
 			return this;
 		}
+		public filterableTuples printStrs() {
+			double avg=0;
+			for(TupleSpec t : this.localList) System.out.println(t.toString());
+			return this;
+		}
 	}
 	//filterableTuples newQuery = new filterableTuples;
 	//newQuery.ofType("PLAYER_GAME_STATE").ofDst("wherever");
 	
 	public class TupleSpec{
+		@Override
+		public String toString() {
+			return "TupleSpec [tupleType=" + tupleType + ", tupleSrc=" + tupleSrc + ", tupleDst=" + tupleDst
+					+ ", tupleNWLatency=" + tupleNWLatency + ", tupleSentTime=" + tupleSentTime + ", tupleArrivTime="
+					+ tupleArrivTime + "]";
+		}
 		String tupleType;
 		String tupleSrc; 
 		String tupleDst;
@@ -151,6 +162,7 @@ public class TextParser {
 			this.tupleNWLatency = arrivalTime-sentTime;
 			globalTuplesList.add(this);
 		}
+		
 		
 	}
 	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
@@ -251,8 +263,5 @@ public class TextParser {
 			e.printStackTrace();
 		}
 		System.out.println(obj);
-				
-		
 	}
-	
 }

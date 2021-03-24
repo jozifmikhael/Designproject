@@ -146,11 +146,11 @@ public class Controller extends SimEntity{
 				}
 			}
 			System.out.println("Total Cost = " + totalNodeCost + " Total Engery Usage = " + totalEnergyUsage);
-    		textfile.writeJSON("output.json");
-			CloudSim.stopSimulation();	
-			CloudSim.terminateSimulation();
 			TextParser.filterableTuples query = textfile.new filterableTuples();
 			query.ofType("PLAYER_GAME_STATE").printAverage();
+//    		textfile.writeJSON("output.json");
+			CloudSim.stopSimulation();	
+			CloudSim.terminateSimulation();
 //			System.exit(0);
 			break;
 		}
