@@ -39,6 +39,9 @@ import org.fog.utils.Logger;
 import org.fog.utils.ModuleLaunchConfig;
 import org.fog.utils.NetworkUsageMonitor;
 import org.fog.utils.TimeKeeper;
+
+import javafx.scene.paint.Color;
+
 import org.fog.placement.Controller;
 
 public class FogDevice extends PowerDatacenter {
@@ -50,7 +53,6 @@ public class FogDevice extends PowerDatacenter {
 	protected Map<String, Application> applicationMap;
 	protected Map<String, List<String>> appToModulesMap;
 	protected Map<Integer, Double> childToLatencyMap;
-	TextParser textfile = Controller.getTextParser();
 	
 	protected Map<Integer, Integer> cloudTrafficMap;
 	
@@ -453,7 +455,7 @@ public class FogDevice extends PowerDatacenter {
 			}
 		}*/
 		
-		Log.printLine();
+//		Log.printLine();
 
 		setLastProcessTime(currentTime);
 		return minTime;
@@ -626,36 +628,19 @@ public class FogDevice extends PowerDatacenter {
 			sendDown(tuple, childId);
 		}
 	}
-	int numClients=0;
+	
+	
+
 	protected void processTupleArrival(SimEvent ev){
 		Tuple tuple = (Tuple)ev.getData();
 		//System.out.println(CloudSim.clock() +" : tuple arrived "+tuple.getTupleType() + " Source " + CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination())); 
 		tuple.setArrivalTime(CloudSim.clock());
-		String tupleLine = tuple.getTupleType() + " " + CloudSim.getEntityName(ev.getSource()).toString() + " " + CloudSim.getEntityName(ev.getDestination()).toString() + " " + tuple.getsendTime() + " " + tuple.getArrivalTime() + "\n";
-		textfile = Controller.getTextParser();
-		if(level == 0) {
-            updateCloudTraffic();
-        }
-		try {
-			textfile.getTuples(tupleLine);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Controller.setTextParser(textfile);
-		/*if(getName().equals("d-0") && tuple.getTupleType().equals("_SENSOR")){
-			System.out.println(++numClients);
-		}*/
+		TextParser.logTuple(tuple.getTupleType(), CloudSim.getEntityName(ev.getSource()), CloudSim.getEntityName(ev.getDestination()), tuple.getsendTime(), tuple.getArrivalTime());
+		
 		Logger.debug(getName(), "Received tuple "+tuple.getCloudletId()+"with tupleType = "+tuple.getTupleType()+"\t| Source : "+
 		CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination()));
 		send(ev.getSource(), CloudSim.getMinTimeBetweenEvents(), FogEvents.TUPLE_ACK);
-		
-		if(FogUtils.appIdToGeoCoverageMap.containsKey(tuple.getAppId())){
-		}
-		
+				
 		if(tuple.getDirection() == Tuple.ACTUATOR){
 			sendTupleToActuator(tuple);
 			return;
