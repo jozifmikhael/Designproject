@@ -1,3 +1,4 @@
 .thick-chart .chart-series-line {    
 -fx-stroke-width: 0.25px;
+-fx-fill: #000000;
 }

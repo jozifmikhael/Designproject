@@ -31,6 +31,7 @@ public class SetupJSONParser {
 		double insIdlePower;
 		double insServiceCharge;
 		double insCostNetworking;
+		double transmissionTime;
 		
 		String stParts[] = nodeLine.split(" ");
 		String hostname = stParts[0];
@@ -44,8 +45,9 @@ public class SetupJSONParser {
 		insBusyPower = Double.parseDouble(stParts[7]);
 		insIdlePower = Double.parseDouble(stParts[8]);
 		String parentName = stParts[9];
+		transmissionTime = Double.parseDouble(stParts[10]);
 		DeviceSpec h = new DeviceSpec(hostname, parentName, insProcessingSpeed, insMemory, insNetworkSpeedUp, insNetworkSpeedDown, insLevel,
-				insCostProcessing, insBusyPower, insIdlePower);
+				insCostProcessing, insBusyPower, insIdlePower,transmissionTime);
 		return h;
 	}
 	
@@ -124,6 +126,7 @@ public class SetupJSONParser {
 		double rate;
 		double ipower;
 		double apower;
+		double transmissionTime;
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
@@ -139,6 +142,7 @@ public class SetupJSONParser {
 			obj.put("rate", o.rate);
 			obj.put("apower", o.apower);
 			obj.put("ipower", o.ipower);
+			obj.put("transmission_time", o.transmissionTime);
 			return obj;
 		}
 		
@@ -152,7 +156,7 @@ public class SetupJSONParser {
 		
 		
 		public DeviceSpec(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate, double apower,
-				double ipower) {
+				double ipower, double transmissionTime) {
 			this.id = getID();
 			this.name = name;
 			this.parent = parent;
@@ -164,7 +168,8 @@ public class SetupJSONParser {
 			this.rate = rate;
 			this.apower = apower;
 			this.ipower = ipower;
-			this.type = "device";
+			this.transmissionTime = transmissionTime;
+			this.type = "device";		
 		}
 	}
 	
@@ -264,6 +269,7 @@ public class SetupJSONParser {
 	}
 	
 	@SuppressWarnings("unchecked")
+	
 	public void writeJSON(String jsonFileName,
 			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList,
 			int i, String time) {

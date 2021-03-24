@@ -186,12 +186,12 @@ public class TextParser {
 	public void writeJSON(String jsonFileName) {
 		JSONObject obj = new JSONObject();
 		
-		JSONArray tupleList = new JSONArray();
+		//JSONArray tupleList = new JSONArray();
 		JSONArray nodeList = new JSONArray();
 		JSONArray energyList = new JSONArray();
 		JSONArray networkList = new JSONArray();
 		
-		for (TupleSpec t:tuples) tupleList.add(t.toJSON());
+		//for (TupleSpec t:tuples) tupleList.add(t.toJSON());
 		for (NodeSpecs n:nodes) nodeList.add(n.toJSON());
 		for (EnergySpec e:listEnergy) energyList.add(e.toJSON());
 		for (NetworkSpec w:listNetwork) networkList.add(w.toJSON());
@@ -201,7 +201,7 @@ public class TextParser {
 //		System.out.println("Energy:\n"+listEnergy.toString()+"\n");
 //		System.out.println("Network:\n"+listNetwork.toString()+"\n");
 		
-		obj.put("tuples", tupleList);
+		//obj.put("tuples", tupleList);
 		obj.put("nodes", nodeList);
 		obj.put("listEnergy", energyList);
 		obj.put("listNetwork", networkList);

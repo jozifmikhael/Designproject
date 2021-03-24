@@ -4,6 +4,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <BorderPane prefHeight="316.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddDeviceController">
@@ -22,17 +23,24 @@
                   <TextField fx:id="upbw" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" text="850" />
                   <TextField fx:id="downbw" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" text="850" />
                   <TextField fx:id="nodelvl" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" text="1" />
-                  <TextField fx:id="ratePerMIPS" layoutX="291.0" layoutY="54.0" prefHeight="25.0" prefWidth="117.0" text="50.0" />
+                  <TextField fx:id="ratePerMIPS" layoutX="291.0" layoutY="54.0" prefHeight="25.0" prefWidth="97.0" text="50.0" />
                   <Text layoutX="14.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Up Bandwidth:" />
                   <Text layoutX="8.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Down Bandwidth:" />
                   <Text layoutX="22.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Level:" />
                   <Text layoutX="206.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Rate per MIPS:" />
-                  <TextField fx:id="busyPower" layoutX="291.0" layoutY="96.0" prefHeight="25.0" prefWidth="117.0" text="3.0" />
-                  <TextField fx:id="idlePower" layoutX="291.0" layoutY="139.0" prefHeight="25.0" prefWidth="117.0" text="1.0" />
+                  <TextField fx:id="busyPower" layoutX="291.0" layoutY="96.0" prefHeight="25.0" prefWidth="97.0" text="3.0" />
+                  <TextField fx:id="idlePower" layoutX="291.0" layoutY="139.0" prefHeight="25.0" prefWidth="97.0" text="1.0" />
                   <Text layoutX="214.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Busy Power:" />
                   <Text layoutX="216.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Idle Power:" />
-                  <TextField fx:id="parentName" layoutX="291.0" layoutY="16.0" prefHeight="25.0" prefWidth="116.0" text="node1" />
+                  <TextField fx:id="parentName" layoutX="291.0" layoutY="16.0" prefHeight="25.0" prefWidth="97.0" text="node1" />
                   <Text layoutX="228.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent:" />
+                  <Text layoutX="211.0" layoutY="216.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensor Parameters:">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <TextField fx:id="transmissionTime" layoutX="291.0" layoutY="235.0" prefHeight="25.0" prefWidth="97.0" text="0.0" />
+                  <Text layoutX="190.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tranmission Time:" />
                </children>
             </AnchorPane>
          </children>
