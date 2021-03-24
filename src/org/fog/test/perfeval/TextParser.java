@@ -13,7 +13,6 @@ public class TextParser {
 	private List<NodeSpecs> nodesList = new ArrayList<NodeSpecs>();
 	private List<EnergySpec> energiesList = new ArrayList<EnergySpec>();
 	private List<NetworkSpec> networkingList = new ArrayList<NetworkSpec>();
-	public static List<TupleSpec> tuplesList = new ArrayList<TupleSpec>();
 	
 	public void getNodespec(String line) throws NumberFormatException, IOException {
 		
@@ -70,7 +69,7 @@ public class TextParser {
 		return network;
 	}
 	
-	static List<TupleSpec> globalTuplesList;
+	static List<TupleSpec> globalTuplesList = new ArrayList<TupleSpec>();
 	class filterableTuples{
 		List<TupleSpec> localList;
 		public filterableTuples() {
@@ -126,7 +125,6 @@ public class TextParser {
 		double tupleNWLatency;
 		double tupleSentTime;
 		double tupleArrivTime;
-		
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
@@ -223,7 +221,7 @@ public class TextParser {
 		JSONArray networkJList = new JSONArray();
 		
 		
-		for (TupleSpec t:tuplesList) tupleJList.add(t.toJSON());
+		for (TupleSpec t:globalTuplesList) tupleJList.add(t.toJSON());
 		for (NodeSpecs n:nodesList) nodeJList.add(n.toJSON());
 		for (EnergySpec e:energiesList) energyJList.add(e.toJSON());
 		for (NetworkSpec w:networkingList) networkJList.add(w.toJSON());
@@ -233,7 +231,7 @@ public class TextParser {
 //		System.out.println("Energy:\n"+energiesList.toString()+"\n");
 //		System.out.println("Network:\n"+networkingList.toString()+"\n");
 		
-		obj.put("tuples", tupleJList);
+//		obj.put("tuples", tupleJList);
 		obj.put("nodes", nodeJList);
 		obj.put("listEnergy", energyJList);
 		obj.put("listNetwork", networkJList);
