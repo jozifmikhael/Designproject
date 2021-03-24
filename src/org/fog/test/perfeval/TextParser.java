@@ -70,30 +70,36 @@ public class TextParser {
 	}
 	
 	static List<TupleSpec> globalTuplesList = new ArrayList<TupleSpec>();
-	class filterableTuples{
+	public class filterableTuples{
 		List<TupleSpec> localList;
 		public filterableTuples() {
-			this.localList=globalTuplesList; 
+			this.localList = new ArrayList<TupleSpec>();
+			this.localList.addAll(globalTuplesList);
 		}
 		public filterableTuples ofType(String reqType){
-			for(TupleSpec t : this.localList) if(!(t.tupleType.equals(reqType))) this.localList.remove(t);
-			return this;
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(t.tupleType.equals(reqType)) temp.localList.remove(t);
+			return temp;
 		}
 		public filterableTuples ofSrc(String reqSrc){
-			for(TupleSpec t : this.localList) if(!(t.tupleSrc.equals(reqSrc))) this.localList.remove(t);
-			return this;
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(!(t.tupleSrc.equals(reqSrc))) temp.localList.remove(t);
+			return temp;
 		}
 		public filterableTuples ofDst(String reqDst){
-			for(TupleSpec t : this.localList) if(!(t.tupleDst.equals(reqDst))) this.localList.remove(t);
-			return this;
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(!(t.tupleDst.equals(reqDst))) temp.localList.remove(t);
+			return temp;
 		}
 		public filterableTuples tholdSent(double reqSent, boolean dir){
-			for(TupleSpec t : this.localList) if(dir&&(t.tupleSentTime>reqSent)) this.localList.remove(t);
-			return this;
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(dir&&(t.tupleSentTime>reqSent)) temp.localList.remove(t);
+			return temp;
 		}
 		public filterableTuples tholdArrived(double reqArrived, boolean dir){
-			for(TupleSpec t : this.localList) if(dir&&(t.tupleArrivTime>reqArrived)) this.localList.remove(t);
-			return this;
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(dir&&(t.tupleArrivTime>reqArrived)) temp.localList.remove(t);
+			return temp;
 		}
 		public filterableTuples printNWLatencies() {
 			for(TupleSpec t : this.localList) System.out.println(t.tupleArrivTime - t.tupleSentTime);
