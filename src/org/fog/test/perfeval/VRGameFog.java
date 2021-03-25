@@ -120,7 +120,7 @@ public class VRGameFog {
         
         System.out.println("Finished meta");
         
-        JSONArray modArr = (JSONArray) jsonObject.get("Modules");	
+        JSONArray modArr = (JSONArray) jsonObject.get("modules");	
         modArr.forEach(n -> parseModuleObject((JSONObject) n, application));	
         JSONArray edgeArr = (JSONArray) jsonObject.get("Edges");	
         edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));	

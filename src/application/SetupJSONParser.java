@@ -185,7 +185,6 @@ public class SetupJSONParser {
 	}
 	
 	class SensorSpec extends NodeSpec {	
-		String nodeName;	
 		String distribution;	
 		double deterministicValue;	
 		double normalMean;	
@@ -197,22 +196,22 @@ public class SetupJSONParser {
 		JSONObject toJSON() {	
 			SensorSpec sensor = this;	
 			JSONObject obj = new JSONObject();	
-			obj.put("Node Name", sensor.nodeName);	
-			obj.put("Module Name", sensor.distribution);	
-			obj.put("RAM", sensor.deterministicValue);	
-			obj.put("Bandwidth", sensor.normalMean);	
-			obj.put("inTuple", sensor.normalStdDev);	
-			obj.put("outTuple", sensor.uniformMax);	
-			obj.put("Size", sensor.uniformMin);	
+			obj.put("sensorName", sensor.name);	
+			obj.put("distribution", sensor.distribution);	
+			obj.put("deterministicValue", sensor.deterministicValue);	
+			obj.put("normalMean", sensor.normalMean);	
+			obj.put("normalStdDev", sensor.normalStdDev);	
+			obj.put("uniformMax", sensor.uniformMax);	
+			obj.put("uniformMin", sensor.uniformMin);
 			obj.put("x_cord", sensor.x);
 			obj.put("y_cord", sensor.y);
 			obj.put("radius", sensor.dispSize);
 			return obj;	
 		}	
 			
-		public SensorSpec(String nodeName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
+		public SensorSpec(String sensorName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
 				double uniformMin) {	
-			this.nodeName = nodeName;	
+			this.name = sensorName;	
 			this.distribution = distribution;	
 			this.deterministicValue = deterministicValue;	
 			this.normalMean = normalMean;	
@@ -410,7 +409,7 @@ public class SetupJSONParser {
 		obj.put("edges", edgeList);
         
 		try {
-			FileWriter file = new FileWriter(jsonFileName, true);
+			FileWriter file = new FileWriter(jsonFileName, false);
 			file.write(obj.toJSONString().replaceAll(",", ",\n"));
 			file.flush();
 			file.close();

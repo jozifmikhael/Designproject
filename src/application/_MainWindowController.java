@@ -425,7 +425,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
-    String selectedJSON="saves/test9.json";
+    String selectedJSON="test9.json";
     String policy = "Edgewards";
     int simTime = 1000;
     int simGranu = 10;
@@ -438,7 +438,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		stage.setTitle("Save File");
 		stage.showAndWait();
 		String reqName=SaveFileController.jsonDestinationFileName;
-		if(reqName!=null) selectedJSON="saves/"+ reqName + ".json";
+		if(reqName!=null) selectedJSON=reqName + ".json";
 		System.out.println("Trying to save to "+ selectedJSON);
 		writeJSON();
     }
@@ -620,7 +620,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		if (s==null) return null;
     		String name = s==null?"Error":s.name;
     		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
-			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
+			if (name != "Error" && sensorNameList.indexOf(name) < 0) {
 				sensorsList.add(s);
 				sensorNameList.add(name);
 				dispNodesList.add(newDevice);
