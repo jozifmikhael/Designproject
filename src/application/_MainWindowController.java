@@ -577,7 +577,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		long RAM = (long) module.get("RAM");
 		double x_cord = (double) module.get("x_cord");
 		double y_cord = (double) module.get("y_cord");
-		double sz = (double) module.get("radius");
+		long szT = (long) module.get("radius");
+		double sz = (double) szT;
 		
 		ModuSpec m = textfile.createModule(nodeName + " " + moduleName + " " + RAM + " " + Bandwidth + " " + inTuple + " " + outTuple + " " + Size + " "
 		+ MIPS + " " + FractionalSensitivity + " \n");
