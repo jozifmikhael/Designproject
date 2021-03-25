@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -76,31 +77,34 @@ public class TextParser {
 			this.localList = new ArrayList<TupleSpec>();
 			this.localList.addAll(globalTuplesList);
 		}
+		public filterableTuples updateTo(List<TupleSpec> newList) {
+			localList = newList;
+			return this;
+		}
 		public filterableTuples ofType(String reqType){
-			// return this.stream().filter(t -> t.tupleType.equals(reqType)).collect(Collectors.toList())
-			filterableTuples temp = new filterableTuples();
-			for(TupleSpec t : this.localList) if(!(t.tupleType.equals(reqType))) temp.localList.remove(t);
-			return temp;
+			return this.updateTo(localList.stream()
+					.filter(t -> t.tupleType.equals(reqType))
+					.collect(Collectors.toList()));
 		}
 		public filterableTuples ofSrc(String reqSrc){
-			filterableTuples temp = new filterableTuples();
-			for(TupleSpec t : this.localList) if(!(t.tupleSrc.equals(reqSrc))) temp.localList.remove(t);
-			return temp;
+			return this.updateTo(localList.stream()
+					.filter(t -> t.tupleType.equals(reqSrc))
+					.collect(Collectors.toList()));
 		}
 		public filterableTuples ofDst(String reqDst){
-			filterableTuples temp = new filterableTuples();
-			for(TupleSpec t : this.localList) if(!(t.tupleDst.equals(reqDst))) temp.localList.remove(t);
-			return temp;
+			return this.updateTo(localList.stream()
+					.filter(t -> t.tupleType.equals(reqDst))
+					.collect(Collectors.toList()));
 		}
 		public filterableTuples tholdSent(double reqSent, boolean dir){
-			filterableTuples temp = new filterableTuples();
-			for(TupleSpec t : this.localList) if(dir&&(t.tupleSentTime>reqSent)) temp.localList.remove(t);
-			return temp;
+			return this.updateTo(localList.stream()
+					.filter(t -> dir?t.tupleSentTime>=reqSent:t.tupleSentTime<=reqSent)
+					.collect(Collectors.toList()));
 		}
 		public filterableTuples tholdArrived(double reqArrived, boolean dir){
-			filterableTuples temp = new filterableTuples();
-			for(TupleSpec t : this.localList) if(dir&&(t.tupleArrivTime>reqArrived)) temp.localList.remove(t);
-			return temp;
+			return this.updateTo(localList.stream()
+					.filter(t -> dir?t.tupleArrivTime>=reqArrived:t.tupleArrivTime<=reqArrived)
+					.collect(Collectors.toList()));
 		}
 		public filterableTuples printNWLatencies() {
 			for(TupleSpec t : this.localList) System.out.println(t.tupleArrivTime - t.tupleSentTime);

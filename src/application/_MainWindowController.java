@@ -693,7 +693,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	//String time = simulationTime.getText();
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
      	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 1, "500");
-     	VRGameFog simObj = new VRGameFog("test9.json");
+     	VRGameFog simObj = new VRGameFog("test7.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

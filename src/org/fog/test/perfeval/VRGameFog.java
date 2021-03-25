@@ -118,7 +118,6 @@ public class VRGameFog {
 //	            
 //            }
 //            else createFogDevices(broker.getId(), appId);
-
         	JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
 			nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
             JSONArray linkArr = (JSONArray) nodeList.get("links");

@@ -476,7 +476,7 @@ public class FogDevice extends PowerDatacenter {
 						Tuple tuple = (Tuple)cl;
 						TimeKeeper.getInstance().tupleEndedExecution(tuple);
 						Application application = getApplicationMap().get(tuple.getAppId());
-						System.out.println("FogDevice.java 479: "+ tuple.getTupleType() + ":\t" + (CloudSim.clock()-tuple.getArrivalTime()+" "+tuple.getActualCPUTime()));
+//						System.out.println("FogDevice.java 479: "+ tuple.getTupleType() + ":\t" + (CloudSim.clock()-tuple.getArrivalTime()+" "+tuple.getActualCPUTime()));
 						List<Tuple> resultantTuples = application.getResultantTuples(tuple.getDestModuleName(), tuple, getId(), vm.getId());
 						for(Tuple resTuple : resultantTuples){
 							resTuple.setModuleCopyMap(new HashMap<String, Integer>(tuple.getModuleCopyMap()));
