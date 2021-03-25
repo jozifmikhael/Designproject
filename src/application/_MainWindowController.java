@@ -158,6 +158,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			data = _n;
 			if(data.type.equals("device")) c = deviceColor;
 			else if(data.type.equals("module")) c = moduleColor;
+			else if(data.type.equals("sensor")) c = sensorColor;
 			else c = _errorColor;
 			id = globalID++;
 		}
@@ -398,22 +399,30 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
-    
+    String selectedJSON="saves/test7.json";
+    String policy = "Edgewards";
+    int simTime = 1000;
+    int simGranu = 10;
 	@FXML
-    void newJSON(ActionEvent event) {
-    	try {
-    		FXMLLoader root = new FXMLLoader(getClass().getResource("createJsonBox.fxml"));
-    		Scene scene = new Scene(root.load(),414,139);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		stage.setTitle("Create New Design File");
-    		stage.show();
-        	String destFile = "saves/"+ createJsonController.jsonDestinationFileName + ".json";
-         	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 10000, "test");
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
+    void newJSON(ActionEvent event) throws IOException {
+		FXMLLoader root = new FXMLLoader(getClass().getResource("SaveFileBox.fxml"));
+		Scene scene = new Scene(root.load(),414,139);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		stage.setTitle("Save File");
+		stage.showAndWait();
+		String reqName=SaveFileController.jsonDestinationFileName;
+		if(reqName!=null) selectedJSON="saves/"+ reqName + ".json";
+		writeJSON();
     }
+	
+	void writeJSON() {
+		String policy = setParamsController.policyType;
+    	int time = setParamsController.simulationTime;
+    	int granularity = setParamsController.granularityMetric;
+    	String centralNode = getCentralNode();
+     	textfile.writeJSON(selectedJSON, devicesList, modulesList, moduleEdgesList, sensorList, time, granularity, policy, centralNode);
+	}
 	
 	@FXML
 	void loadJson(ActionEvent event) {
@@ -546,10 +555,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     dispNode addSensor() {
     	try {
     		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-    		Scene scene = new Scene(addNewSensorLoader.load(),450,320);
+    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
+    		sensorController.populateList(deviceNamesList);
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
     		SensorSpec s = sensorController.getSpec();
@@ -724,20 +734,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     public String getCentralNode() {
-    	return "test";
+    	return "cloud";
     }
     
     @FXML
     void startSim(ActionEvent event) throws Exception {
-    	String policy = setParamsController.finalPolChoice; //policyChoice;
-    	int time = setParamsController.simulationTime;  //100; //simulationTime.getText();
-    	int granularity = setParamsController.granularityMetric;  //100; //simulationTime.getText();
-    	String centralNode = getCentralNode();
-    	String destFile = createJsonController.jsonDestinationFileName + ".json";
-//    	String destFile = "test7.json";
-    	testmethod();
-     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, granularity, policy, centralNode);
-     	VRGameFog simObj = new VRGameFog("test7.json");
+    	writeJSON();
+//    	testmethod();
+    	System.out.println(selectedJSON);
+     	VRGameFog simObj = new VRGameFog("saves/test7.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();
@@ -745,6 +750,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         stage.setTitle("Output");
         stage.showAndWait();
     }
+    
     @FXML
     public void createJson(ActionEvent event) {
     	try {

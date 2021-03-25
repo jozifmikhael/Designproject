@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 public class setParamsController {
 	public static int simulationTime = 1000;
 	public static int granularityMetric = 10;
-	public static String finalPolChoice = "Profit Aware";
+	public static String policyType = "Edgewards";
 
     @FXML
     private ResourceBundle resources;
@@ -51,13 +51,11 @@ public class setParamsController {
 		
 		if (PolicyChoice.getSelectionModel().getSelectedItem() == null
 				|| PolicyChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {			
-			PolicyChoice.setValue("ProfitAwareDefaultNew");
-		}
-		finalPolChoice = PolicyChoice.getSelectionModel().getSelectedItem().toString();
+			PolicyChoice.setValue("Edgewards");
+		} else policyType = PolicyChoice.getSelectionModel().getSelectedItem().toString();
     	stage.close();
     }
-    
-    
+        
     void populateList(List<String> str_list) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		items.addAll(str_list);
