@@ -1,4 +1,8 @@
 {
+	"central":"test",
+	"granularity":345,
+	"time":3,
+	"policy":"Profit Aware Policy",
 	"nodes": [
 		{
 			"apower": 87.53,

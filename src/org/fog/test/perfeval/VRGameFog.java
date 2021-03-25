@@ -53,6 +53,7 @@ import org.fog.placement.ModulePlacementMapping;
 import org.fog.placement.ModulePlacementOnlyCloud;
 import org.fog.policy.AppModuleAllocationPolicy;
 import org.fog.scheduler.StreamOperatorScheduler;
+import org.fog.utils.Config;
 import org.fog.utils.FogLinearPowerModel;
 import org.fog.utils.FogUtils;
 import org.fog.utils.TimeKeeper;
@@ -118,6 +119,15 @@ public class VRGameFog {
 //	            
 //            }
 //            else createFogDevices(broker.getId(), appId);
+            String simPolicy = (String) nodeList.get("policy");
+            
+            long granularity = (long) nodeList.get("granularity");
+            long time = (long) nodeList.get("time");
+            Config.RESOURCE_MANAGE_INTERVAL = (int) granularity;
+            Config.RESOURCE_MGMT_INTERVAL = (double) granularity;
+            Config.MAX_SIMULATION_TIME = (int) time;
+            Config.TOP_NODE = (String) nodeList.get("central");
+
         	JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
 			nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
             JSONArray linkArr = (JSONArray) nodeList.get("links");
@@ -160,7 +170,7 @@ public class VRGameFog {
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
 		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower, transmissionTime); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
-//        FogDevice mobile = addMobile(nodeID, 5);
+//      FogDevice mobile = addMobile(nodeID, 5);
 //		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
 		fogDevices.add(mobile);
     }

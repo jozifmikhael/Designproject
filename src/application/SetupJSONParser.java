@@ -309,7 +309,7 @@ public class SetupJSONParser {
 	
 	public void writeJSON(String jsonFileName,
 			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList,
-			int i, String time) {
+			int granularity, int time, String policy, String centralNode) {
 		JSONObject obj = new JSONObject();
 		JSONArray nodeList = new JSONArray();
 		JSONArray edgeList = new JSONArray();
@@ -322,7 +322,9 @@ public class SetupJSONParser {
 		obj.put("nodes", nodeList);
 		obj.put("modules", moduleList);
 		obj.put("edges", edgeList);
-		obj.put("policy", i);
+		obj.put("policy", policy);
+		obj.put("central", centralNode);
+		obj.put("granularity", granularity);
 		obj.put("time", time);
 		
 		try {

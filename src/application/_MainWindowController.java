@@ -69,9 +69,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private MenuItem SetRunTimeItem;
+    
+    @FXML
+    private MenuItem SetSimParams;
 
     @FXML
     private TextField policyView;
+    
+    @FXML
+    private Button startButton;
     
     @FXML
     private Button editButton;
@@ -688,11 +694,49 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
+    void setParams(ActionEvent event) {
+    	try {
+    		List<String> placementPolicyList = new ArrayList<String>();
+    		placementPolicyList.add("Profit Aware Policy");
+        	placementPolicyList.add("Quality of Service");
+        	placementPolicyList.add("Lowest Power Usage");
+        	
+        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("setSimParamsBox.fxml"));
+			Scene scene = new Scene(dataFXML.load(),414,210);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			setParamsController controller = dataFXML.getController();
+			controller.populateList(placementPolicyList);
+     		stage.setTitle("Setting Parameters");    		
+     		stage.showAndWait();
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    void testmethod() {
+    	double testgran = org.fog.utils.Config.RESOURCE_MGMT_INTERVAL;
+    	int testsimtime = org.fog.utils.Config.MAX_SIMULATION_TIME;
+    	String testtopnode = org.fog.utils.Config.TOP_NODE;
+    	System.out.print("TEST Maxtime: " + testsimtime);
+    	System.out.print("\n TEST Gran: " + testgran);
+    	System.out.print("\n TEST Top Node: " + testtopnode);
+    }
+    
+    public String getCentralNode() {
+    	return "test";
+    }
+    
+    @FXML
     void startSim(ActionEvent event) throws Exception {
-    	//String policy = policyView.getText();
-    	//String time = simulationTime.getText();
+    	String policy = setParamsController.finalPolChoice; //policyChoice;
+    	int time = setParamsController.simulationTime;  //100; //simulationTime.getText();
+    	int granularity = setParamsController.granularityMetric;  //100; //simulationTime.getText();
+    	String centralNode = getCentralNode();
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
-     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 1, "500");
+//    	String destFile = "test7.json";
+    	testmethod();
+     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, granularity, policy, centralNode);
      	VRGameFog simObj = new VRGameFog("test7.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
