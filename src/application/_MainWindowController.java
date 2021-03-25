@@ -208,6 +208,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
+	public List<LinkSpec> linksList = new ArrayList<LinkSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
 	
 	
@@ -295,14 +296,26 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	} else if (state==1) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newDevice=addDevice();
-    			if(newDevice!=null) newDevice.setPos(mEvent);
+    			if(newDevice!=null) {
+    				newDevice.setPos(mEvent);  
+    				DeviceSpec d = getDevice(newDevice.name);
+    				d.x = newDevice.x;
+    				d.y = newDevice.y;
+    				d.size = newDevice.sz; 				
+    			}	   				
     		}
         	else draggingNode.setPos(mEvent);
         	draggingNode=null;
     	} else if (state==2) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newModule = addModule();
-    			if(newModule!=null) newModule.setPos(mEvent);
+    			if(newModule!=null) {
+    				newModule.setPos(mEvent);
+    				ModuSpec m = getModule(newModule.name);
+    				m.x = newModule.x;
+    				m.y = newModule.y;
+    				m.size = (long) newModule.sz;
+    			}			
     		}
         	else draggingNode.setPos(mEvent);
         	draggingNode=null;
@@ -337,7 +350,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		} else if (state==4) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newSensor = addSensor();
-    			if(newSensor!=null) newSensor.setPos(mEvent);
+    			if(newSensor!=null) {
+    				newSensor.setPos(mEvent);
+    				SensorSpec s = getSensor(newSensor.name);
+    				s.x = newSensor.x;
+    				s.y = newSensor.y;
+    				s.size = (long) newSensor.sz;
+    			}
     		}
         	else draggingNode.setPos(mEvent);
         	draggingNode=null;
@@ -348,6 +367,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     public ModuSpec getModule(String _name) {
     	if (_name==null) return null;
     	for (ModuSpec m : modulesList) if (m.name.equals(_name)) return m;
+		return null;
+    }
+    public SensorSpec getSensor(String _name) {
+    	if (_name==null) return null;
+    	for (SensorSpec s : sensorList) if (s.name.equals(_name)) return s;
 		return null;
     }
     public DeviceSpec getDevice(String _name) {
@@ -403,7 +427,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Create New Design File");
     		stage.show();
         	String destFile = "saves/"+ createJsonController.jsonDestinationFileName + ".json";
-         	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 10000, "test");
+         	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList,linksList, 10000, "test");
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -574,11 +598,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
+    		LinkSpec l = controller.getLinkSpec();
     		if (d==null) return null;
     		String name = d==null?"Error":d.name;
     		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R);
 			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
 				devicesList.add(d);
+				linksList.add(l);
 				deviceNamesList.add(name);
 				dispNodesList.add(newDevice);
 				dispLinksList.add(new dispLink(d));
@@ -692,8 +718,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	//String policy = policyView.getText();
     	//String time = simulationTime.getText();
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
-     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 1, "500");
-     	VRGameFog simObj = new VRGameFog("test9.json");
+     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, linksList, 1, "500");
+     	VRGameFog simObj = new VRGameFog("testing.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

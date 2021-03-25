@@ -13,11 +13,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import application._MainWindowController.dispNode;
+import javafx.scene.paint.Color;
 
 public class SetupJSONParser {
 	private List<DeviceSpec> hosts = new ArrayList<DeviceSpec>();
 	private List<ModuEdgeSpec> edges = new ArrayList<ModuEdgeSpec>();
 	private List<ModuSpec> modules = new ArrayList<ModuSpec>();
+	private List<LinkSpec> links = new ArrayList<LinkSpec>();
 	private int globalID = 0;
 	
 	public DeviceSpec createDevice(String nodeLine) throws NumberFormatException, IOException {
@@ -31,7 +33,7 @@ public class SetupJSONParser {
 		double insIdlePower;
 		double insServiceCharge;
 		double insCostNetworking;
-		double transmissionTime;
+		double latency;
 		
 		String stParts[] = nodeLine.split(" ");
 		String hostname = stParts[0];
@@ -45,10 +47,24 @@ public class SetupJSONParser {
 		insBusyPower = Double.parseDouble(stParts[7]);
 		insIdlePower = Double.parseDouble(stParts[8]);
 		String parentName = stParts[9];
-		transmissionTime = Double.parseDouble(stParts[10]);
+		latency = Double.parseDouble(stParts[10]);
 		DeviceSpec h = new DeviceSpec(hostname, parentName, insProcessingSpeed, insMemory, insNetworkSpeedUp, insNetworkSpeedDown, insLevel,
-				insCostProcessing, insBusyPower, insIdlePower,transmissionTime);
-		return h;
+				insCostProcessing, insBusyPower, insIdlePower,latency);
+			return h;
+	}
+	
+	public LinkSpec createLink(String linkLine) throws NumberFormatException, IOException {
+		String srcID;
+		String dstID;
+		double latency;
+
+		
+		String stParts[] = linkLine.split(" ");
+		srcID = stParts[0];
+		dstID = stParts[1];
+		latency = Double.parseDouble(stParts[2]);
+			LinkSpec l = new LinkSpec(srcID, dstID, latency);		
+		return l;
 	}
 	
 	public ModuEdgeSpec createModuleEdge(String edgeLine) throws NumberFormatException, IOException {
@@ -106,6 +122,7 @@ public class SetupJSONParser {
 		long upbw;
 		long downbw;
 		int id;
+		double x,y, size;
 	}
 	
 	public int getID() {
@@ -117,7 +134,28 @@ public class SetupJSONParser {
 		for(NodeSpec h: edges) if(h.id == _id) hosts.remove(h);
 		for(NodeSpec h: modules) if(h.id == _id) hosts.remove(h);
 	}
-	
+	class LinkSpec extends NodeSpec{
+		String srcID;
+		String dstID;
+		double latency;
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			LinkSpec link = this;
+			JSONObject obj = new JSONObject();
+			obj.put("srcID", link.srcID);
+			obj.put("dstID", link.dstID);
+			obj.put("latency", link.latency);
+			return obj;
+		}
+		
+		public LinkSpec(String srcID, String dstID, double latency) {
+			this.srcID = srcID;
+			this.dstID = dstID;
+			this.latency = latency;
+			this.id = getID();
+		}
+	}
 	class SensorSpec extends NodeSpec {	
 		String nodeName;	
 		String distribution;	
@@ -138,6 +176,9 @@ public class SetupJSONParser {
 			obj.put("inTuple", sensor.normalStdDev);	
 			obj.put("outTuple", sensor.uniformMax);	
 			obj.put("Size", sensor.uniformMin);	
+			obj.put("x_cord", sensor.x);
+			obj.put("y_cord", sensor.y);
+			obj.put("radius", sensor.size);
 			return obj;	
 		}	
 			
@@ -163,7 +204,7 @@ public class SetupJSONParser {
 		double rate;
 		double ipower;
 		double apower;
-		double transmissionTime;
+		double latency;
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
@@ -179,21 +220,22 @@ public class SetupJSONParser {
 			obj.put("rate", o.rate);
 			obj.put("apower", o.apower);
 			obj.put("ipower", o.ipower);
-			obj.put("transmission_time", o.transmissionTime);
+			obj.put("latency", o.latency);
+			obj.put("x_cord", o.x);
+			obj.put("y_cord", o.y);
+			obj.put("radius", o.size);
 			return obj;
 		}
-		
 		
 		public String toString() {
             String str = this.type + " ID: " + this.id+ "\nNode Name: " + this.name + "\nNode Parent Name:  " + this.parent + "\nUp Bandwidth: " 
         + this.upbw + "\nDown Bandwidth:  " + this.downbw + "\nMIPS: " + this.mips + "\nRAM: " + this.ram + "\nLevel: " + this.level + "\nRate: " + this.rate + "\nIdle Power: " + this.ipower + "\nActive Power: " + this.apower + "\n";
             String str1 = "--------------------------------------------------------------------------------";
             return str+str1;
-        }
-		
+        }		
 		
 		public DeviceSpec(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate, double apower,
-				double ipower, double transmissionTime) {
+				double ipower, double latency) {
 			this.id = getID();
 			this.name = name;
 			this.parent = parent;
@@ -205,7 +247,7 @@ public class SetupJSONParser {
 			this.rate = rate;
 			this.apower = apower;
 			this.ipower = ipower;
-			this.transmissionTime = transmissionTime;
+			this.latency = latency;
 			this.type = "device";		
 		}
 	}
@@ -233,6 +275,9 @@ public class SetupJSONParser {
 			obj.put("Size", module.size);
 			obj.put("MIPS", module.MIPS);
 			obj.put("Fractional Sensitivity", module.fractionalSensitivity);
+			obj.put("x_cord", module.x);
+			obj.put("y_cord", module.y);
+			obj.put("radius", module.size);
 			return obj;
 		}
 		
@@ -308,18 +353,21 @@ public class SetupJSONParser {
 	@SuppressWarnings("unchecked")
 	
 	public void writeJSON(String jsonFileName,
-			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList,
+			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList, List<LinkSpec> linksList,
 			int i, String time) {
 		JSONObject obj = new JSONObject();
 		JSONArray nodeList = new JSONArray();
 		JSONArray edgeList = new JSONArray();
 		JSONArray moduleList = new JSONArray();
+		JSONArray linkList = new JSONArray();
 		
 		for (DeviceSpec h : devicesList) nodeList.add(h.toJSON());
+		for (LinkSpec l : linksList) linkList.add(l.toJSON());
 		for (ModuSpec m : modulesList) moduleList.add(m.toJSON());
 		for (ModuEdgeSpec e : modEdgesList) edgeList.add(e.toJSON());
 
 		obj.put("nodes", nodeList);
+		obj.put("links", linkList);
 		obj.put("modules", moduleList);
 		obj.put("edges", edgeList);
 		obj.put("policy", i);

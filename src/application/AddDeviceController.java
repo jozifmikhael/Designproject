@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.BufferedWriter;
@@ -14,11 +15,13 @@ import java.io.PrintWriter;
 import org.fog.test.perfeval.TextParser;
 
 import application.SetupJSONParser.DeviceSpec;
+import application.SetupJSONParser.LinkSpec;
 
 import java.io.IOException;
 
 public class AddDeviceController {
 	DeviceSpec h;
+	LinkSpec l;
 	SetupJSONParser textfile = new SetupJSONParser();
 
 	@FXML
@@ -50,6 +53,9 @@ public class AddDeviceController {
 	
 	@FXML
 	private TextField busyPower;
+	
+	@FXML
+    private TextField upLinkLatency;
 	
 	@FXML
 	private TextField idlePower;
@@ -92,8 +98,12 @@ public class AddDeviceController {
 		}
 		h = textfile.createDevice(name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
 		+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
-		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() +  " " + transmissionTime.getText().toString()+" \n");
+		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() +  " " + upLinkLatency.getText().toString()+" \n");
+		
+		l = textfile.createLink(name.getText().toString() + " " + parentName.getText().toString() +  " " +upLinkLatency.getText().toString()+" \n");
 		stage.close();
 	}
 	public DeviceSpec getSpec() {return h;}
+	public LinkSpec getLinkSpec() {return l;}
 }
+	
