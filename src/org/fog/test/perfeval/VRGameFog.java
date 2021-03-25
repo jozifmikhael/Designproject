@@ -80,22 +80,20 @@ public class VRGameFog {
 	static int userId;
 	static String appId;
 	
-	public VRGameFog(String jsonFile) {
+	public VRGameFog(String jsonFile) throws Exception {
 
-		Log.printLine("Starting VRGame...");
+		System.out.println("Starting VRGame... ");
+		Log.disable();
+		int num_user = 1; // number of cloud users
+		Calendar calendar = Calendar.getInstance();
+		boolean trace_flag = false; // mean trace events
 
-		try {
-			Log.disable();
-			int num_user = 1; // number of cloud users
-			Calendar calendar = Calendar.getInstance();
-			boolean trace_flag = false; // mean trace events
+		CloudSim.init(num_user, calendar, trace_flag);
 
-			CloudSim.init(num_user, calendar, trace_flag);
-
-			appId = "vr_game"; // identifier of the application
-			
-			PowerDatacenterBroker broker = new FogBroker("broker");
-			userId = broker.getId();
+		appId = "vr_game"; // identifier of the application
+		
+		PowerDatacenterBroker broker = new FogBroker("broker");
+		userId = broker.getId();
 //			cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
 //			cloud.setParentId(-1);
 //			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
@@ -104,57 +102,52 @@ public class VRGameFog {
 //			
 //			fogDevices.add(cloud);
 //			fogDevices.add(proxy);
-			
-			Application application = new Application(appId, broker.getId());
-			application.setUserId(broker.getId());
-			
-			
-			JSONParser jsonParser = new JSONParser();
-			FileReader reader = new FileReader(jsonFile);
-            Object obj = jsonParser.parse(reader);
-            JSONObject nodeList = (JSONObject) obj;
-            
-//            boolean jsonNode=true;
-//            if(jsonNode) {
-//	            
-//            }
-//            else createFogDevices(broker.getId(), appId);
-            String simPolicy = (String) nodeList.get("policy");
-            
-            long granularity = (long) nodeList.get("granularity");
-            long time = (long) nodeList.get("time");
-            Config.RESOURCE_MANAGE_INTERVAL = (int) granularity;
-            Config.RESOURCE_MGMT_INTERVAL = (double) granularity;
-            Config.MAX_SIMULATION_TIME = (int) time;
-            Config.TOP_NODE = (String) nodeList.get("central");
+		
+		Application application = new Application(appId, broker.getId());
+		application.setUserId(broker.getId());
+		
+		System.out.println("Starting parsing...");
+		JSONParser jsonParser = new JSONParser();
+		FileReader reader = new FileReader(jsonFile);
+        Object obj = jsonParser.parse(reader);
+        
+        System.out.println("init parsing");
+        System.out.println("Starting meta");
+        JSONObject jsonObject = (JSONObject) obj;
+        String simPolicy = (String) obj.get("policy");
+        long granularity = (long) nodeList.get("granularity");
+        long time = (long) nodeList.get("time");
+        Config.RESOURCE_MANAGE_INTERVAL = (int) granularity;
+        Config.RESOURCE_MGMT_INTERVAL = (double) granularity;
+        Config.MAX_SIMULATION_TIME = (int) time;
+        Config.TOP_NODE = (String) nodeList.get("central");
+        
+        System.out.println("Finished meta");
 
-        	JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
-			nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
-            JSONArray linkArr = (JSONArray) nodeList.get("links");
-            linkArr.forEach(l -> parseLinkObject((JSONObject) l));
-			JSONArray modArr = (JSONArray) nodeList.get("Modules");
-	        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
-	        JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
-	        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
-			
-			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-			moduleMapping.addModuleToDevice("connector", "cloud");
-			
-			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-			
-			controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
-			
-			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
-			
-			CloudSim.startSimulation();
+        
+    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
+		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
+        JSONArray linkArr = (JSONArray) jsonObject.get("links");
+        linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+		JSONArray modArr = (JSONArray) jsonObject.get("Modules");
+        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
+        JSONArray edgeArr = (JSONArray) jsonObject.get("Edges");
+        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
+		
+		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
+		moduleMapping.addModuleToDevice("connector", "cloud");
+		
+		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
+		
+		controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
+		
+		TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
+		
+		CloudSim.startSimulation();
 
-			CloudSim.stopSimulation();
+		CloudSim.stopSimulation();
 
-			Log.printLine("VRGame finished!");
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.printLine("Unwanted errors happen");
-		}
+		Log.printLine("VRGame finished!");
 	}
 	
 	private static void parseNodeObject(JSONObject node) {

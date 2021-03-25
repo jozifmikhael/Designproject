@@ -339,6 +339,7 @@ public class SetupJSONParser {
 		JSONArray edgeList = new JSONArray();
 		JSONArray moduleList = new JSONArray();
 		JSONArray sensorList = new JSONArray();
+		JSONArray metaList = new JSONArray();
 		
 		for (DeviceSpec h : devicesList) nodeList.add(h.toJSON());
 		for (ModuSpec m : modulesList) moduleList.add(m.toJSON());
