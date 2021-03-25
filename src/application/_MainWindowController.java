@@ -325,6 +325,21 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 						srcDev.parent = linkDstNode.name;
 						DeviceSpec dstDev = getDevice(srcDev.parent);
 						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
+						// INSERT HERE
+						
+						try {				    				        	
+				        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+							Scene scene = new Scene(dataFXML.load(),414,139);
+							Stage stage = new Stage();
+							stage.setScene(scene);							
+				     		stage.setTitle("Setting Link Latency");    		
+				     		stage.showAndWait();
+				    	} catch(Exception e) {
+				    		e.printStackTrace();
+				    	}
+						
+						System.out.println(LinkLatencyInputController.LinkLatencyValue);
+						
 						if(srcLink!=null) srcLink.dst = linkDstNode;
 						else dispLinksList.add(new dispLink(srcDev, dstDev));
 					}else if(srcType.equals("module")) {
