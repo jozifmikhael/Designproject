@@ -254,7 +254,7 @@ public class Controller extends SimEntity{
 		double totalLoopTime=0;
 		double totalLoopTimeCTT = 0;
 		for(Integer loopId : TimeKeeper.getInstance().getLoopIdToTupleIds().keySet()){
-			/*double average = 0, count = 0;
+			double average = 0, count = 0;
 			for(int tupleId : TimeKeeper.getInstance().getLoopIdToTupleIds().get(loopId)){
 				Double startTime = 	TimeKeeper.getInstance().getEmitTimes().get(tupleId);
 				Double endTime = 	TimeKeeper.getInstance().getEndTimes().get(tupleId);
@@ -263,7 +263,7 @@ public class Controller extends SimEntity{
 				average += endTime-startTime;
 				count += 1;
 			}
-			System.out.println(getStringForLoopId(loopId) + " ---> "+(average/count));*/
+			System.out.println(getStringForLoopId(loopId) + " ---> "+(average/count));
 			System.out.println(getStringForLoopId(loopId) + " ---> "+TimeKeeper.getInstance().getLoopIdToCurrentAverage().get(loopId));
 			totalLoopTime+=TimeKeeper.getInstance().getLoopIdToCurrentAverage().get(loopId);
 			totalLoopTimeCTT = TimeKeeper.getInstance().getLoopIdToCurrentAverage().get(loopId);

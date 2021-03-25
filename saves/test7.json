@@ -644,22 +644,7 @@
 			"edgeType": 2
 		}
 	]
-}
-{"nodes":[],
-"sensors":[{"uniformMax":0.0,
-"sensorName":"sensor1",
-"normalStdDev":0.0,
-"normalMean":0.0,
-"deterministicValue":33.0,
-"distribution":"Deterministic",
-"sensorLatency":0.0,
-"uniformMin":0.0}],
-"central":"test",
-"granularity":1000,
-"edges":[],
-"time":10,
-"modules":[],
-"policy":"Edgewards"}{"nodes":[],
+}{"nodes":[],
 "sensors":[],
 "central":"cloud",
 "granularity":1000,

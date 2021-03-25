@@ -157,7 +157,6 @@ public class SetupJSONParser {
 			JSONObject obj = new JSONObject();	
 			obj.put("sensorName", sensor.name);	
 			obj.put("distribution", sensor.distribution);	
-			obj.put("sensorLatency", sensor.sensorLatency);	
 			obj.put("deterministicValue", sensor.deterministicValue);	
 			obj.put("normalMean", sensor.normalMean);	
 			obj.put("normalStdDev", sensor.normalStdDev);	
