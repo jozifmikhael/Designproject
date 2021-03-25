@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 public class setParamsController {
 	public static int simulationTime = 1000;
 	public static int granularityMetric = 10;
+	public static String finalPolChoice = "default";
 
     @FXML
     private ResourceBundle resources;
@@ -48,30 +49,34 @@ public class setParamsController {
 		else granularityMetric = Integer.parseInt(GranValue.getText());
 		System.out.println("Simulation granularity will be: " + granularityMetric + " \n");
 		
-//		if (PolicyChoice.getSelectionModel().getSelectedItem() == null
-//				|| PolicyChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-//			PolicyChoice.setValue("ProfitAwareDefaultNew");
-//		}
-		
+		if (PolicyChoice.getSelectionModel().getSelectedItem() == null
+				|| PolicyChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {			
+			PolicyChoice.setValue("ProfitAwareDefaultNew");
+		}
+		finalPolChoice = PolicyChoice.getSelectionModel().getSelectedItem().toString();
     	stage.close();
 
     }
     
-    @FXML
+    //Static String finalPolChoice = PolicyChoice.getSelectionModel().getSelectedItem().toString();
+    
     void populateList(List<String> str_list) {
+//    	System.out.println(str_list);
 		ObservableList<String> items = FXCollections.observableArrayList();
 		items.addAll(str_list);
+//		System.out.println(items.size());
 		PolicyChoice.setItems(items);	
+		PolicyChoice.setValue(items.get(0));
 		
 	}
     
 
     @FXML
     void initialize() {
-        assert simTimeValue != null : "fx:id=\"simTimeValue\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
-        assert setParamsButton != null : "fx:id=\"setParamsButton\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
-        assert GranValue != null : "fx:id=\"GranValue\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
-        assert PolicyChoice != null : "fx:id=\"PolicyChoice\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
+//        assert simTimeValue != null : "fx:id=\"simTimeValue\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
+//        assert setParamsButton != null : "fx:id=\"setParamsButton\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
+//        assert GranValue != null : "fx:id=\"GranValue\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
+//        assert PolicyChoice != null : "fx:id=\"PolicyChoice\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
 
     }
 }

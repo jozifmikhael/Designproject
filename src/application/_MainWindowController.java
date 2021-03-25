@@ -247,9 +247,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		gc.setFont(new Font(font, fontSize));
     	scene.setOnKeyPressed(this); // uses handle method
     	
-    	placementPolicyList.add("Policy 1 l250 mc");
-    	placementPolicyList.add("Policy 2 l250 mc");
-    	placementPolicyList.add("Policy 3 l250 mc");
+    	placementPolicyList.add("Profit Aware Policy");
+    	placementPolicyList.add("Quality of Service");
+    	placementPolicyList.add("Lowest Power Usage");
     }
 
 	dispNode draggingNode = null;
@@ -641,14 +641,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void setParams(ActionEvent event) {
     	try {	
-    		BorderPane root = FXMLLoader.load(getClass().getResource("setSimParamsBox.fxml"));
-    		Scene scene = new Scene(root,414,207);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		stage.setTitle("Setting Parameters");    		
-    		setParamsController paramsController = new setParamsController();
-    		paramsController.populateList(placementPolicyList);
-    		stage.show();
+    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("setSimParamsBox.fxml"));
+			Scene scene = new Scene(dataFXML.load(),414,210);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			setParamsController controller = dataFXML.getController();
+			controller.populateList(placementPolicyList);
+     		stage.setTitle("Setting Parameters");    		
+//    		
+   		stage.showAndWait();
     		       
     		
     	} catch(Exception e) {
@@ -748,8 +749,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
    @FXML
     void startSim(ActionEvent event) throws Exception {
     	
-    	String policy = policyChoice;
-    	int time = setSimTimeController.simulationTime;  //100; //simulationTime.getText();
+    	String policy = setParamsController.finalPolChoice; //policyChoice;
+    	int time = setParamsController.simulationTime;  //100; //simulationTime.getText();
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
      	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, policy);
   //   	VRGameFog_src simObj = new VRGameFog_src("test6.json");   	
@@ -796,7 +797,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	double testgran = org.fog.utils.Config.RESOURCE_MGMT_INTERVAL;
     	int testsimtime = org.fog.utils.Config.MAX_SIMULATION_TIME;
     	String testtopnode = org.fog.utils.Config.TOP_NODE;
-    	System.out.print("TEST Maxtime" + testsimtime);
+    	System.out.print("TEST Maxtime: " + testsimtime);
     	System.out.print("\n TEST Gran: " + testgran);
     	System.out.print("\n TEST Top Node: " + testtopnode);
     }
