@@ -58,6 +58,8 @@ import org.fog.utils.FogLinearPowerModel;
 import org.fog.utils.FogUtils;
 import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
+import org.fog.utils.distribution.NormalDistribution;	
+import org.fog.utils.distribution.UniformDistribution;
 
 /**
  * Simulation setup for case study 1 - EEG Beam Tractor Game
@@ -68,14 +70,9 @@ public class VRGameFog {
 	static List<Sensor> sensors = new ArrayList<Sensor>();
 	static List<Actuator> actuators = new ArrayList<Actuator>();
 	
-	static boolean CLOUD = false;
 	
-	static int numOfDepts = 4;
-	static int numOfMobilesPerDept = 6;
-	static double EEG_TRANSMISSION_TIME = 5.1;
-	
-	static FogDevice cloud;
-	static FogDevice proxy;
+	static String sensorTuple = null;	
+	static String actuatorType = null;
 	
 	static int userId;
 	static String appId;
@@ -107,9 +104,6 @@ public class VRGameFog {
 		application.setUserId(broker.getId());
 		
 		System.out.println("Starting parsing...");
-		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("client");add("DISPLAY");}});
-        List<AppLoop> loops = new ArrayList<AppLoop>(){{add(loop1);}};
-        application.setLoops(loops);
 		JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(jsonFile);
         Object obj = jsonParser.parse(reader);
@@ -126,14 +120,18 @@ public class VRGameFog {
         
         System.out.println("Finished meta");
         
-    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
-		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
-        JSONArray linkArr = (JSONArray) jsonObject.get("links");
+        JSONArray modArr = (JSONArray) jsonObject.get("Modules");	
+        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));	
+        JSONArray edgeArr = (JSONArray) jsonObject.get("Edges");	
+        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));	
+    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");	
+		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));	
+		JSONArray sensorArr = (JSONArray) jsonObject.get("sensors");	
+		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));	
+		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");	
+		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));	
+        JSONArray linkArr = (JSONArray) jsonObject.get("links");	
         linkArr.forEach(l -> parseLinkObject((JSONObject) l));
-		JSONArray modArr = (JSONArray) jsonObject.get("Modules");
-        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
-        JSONArray edgeArr = (JSONArray) jsonObject.get("Edges");
-        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
 		
 		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 		moduleMapping.addModuleToDevice("connector", "cloud");
@@ -158,26 +156,71 @@ public class VRGameFog {
         double transmissionTime = (double) node.get("transmission_time");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
-		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower, transmissionTime); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
+		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
 //      FogDevice mobile = addMobile(nodeID, 5);
 //		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
 		fogDevices.add(mobile);
     }
+	
+	private static void parseSensorObject(JSONObject sensor) {	
+		String sensorName = (String) sensor.get("sensorName");	
+		String distribution = (String) sensor.get("distribution");	
+		double deterministicValue = (double) sensor.get("deterministicValue");	
+		double normalMean = (double) sensor.get("normalMean");	
+		double normalStdDev = (double) sensor.get("normalStdDev");	
+		double uniformMax = (double) sensor.get("uniformMax");	
+		double uniformMin = (double) sensor.get("uniformMin");	
+			
+		if(distribution.equals("Deterministic")) {	
+			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+			sensors.add(newSensor);	
+		}	
+		else if(distribution.equals("Normal")) {	
+			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new NormalDistribution(normalMean, normalStdDev)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+			sensors.add(newSensor);	
+		}	
+		else if(distribution.equals("Uniform")) {	
+			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new UniformDistribution(uniformMin, uniformMax)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+			sensors.add(newSensor);	
+		}	
+	}	
+		
+	private static void parseActuatorObject(JSONObject actuator) {	
+		String actuatorName = (String) actuator.get("Actuator Name");	
+		
+		Actuator display = new Actuator(actuatorName, userId, appId, actuatorType);
+		actuators.add(display);
+	}
+	
 	private static void parseLinkObject(JSONObject link) {
 		double latency = (double) (link.get("latency"));
 		String srcID = (String) link.get("srcID");
 		String dstID = (String) link.get("dstID");
 		FogDevice src = null;
 		FogDevice dst = null;
-		//double bw = (double) link.get("bw");
+		Sensor sensorSrc = null;	
+		Actuator actuatorSrc = null;
 
 		for(FogDevice device : fogDevices) {
 			if (device.getName().equals(srcID)) src=device;
 			if (device.getName().equals(dstID)) dst=device;
 		}
+		for(Sensor sensor : sensors) {	
+			if (sensor.getName().equals(srcID)) sensorSrc=sensor;	
+		}	
+			
+		for(Actuator actuator : actuators) {	
+			if (actuator.getName().equals(srcID)) actuatorSrc = actuator;	
+		}
 		if(!(src==null || dst==null)) {
 			src.setParentId(dst.getId());
 			src.setUplinkLatency(latency);
+		}else if(!(sensorSrc==null || dst==null)) {	
+			sensorSrc.setGatewayDeviceId(dst.getId());	
+			sensorSrc.setLatency(latency);	
+		}else if(!(actuatorSrc==null || dst==null)) {	
+			actuatorSrc.setGatewayDeviceId(dst.getId());	
+			actuatorSrc.setLatency(latency);
 		}else System.out.println("Error src/dst not found");
 	}
 	
@@ -203,15 +246,13 @@ public class VRGameFog {
 		int direction = Integer.parseUnsignedInt(edges.get("direction").toString());
 		int edgeType = Integer.parseUnsignedInt(edges.get("edgeType").toString());
 		
-		if(edgeType == 1) {
-			application.addAppEdge("EEG", dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
-		}
-		else if(edgeType == 2) {
-			application.addAppEdge(src, "DISPLAY", periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
-		}
-		else {
-			application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
-		}
+		if(edgeType == 1) {	
+			sensorTuple = tupleType;	
+		}	
+		else if(edgeType == 2) {	
+			actuatorType = dest;	
+		}	
+		application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
 	}
 	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
 		String inTuple = (String) tuplemaps.get("inTuple");
@@ -219,21 +260,11 @@ public class VRGameFog {
 		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
 		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
 	}
-	private static FogDevice addMobile(String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower, double transmissionTime){
+	private static FogDevice addMobile(String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
 		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
 		if (nodeLevel == 0) {
 			mobile.setParentId(-1);
 		}
-		if (!(transmissionTime == 0.0)) {
-			Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(transmissionTime)); // inter-transmission time of EEG sensor follows a deterministic distribution
-			sensors.add(newSensor);
-			Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
-			actuators.add(display);
-			newSensor.setGatewayDeviceId(mobile.getId());
-			newSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
-			display.setGatewayDeviceId(mobile.getId());
-			display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
-		}		
 		return mobile;
 	}
 	

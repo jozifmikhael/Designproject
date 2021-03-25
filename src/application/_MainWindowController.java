@@ -164,8 +164,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				modulesList.add(m);
 			}else if(data.type.equals("sensor")) {
 				SensorSpec s = getSensor(this.data.name);
-				devicesList.remove(s);
-				s.x=this.x; s.y=this.y; s.dispSize=this.sz;
+				sensorsList.remove(s);
+				s.x=this.x; s.y=this.y;
+				s.dispSize=this.sz;
 				sensorsList.add(s);
 			}else if(data.type.equals("actuator")) {
 				
@@ -424,7 +425,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
-    String selectedJSON="test9.json";
+    String selectedJSON="saves/test9.json";
     String policy = "Edgewards";
     int simTime = 1000;
     int simGranu = 10;
@@ -478,6 +479,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					JSONObject module = (JSONObject) moduleList.get(i);
 					parseModuleObj(module);
 				}
+				JSONArray sensorList = (JSONArray) jsonObject.get("sensors");
+				for (int i = 0; i < sensorList.size(); i++) {
+					JSONObject sensor = (JSONObject) sensorList.get(i);
+					parseSensorObj(sensor);
+				}
 			}
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -491,32 +497,57 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		}
 	}
 	
-	static void parseDeviceObj(JSONObject device) {
+	void parseDeviceObj(JSONObject device) throws NumberFormatException, IOException {
 		//JSONObject deviceObj = (JSONObject) device.get("nodes");
-		String parent = (String) device.get("parent");
-		String name = (String) device.get("name");
+		String parentname = (String) device.get("parent");
+		String nodename = (String) device.get("name");
 		double apower = (double) device.get("apower");
-		long level = (long) device.get("level");
+		int level = Integer.parseUnsignedInt(device.get("level").toString());
 		double rate = (double) device.get("rate");
 		double ipower = (double) device.get("ipower");
-		long downbw = (long) device.get("down_bw");
-		long upbw = (long) device.get("up_bw");
-		long ram = (long) device.get("ram");
-		long mips = (long) device.get("mips");
-		System.out.println("Parent: "+parent);
-		System.out.println("name: "+name);
-		System.out.println("apower: "+apower);
-		System.out.println("level: "+level);
-		System.out.println("rate: "+rate);
-		System.out.println("ipower: "+ipower);
-		System.out.println("downbw: "+downbw);
-		System.out.println("upbw: "+upbw);
-		System.out.println("ram: "+ram);
-		System.out.println("mips: "+mips);
-		System.out.println("---------------------------");
+		int downbw = Integer.parseUnsignedInt(device.get("down_bw").toString());
+		int upbw = Integer.parseUnsignedInt(device.get("up_bw").toString());
+		int ram =  Integer.parseUnsignedInt(device.get("ram").toString());
+		int mips = Integer.parseUnsignedInt(device.get("mips").toString());
+		double x_cord = (double) device.get("x_cord");
+		double y_cord = (double) device.get("y_cord");
+		double size = (double) device.get("radius");
+		double latency = (double) device.get("latency");
+		DeviceSpec d = textfile.createDevice(nodename + " " + mips + " " + ram + " " + upbw + " " + downbw + " " + level + " " + rate + " "
+		+ apower + " " + ipower + " " + parentname +  " " + latency +" \n");
+		d.x = x_cord;
+		d.y = y_cord;
+		d.dispSize = size;
+		devicesList.add(d);
+		dispNode newDevice = new dispNode(nodename, d, d.x, d.y, d.dispSize);
+		dispNodesList.add(newDevice);
+		dispLinksList.add(new dispLink(d));
+		redrawNodes();
 	}
-	
-	static void parseEdgeObj(JSONObject edge) {
+	void parseSensorObj(JSONObject sensor) throws NumberFormatException, IOException {
+		//JSONObject deviceObj = (JSONObject) device.get("nodes");
+		double uniformMax = (double) sensor.get("uniformMax");
+		String sensorName = (String) sensor.get("sensorName");
+		double normalStdDev = (double) sensor.get("normalStdDev");
+		double normalMean = (double) sensor.get("normalMean");
+		double deterministicValue = (double) sensor.get("deterministicValue");
+		String distribution = (String) sensor.get("distribution");
+		double uniformMin = (double) sensor.get("uniformMin");
+		double x_cord = (double) sensor.get("x_cord");
+		double y_cord = (double) sensor.get("y_cord");
+		double size = (double) sensor.get("radius");
+		SensorSpec s = textfile.createSensor("node" + " " + 2.0 + " " + sensorName + " " + deterministicValue + " " + normalMean + " " + normalStdDev + " " + uniformMax + " "
+		+ uniformMin + " " + distribution + " \n");
+		s.x = x_cord;
+		s.y = y_cord;
+		s.dispSize = size;
+		sensorsList.add(s);
+		dispNode newDevice = new dispNode(sensorName, s, s.x, s.y, s.dispSize);
+		sensorNameList.add(sensorName);
+		dispNodesList.add(newDevice);
+		redrawNodes();
+	}
+	void parseEdgeObj(JSONObject edge) throws NumberFormatException, IOException {
 		//JSONObject edgeObj = (JSONObject) edgeList.get("nodes");
 		String src = (String) edge.get("src");
 		String dest = (String) edge.get("dest");
@@ -527,19 +558,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		double tupleNwLength = (double) edge.get("tupleNwLength");
 		long direction = (long) edge.get("direction");
 		String time = (String) edge.get("time");
-		System.out.println("src: "+src);
-		System.out.println("dest: "+dest);
-		System.out.println("tupleCpuLength: "+tupleCpuLength);
-		System.out.println("edgeType: "+edgeType);
-		System.out.println("periodicity: "+periodicity);
-		System.out.println("tupleType: "+tupleType);
-		System.out.println("tupleNwLength: "+tupleNwLength);
-		System.out.println("direction: "+direction);
-		System.out.println("time: "+time);
-		System.out.println("---------------------------");
+		
+		ModuEdgeSpec e = textfile.createModuleEdge(src + " " + dest + " " + tupleType + " " + periodicity + " " + tupleCpuLength + " " + tupleNwLength + " " + edgeType + " "
+		+ direction  +" \n");
+		moduleEdgesList.add(e);		
 	}
 	
-	static void parseModuleObj(JSONObject module) {
+	void parseModuleObj(JSONObject module) throws NumberFormatException, IOException {
 		//JSONObject moduleObj = (JSONObject) moduleList.get("nodes");
 		String nodeName = (String) module.get("Node Name");
 		String moduleName = (String) module.get("Module Name");
@@ -550,16 +575,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		long MIPS = (long) module.get("MIPS");
 		String outTuple = (String) module.get("outTuple");
 		long RAM = (long) module.get("RAM");
-		System.out.println("nodeName: "+nodeName);
-		System.out.println("moduleName: "+moduleName);
-		System.out.println("Size: "+Size);
-		System.out.println("Bandwidth: "+Bandwidth);
-		System.out.println("FractionalSensitivity: "+FractionalSensitivity);
-		System.out.println("inTuple: "+inTuple);
-		System.out.println("MIPS: "+MIPS);
-		System.out.println("outTuple: "+outTuple);
-		System.out.println("RAM: "+RAM);
-		System.out.println("---------------------------");
+		double x_cord = (double) module.get("x_cord");
+		double y_cord = (double) module.get("y_cord");
+		double sz = (double) module.get("radius");
+		
+		ModuSpec m = textfile.createModule(nodeName + " " + moduleName + " " + RAM + " " + Bandwidth + " " + inTuple + " " + outTuple + " " + Size + " "
+		+ MIPS + " " + FractionalSensitivity + " \n");
+		m.x = x_cord;
+		m.y = y_cord;
+		m.dispSize = sz;
+		modulesList.add(m);
+		dispNode newMod = new dispNode(nodeName, m, m.x, m.y, m.dispSize);
+		moduleNamesList.add(nodeName);
+		dispNodesList.add(newMod);
+		redrawNodes();
 	}
 	
     @FXML
@@ -766,8 +795,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void startSim(ActionEvent event) throws Exception {
-//    	writeJSON();
-//    	testmethod();
+    	writeJSON();
+    	testmethod();
     	System.out.println(selectedJSON);
      	VRGameFog simObj = new VRGameFog(selectedJSON);
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
