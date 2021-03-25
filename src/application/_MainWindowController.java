@@ -129,6 +129,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	Color deviceColor=Color.RED;
 	Color moduleColor=Color.CYAN;
 	Color sensorColor=Color.PINK;
+	Color actuatorColor=Color.ORANGE;
 	Color transpColor=Color.TRANSPARENT;
 	Color _errorColor=Color.GREEN;
     GraphicsContext gc;
@@ -169,7 +170,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				s.dispSize=this.sz;
 				sensorsList.add(s);
 			}else if(data.type.equals("actuator")) {
-				
+				ActuatorSpec a = getActuator(this.data.name);
+				actuatorsList.remove(a);
+				a.x=this.x; a.y=this.y;
+				a.dispSize=this.sz;
+				actuatorsList.add(a);
 			}
 		}
 		dispNode(String _name, NodeSpec _n) {this(_name, _n, xCenter, yCenter, R+R);}
@@ -182,6 +187,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			if(data.type.equals("device")) c = deviceColor;
 			else if(data.type.equals("module")) c = moduleColor;
 			else if(data.type.equals("sensor")) c = sensorColor;
+			else if(data.type.equals("actuator")) c = actuatorColor;
 			else c = _errorColor;
 			id = globalID++;
 		}
@@ -233,8 +239,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<String> moduleNamesList = new ArrayList<String>();
 	public List<String> selectedModulesList = new ArrayList<String>();
 	
-	public List<String> sensorNameList = new ArrayList<String>();
+	public List<String> sensorNamesList = new ArrayList<String>();
 	public List<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
+	public List<ActuatorSpec> actuatorsList = new ArrayList<ActuatorSpec>();
+	public List<String> actuatorNamesList = new ArrayList<String>();
 	public List<LinkSpec> linksList = new ArrayList<LinkSpec>();
 	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
@@ -257,6 +265,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case DIGIT2 : state=2; break;	 // Select Module Placer
 			case DIGIT3 : state=3; break;	 // Select Edge Placer
 			case DIGIT4 : state=4; break;    // Select Sensor Placer
+			case DIGIT5 : state=5; break;    // Select Actuator Placer
 			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
 			case E 		: System.out.println("E"); break;	 // Edit Object Selected
 			case F5 	: System.out.println("F5"); break;   // Save File
@@ -314,12 +323,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			} else {
 				draggingNode = selNode;
 			}
+		} else if (state == 5) {
+			if (selNode == null) {
+				dispNode newNode = new dispNode("New Actuator", actuatorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				draggingNode = newNode;
+			} else {
+				draggingNode = selNode;
+			}
 		}
 		redrawNodes();
 	}
     
     @FXML
-    private void mouseReleaseHandler(MouseEvent mEvent) {
+    private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
 //    	System.out.println("_MainWindowController.java: MRelease State is " + state);
     	if (state==0) {
     		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
@@ -347,8 +363,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 						DeviceSpec srcDev = getDevice(linkSrcNode.name);
 						srcDev.parent = linkDstNode.name;
 						DeviceSpec dstDev = getDevice(srcDev.parent);
-						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
-						if(srcLink!=null) srcLink.dst = linkDstNode;
+						dispLink srcLink = getLinkBySrc(linkSrcNode.name);   				        	
+			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+						Scene scene = new Scene(dataFXML.load(),414,139);
+						Stage stage = new Stage();
+						stage.setScene(scene);							
+			     		stage.setTitle("Setting Link Latency");    		
+			     		stage.showAndWait();
+			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
+						if(srcLink!=null)srcLink.dst = linkDstNode;
 						else dispLinksList.add(new dispLink(srcDev, dstDev));
 					}else if(srcType.equals("module")) {
 						selectedModulesList.add(linkDstNode.name);
@@ -369,6 +392,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     			if(newSensor!=null) newSensor.setPos(mEvent);
     		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
+		} else if (state==5) {			
+    		if(dispNodesList.indexOf(draggingNode)<0) {
+    			dispNode newActuator = addActuator();
+    			if(newActuator!=null) newActuator.setPos(mEvent);   			
+    		}
 		}
     	redrawNodes();
     }
@@ -386,6 +414,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     public DeviceSpec getDevice(String _name) {
     	if (_name==null) return null;
     	for (DeviceSpec d : devicesList) if (d.name.equals(_name)) return d;
+		return null;
+    }
+    public ActuatorSpec getActuator(String _name) {
+    	if (_name==null) return null;
+    	for (ActuatorSpec a : actuatorsList) if (a.name.equals(_name)) return a;
 		return null;
     }
     public dispLink getLinkBySrc(String _src) {
@@ -543,7 +576,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		s.dispSize = size;
 		sensorsList.add(s);
 		dispNode newDevice = new dispNode(sensorName, s, s.x, s.y, s.dispSize);
-		sensorNameList.add(sensorName);
+		sensorNamesList.add(sensorName);
 		dispNodesList.add(newDevice);
 		redrawNodes();
 	}
@@ -566,15 +599,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	void parseModuleObj(JSONObject module) throws NumberFormatException, IOException {
 		//JSONObject moduleObj = (JSONObject) moduleList.get("nodes");
-		String nodeName = (String) module.get("Node Name");
-		String moduleName = (String) module.get("Module Name");
-		long Size = (long) module.get("Size");
-		long Bandwidth = (long) module.get("Bandwidth");
+		String nodeName = (String) module.get("node name");
+		String moduleName = (String) module.get("module name");
+		long Size = (long) module.get("size");
+		long Bandwidth = (long) module.get("bandwidth");
 		double FractionalSensitivity = (double) module.get("Fractional Sensitivity");
 		String inTuple = (String) module.get("inTuple");
-		long MIPS = (long) module.get("MIPS");
+		long MIPS = (long) module.get("mips");
 		String outTuple = (String) module.get("outTuple");
-		long RAM = (long) module.get("RAM");
+		long RAM = (long) module.get("ram");
 		double x_cord = (double) module.get("x_cord");
 		double y_cord = (double) module.get("y_cord");
 		long szT = (long) module.get("radius");
@@ -605,6 +638,33 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
             e.printStackTrace();
         }
     }
+    @FXML
+    dispNode addActuator() {
+    	  	try {
+    		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
+    		
+    		Scene scene = new Scene(addNewActuatorLoader.load(),264,133);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		ActuatorInputController actuatorController = addNewActuatorLoader.getController();
+    		stage.setTitle("Add Actuator");
+    		stage.showAndWait();
+    		ActuatorSpec a = actuatorController.getSpec();
+    		if (a==null) return null;
+    		String name = a==null?"Error":a.name;
+    		dispNode newDevice = new dispNode(name, a, xCenter, yCenter, R+R);
+			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
+				actuatorsList.add(a);
+				actuatorNamesList.add(name);
+				dispNodesList.add(newDevice);
+			}
+			redrawNodes();
+    		return newDevice;
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
     
     @FXML
     dispNode addSensor() {
@@ -621,9 +681,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		if (s==null) return null;
     		String name = s==null?"Error":s.name;
     		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
-			if (name != "Error" && sensorNameList.indexOf(name) < 0) {
+			if (name != "Error" && sensorNamesList.indexOf(name) < 0) {
 				sensorsList.add(s);
-				sensorNameList.add(name);
+				sensorNamesList.add(name);
 				dispNodesList.add(newDevice);
 			}
 			redrawNodes();

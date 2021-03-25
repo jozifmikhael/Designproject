@@ -229,7 +229,7 @@ public class VRGameFog {
 		int ram = Integer.parseUnsignedInt(module.get("ram").toString());
 		int mips = Integer.parseUnsignedInt(module.get("mips").toString());
 		long size = Long.parseUnsignedLong(module.get("size").toString());
-		long bw = Long.parseUnsignedLong(module.get("bw").toString());
+		long bw = Long.parseUnsignedLong(module.get("bandwidth").toString());
 		
 		application.addAppModule(name, ram, mips, size, bw);
 		

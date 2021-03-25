@@ -19,7 +19,52 @@ public class SetupJSONParser {
 	private List<ModuEdgeSpec> edges = new ArrayList<ModuEdgeSpec>();
 	private List<ModuSpec> modules = new ArrayList<ModuSpec>();
 	private List<LinkSpec> links = new ArrayList<LinkSpec>();
+	private List<ActuatorSpec> actuators = new ArrayList<ActuatorSpec>();
 	private int globalID = 0;
+	
+	public ActuatorSpec createActuator(String sensorLine) throws NumberFormatException, IOException  {	
+		
+		String actuName;
+//		String actuUserID;
+//		String actuAppID;
+//		String actuActuatorType;
+		
+		String stParts[] = sensorLine.split(" ");
+		actuName = stParts[0];
+//		actuUserID = stParts[1];
+//		actuAppID = stParts[2];
+//		actuActuatorType = stParts[3];
+			
+		ActuatorSpec a = new ActuatorSpec(actuName/*, actuUserID, actuAppID, actuActuatorType*/);		
+		return a;
+	}
+	class ActuatorSpec extends NodeSpec {	
+		String name;
+//		String UserID;
+//		String AppID;
+//		String ActuatorType;
+			
+		@SuppressWarnings("unchecked")	
+		JSONObject toJSON() {	
+			ActuatorSpec actuator = this;	
+			JSONObject obj = new JSONObject();	
+			obj.put("Actuator Name", actuator.name);	
+//			obj.put("User_ID", actuator.UserID);	
+//			obj.put("App_ID", actuator.AppID);	
+//			obj.put("Type", actuator.ActuatorType);	
+			return obj;	
+		}	
+			
+		public ActuatorSpec(String actuatorName/*, String UserID, String AppID, String ActuatorType*/) {	
+			this.name = actuatorName;	
+//			this.UserID = UserID;	
+//			this.AppID = AppID;	
+//			this.ActuatorType = ActuatorType;				
+			this.id = getID();	
+			this.type = "actuator";	
+		}	
+	}
+	
 	
 	public DeviceSpec createDevice(String nodeLine) throws NumberFormatException, IOException {
 		long insProcessingSpeed = 0;
@@ -295,14 +340,14 @@ public class SetupJSONParser {
 		JSONObject toJSON() {
 			ModuSpec module = this;
 			JSONObject obj = new JSONObject();
-			obj.put("Node Name", module.nodeName);
-			obj.put("Module Name", module.name);
-			obj.put("RAM", module.modRam);
-			obj.put("Bandwidth", module.bandwidth);
+			obj.put("node name", module.nodeName);
+			obj.put("module name", module.name);
+			obj.put("ram", module.modRam);
+			obj.put("bandwidth", module.bandwidth);
 			obj.put("inTuple", module.inTuple);
 			obj.put("outTuple", module.outTuple);
-			obj.put("Size", module.size);
-			obj.put("MIPS", module.MIPS);
+			obj.put("size", module.size);
+			obj.put("mips", module.MIPS);
 			obj.put("Fractional Sensitivity", module.fractionalSensitivity);
 			obj.put("x_cord", module.x);
 			obj.put("y_cord", module.y);
