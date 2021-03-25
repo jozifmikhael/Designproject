@@ -118,6 +118,43 @@ public class SetupJSONParser {
 		for(NodeSpec h: modules) if(h.id == _id) hosts.remove(h);
 	}
 	
+	class SensorSpec extends NodeSpec {	
+		String nodeName;	
+		String distribution;	
+		double deterministicValue;	
+		double normalMean;	
+		double normalStdDev;	
+		double uniformMax;	
+		double uniformMin;	
+			
+		@SuppressWarnings("unchecked")	
+		JSONObject toJSON() {	
+			SensorSpec sensor = this;	
+			JSONObject obj = new JSONObject();	
+			obj.put("Node Name", sensor.nodeName);	
+			obj.put("Module Name", sensor.distribution);	
+			obj.put("RAM", sensor.deterministicValue);	
+			obj.put("Bandwidth", sensor.normalMean);	
+			obj.put("inTuple", sensor.normalStdDev);	
+			obj.put("outTuple", sensor.uniformMax);	
+			obj.put("Size", sensor.uniformMin);	
+			return obj;	
+		}	
+			
+		public SensorSpec(String nodeName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
+				double uniformMin) {	
+			this.nodeName = nodeName;	
+			this.distribution = distribution;	
+			this.deterministicValue = deterministicValue;	
+			this.normalMean = normalMean;	
+			this.normalStdDev = normalStdDev;	
+			this.uniformMax = uniformMax;	
+			this.uniformMin = uniformMin;	
+			this.id = getID();	
+			this.type = "sensor";	
+		}	
+	}
+	
 	class DeviceSpec extends NodeSpec {
 		int pe;
 		long mips;

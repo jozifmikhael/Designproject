@@ -72,7 +72,6 @@ public class VRGameFog {
 	static int numOfDepts = 4;
 	static int numOfMobilesPerDept = 6;
 	static double EEG_TRANSMISSION_TIME = 5.1;
-	static String sourceFile="test7.json";
 	
 	static FogDevice cloud;
 	static FogDevice proxy;
@@ -147,10 +146,6 @@ public class VRGameFog {
 			e.printStackTrace();
 			Log.printLine("Unwanted errors happen");
 		}
-	}
-	
-	public static void main() {
-		VRGameFog simObj = new VRGameFog("test9.json");
 	}
 	
 	private static void parseNodeObject(JSONObject node) {
@@ -232,7 +227,7 @@ public class VRGameFog {
 			mobile.setParentId(-1);
 		}
 		if (!(transmissionTime == 0.0)) {
-			Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
+			Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(transmissionTime)); // inter-transmission time of EEG sensor follows a deterministic distribution
 			sensors.add(newSensor);
 			Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
 			actuators.add(display);

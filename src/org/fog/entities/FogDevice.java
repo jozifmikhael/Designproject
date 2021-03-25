@@ -134,8 +134,8 @@ public class FogDevice extends PowerDatacenter {
 			throw new Exception(super.getName()
 					+ " : Error - this entity has no PEs. Therefore, can't process any Cloudlets.");
 		}
-		// stores id of this class
-		getCharacteristics().setId(super.getId());
+		
+		((FogDeviceCharacteristics)getCharacteristics()).setId(super.getId());
 		
 		applicationMap = new HashMap<String, Application>();
 		appToModulesMap = new HashMap<String, List<String>>();
@@ -476,7 +476,7 @@ public class FogDevice extends PowerDatacenter {
 						Tuple tuple = (Tuple)cl;
 						TimeKeeper.getInstance().tupleEndedExecution(tuple);
 						Application application = getApplicationMap().get(tuple.getAppId());
-						Logger.debug(getName(), "Completed execution of tuple "+tuple.getCloudletId()+"on "+tuple.getDestModuleName());
+						System.out.println("FogDevice.java 479: "+ tuple.getTupleType() + ":\t" + (CloudSim.clock()-tuple.getArrivalTime()+" "+tuple.getActualCPUTime()));
 						List<Tuple> resultantTuples = application.getResultantTuples(tuple.getDestModuleName(), tuple, getId(), vm.getId());
 						for(Tuple resTuple : resultantTuples){
 							resTuple.setModuleCopyMap(new HashMap<String, Integer>(tuple.getModuleCopyMap()));
@@ -489,8 +489,7 @@ public class FogDevice extends PowerDatacenter {
 				}
 			}
 		}
-		if(cloudletCompleted)
-			updateAllocatedMips(null);
+		if(cloudletCompleted) updateAllocatedMips(null);
 	}
 	
 	protected void updateTimingsOnSending(Tuple resTuple) {

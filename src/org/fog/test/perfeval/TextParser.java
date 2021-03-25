@@ -77,6 +77,7 @@ public class TextParser {
 			this.localList.addAll(globalTuplesList);
 		}
 		public filterableTuples ofType(String reqType){
+			// return this.stream().filter(t -> t.tupleType.equals(reqType)).collect(Collectors.toList())
 			filterableTuples temp = new filterableTuples();
 			for(TupleSpec t : this.localList) if(!(t.tupleType.equals(reqType))) temp.localList.remove(t);
 			return temp;

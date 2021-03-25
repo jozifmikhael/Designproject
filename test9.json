@@ -6,7 +6,7 @@
 			"rate": 0.0,
 			"ipower": 82.44,			
 			"name": "node1",
-			"transmission_time": 5.1,
+			"transmission_time": 1.1,
 			"down_bw": 270,
 			"mips": 1000,
 			"up_bw": 10000,

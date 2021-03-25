@@ -8,6 +8,12 @@ import org.cloudbus.cloudsim.UtilizationModel;
 
 public class Tuple extends Cloudlet{
 
+	@Override
+	public String toString() {
+		return "Tuple [tupleType=" + tupleType + ", destModuleName=" + destModuleName + ", srcModuleName="
+				+ srcModuleName + ", sendTime=" + sendTime + ", arrivalTime=" + arrivalTime + "]";
+	}
+
 	public static final int UP = 1;
 	public static final int DOWN = 2;
 	public static final int ACTUATOR = 3;
