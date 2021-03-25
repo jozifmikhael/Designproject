@@ -72,6 +72,30 @@ public class SetupJSONParser {
 		return e;
 	}
 	
+	public SensorSpec createSensor(String sensorLine) throws NumberFormatException, IOException  {	
+		double deterministicValue;	
+		double normalMean;	
+		double normalStdDev;	
+		double uniformMax;	
+		double uniformMin;	
+		double sensorLatency;
+		
+		String stParts[] = sensorLine.split(" ");
+		String nodeName = stParts[0];
+		sensorLatency = Double.parseDouble(stParts[1]);
+		String sensorName = stParts[2];
+		deterministicValue = Double.parseDouble(stParts[3]);
+		normalMean = Double.parseDouble(stParts[4]);
+		normalStdDev = Double.parseDouble(stParts[5]);
+		uniformMax = Double.parseDouble(stParts[6]);
+		uniformMin = Double.parseDouble(stParts[7]);
+		String distribution = stParts[8];
+		
+		SensorSpec s = new SensorSpec(sensorName, distribution, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin);
+		
+		return s;
+	}
+	
 	public ModuSpec createModule(String moduleLine) throws NumberFormatException, IOException {
 		// String insNodeName;
 		// String insModuleName;
@@ -119,8 +143,8 @@ public class SetupJSONParser {
 	}
 	
 	class SensorSpec extends NodeSpec {	
-		String nodeName;	
 		String distribution;	
+		double sensorLatency;
 		double deterministicValue;	
 		double normalMean;	
 		double normalStdDev;	
@@ -131,19 +155,20 @@ public class SetupJSONParser {
 		JSONObject toJSON() {	
 			SensorSpec sensor = this;	
 			JSONObject obj = new JSONObject();	
-			obj.put("Node Name", sensor.nodeName);	
-			obj.put("Module Name", sensor.distribution);	
-			obj.put("RAM", sensor.deterministicValue);	
-			obj.put("Bandwidth", sensor.normalMean);	
-			obj.put("inTuple", sensor.normalStdDev);	
-			obj.put("outTuple", sensor.uniformMax);	
-			obj.put("Size", sensor.uniformMin);	
+			obj.put("sensorName", sensor.name);	
+			obj.put("distribution", sensor.distribution);	
+			obj.put("sensorLatency", sensor.sensorLatency);	
+			obj.put("deterministicValue", sensor.deterministicValue);	
+			obj.put("normalMean", sensor.normalMean);	
+			obj.put("normalStdDev", sensor.normalStdDev);	
+			obj.put("uniformMax", sensor.uniformMax);	
+			obj.put("uniformMin", sensor.uniformMin);	
 			return obj;	
 		}	
 			
-		public SensorSpec(String nodeName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
+		public SensorSpec(String sensorName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
 				double uniformMin) {	
-			this.nodeName = nodeName;	
+			this.name = sensorName;	
 			this.distribution = distribution;	
 			this.deterministicValue = deterministicValue;	
 			this.normalMean = normalMean;	
@@ -308,20 +333,23 @@ public class SetupJSONParser {
 	@SuppressWarnings("unchecked")
 	
 	public void writeJSON(String jsonFileName,
-			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList,
+			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList, List<SensorSpec> sensorsList,
 			int i, String time) {
 		JSONObject obj = new JSONObject();
 		JSONArray nodeList = new JSONArray();
 		JSONArray edgeList = new JSONArray();
 		JSONArray moduleList = new JSONArray();
+		JSONArray sensorList = new JSONArray();
 		
 		for (DeviceSpec h : devicesList) nodeList.add(h.toJSON());
 		for (ModuSpec m : modulesList) moduleList.add(m.toJSON());
 		for (ModuEdgeSpec e : modEdgesList) edgeList.add(e.toJSON());
+		for (SensorSpec s : sensorsList) sensorList.add(s.toJSON());
 
 		obj.put("nodes", nodeList);
 		obj.put("modules", moduleList);
 		obj.put("edges", edgeList);
+		obj.put("sensors", sensorList);
 		obj.put("policy", i);
 		obj.put("time", time);
 		

@@ -152,6 +152,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			data = _n;
 			if(data.type.equals("device")) c = deviceColor;
 			else if(data.type.equals("module")) c = moduleColor;
+			else if(data.type.equals("sensor")) c = sensorColor;
 			else c = _errorColor;
 			id = globalID++;
 		}
@@ -403,7 +404,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Create New Design File");
     		stage.show();
         	String destFile = "saves/"+ createJsonController.jsonDestinationFileName + ".json";
-         	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 10000, "test");
+         	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, sensorList, 10000, "test");
     	} catch(Exception e) {
     		e.printStackTrace();
     	}
@@ -540,10 +541,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     dispNode addSensor() {
     	try {
     		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-    		Scene scene = new Scene(addNewSensorLoader.load(),450,320);
+    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
+    		sensorController.populateList(deviceNamesList);
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
     		SensorSpec s = sensorController.getSpec();
@@ -554,6 +556,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				sensorList.add(s);
 				sensorNameList.add(name);
 				dispNodesList.add(newDevice);
+			}
+			for(SensorSpec test : sensorList) {
+				System.out.println(test.name);
 			}
 			redrawNodes();
     		return newDevice;
@@ -692,7 +697,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	//String policy = policyView.getText();
     	//String time = simulationTime.getText();
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
-     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, 1, "500");
+     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, sensorList, 1, "500");
      	VRGameFog simObj = new VRGameFog("test9.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);

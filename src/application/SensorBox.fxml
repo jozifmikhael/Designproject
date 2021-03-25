@@ -9,21 +9,21 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="254.0" prefWidth="352.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddSensorController">
+<BorderPane minHeight="400.0" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddSensorController">
    <center>
       <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>
             <AnchorPane minHeight="320.0" minWidth="450.0" prefHeight="320.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Accordion layoutY="65.0" prefHeight="255.0" prefWidth="450.0">
+                  <Accordion layoutY="150.0" prefHeight="252.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <panes>
-                      <TitledPane animated="false" prefHeight="154.0" prefWidth="450.0" text="Deterministic Distribution">
+                      <TitledPane animated="false" prefHeight="215.0" prefWidth="450.0" text="Deterministic Distribution">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Text layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Deterministic Value:" />
-                                    <TextField fx:id="DeterministicValue" layoutX="225.0" layoutY="33.0" />
-                                    <Button layoutX="25.0" layoutY="130.0" mnemonicParsing="false" text="Save Sensor" />
+                                    <Text layoutX="40.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Deterministic Value:" />
+                                    <TextField fx:id="DeterministicValue" layoutX="224.0" layoutY="23.0" />
+                                    <Button fx:id="saveDeterministic" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveDeterministic" text="Save Sensor" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -32,32 +32,36 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button layoutX="25.0" layoutY="130.0" mnemonicParsing="false" text="Save Sensor" />
-                                    <Text layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mean:" />
-                                    <TextField fx:id="mean" layoutX="225.0" layoutY="32.0" />
-                                    <Text layoutX="40.0" layoutY="100.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Standard Deviation" />
-                                    <TextField fx:id="stdDev" layoutX="225.0" layoutY="81.0" />
+                                    <Button fx:id="saveNormal" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveNormal" text="Save Sensor" />
+                                    <Text layoutX="40.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mean:" />
+                                    <TextField fx:id="mean" layoutX="225.0" layoutY="23.0" />
+                                    <Text layoutX="40.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Standard Deviation:" />
+                                    <TextField fx:id="stdDev" layoutX="225.0" layoutY="73.0" />
                                  </children>
                               </AnchorPane>
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" text="Uniform Distribution">
+                      <TitledPane animated="false" prefHeight="142.0" prefWidth="441.0" text="Uniform Distribution">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button layoutX="25.0" layoutY="130.0" mnemonicParsing="false" text="Save Sensor" />
-                                    <TextField fx:id="max" layoutX="225.0" layoutY="33.0" />
-                                    <Text layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Maximum" />
-                                    <Text layoutX="40.0" layoutY="100.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Minimum" />
-                                    <TextField fx:id="min" layoutX="225.0" layoutY="83.0" />
+                                    <Button fx:id="saveUniform" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveUniform" text="Save Sensor" />
+                                    <TextField fx:id="max" layoutX="225.0" layoutY="23.0" />
+                                    <Text layoutX="40.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Maximum:" />
+                                    <Text layoutX="40.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Minimum:" />
+                                    <TextField fx:id="min" layoutX="225.0" layoutY="73.0" />
                                  </children>
                               </AnchorPane>
                         </content>
                       </TitledPane>
                     </panes>
                   </Accordion>
-                  <Text layoutX="40.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Node" />
-                  <ChoiceBox fx:id="nodeBox" layoutX="225.0" layoutY="26.0" prefWidth="150.0" />
+                  <Text layoutX="40.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Node:" />
+                  <ChoiceBox fx:id="nodeBox" layoutX="226.0" layoutY="18.0" prefWidth="150.0" />
+                  <Text layoutX="40.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latency:" />
+                  <TextField fx:id="sensorLatency" layoutX="227.0" layoutY="63.0" text="6.0" />
+                  <Text layoutX="40.0" layoutY="125.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensor Name:" />
+                  <TextField fx:id="sensorName" layoutX="227.0" layoutY="108.0" text="sensor1" />
                </children></AnchorPane>
          </children>
       </AnchorPane>
