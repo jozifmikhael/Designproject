@@ -10,29 +10,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class TextParser {
-	private List<TupleSpec> tuples = new ArrayList<TupleSpec>();
-	private List<NodeSpecs> nodes = new ArrayList<NodeSpecs>();
-	private List<EnergySpec> listEnergy = new ArrayList<EnergySpec>();
-	private List<NetworkSpec> listNetwork = new ArrayList<NetworkSpec>();
-	
-	
-	public void getTuples(String line) throws NumberFormatException, IOException {
-		
-		double TupleLatency;
-		double arrivalTime;
-		double sendTime;
-		
-		String stParts[] = line.split(" ");
-		String tupleTyple = stParts[0];
-		String tupleSRC = stParts[1];
-		String tupleDEST = stParts[2];
-		sendTime = Double.parseDouble(stParts[3]);
-		arrivalTime = Double.parseDouble(stParts[4]);
-		TupleLatency = arrivalTime - sendTime;
-		//System.out.println("Source " + tupleSRC + " " + "DEST " + tupleDEST + " " +TupleLatency);
-		
-		TupleSpec h = addTuple(tupleTyple, tupleSRC, tupleDEST, TupleLatency);	
-	}
+	private List<NodeSpecs> nodesList = new ArrayList<NodeSpecs>();
+	private List<EnergySpec> energiesList = new ArrayList<EnergySpec>();
+	private List<NetworkSpec> networkingList = new ArrayList<NetworkSpec>();
 	
 	public void getNodespec(String line) throws NumberFormatException, IOException {
 		
@@ -69,57 +49,124 @@ public class TextParser {
 		NetworkSpec w = addNetwork(time, networkUsage);	
 	}
 	
-	public TupleSpec addTuple(String tupleTyple, String tupleSRC, String tupleDEST, double TupleLatency) {
-		TupleSpec tuple = new TupleSpec(tupleTyple,tupleSRC,tupleDEST, TupleLatency);
-		tuple.tupleTyple = tupleTyple;
-		tuples.add(tuple);
-		return tuple;
-	}
-	
 	public NodeSpecs addNode(String nodeName) {
 		NodeSpecs node = new NodeSpecs(nodeName);
 		node.nodeName = nodeName;
-		nodes.add(node);
+		nodesList.add(node);
 		return node;
 	}
 
 	public EnergySpec addEnergy(String name, double energy, double time, double cost) {
 		EnergySpec nodeEngery = new EnergySpec(name, energy, time, cost);
 		nodeEngery.name = name;
-		listEnergy.add(nodeEngery);
+		energiesList.add(nodeEngery);
 		return nodeEngery;
 	}
 	
 	public NetworkSpec addNetwork(double time, double networkUsage) {
 		NetworkSpec network = new NetworkSpec(time, networkUsage);
-		listNetwork.add(network);
+		networkingList.add(network);
 		return network;
 	}
 	
-	class TupleSpec{
-		String tupleTyple;
-		String tupleSRC; 
-		String tupleDEST;
-		double TupleLatency;
-		
+	static List<TupleSpec> globalTuplesList = new ArrayList<TupleSpec>();
+	public class filterableTuples{
+		List<TupleSpec> localList;
+		public filterableTuples() {
+			this.localList = new ArrayList<TupleSpec>();
+			this.localList.addAll(globalTuplesList);
+		}
+		public filterableTuples ofType(String reqType){
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(!(t.tupleType.equals(reqType))) temp.localList.remove(t);
+			return temp;
+		}
+		public filterableTuples ofSrc(String reqSrc){
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(!(t.tupleSrc.equals(reqSrc))) temp.localList.remove(t);
+			return temp;
+		}
+		public filterableTuples ofDst(String reqDst){
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(!(t.tupleDst.equals(reqDst))) temp.localList.remove(t);
+			return temp;
+		}
+		public filterableTuples tholdSent(double reqSent, boolean dir){
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(dir&&(t.tupleSentTime>reqSent)) temp.localList.remove(t);
+			return temp;
+		}
+		public filterableTuples tholdArrived(double reqArrived, boolean dir){
+			filterableTuples temp = new filterableTuples();
+			for(TupleSpec t : this.localList) if(dir&&(t.tupleArrivTime>reqArrived)) temp.localList.remove(t);
+			return temp;
+		}
+		public filterableTuples printNWLatencies() {
+			for(TupleSpec t : this.localList) System.out.println(t.tupleArrivTime - t.tupleSentTime);
+			return this;
+		}
+		public filterableTuples printAverage() {
+			double avg=0;
+			for(TupleSpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
+			System.out.println(avg/this.localList.size());
+			return this;
+		}
+		public filterableTuples printVariance() {
+			double avg=0;
+			for(TupleSpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
+			avg/=this.localList.size();
+			double var=0;
+			for(TupleSpec t : this.localList) var+=Math.pow((t.tupleArrivTime-t.tupleSentTime-avg),2);
+			System.out.println(var/this.localList.size());
+			return this;
+		}
+		public filterableTuples printStrs() {
+			double avg=0;
+			for(TupleSpec t : this.localList) System.out.println(t.toString());
+			return this;
+		}
+	}
+	//filterableTuples newQuery = new filterableTuples;
+	//newQuery.ofType("PLAYER_GAME_STATE").ofDst("wherever");
+	
+	public class TupleSpec{
+		@Override
+		public String toString() {
+			return "TupleSpec [tupleType=" + tupleType + ", tupleSrc=" + tupleSrc + ", tupleDst=" + tupleDst
+					+ ", tupleNWLatency=" + tupleNWLatency + ", tupleSentTime=" + tupleSentTime + ", tupleArrivTime="
+					+ tupleArrivTime + "]";
+		}
+		String tupleType;
+		String tupleSrc; 
+		String tupleDst;
+		double tupleNWLatency;
+		double tupleSentTime;
+		double tupleArrivTime;
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
 			TupleSpec t = this;
 			JSONObject obj = new JSONObject();
-			obj.put("tupleType", t.tupleTyple);
-			obj.put("tupleSRC", t.tupleSRC);
-			obj.put("tupleDEST", t.tupleDEST);
-			obj.put("TupleLatency", t.TupleLatency);
+			obj.put("tupleType", t.tupleType);
+			obj.put("tupleSRC", t.tupleSrc);
+			obj.put("tupleDEST", t.tupleDst);
+			obj.put("tupleNWLatency", t.tupleNWLatency);
 			return obj;
 		}
-		
-		public TupleSpec(String tupleTyple, String tupleSRC, String tupleDEST, double TupleLatency) {
-			this.tupleTyple = tupleTyple;
-			this.tupleSRC = tupleSRC;
-			this.tupleDEST = tupleDEST;
-			this.TupleLatency = TupleLatency;			
+		public TupleSpec(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
+			this.tupleType = tupleType;
+			this.tupleSrc = tupleSRC;
+			this.tupleDst = tupleDEST;
+			this.tupleSentTime = sentTime;
+			this.tupleArrivTime = arrivalTime;
+			this.tupleNWLatency = arrivalTime-sentTime;
+			globalTuplesList.add(this);
 		}
+		
+		
+	}
+	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
+		this.new TupleSpec(tupleType, tupleSRC, tupleDEST, sentTime, arrivalTime);
 	}
 	
 	class NodeSpecs{
@@ -186,25 +233,26 @@ public class TextParser {
 	public void writeJSON(String jsonFileName) {
 		JSONObject obj = new JSONObject();
 		
-		JSONArray tupleList = new JSONArray();
-		JSONArray nodeList = new JSONArray();
-		JSONArray energyList = new JSONArray();
-		JSONArray networkList = new JSONArray();
+		JSONArray tupleJList = new JSONArray();
+		JSONArray nodeJList = new JSONArray();
+		JSONArray energyJList = new JSONArray();
+		JSONArray networkJList = new JSONArray();
 		
-		for (TupleSpec t:tuples) tupleList.add(t.toJSON());
-		for (NodeSpecs n:nodes) nodeList.add(n.toJSON());
-		for (EnergySpec e:listEnergy) energyList.add(e.toJSON());
-		for (NetworkSpec w:listNetwork) networkList.add(w.toJSON());
 		
-//		System.out.println("Tuples:\n"+tuples.toString()+"\n");
-//		System.out.println("Nodes:\n"+nodes.toString()+"\n");
-//		System.out.println("Energy:\n"+listEnergy.toString()+"\n");
-//		System.out.println("Network:\n"+listNetwork.toString()+"\n");
+		for (TupleSpec t:globalTuplesList) tupleJList.add(t.toJSON());
+		for (NodeSpecs n:nodesList) nodeJList.add(n.toJSON());
+		for (EnergySpec e:energiesList) energyJList.add(e.toJSON());
+		for (NetworkSpec w:networkingList) networkJList.add(w.toJSON());
 		
-		//obj.put("tuples", tupleList);
-		obj.put("nodes", nodeList);
-		obj.put("listEnergy", energyList);
-		obj.put("listNetwork", networkList);
+//		System.out.println("Tuples:\n"+tuplesList.toString()+"\n");
+//		System.out.println("Nodes:\n"+nodesList.toString()+"\n");
+//		System.out.println("Energy:\n"+energiesList.toString()+"\n");
+//		System.out.println("Network:\n"+networkingList.toString()+"\n");
+		
+//		obj.put("tuples", tupleJList);
+		obj.put("nodes", nodeJList);
+		obj.put("listEnergy", energyJList);
+		obj.put("listNetwork", networkJList);
 		
 		try {
 			FileWriter file = new FileWriter(jsonFileName, true);
@@ -215,8 +263,5 @@ public class TextParser {
 			e.printStackTrace();
 		}
 		System.out.println(obj);
-				
-		
 	}
-	
 }

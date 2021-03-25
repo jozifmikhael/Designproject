@@ -58,6 +58,9 @@ public class Controller extends SimEntity{
 
 	private Map<String, ModulePlacement> appModulePlacementPolicy;
 	
+	int numClients=0;
+	long count=0;
+
 	public Controller(String name, List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators) {
 		super(name);
 		this.applications = new HashMap<String, Application>();
@@ -143,12 +146,13 @@ public class Controller extends SimEntity{
 				}
 			}
 			System.out.println("Total Cost = " + totalNodeCost + " Total Engery Usage = " + totalEnergyUsage);
+			TextParser.filterableTuples query = textfile.new filterableTuples();
+			query.ofType("PLAYER_GAME_STATE").printAverage();
     		textfile.writeJSON("output.json");
 			CloudSim.stopSimulation();	
-			CloudSim.terminateSimulation();	
+			CloudSim.terminateSimulation();
 //			System.exit(0);
 			break;
-			
 		}
 	}
 	
@@ -434,13 +438,5 @@ public class Controller extends SimEntity{
 
 	public void setAppModulePlacementPolicy(Map<String, ModulePlacement> appModulePlacementPolicy) {
 		this.appModulePlacementPolicy = appModulePlacementPolicy;
-	}
-	
-	public static TextParser getTextParser() {
-		return textfile;
-	}
-	
-	public static void setTextParser(TextParser text) {
-		textfile = text;
 	}
 }

@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 public class setParamsController {
 	public static int simulationTime = 1000;
 	public static int granularityMetric = 10;
-	public static String finalPolChoice = "default";
+	public static String finalPolChoice = "Profit Aware";
 
     @FXML
     private ResourceBundle resources;
@@ -58,13 +58,10 @@ public class setParamsController {
 
     }
     
-    //Static String finalPolChoice = PolicyChoice.getSelectionModel().getSelectedItem().toString();
     
     void populateList(List<String> str_list) {
-//    	System.out.println(str_list);
 		ObservableList<String> items = FXCollections.observableArrayList();
 		items.addAll(str_list);
-//		System.out.println(items.size());
 		PolicyChoice.setItems(items);	
 		PolicyChoice.setValue(items.get(0));
 		
@@ -73,10 +70,6 @@ public class setParamsController {
 
     @FXML
     void initialize() {
-//        assert simTimeValue != null : "fx:id=\"simTimeValue\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
-//        assert setParamsButton != null : "fx:id=\"setParamsButton\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
-//        assert GranValue != null : "fx:id=\"GranValue\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
-//        assert PolicyChoice != null : "fx:id=\"PolicyChoice\" was not injected: check your FXML file 'setSimParamsBox.fxml'.";
 
     }
 }

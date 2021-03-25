@@ -41,11 +41,6 @@
                         <Menu mnemonicParsing="false" text="Policy">
                           <items>
                               <MenuItem fx:id="SetSimParams" mnemonicParsing="false" onAction="#setParams" text="Set Simulation Parameters" />
-                            <MenuItem fx:id="ProfitAwareItem" mnemonicParsing="false" onAction="#confirmPolicy1" text="Profit Aware Policy" />
-                              <MenuItem fx:id="QosItem" mnemonicParsing="false" onAction="#confirmPolicy2" text="QoS Policy" />
-                              <MenuItem fx:id="LowestPowerItem" mnemonicParsing="false" onAction="#confirmPolicy3" text="Lowest Power Policy" />
-                              <MenuItem fx:id="SetRunTimeItem" mnemonicParsing="false" onAction="#setSimTime" text="Set Sim Duration" />
-                              <MenuItem fx:id="SetRunTimeGranularity" mnemonicParsing="false" onAction="#setSimGran" text="Set Sim Granularity" />
                           </items>
                         </Menu>
                     </menus>
