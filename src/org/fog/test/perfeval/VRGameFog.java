@@ -110,20 +110,18 @@ public class VRGameFog {
 		JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(jsonFile);
         Object obj = jsonParser.parse(reader);
-        
-        System.out.println("init parsing");
-        System.out.println("Starting meta");
         JSONObject jsonObject = (JSONObject) obj;
-        String simPolicy = (String) obj.get("policy");
-        long granularity = (long) nodeList.get("granularity");
-        long time = (long) nodeList.get("time");
+
+        JSONObject metaArr = (JSONObject) jsonObject.get("meta");
+        String simPolicy = (String) metaArr.get("policy");
+        long granularity = (long) metaArr.get("granularity");
+        long time = (long) metaArr.get("time");
         Config.RESOURCE_MANAGE_INTERVAL = (int) granularity;
         Config.RESOURCE_MGMT_INTERVAL = (double) granularity;
         Config.MAX_SIMULATION_TIME = (int) time;
-        Config.TOP_NODE = (String) nodeList.get("central");
+        Config.TOP_NODE = (String) metaArr.get("central");
         
         System.out.println("Finished meta");
-
         
     	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
 		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
@@ -136,17 +134,12 @@ public class VRGameFog {
 		
 		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 		moduleMapping.addModuleToDevice("connector", "cloud");
-		
 		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-		
 		controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
 		
 		TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
-		
 		CloudSim.startSimulation();
-
 		CloudSim.stopSimulation();
-
 		Log.printLine("VRGame finished!");
 	}
 	

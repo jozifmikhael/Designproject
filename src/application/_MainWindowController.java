@@ -399,7 +399,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
-    String selectedJSON="saves/test7.json";
+    String selectedJSON="test7.json";
     String policy = "Edgewards";
     int simTime = 1000;
     int simGranu = 10;
@@ -462,7 +462,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			//System.out.println(deviceList + "\n"+edgeList+"\n"+moduleList);
 		}
 	}
 	
@@ -739,10 +738,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void startSim(ActionEvent event) throws Exception {
-    	writeJSON();
+//    	writeJSON();
 //    	testmethod();
     	System.out.println(selectedJSON);
-     	VRGameFog simObj = new VRGameFog("saves/test7.json");
+     	VRGameFog simObj = new VRGameFog("test7.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

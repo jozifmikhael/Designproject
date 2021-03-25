@@ -339,22 +339,25 @@ public class SetupJSONParser {
 		JSONArray edgeList = new JSONArray();
 		JSONArray moduleList = new JSONArray();
 		JSONArray sensorList = new JSONArray();
-		JSONArray metaList = new JSONArray();
+		
 		
 		for (DeviceSpec h : devicesList) nodeList.add(h.toJSON());
 		for (ModuSpec m : modulesList) moduleList.add(m.toJSON());
 		for (ModuEdgeSpec e : modEdgesList) edgeList.add(e.toJSON());
 		for (SensorSpec s : sensorsList) sensorList.add(s.toJSON());
 
+		JSONObject metaList = new JSONObject();
+		metaList.put("policy", policy);
+		metaList.put("central", centralNode);
+		metaList.put("granularity", granularity);
+		metaList.put("time", time);
+		
+		obj.put("meta", metaList);
 		obj.put("nodes", nodeList);
 		obj.put("modules", moduleList);
 		obj.put("sensors", sensorList);
 		obj.put("edges", edgeList);
-		obj.put("policy", policy);
-		obj.put("central", centralNode);
-		obj.put("granularity", granularity);
-		obj.put("time", time);
-		
+        
 		try {
 			FileWriter file = new FileWriter(jsonFileName, true);
 			file.write(obj.toJSONString().replaceAll(",", ",\n"));

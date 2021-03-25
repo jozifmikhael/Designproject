@@ -1,8 +1,9 @@
 {
-	"central":"test",
-	"granularity":345,
-	"time":3,
-	"policy":"Profit Aware Policy",
+	"meta":{"central":"cloud",
+			"granularity":55,
+			"time":5,
+			"policy":"Profit Aware Policy"
+			},	
 	"nodes": [
 		{
 			"apower": 87.53,
