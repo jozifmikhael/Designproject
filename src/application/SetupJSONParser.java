@@ -18,6 +18,7 @@ public class SetupJSONParser {
 	private List<DeviceSpec> hosts = new ArrayList<DeviceSpec>();
 	private List<ModuEdgeSpec> edges = new ArrayList<ModuEdgeSpec>();
 	private List<ModuSpec> modules = new ArrayList<ModuSpec>();
+	private List<ActuatorSpec> actuators = new ArrayList<ActuatorSpec>();
 	private int globalID = 0;
 	
 	public DeviceSpec createDevice(String nodeLine) throws NumberFormatException, IOException {
@@ -49,6 +50,23 @@ public class SetupJSONParser {
 		DeviceSpec h = new DeviceSpec(hostname, parentName, insProcessingSpeed, insMemory, insNetworkSpeedUp, insNetworkSpeedDown, insLevel,
 				insCostProcessing, insBusyPower, insIdlePower,transmissionTime);
 		return h;
+	}
+	
+	public ActuatorSpec createActuator(String sensorLine) throws NumberFormatException, IOException  {	
+		
+		String actuName;
+//		String actuUserID;
+//		String actuAppID;
+//		String actuActuatorType;
+		
+		String stParts[] = sensorLine.split(" ");
+		actuName = stParts[0];
+//		actuUserID = stParts[1];
+//		actuAppID = stParts[2];
+//		actuActuatorType = stParts[3];
+			
+		ActuatorSpec a = new ActuatorSpec(actuName/*, actuUserID, actuAppID, actuActuatorType*/);		
+		return a;
 	}
 	
 	public ModuEdgeSpec createModuleEdge(String edgeLine) throws NumberFormatException, IOException {
@@ -98,7 +116,12 @@ public class SetupJSONParser {
 				insFractionalSensitivity);
 		return m;
 	}
-	
+//	class ActuatorSpec {
+//		String name;
+//		String UserID;
+//		String AppID;
+//		String ActuatorType;
+//	}
 	class NodeSpec {
 		String name;
 		String parent;
@@ -152,6 +175,33 @@ public class SetupJSONParser {
 			this.uniformMin = uniformMin;	
 			this.id = getID();	
 			this.type = "sensor";	
+		}	
+	}
+	
+	class ActuatorSpec extends NodeSpec {	
+		String name;
+//		String UserID;
+//		String AppID;
+//		String ActuatorType;
+			
+		@SuppressWarnings("unchecked")	
+		JSONObject toJSON() {	
+			ActuatorSpec actuator = this;	
+			JSONObject obj = new JSONObject();	
+			obj.put("Actuator Name", actuator.name);	
+//			obj.put("User_ID", actuator.UserID);	
+//			obj.put("App_ID", actuator.AppID);	
+//			obj.put("Type", actuator.ActuatorType);	
+			return obj;	
+		}	
+			
+		public ActuatorSpec(String actuatorName/*, String UserID, String AppID, String ActuatorType*/) {	
+			this.name = actuatorName;	
+//			this.UserID = UserID;	
+//			this.AppID = AppID;	
+//			this.ActuatorType = ActuatorType;				
+			this.id = getID();	
+			this.type = "actuator";	
 		}	
 	}
 	
@@ -308,20 +358,23 @@ public class SetupJSONParser {
 	@SuppressWarnings("unchecked")
 	
 	public void writeJSON(String jsonFileName,
-			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList,
+			List<DeviceSpec> devicesList, List<ModuSpec> modulesList, List<ModuEdgeSpec> modEdgesList, List<ActuatorSpec> actuatorsList,
 			int granularity, int time, String policy, String centralNode) {
 		JSONObject obj = new JSONObject();
 		JSONArray nodeList = new JSONArray();
 		JSONArray edgeList = new JSONArray();
 		JSONArray moduleList = new JSONArray();
+		JSONArray actuatorList = new JSONArray();
 		
 		for (DeviceSpec h : devicesList) nodeList.add(h.toJSON());
 		for (ModuSpec m : modulesList) moduleList.add(m.toJSON());
 		for (ModuEdgeSpec e : modEdgesList) edgeList.add(e.toJSON());
+		for (ActuatorSpec a : actuatorsList) actuatorList.add(a.toJSON());
 
 		obj.put("nodes", nodeList);
 		obj.put("modules", moduleList);
 		obj.put("edges", edgeList);
+		obj.put("actuators", actuatorList);
 		obj.put("policy", policy);
 		obj.put("central", centralNode);
 		obj.put("granularity", granularity);

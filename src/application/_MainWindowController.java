@@ -131,6 +131,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	Color sensorColor=Color.PINK;
 	Color transpColor=Color.TRANSPARENT;
 	Color _errorColor=Color.GREEN;
+	Color ActuatorColor=Color.ORANGE;
+	
     GraphicsContext gc;
     SetupJSONParser textfile = new SetupJSONParser();
 	
@@ -158,6 +160,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			data = _n;
 			if(data.type.equals("device")) c = deviceColor;
 			else if(data.type.equals("module")) c = moduleColor;
+			else if(data.type.equals("actuator")) c = ActuatorColor;
 			else c = _errorColor;
 			id = globalID++;
 		}
@@ -212,6 +215,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<String> sensorNameList = new ArrayList<String>();
 	public List<SensorSpec> sensorList = new ArrayList<SensorSpec>();
 	
+	public List<String> actuatorNameList = new ArrayList<String>();
+	public List<ActuatorSpec> actuatorsList = new ArrayList<ActuatorSpec>();
+	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
@@ -232,6 +238,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case DIGIT2 : state=2; break;	 // Select Module Placer
 			case DIGIT3 : state=3; break;	 // Select Edge Placer
 			case DIGIT4 : state=4; break;    // Select Sensor Placer
+			case DIGIT5 : state=5; break;    // Select Actuator Placer
 			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
 			case E 		: System.out.println("E"); break;	 // Edit Object Selected
 			case F5 	: System.out.println("F5"); break;   // Save File
@@ -282,9 +289,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			draggingNode = newNode;
 			draggingLink = new dispLink(linkSrcNode, draggingNode);
 		} else if (state == 4) {
+			
 			if (selNode == null) {
 //				System.out.println("_MainWindowController.java.java: Making new Sensor node...");
 				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				draggingNode = newNode;
+			} else {
+				draggingNode = selNode;
+			}
+		} else if (state == 5) {
+			
+			if (selNode == null) {
+//				System.out.println("_MainWindowController.java.java: Making new Sensor node...");
+				dispNode newNode = new dispNode("New Actuator", ActuatorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
@@ -355,14 +372,22 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			} else if (linkDstNode==null) {
 				System.out.println("_MainWindowController.java: Linker Dst is null");
 			}
-		} else if (state==4) {
+		} else if (state==4) {			
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newSensor = addSensor();
-    			if(newSensor!=null) newSensor.setPos(mEvent);
-    		}
+    			if(newSensor!=null) newSensor.setPos(mEvent);   			
+    		}    		
         	else draggingNode.setPos(mEvent);
-        	draggingNode=null;
-		}
+        	draggingNode=null;        	
+		} else if (state==5) {			
+    		if(dispNodesList.indexOf(draggingNode)<0) {
+    			dispNode newSensor = addActuator();
+    			if(newSensor!=null) newSensor.setPos(mEvent);   			
+    		}    		
+        	else draggingNode.setPos(mEvent);
+        	draggingNode=null;        	
+		}   	  	
+    	
     	redrawNodes();
     }
     
@@ -555,6 +580,34 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    @FXML
+    dispNode addActuator() {
+    	  	try {
+    		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
+    		
+    		Scene scene = new Scene(addNewActuatorLoader.load(),264,133);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		ActuatorInputController actuatorController = addNewActuatorLoader.getController();
+    		stage.setTitle("Add Actuator");
+    		stage.showAndWait();
+    		ActuatorSpec a = actuatorController.getSpec();
+    		if (a==null) return null;
+    		String name = a==null?"Error":a.name;
+    		dispNode newDevice = new dispNode(name, a, xCenter, yCenter, R+R);
+			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
+				actuatorsList.add(a);
+				actuatorNameList.add(name);
+				dispNodesList.add(newDevice);
+			}
+			redrawNodes();
+    		return newDevice;
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
     }
     
     @FXML
@@ -751,7 +804,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	String destFile = createJsonController.jsonDestinationFileName + ".json";
 //    	String destFile = "test7.json";
     	testmethod();
-     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, time, granularity, policy, centralNode);
+     	textfile.writeJSON(destFile, devicesList, modulesList, moduleEdgesList, actuatorsList, time, granularity, policy, centralNode);
      	VRGameFog simObj = new VRGameFog("test7.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
