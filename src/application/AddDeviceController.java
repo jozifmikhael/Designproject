@@ -16,9 +16,12 @@ import org.fog.test.perfeval.TextParser;
 import application.SetupJSONParser.DeviceSpec;
 
 import java.io.IOException;
+import application.SetupJSONParser.LinkSpec;
+
 
 public class AddDeviceController {
 	DeviceSpec h;
+	LinkSpec l;
 	SetupJSONParser textfile = new SetupJSONParser();
 
 	@FXML
@@ -35,7 +38,9 @@ public class AddDeviceController {
 	
 	@FXML
 	private Button saveNode;
-	
+
+	@FXML
+    private TextField upLinkLatency;
 	@FXML
 	private TextField upbw;
 	
@@ -92,8 +97,11 @@ public class AddDeviceController {
 		}
 		h = textfile.createDevice(name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
 		+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
-		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() +  " " + transmissionTime.getText().toString()+" \n");
+		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() +  " " + upLinkLatency.getText().toString()+" \n");
+		
+		l = textfile.createLink(name.getText().toString() + " " + parentName.getText().toString() +  " " +upLinkLatency.getText().toString()+" \n");
 		stage.close();
 	}
 	public DeviceSpec getSpec() {return h;}
+	public LinkSpec getLinkSpec() {return l;}
 }

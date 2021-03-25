@@ -4,7 +4,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <BorderPane prefHeight="316.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddDeviceController">
@@ -34,13 +33,8 @@
                   <Text layoutX="216.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Idle Power:" />
                   <TextField fx:id="parentName" layoutX="291.0" layoutY="16.0" prefHeight="25.0" prefWidth="97.0" text="node1" />
                   <Text layoutX="228.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent:" />
-                  <Text layoutX="211.0" layoutY="216.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensor Parameters:">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                  </Text>
-                  <TextField fx:id="transmissionTime" layoutX="291.0" layoutY="235.0" prefHeight="25.0" prefWidth="97.0" text="0.0" />
-                  <Text layoutX="190.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tranmission Time:" />
+                  <TextField fx:id="upLinkLatency" layoutX="291.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" text="2.0" />
+                  <Text layoutX="206.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Uplink latency:" />
                </children>
             </AnchorPane>
          </children>
