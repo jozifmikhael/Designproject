@@ -107,6 +107,9 @@ public class VRGameFog {
 		application.setUserId(broker.getId());
 		
 		System.out.println("Starting parsing...");
+		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("client");add("DISPLAY");}});
+        List<AppLoop> loops = new ArrayList<AppLoop>(){{add(loop1);}};
+        application.setLoops(loops);
 		JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(jsonFile);
         Object obj = jsonParser.parse(reader);

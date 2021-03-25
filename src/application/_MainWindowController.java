@@ -140,7 +140,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		int id;
 		Color c;
 		NodeSpec data;
-
+		
 		void draw() {
 			gc.setFill(c);
 			gc.fillOval(this.x, this.y, this.sz, this.sz);
@@ -151,11 +151,22 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		void setPos(MouseEvent mEvent) {
 			this.x=mEvent.getX()-0.5*this.sz; this.y=mEvent.getY()-0.5*this.sz;
 			if(data.type.equals("device")) {
-				
+				DeviceSpec d = getDevice(this.data.name);
+				devicesList.remove(d);
+				d.x=this.x;
+				d.y=this.y;
+				d.dispSize=this.sz;
+				devicesList.add(d);
 			}else if(data.type.equals("module")) {
-				
+				ModuSpec m = getModule(this.data.name);
+				devicesList.remove(m);
+				m.x=this.x; m.y=this.y; m.dispSize=this.sz;
+				modulesList.add(m);
 			}else if(data.type.equals("sensor")) {
-				
+				SensorSpec s = getSensor(this.data.name);
+				devicesList.remove(s);
+				s.x=this.x; s.y=this.y; s.dispSize=this.sz;
+				sensorsList.add(s);
 			}else if(data.type.equals("actuator")) {
 				
 			}
@@ -222,7 +233,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<String> selectedModulesList = new ArrayList<String>();
 	
 	public List<String> sensorNameList = new ArrayList<String>();
-	public List<SensorSpec> sensorList = new ArrayList<SensorSpec>();
+	public List<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
 	public List<LinkSpec> linksList = new ArrayList<LinkSpec>();
 	
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
@@ -306,14 +317,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		redrawNodes();
 	}
     
-    public void updateDevicePos(dispNode dispDevice) {
-    	String name = dispDevice.name;    	
-    	DeviceSpec d = getDevice(name);
-		d.x = dispDevice.x;
-		d.y = dispDevice.y;
-		d.size = dispDevice.sz;
-    }
-    
     @FXML
     private void mouseReleaseHandler(MouseEvent mEvent) {
 //    	System.out.println("_MainWindowController.java: MRelease State is " + state);
@@ -328,15 +331,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	} else if (state==2) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newModule = addModule();
-    			if(newModule!=null) {
-    				newModule.setPos(mEvent);
-    				ModuSpec m = getModule(newModule.name);
-    				m.x = newModule.x;
-    				m.y = newModule.y;
-    				m.size = (long) newModule.sz;
-    			}
-    		}
-        	else draggingNode.setPos(mEvent);
+    			if(newModule!=null) newModule.setPos(mEvent);
+    		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
     	} else if (state == 3) {
         	draggingLink=null;
@@ -358,7 +354,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 						selectedModulesList.add(linkSrcNode.name);
 						addEdge();
 					}
-				} else if(srcType.equals("sensor")&&dstType.equals("node")) {
+				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
 					System.out.println("Sensor-Node link detected");
 				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
 			} else if (linkSrcNode==null) {
@@ -369,15 +365,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		} else if (state==4) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newSensor = addSensor();
-    			if(newSensor!=null) {
-    				newSensor.setPos(mEvent);
-    				SensorSpec s = getSensor(newSensor.name);
-    				s.x = newSensor.x;
-    				s.y = newSensor.y;
-    				s.size = (long) newSensor.sz;
-    			}
-    		}
-        	else draggingNode.setPos(mEvent);
+    			if(newSensor!=null) newSensor.setPos(mEvent);
+    		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
 		}
     	redrawNodes();
@@ -390,7 +379,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     public SensorSpec getSensor(String _name) {
     	if (_name==null) return null;
-    	for (SensorSpec s : sensorList) if (s.name.equals(_name)) return s;
+    	for (SensorSpec s : sensorsList) if (s.name.equals(_name)) return s;
 		return null;
     }
     public DeviceSpec getDevice(String _name) {
@@ -407,9 +396,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
     	if(draggingNode != null){
-    		draggingNode.x = mEvent.getX()-R;
-    		draggingNode.y = mEvent.getY()-R;
-    		redrawNodes();
+			draggingNode.x = mEvent.getX()-R;
+			draggingNode.y = mEvent.getY()-R;
+			redrawNodes();
     	}
     }
     
@@ -435,7 +424,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		for(dispNode node : dispNodesList) node.draw();
 		if (draggingNode!=null) draggingNode.draw();
 	}
-    String selectedJSON="test7.json";
+    String selectedJSON="test9.json";
     String policy = "Edgewards";
     int simTime = 1000;
     int simGranu = 10;
@@ -458,7 +447,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
     	String centralNode = getCentralNode();
-     	textfile.writeJSON(selectedJSON, devicesList, modulesList, moduleEdgesList, sensorList, linksList, time, granularity, policy, centralNode);
+     	textfile.writeJSON(selectedJSON, devicesList, modulesList, moduleEdgesList, sensorsList, linksList, time, granularity, policy, centralNode);
 	}
 	
 	@FXML
@@ -603,7 +592,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		String name = s==null?"Error":s.name;
     		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
 			if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
-				sensorList.add(s);
+				sensorsList.add(s);
 				sensorNameList.add(name);
 				dispNodesList.add(newDevice);
 			}
@@ -729,7 +718,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void confirmPolicy(ActionEvent event) {
-    	try {	
+    	try {
     		BorderPane root = FXMLLoader.load(getClass().getResource("PolicySelectionBox.fxml"));
     		Scene scene = new Scene(root,276,200);
     		Stage stage = new Stage();
@@ -780,7 +769,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //    	writeJSON();
 //    	testmethod();
     	System.out.println(selectedJSON);
-     	VRGameFog simObj = new VRGameFog("test7.json");
+     	VRGameFog simObj = new VRGameFog(selectedJSON);
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

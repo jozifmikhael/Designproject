@@ -272,9 +272,9 @@ public class Controller extends SimEntity{
 		System.out.println("=========================================");
 		System.out.println("TUPLE CPU EXECUTION DELAY");
 		System.out.println("=========================================");
-		for(String tupleTyple : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
-			System.out.println(tupleTyple + " ---> "+TimeKeeper.getInstance().getEmitTimes());
-		}
+//		for(String tupleTyple : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
+//			System.out.println(tupleTyple + " ---> "+TimeKeeper.getInstance().getEmitTimes());
+//		}
 		
 		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
 			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));

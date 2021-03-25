@@ -1,7 +1,7 @@
 {
 	"meta":{"central":"cloud",
-			"granularity":55,
-			"time":5,
+			"granularity":10,
+			"time":1000,
 			"policy":"Profit Aware Policy"
 			},	
 	"nodes": [

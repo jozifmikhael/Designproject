@@ -146,7 +146,7 @@ public class SetupJSONParser {
 		int id;
 		double x;
 		double y;
-		double size;
+		double dispSize;
 	}
 	
 	class LinkSpec extends NodeSpec{
@@ -206,7 +206,7 @@ public class SetupJSONParser {
 			obj.put("Size", sensor.uniformMin);	
 			obj.put("x_cord", sensor.x);
 			obj.put("y_cord", sensor.y);
-			obj.put("radius", sensor.size);
+			obj.put("radius", sensor.dispSize);
 			return obj;	
 		}	
 			
@@ -251,7 +251,7 @@ public class SetupJSONParser {
 			obj.put("latency", o.latency);
 			obj.put("x_cord", o.x);
 			obj.put("y_cord", o.y);
-			obj.put("radius", o.size);
+			obj.put("radius", o.dispSize);
 			return obj;
 		}
 		
