@@ -34,7 +34,6 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			_MainWindowController controller = (_MainWindowController)loader.getController();
 			controller.setupListeners(primaryStage, scene);
-			
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Policy Placement Application");
 			primaryStage.show();

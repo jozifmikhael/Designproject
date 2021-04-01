@@ -122,7 +122,7 @@ public class VRGameFog {
         
         JSONArray modArr = (JSONArray) jsonObject.get("modules");	
         modArr.forEach(n -> parseModuleObject((JSONObject) n, application));	
-        JSONArray edgeArr = (JSONArray) jsonObject.get("Edges");	
+        JSONArray edgeArr = (JSONArray) jsonObject.get("edges");	
         edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));	
     	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");	
 		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));	
@@ -153,7 +153,6 @@ public class VRGameFog {
         long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
         long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
         long nodeMips = Long.parseUnsignedLong(node.get("mips").toString());
-        double transmissionTime = (double) node.get("transmission_time");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
 		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
@@ -229,7 +228,7 @@ public class VRGameFog {
 		int ram = Integer.parseUnsignedInt(module.get("ram").toString());
 		int mips = Integer.parseUnsignedInt(module.get("mips").toString());
 		long size = Long.parseUnsignedLong(module.get("size").toString());
-		long bw = Long.parseUnsignedLong(module.get("bw").toString());
+		long bw = Long.parseUnsignedLong(module.get("bandwidth").toString());
 		
 		application.addAppModule(name, ram, mips, size, bw);
 		

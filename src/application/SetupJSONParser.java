@@ -104,8 +104,9 @@ public class SetupJSONParser {
 		uniformMax = Double.parseDouble(stParts[6]);
 		uniformMin = Double.parseDouble(stParts[7]);
 		String distribution = stParts[8];
+		sensorLatency = Double.parseDouble(stParts[9]);
 		
-		SensorSpec s = new SensorSpec(sensorName, distribution, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin);
+		SensorSpec s = new SensorSpec(sensorName, nodeName, distribution, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin, sensorLatency);
 		
 		return s;
 	}
@@ -147,6 +148,10 @@ public class SetupJSONParser {
 		double x;
 		double y;
 		double dispSize;
+		
+		public void setParent(String parent) {
+			this.parent = parent;
+		}
 	}
 	
 	class LinkSpec extends NodeSpec{
@@ -191,6 +196,7 @@ public class SetupJSONParser {
 		double normalStdDev;	
 		double uniformMax;	
 		double uniformMin;	
+		double latency;
 			
 		@SuppressWarnings("unchecked")	
 		JSONObject toJSON() {	
@@ -209,9 +215,11 @@ public class SetupJSONParser {
 			return obj;	
 		}	
 			
-		public SensorSpec(String sensorName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
-				double uniformMin) {	
+		
+		public SensorSpec(String sensorName, String nodeName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
+				double uniformMin, double latency) {	
 			this.name = sensorName;	
+			this.parent = nodeName;
 			this.distribution = distribution;	
 			this.deterministicValue = deterministicValue;	
 			this.normalMean = normalMean;	
@@ -219,6 +227,7 @@ public class SetupJSONParser {
 			this.uniformMax = uniformMax;	
 			this.uniformMin = uniformMin;	
 			this.id = getID();	
+			this.latency = latency;
 			this.type = "sensor";	
 		}	
 	}
@@ -254,6 +263,9 @@ public class SetupJSONParser {
 			return obj;
 		}
 		
+		public void setParent(String newParentName) {
+			this.parent = newParentName;
+		}		
 		
 		public String toString() {
             String str = this.type + " ID: " + this.id+ "\nNode Name: " + this.name + "\nNode Parent Name:  " + this.parent + "\nUp Bandwidth: " 
@@ -310,6 +322,10 @@ public class SetupJSONParser {
 			return obj;
 		}
 		
+		public void setNodeName(String nodeName) {
+			this.nodeName = nodeName;
+		}
+		
 		public String toString() {
 			String str = this.type+" Node: " + this.nodeName + "\nModule: " + this.name + "\nRAM: " + this.modRam + "\nBW: " +this.bandwidth + "\nIn Tuple: " 
 		+ this.inTuple + "OutTuple: " + this.outTuple + "Size: " + this.size + "MIPs: " + this.MIPS + "Sens: "+ this.fractionalSensitivity + "\n";
@@ -334,7 +350,6 @@ public class SetupJSONParser {
 	}
 	
 	class ModuEdgeSpec extends NodeSpec {
-		String parent;
 		String child;
 		String tupleType;
 		double periodicity;
@@ -356,6 +371,10 @@ public class SetupJSONParser {
 			obj.put("edgeType", edge.edgeType);
 			obj.put("direction", edge.direction);
 			return obj;
+		}
+		
+		public void setChild(String child) {
+			this.child = child;
 		}
 		
 		public String toString() {

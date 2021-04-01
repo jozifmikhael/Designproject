@@ -90,10 +90,28 @@ public class AddModuleController {
 		stage.close();
 	}
 	
-	void populateList(List<String> str_list) {
+	public void populateList(List<String> str_list) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		items.addAll(str_list);
 		nodeBox.setItems(items);
 	}
+	
+	public void initialize() {
+		moduleName.setText("client");
+		ram.setText("10");
+		bandwidth.setText("100");
+		size.setText("100");
+		MIPS.setText("100");
+	}
+	
+	public void initializeEdit(ModuSpec module) {
+		nodeBox.getSelectionModel().select(module.nodeName);
+		moduleName.setText(module.name);
+		ram.setText(String.valueOf(module.modRam));
+		bandwidth.setText(String.valueOf(module.bandwidth));
+		size.setText(String.valueOf(module.size));
+		MIPS.setText(String.valueOf(module.MIPS));
+	}
+	
 	public ModuSpec getSpec() {return m;}
 }

@@ -41,6 +41,7 @@ public class AddDeviceController {
 
 	@FXML
     private TextField upLinkLatency;
+	
 	@FXML
 	private TextField upbw;
 	
@@ -58,9 +59,6 @@ public class AddDeviceController {
 	
 	@FXML
 	private TextField idlePower;
-	
-	@FXML
-    private TextField transmissionTime;
 	
 	@FXML
 	void saveNodeHandler(ActionEvent event) throws NumberFormatException, IOException {
@@ -95,6 +93,9 @@ public class AddDeviceController {
 		if (idlePower.getText().trim().isEmpty()) {
 			idlePower.setText("0");
 		}
+		if (upLinkLatency.getText().trim().isEmpty()) {
+			upLinkLatency.setText("0");
+		}
 		h = textfile.createDevice(name.getText().toString() + " " + mips.getText() + " " + ram.getText() + " " + upbw.getText()
 		+ " " + downbw.getText() + " " + nodelvl.getText() + " " + ratePerMIPS.getText() + " "
 		+ busyPower.getText() + " " + idlePower.getText() + " " + parentName.getText().toString() +  " " + upLinkLatency.getText().toString()+" \n");
@@ -102,6 +103,39 @@ public class AddDeviceController {
 		l = textfile.createLink(name.getText().toString() + " " + parentName.getText().toString() +  " " +upLinkLatency.getText().toString()+" \n");
 		stage.close();
 	}
+	
+	public void initializeEdit(DeviceSpec device) {
+		name.setText(device.name);
+		parentName.setText(device.parent);
+		mips.setText(String.valueOf(device.mips));
+		ram.setText(String.valueOf(device.ram));
+		upLinkLatency.setText(String.valueOf(device.ram));
+		upbw.setText(String.valueOf(device.upbw));
+		downbw.setText(String.valueOf(device.downbw));
+		nodelvl.setText(String.valueOf(device.level));
+		ratePerMIPS.setText(String.valueOf(device.rate));
+		busyPower.setText(String.valueOf(device.apower));
+		idlePower.setText(String.valueOf(device.ipower));
+	}
+	
+	public void firstNodeSetup() {
+		parentName.setText("defaultNode");
+	}
+	
+	public void initialize() {
+		name.setText("node1");
+		parentName.setText("node1");
+		mips.setText("1500");
+		ram.setText("10240");
+		upLinkLatency.setText("2.0");
+		upbw.setText("850");
+		downbw.setText("850");
+		nodelvl.setText("1");
+		ratePerMIPS.setText("50.0");
+		busyPower.setText("3.0");
+		idlePower.setText("1.0");
+	}
+	
 	public DeviceSpec getSpec() {return h;}
 	public LinkSpec getLinkSpec() {return l;}
 }

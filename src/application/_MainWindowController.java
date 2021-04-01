@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.fog.entities.Sensor;
 import org.fog.test.perfeval.VRGameFog;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -141,6 +142,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		Color c;
 		NodeSpec data;
 		
+		void drawSelected() {
+			gc.setLineWidth(10);
+			gc.setFill(c);
+			gc.fillOval(this.x, this.y, this.sz, this.sz);
+			if(c!=transpColor) gc.strokeOval(this.x, this.y, this.sz, this.sz);
+			gc.setFill(Color.BLACK);
+			gc.setLineWidth(1.0);
+			gc.strokeText(this.name, this.x+0.5*this.sz, this.y+0.5*this.sz+0.4*fontSize);
+		}
+		
 		void draw() {
 			gc.setFill(c);
 			gc.fillOval(this.x, this.y, this.sz, this.sz);
@@ -196,6 +207,30 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	class dispLink{
 		dispNode src, dst;
+		
+		void drawSelected(){
+			double x1=0; double y1=0;
+			double x2=0; double y2=0;
+			if(src!=null) {x1=src.x+0.5*src.sz; y1= src.y+0.5*src.sz;}
+			if(dst!=null) {x2=dst.x+0.5*dst.sz; y2= dst.y+0.5*dst.sz;}
+			if(src!=null&&dst!=null) {
+				gc.setStroke(Color.AQUA);
+				gc.beginPath();
+				gc.setLineWidth(10);
+		    	gc.moveTo(x1+2, y1-2);
+		    	gc.lineTo(x1+2, y1+2);
+				gc.lineTo(x2-2, y2+2);
+				gc.lineTo(x2-2, y2-2);
+				gc.lineTo(x1+2, y1-2);
+				gc.setFill(Color.AQUA);
+				gc.fill();
+				gc.setFill(Color.BLACK);
+				gc.setLineWidth(1.0);
+				gc.stroke();
+				gc.setStroke(Color.BLACK);
+			}
+		}
+		
 		void draw() {
 			double x1=0; double y1=0;
 			double x2=0; double y2=0;
@@ -203,8 +238,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			if(dst!=null) {x2=dst.x+0.5*dst.sz; y2= dst.y+0.5*dst.sz;}
 			if(src!=null&&dst!=null) {
 				gc.beginPath();
-		    	gc.moveTo(x1, y1);
-				gc.lineTo(x2, y2);
+				gc.moveTo(x1+2, y1-2);
+		    	gc.lineTo(x1+2, y1+2);
+				gc.lineTo(x2-2, y2+2);
+				gc.lineTo(x2-2, y2-2);
+				gc.lineTo(x1+2, y1-2);
+				gc.setFill(Color.BLACK);
+				gc.fill();
 				gc.stroke();
 			}
 		}
@@ -224,6 +264,21 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		public dispLink(ModuSpec _src, ModuSpec _dst) {
 			for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
 	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
+		}
+		dispLink(SensorSpec _src, DeviceSpec _dst){
+			for (dispNode dn : dispNodesList) if (dn.name.matches(_src.name)) this.src = dn;
+			for (dispNode dn : dispNodesList) if (dn.name.matches(_dst.parent)) this.dst = dn;
+		}
+		dispLink(DeviceSpec _src, SensorSpec _dst){
+			for (dispNode dn : dispNodesList) if (dn.name.matches(_src.name)) this.src = dn;
+			for (dispNode dn : dispNodesList) if (dn.name.matches(_dst.parent)) this.dst = dn;
+		}
+		public void setSrc(dispNode node) {
+			this.src = node;
+		}
+		
+		public void setDst(dispNode node) {
+			this.dst = node;
 		}
 	}
 	
@@ -278,41 +333,56 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	dispNode draggingNode = null;
 	dispLink draggingLink = null;
 	dispNode linkSrcNode = null;
+	dispNode selectedNode = null;
+	dispLink selectedLink = null;
     @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
 //    	System.out.println("_MainWindowController.java: MClick State is " + state);
+    	selectedLink = getLinkOnClick(mEvent);
+    	if(selectedLink != null)System.out.println("not null");
+    	//TODO
+    	redrawNodes();
 		dispNode selNode = getNodeOnClick(mEvent);
+		if(selectedLink != null && selNode != null) selectedLink = null;
 		if (state == 0) {
 			draggingNode = selNode;
+			selectedNode = selNode;
 		} else if (state == 1) {
 			if (selNode == null) {
 //				System.out.println("_MainWindowController.java.java: Making new device node...");
 				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
+				selectedNode = newNode;
 			} else {
 				draggingNode = selNode;
+				selectedNode = selNode;
 			}
 		} else if (state == 2) {
 			if (selNode == null) {
 //				System.out.println("_MainWindowController.java.java: Making new module node...");
 				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
+				selectedNode = newNode;
 			} else {
 				draggingNode = selNode;
+				selectedNode = selNode;
 			}
 		} else if (state == 3) {
 //			System.out.println("_MainWindowController.java.java: Making link...");
 			linkSrcNode = selNode;
 			dispNode newNode = new dispNode("", transpColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 			draggingNode = newNode;
+			selectedNode = newNode;
 			draggingLink = new dispLink(linkSrcNode, draggingNode);
 		} else if (state == 4) {
 			if (selNode == null) {
 //				System.out.println("_MainWindowController.java.java: Making new Sensor node...");
 				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
 				draggingNode = newNode;
+				selectedNode = newNode;
 			} else {
 				draggingNode = selNode;
+				selectedNode = selNode;
 			}
 		}
 		redrawNodes();
@@ -417,12 +487,37 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		return null;
 	}
 	
+	private dispLink getLinkOnClick(MouseEvent mEvent) {
+		//TODO
+		if(dispLinksList.isEmpty()) return null;
+		for(dispLink l : dispLinksList) {
+			if(l.dst == null || l.src == null) continue;
+			if((mEvent.getX() <= ((l.src.x) + 5) && mEvent.getX() >= ((l.dst.x) - 5) && mEvent.getY() <= ((l.src.y) + 5) && mEvent.getY() >= ((l.dst.y) - 5))
+				||(mEvent.getX() <= ((l.dst.x) + 5) && mEvent.getX() >= ((l.src.x) - 5) && mEvent.getY() <= ((l.dst.y) + 5) && mEvent.getY() >= ((l.src.y) - 5))
+				||(mEvent.getX() <= ((l.dst.x) + 5) && mEvent.getX() >= ((l.src.x) - 5) && mEvent.getY() <= ((l.src.y) + 5) && mEvent.getY() >= ((l.dst.y) - 5))
+				||(mEvent.getX() <= ((l.src.x) + 5) && mEvent.getX() >= ((l.dst.x) - 5) && mEvent.getY() <= ((l.dst.y) + 5) && mEvent.getY() >= ((l.src.y) - 5))) {
+				return l;
+			} 
+		}
+		return null;
+	}
+	
     private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for(dispLink link : dispLinksList) link.draw();
+		for(dispLink link : dispLinksList) {
+			if(selectedLink != null && selectedLink.equals(link)) {
+				link.drawSelected();
+			}
+			link.draw();
+		}
 		if (draggingLink!=null) draggingLink.draw();
-		for(dispNode node : dispNodesList) node.draw();
+		for(dispNode node : dispNodesList) {
+			if(selectedNode != null && selectedNode.equals(node)) {
+				node.drawSelected();
+			}
+			node.draw();
+		}
 		if (draggingNode!=null) draggingNode.draw();
 	}
     String selectedJSON="test9.json";
@@ -613,6 +708,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
+    		sensorController.initialize();
     		sensorController.populateList(deviceNamesList);
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
@@ -641,6 +737,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddDeviceController controller = addNewNodeLoader.getController();
+    		controller.initialize();
+    		if(devicesList.isEmpty()) controller.firstNodeSetup();
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
@@ -672,6 +770,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
+    		controller.initialize();
     		controller.populateList(deviceNamesList);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
@@ -720,12 +819,312 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void deleteHandler(ActionEvent event) {
-    	
+    	if(!(selectedNode == null)) {
+    		if(selectedNode.data.type.equals("device")) {
+    			for(String nodeName: deviceNamesList) {
+    		        if(selectedNode.name.equals(nodeName)) {
+    		            deviceNamesList.remove(nodeName);
+    		            break;
+    		        }
+    		    }
+    			for(DeviceSpec node : devicesList) {
+    		        if(selectedNode.name.equals(node.name)) {
+    		            devicesList.remove(node);
+    		            break;
+    		        }
+    		    }
+    			for(ModuSpec module : modulesList) {
+    		        if(selectedNode.name.equals(module.nodeName)) {
+    		        	module.setNodeName("Module_default_node");
+    		        }
+    		    }
+    		    for(LinkSpec links: linksList) {
+    		        if(selectedNode.name.equals(links.dstID)||selectedNode.name.equals(links.srcID)) {
+    		            linksList.remove(links);
+    		        }
+    		    }
+    		    for(SensorSpec sensor : sensorsList ) {
+    		        if(selectedNode.name.equals(sensor.parent)) {
+    		            sensor.setParent("0");
+    		        }
+    		    }
+    		    for(dispLink link: dispLinksList) {
+    		        if(selectedNode.equals(link.src) || selectedNode.equals(link.dst)) {
+    		            dispLinksList.remove(link);
+    		        }
+    		    }
+    		    dispNodesList.remove(selectedNode);
+    		    selectedNode = null;
+    	        redrawNodes();
+    		}
+    		else if(selectedNode.data.type.equals("module")) {
+    			for(String m: moduleNamesList) {
+    				if(selectedNode.name.equals(m)) {
+    					moduleNamesList.remove(m);
+    				}
+    			}
+    			for(String m: selectedModulesList) {
+    				if(selectedNode.name.equals(m)) {
+    					selectedModulesList.remove(m);
+    				}
+    			}
+    			for(ModuEdgeSpec edge: moduleEdgesList) {
+    				if(selectedNode.name.equals(edge.parent) || selectedNode.name.equals(edge.child)) {
+    					moduleEdgesList.remove(edge);
+    				}
+    			}
+    			for(ModuSpec module: modulesList) {
+    				if(selectedNode.name.equals(module.name)) {
+    					modulesList.remove(module);
+    				}
+    			}
+    			for(dispLink link: dispLinksList) {
+    		        if(selectedNode.equals(link.src) || selectedNode.equals(link.dst)) {
+    		            dispLinksList.remove(link);
+    		        }
+    		    }
+    			dispNodesList.remove(selectedNode);
+    		    selectedNode = null;
+    	        redrawNodes();
+    		}
+    		else if(selectedNode.data.type.equals("sensor")) {
+    			for(String sensorName: sensorNameList) {
+    				if(selectedNode.name.equals(sensorName)) {
+    					sensorNameList.remove(sensorName);
+    				}
+    			}
+    			for(LinkSpec links: linksList) {
+    		        if(selectedNode.name.equals(links.dstID)) {
+    		            linksList.remove(links);
+    		            break;
+    		        }
+    		    }
+    			for(SensorSpec s: sensorsList) {
+    				if(selectedNode.name.equals(s.name)) {
+    					sensorsList.remove(s);
+    				}
+    			}
+    			for(dispLink displayLink: dispLinksList) {
+    				if(selectedNode.equals(displayLink.dst)) {
+    					dispLinksList.remove(displayLink);
+    					break;
+    				}
+    			}
+    			dispNodesList.remove(selectedNode);
+    		    selectedNode = null;
+    	        redrawNodes();
+    		}
+    		else if(selectedNode.data.type.equals("acutator")) {
+    			//TODO Actuators
+    		}
+    	}
     }
     
     @FXML
-    void editHandler(ActionEvent event) {
-    	
+    dispNode editHandler(ActionEvent event) {
+    	if(selectedNode != null) {
+    		if(selectedNode.data.type.equals("device")) {
+    			for(DeviceSpec device: devicesList) {
+    				if(device.name.equals(selectedNode.name)) {
+    					try {
+    	    	    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
+    	    	    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
+    	    	    		Stage stage = new Stage();
+    	    	    		stage.setScene(scene);
+    	    	    		AddDeviceController controller = addNewNodeLoader.getController();
+    	    	    		controller.initializeEdit(device);
+    	    	    		stage.setTitle("Add Device Node");
+    	    	    		stage.showAndWait();
+    	    	    		DeviceSpec d = controller.getSpec();
+    	    	    		LinkSpec l = controller.getLinkSpec();
+    	    	    		boolean exists = false;
+    	    	    		if (d==null) return null;
+    	    	    		if(!d.parent.equals("defaultNode")) {
+    	    	    			for(DeviceSpec parentDevice: devicesList) {
+    	    	    				if(d.parent.equals(parentDevice.name)) {
+    	    	    					exists = true;
+    	    	    					break;
+    	    	    				}
+    	    	    			}
+    	    	    			d.setParent("defaultNode");
+    	    	    		}
+    	    	    		String name = d==null?"Error":d.name;
+    	    	    		dispNode newDevice = new dispNode(name, d, selectedNode.x, selectedNode.y, R+R);
+    	    	    		
+    	    	    		for(DeviceSpec ds: devicesList) {
+    	    	    			if(ds.parent.equals(device.name)) {
+    	    	    				ds.setParent(d.name);
+    	    	    			}
+    	    	    		}
+    	    	    		
+    	    	    		for(ModuSpec m: modulesList) {
+    	    	    			if(m.nodeName.equals(selectedNode.name)) {
+    	    	    				m.setNodeName(d.name);
+    	    	    			}
+    	    	    		}
+    	    	    		
+    	    	    		for(String deviceName : deviceNamesList) {
+    	    	    			if(device.name.equals(deviceName)) {
+    	    	    				deviceNamesList.remove(deviceName);
+    	    	    				break;
+    	    	    			}
+    	    	    		}
+    	    	    		
+    	    	    		int position;
+    	    				for(dispLink dispLink: dispLinksList) {
+    	    					position = dispLinksList.indexOf(dispLink);
+    	    					if(dispLink.src.equals(selectedNode)) {
+    	    						dispLink.setSrc(newDevice);
+    	    						dispLinksList.set(position, dispLink);
+    	    					}
+    	    					if(dispLink.dst.equals(selectedNode)) {
+    	    						dispLink.setDst(newDevice);
+    	    						dispLinksList.set(position, dispLink);
+    	    					}
+    	    				}
+    	    	    		dispNodesList.remove(selectedNode);
+    	    	    		
+    	    	    		for(LinkSpec link: linksList) {
+    	    	    			if(device.name.equals(link.name) && device.parent.equals(link.parent)) {
+    	    	    				linksList.remove(link);
+    	    	    				break;
+    	    	    			}
+    	    	    		}
+    	    	    		
+    	    	    		devicesList.remove(device);
+    	    				if (name != "Error" && deviceNamesList.indexOf(name) < 0) {
+    	    					devicesList.add(d);
+    	    					linksList.add(l);
+    	    					deviceNamesList.add(name);
+    	    					dispNodesList.add(newDevice);
+    	    				}
+    	    				selectedNode = null;
+    	    				redrawNodes();
+    	    	    		return newDevice;
+    	    	    	} catch(Exception e) {
+    	    	    		e.printStackTrace();
+    	    	    		return null;
+    	    	    	}
+    				}
+    			}
+    		}
+    		else if(selectedNode.data.type.equals("module")) {
+    			for(ModuSpec module : modulesList) {
+    				if(selectedNode.name.equals(module.name)) {
+    					try {
+    			    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
+    			    		Scene scene = new Scene(dataFXML.load(),414,346);
+    			    		Stage stage = new Stage();
+    			    		stage.setScene(scene);
+    			    		AddModuleController controller = dataFXML.getController();
+    			    		controller.initializeEdit(module);
+    			    		controller.populateList(deviceNamesList);
+    			    		stage.setTitle("Add Module");
+    			    		stage.showAndWait();
+    			    		ModuSpec m = controller.getSpec();
+    			    		if (m==null) return null;
+    			    		String name = m.name==null?"Error":m.name;
+    			    		dispNode newMod = new dispNode(name, m, selectedNode.x, selectedNode.y, R+R);
+    			    		
+    			    		for(String moduleName: moduleNamesList) {
+    			    			if(moduleName.equals(selectedNode.name)) {
+    			    				moduleNamesList.remove(moduleName);
+    			    				break;
+    			    			}
+    			    		}
+    			    		
+    			    		for(ModuEdgeSpec mes: moduleEdgesList) {
+    			    			if(mes.parent.equals(selectedNode.name)) {
+    			    				mes.setParent(m.name);
+    			    			}
+    			    			if(mes.child.equals(selectedNode.name)) {
+    			    				mes.setChild(m.name);
+    			    			}
+    			    		}
+    			    		
+    	    	    		for(String moduleName : selectedModulesList) {
+    	        				if(module.name.equals(moduleName)) {
+    	        					selectedModulesList .remove(moduleName);
+    	        					break;
+    	        				}
+    	        			}
+    	    	    		
+    			    		modulesList.remove(module);
+    						if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
+    							modulesList.add(m);
+    							moduleNamesList.add(name);
+    							dispNodesList.add(newMod);
+    						}
+    						selectedNode = null;
+    			    		redrawNodes();
+    			    		return newMod;
+    			    	} catch(Exception e) {
+    			    		e.printStackTrace();
+    			    		return null;
+    			    	}
+    				}
+    			}
+    		}
+    		else if(selectedNode.data.type.equals("sensor")) {
+    			for(SensorSpec sensor: sensorsList) {
+    				if(selectedNode.name.equals(sensor.name)) {
+    			    	try {
+    			    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
+    			    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
+    			    		Stage stage = new Stage();
+    			    		stage.setScene(scene);
+    			    		AddSensorController sensorController = addNewSensorLoader.getController();
+    			    		sensorController.initializeEdit(sensor);
+    			    		sensorController.populateList(deviceNamesList);
+    			    		stage.setTitle("Add Sensor");
+    			    		stage.showAndWait();
+    			    		SensorSpec s = sensorController.getSpec();
+    			    		if (s==null) return null;
+    			    		String name = s==null?"Error":s.name;
+    			    		dispNode newDevice = new dispNode(name, s, selectedNode.x, selectedNode.y, R+R);
+    			    		
+    			    		for(String sensorName : sensorNameList) {
+    			    			if(sensorName.equals(sensor.name)) {
+    			    				sensorNameList.remove(sensorName);
+    			    				break;
+    			    			}
+    			    		}
+    			    		
+    			    		for(LinkSpec link: linksList) {
+    			    			if(link.dstID.equals(sensor.name)) {
+    			    				linksList.remove(link);
+    			    				break;
+    			    			}
+    			    		}
+    			    		
+    			    		for(dispLink displayLink: dispLinksList) {
+    			    			if(selectedNode.equals(displayLink.dst)) {
+    			    				dispLinksList.remove(displayLink);
+    			    				break;
+    			    			}
+    			    		}
+    			    		
+    			    		sensorsList.remove(sensor);
+    						if (name != "Error" && sensorNameList.indexOf(name) < 0) {
+    							sensorsList.add(s);
+    							sensorNameList.add(name);
+    							dispNodesList.add(newDevice);
+    						}
+    						selectedNode = null;
+    						redrawNodes();
+    			    		return newDevice;
+    			    	} catch(Exception e) {
+    			    		e.printStackTrace();
+    			    		return null;
+    			    	}
+    				}
+    			}
+    		}
+    		else if(selectedNode.data.type.equals("acutator")) {
+    			//TODO Actuators
+    		}
+    	}
+    	return null;
     }
     
     @FXML
@@ -798,7 +1197,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	writeJSON();
     	testmethod();
     	System.out.println(selectedJSON);
-     	VRGameFog simObj = new VRGameFog(selectedJSON);
+     	VRGameFog simObj = new VRGameFog("test10.json");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

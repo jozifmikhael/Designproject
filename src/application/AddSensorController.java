@@ -70,7 +70,7 @@ public class AddSensorController {
 		min.setText("0.0");
 		s = textfile.createSensor(nodeBox.getSelectionModel().getSelectedItem() + " " + sensorLatency.getText() + " " + sensorName.getText().toString() 
 				+ " " + DeterministicValue.getText() + " " + mean.getText() + " " + stdDev.getText() + " " + max.getText() + " " + min.getText() 
-				+ " " + "Deterministic");
+				+ " " + "Deterministic" + " " + sensorLatency.getText().toString());
 		stage.close();
 	}
 	
@@ -92,7 +92,7 @@ public class AddSensorController {
 		min.setText("0.0");
 		s = textfile.createSensor(nodeBox.getSelectionModel().getSelectedItem() + " " + sensorLatency.getText() + " " + sensorName.getText().toString() 
 				+ " " + DeterministicValue.getText() + " " + mean.getText() + " " + stdDev.getText() + " " + max.getText() + " " + min.getText() 
-				+ " " + "Normal");
+				+ " " + "Normal" + " " + sensorLatency.getText().toString());
 		stage.close();
 	}
 	
@@ -114,14 +114,35 @@ public class AddSensorController {
 		stdDev.setText("0.0");
 		s = textfile.createSensor(nodeBox.getSelectionModel().getSelectedItem() + " " + sensorLatency.getText() + " " + sensorName.getText().toString() 
 				+ " " + DeterministicValue.getText() + " " + mean.getText() + " " + stdDev.getText() + " " + max.getText() + " " + min.getText() 
-				+ " " + "Uniform");
+				+ " " + "Uniform" + " " + sensorLatency.getText().toString());
 		stage.close();
 	}
 	
-	void populateList(List<String> str_list) {
+	public void populateList(List<String> str_list) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		items.addAll(str_list);
 		nodeBox.setItems(items);
+	}
+	
+	public void initialize() {
+		sensorLatency.setText("6.0");
+		sensorName.setText("sensor1");
+		DeterministicValue.setText("5.1");
+		mean.setText("5.0");
+		stdDev.setText("1.0");
+		max.setText("5.0");
+		min.setText("1.0");
+	}
+	
+	public void initializeEdit(SensorSpec sensor) {
+		nodeBox.getSelectionModel().select(sensor.parent);
+		sensorLatency.setText(String.valueOf(sensor.latency));
+		sensorName.setText(sensor.name);
+		DeterministicValue.setText(String.valueOf(sensor.deterministicValue));
+		mean.setText(String.valueOf(sensor.normalMean));
+		stdDev.setText(String.valueOf(sensor.normalStdDev));
+		max.setText(String.valueOf(sensor.uniformMax));
+		min.setText(String.valueOf(sensor.uniformMin));
 	}
   	
 	public SensorSpec getSpec() {return s;}

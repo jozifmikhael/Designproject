@@ -59,9 +59,9 @@
                   <Text layoutX="40.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Node:" />
                   <ChoiceBox fx:id="nodeBox" layoutX="226.0" layoutY="18.0" prefWidth="150.0" />
                   <Text layoutX="40.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latency:" />
-                  <TextField fx:id="sensorLatency" layoutX="227.0" layoutY="63.0" text="6.0" />
+                  <TextField fx:id="sensorLatency" layoutX="227.0" layoutY="63.0" />
                   <Text layoutX="40.0" layoutY="125.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensor Name:" />
-                  <TextField fx:id="sensorName" layoutX="227.0" layoutY="108.0" text="sensor1" />
+                  <TextField fx:id="sensorName" layoutX="227.0" layoutY="108.0" />
                </children></AnchorPane>
          </children>
       </AnchorPane>
