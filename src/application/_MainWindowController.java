@@ -231,13 +231,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		
 		void draw() {
 			gc.setFill(c);
-			gc.fillOval(this.x, this.y, this.sz*zoomFactor, this.sz*zoomFactor);
-			if(c!=transpColor) gc.strokeOval(this.x, this.y, this.sz*zoomFactor, this.sz*zoomFactor);
+			gc.fillOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
+			if(c!=transpColor) gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
 			gc.setFill(Color.BLACK);
-			gc.strokeText(this.name, this.x+(zoomFactor*0.5*this.sz), this.y+(zoomFactor*0.5*this.sz)+0.4*fontSize);
+			gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
 		}
 		void setPos(MouseEvent mEvent) {
-			this.x=mEvent.getX()-0.5*this.sz; this.y=mEvent.getY()-0.5*this.sz;
+			this.x=mEvent.getX(); this.y=mEvent.getY();
 			if(data.type.equals("device")) {
 				DeviceSpec d = getDevice(this.data.name);
 				devicesList.remove(d);
@@ -292,8 +292,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		void draw() {
 			double x1=0; double y1=0;
 			double x2=0; double y2=0;
-			if(src!=null) {x1=src.x+0.5*src.sz; y1= src.y+0.5*src.sz;}
-			if(dst!=null) {x2=dst.x+0.5*dst.sz; y2= dst.y+0.5*dst.sz;}
+			if(src!=null) {x1=src.x; y1= src.y;}
+			if(dst!=null) {x2=dst.x; y2= dst.y;}
 			if(src!=null&&dst!=null) {
 				gc.beginPath();
 		    	gc.moveTo(x1, y1);
@@ -372,11 +372,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void mouseScrollHandler(ScrollEvent event) {
     	System.out.println(event.getDeltaY() +" "+ event.getX() +" "+ event.getY());
     	zoomFactor+=(event.getDeltaY()>0)?0.05:-0.05;
-    	double del = 0.02;
-    	for(dispNode d:dispNodesList) {
-    		d.x*=(event.getDeltaY()<0)?1+del:1-del;
-    		d.y*=(event.getDeltaY()<0)?1+del:1-del;
-    	}
     	System.out.println(zoomFactor);
     	redrawNodes();
     }
@@ -400,33 +395,33 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			draggingNode = selNode;
 		} else if (state == 1) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 2) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 3) {
 			linkSrcNode = selNode;
-			dispNode newNode = new dispNode("", transpColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+			dispNode newNode = new dispNode("", transpColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 			draggingNode = newNode;
 			draggingLink = new dispLink(linkSrcNode, draggingNode);
 		} else if (state == 4) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 5) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Actuator", actuatorColor, mEvent.getX() - R, mEvent.getY() - R, R + R);
+				dispNode newNode = new dispNode("New Actuator", actuatorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
@@ -505,8 +500,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
     	if(draggingNode != null){
-			draggingNode.x = mEvent.getX()-R;
-			draggingNode.y = mEvent.getY()-R;
+			draggingNode.x = mEvent.getX();
+			draggingNode.y = mEvent.getY();
 			redrawNodes();
     	}
     }
@@ -520,7 +515,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
 	
 	private dispNode getNodeOnClick(MouseEvent mEvent) {
-		for(dispNode n : dispNodesList) if(Math.pow(Math.pow(n.x+(0.5*n.sz)-mEvent.getX(),2)+Math.pow(n.y+(0.5*n.sz)-mEvent.getY(),2),0.5)<=0.5*n.sz) return n;
+		for(dispNode n : dispNodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) return n;
 		return null;
 	}
     
