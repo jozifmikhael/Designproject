@@ -57,70 +57,61 @@ public class AddSensorController {
 	@FXML
 	void saveDeterministic(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveDeterministic.getScene().getWindow();
-		if (nodeBox.getSelectionModel().getSelectedItem() == null
-				|| nodeBox.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			nodeBox.setValue("0");
-		}
-		if (DeterministicValue.getText().trim().isEmpty()) {
-			DeterministicValue.setText("5.0");
-		}
-		mean.setText("0.0");
-		stdDev.setText("0.0");
-		max.setText("0.0");
-		min.setText("0.0");
-		s = textfile.createSensor(nodeBox.getSelectionModel().getSelectedItem() + " " + sensorLatency.getText() + " " + sensorName.getText().toString() 
-				+ " " + DeterministicValue.getText() + " " + mean.getText() + " " + stdDev.getText() + " " + max.getText() + " " + min.getText() 
-				+ " " + "Deterministic");
+		saveSensor("Deterministic");
 		stage.close();
 	}
 	
 	@FXML
 	void saveNormal(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveNormal.getScene().getWindow();
-		if (nodeBox.getSelectionModel().getSelectedItem() == null
-				|| nodeBox.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			nodeBox.setValue("0");
-		}
-		if (mean.getText().trim().isEmpty()) {
-			mean.setText("5.0");
-		}
-		if (stdDev.getText().trim().isEmpty()) {
-			stdDev.setText("1.0");
-		}
-		DeterministicValue.setText("0.0");
-		max.setText("0.0");
-		min.setText("0.0");
-		s = textfile.createSensor(nodeBox.getSelectionModel().getSelectedItem() + " " + sensorLatency.getText() + " " + sensorName.getText().toString() 
-				+ " " + DeterministicValue.getText() + " " + mean.getText() + " " + stdDev.getText() + " " + max.getText() + " " + min.getText() 
-				+ " " + "Normal");
+		saveSensor("Normal");
 		stage.close();
 	}
 	
 	@FXML
 	void saveUniform(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveUniform.getScene().getWindow();
-		if (nodeBox.getSelectionModel().getSelectedItem() == null
-				|| nodeBox.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			nodeBox.setValue("0");
-		}
-		if (max.getText().trim().isEmpty()) {
-			max.setText("5.0");
-		}
-		if (min.getText().trim().isEmpty()) {
-			min.setText("1.0");
-		}
-		DeterministicValue.setText("0.0");
-		mean.setText("0.0");
-		stdDev.setText("0.0");
-		s = textfile.createSensor(nodeBox.getSelectionModel().getSelectedItem() + " " + sensorLatency.getText() + " " + sensorName.getText().toString() 
-				+ " " + DeterministicValue.getText() + " " + mean.getText() + " " + stdDev.getText() + " " + max.getText() + " " + min.getText() 
-				+ " " + "Uniform");
+		saveSensor("Uniform");
 		stage.close();
 	}
 	
-	void populateList(List<String> str_list) {
+	void saveSensor(String distType) {
+		if(distType.equals("Deterministic")) {
+			if (DeterministicValue.getText().trim().isEmpty()) DeterministicValue.setText("5.0");
+		}else{
+			DeterministicValue.setText("0.0");
+		}
+		
+		if(distType.equals("Uniform")) {
+			if (max.getText().trim().isEmpty()) max.setText("5.0");
+			if (min.getText().trim().isEmpty())	min.setText("1.0");
+		}else {
+			max.setText("0.0");
+			min.setText("0.0");
+		}
+		
+		if(distType.equals("Normal")) {
+			if (mean.getText().trim().isEmpty()) mean.setText("5.0");
+			if (stdDev.getText().trim().isEmpty()) stdDev.setText("1.0");
+		}else {
+			mean.setText("0.0");
+			stdDev.setText("0.0");
+		}
+		
+		s = textfile.createSensor(
+				sensorName.getText().toString(),
+				nodeBox.getSelectionModel().getSelectedItem(),
+				Double.parseDouble(sensorLatency.getText()),
+				Double.parseDouble(DeterministicValue.getText()),
+				Double.parseDouble(mean.getText()),
+				Double.parseDouble(stdDev.getText()),
+				Double.parseDouble(max.getText()),
+				Double.parseDouble(min.getText()));
+	}
+	
+	void populateList(List<DeviceSpec> devicesList) {
 		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
+		for(DeviceSpec d : devicesList) items.add(d.name);
 		nodeBox.setItems(items);
 	}
   	

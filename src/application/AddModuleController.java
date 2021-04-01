@@ -56,43 +56,21 @@ public class AddModuleController {
 	@FXML
 	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveModule.getScene().getWindow();
-		if (nodeBox.getSelectionModel().getSelectedItem() == null
-				|| nodeBox.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			nodeBox.setValue("Module_default_node");
-		}
-		if (moduleName.getText().trim().isEmpty()) {
-			moduleName.setText("0");
-		}
-		if (ram.getText().trim().isEmpty()) {
-			ram.setText("0");
-		}
-		if (MIPS.getText().trim().isEmpty()) {
-			MIPS.setText("0");
-		}
-		if (size.getText().trim().isEmpty()) {
-			size.setText("0");
-		}
-		if (bandwidth.getText().trim().isEmpty()) {
-			bandwidth.setText("0");
-		}
-		if (inTuple.getText().trim().isEmpty()) {
-			inTuple.setText("0");
-		}
-		if (outTuple.getText().trim().isEmpty()) {
-			outTuple.setText("0");
-		}
-		if (fractionalSensitivity.getText().trim().isEmpty()) {
-			fractionalSensitivity.setText("0");
-		}
-		m = textfile.createModule(nodeBox.getSelectionModel().getSelectedItem() + " " + moduleName.getText() + " "
-				+ ram.getText() + " " + bandwidth.getText() + " " + inTuple.getText() + " " + outTuple.getText() + " "
-				+ size.getText() + " " + MIPS.getText() + " " + fractionalSensitivity.getText() + "\n");
+		m = textfile.createModule(
+				nodeBox.getSelectionModel().getSelectedItem(),
+				moduleName.getText(),
+				Integer.parseInt(ram.getText()),
+				Long.parseLong(bandwidth.getText()),
+				inTuple.getText(), outTuple.getText(),
+				Long.parseLong(size.getText()),
+				Integer.parseInt(MIPS.getText()),
+				Double.parseDouble(fractionalSensitivity.getText()));
 		stage.close();
 	}
 	
-	void populateList(List<String> str_list) {
+	void populateList(List<DeviceSpec> devicesList) {
 		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
+		for(DeviceSpec d : devicesList) items.add(d.name);
 		nodeBox.setItems(items);
 	}
 	public ModuSpec getSpec() {return m;}

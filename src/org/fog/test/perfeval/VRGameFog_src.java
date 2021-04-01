@@ -17,6 +17,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import application.SetupJSONParser.*;
+
 //import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
 //import org.cloudbus.cloudsim.VmAllocationPolicySimple;
@@ -31,6 +33,7 @@ import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.power.PowerHost;
+import org.cloudbus.cloudsim.power.PowerDatacenter;
 import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.cloudbus.cloudsim.sdn.overbooking.BwProvisionerOverbooking;
@@ -52,140 +55,84 @@ import org.fog.placement.ModulePlacementMapping;
 import org.fog.placement.ModulePlacementOnlyCloud;
 import org.fog.policy.AppModuleAllocationPolicy;
 import org.fog.scheduler.StreamOperatorScheduler;
+import org.fog.utils.Config;
 import org.fog.utils.FogLinearPowerModel;
 import org.fog.utils.FogUtils;
 import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
+import org.fog.utils.distribution.NormalDistribution;	
+import org.fog.utils.distribution.UniformDistribution;
 
-/**
- * @author 
- *
- */
 public class VRGameFog_src {
 	static List<FogDevice> fogDevices = new ArrayList<FogDevice>();
 	static List<Sensor> sensors = new ArrayList<Sensor>();
 	static List<Actuator> actuators = new ArrayList<Actuator>();
-	static List<Cloudlet> cloudlets = new ArrayList<Cloudlet>();
-	private static List<Vm> vmlist;
+	static String sensorTuple = null;	
+	static String actuatorType = null;
 	
-	static boolean CLOUD = false;
-	static FogDevice cloud;
-	static FogDevice proxy;
-	static double EEG_TRANSMISSION_TIME = 5.1;
+	static int userId;
+	static String appId;
 	
-	static String sourceFile="test6.json";
-	
-	public VRGameFog_src(String inp) throws Exception{
-		Log.printLine("Starting VRGame...");
-		System.out.println("File path given is"+ inp);
-		try {
-			Log.disable();
-			int num_user = 1; // number of cloud users
-			Calendar calendar = Calendar.getInstance();
-			boolean trace_flag = false; // mean trace events
-
-			CloudSim.init(num_user, calendar, trace_flag);
-			
-			
-			String appId = "vr_game"; // identifier of the application
-			PowerDatacenterBroker broker = new FogBroker("broker");
-			Application application = new Application(appId, broker.getId());
-			application.setUserId(broker.getId());
-			
-			cloud = createFogDevice("cloud", 1000, 40000, 100, 10000, 0, 1, 3, 0); // creates the fog device Cloud at the apex of the hierarchy with level=0
-			cloud.setParentId(-1);
-			fogDevices.add(cloud);
-			
-//			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
-//			proxy.setParentId(cloud.getId());
-//			fogDevices.add(proxy);
-			
-			
-			//Parse JSON file and initialize nodes
-			JSONParser jsonParser = new JSONParser();
-			FileReader reader = new FileReader(sourceFile);
-            Object obj = jsonParser.parse(reader);
-            JSONObject nodeList = (JSONObject) obj;
-            JSONArray nodeArr = (JSONArray) nodeList.get("nodes");
-            nodeArr.forEach(n -> parseNodeObject( (JSONObject) n, broker.getId(), appId, cloud.getId()));
-            JSONArray linkArr = (JSONArray) nodeList.get("links");
-            linkArr.forEach(l -> parseLinkObject((JSONObject) l));
-            JSONArray modArr = (JSONArray) nodeList.get("Modules");
-            modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
-            JSONArray edgeArr = (JSONArray) nodeList.get("Edges");
-            edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
-            
-            
-//            vmlist = new ArrayList<Vm>();
-			// VM description
-//			int vmid = 0;
-//			int mips = 1000;
-//			long size = 10000; // image size (MB)
-//			int ram = 512; // vm memory (MB)
-//			long bw = 1000;
-//			int pesNumber = 1; // number of cpus
-//			String vmm = "Xen"; // VMM name
-			
-			// add the VM to the vmList
-//			for(int i = 0; i<10000; i++) {
-//				Cloudlet c = new Cloudlet(FogUtils.generateEntityId(), 1000, 1, 100, 100, null, null, null);
-//				Vm vm = new Vm(vmid+i, broker.getId(), mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-//				c.setVmId(vmid+i);
-//				cloudlets.add(c);
-//				vmlist.add(vm);
-//			}
-//			broker.submitCloudletList(cloudlets);
-//			List<Cloudlet> newList = broker.getCloudletReceivedList();
-//			broker.submitVmList(vmlist);
-			//printCloudletList(newList);
-            
-			ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-//			moduleMapping.addModuleToDevice("client", "node1"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("bus_stop", "node1"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("concentration_calculator", "node1"); // fixing all instances of the Connector module to the Cloud
-//			moduleMapping.addModuleToDevice("connector", "node1"); // fixing all instances of the Connector module to the Cloud
-			
-			Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
-//			controller.submitApplication(application, 0, new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping));
-			controller.submitApplication(application, 0, new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application));
-			
-			TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
-			System.out.println(moduleMapping.getModuleMapping());
-			CloudSim.startSimulation();
-			
-			//CloudSim.stopSimulation();
-			//System.out.println("VRGame finished!");
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.printLine("Unwanted errors happen");
-		}
-	}
-	
-	public static void main(String[] args) throws Exception{
-		System.out.println("Start?");
-		VRGameFog_src testObj = new VRGameFog_src("test6.json");
-		System.out.println("Exited?");
-	}
+	@SuppressWarnings("unchecked")
+	public VRGameFog_src(
+			List<DeviceSpec> deviceSpecs,
+			List<ModuSpec> moduleSpecs,
+			List<SensorSpec> sensorSpecs,
+			List<ActuatorSpec> actuatorSpecs,
+			List<ModuEdgeSpec> edgeSpecs,
+			int simTime, int simGranularity,
+			String simPlacementPolicy,
+			String topLevelNode) throws Exception {
+		System.out.println("Starting VRGame... ");
+		Log.disable();
 		
-	private static void parseLinkObject(JSONObject link) {
-		String srcID = (String) link.get("srcID");
-		String dstID = (String) link.get("dstID");
-		FogDevice src = null;
-		FogDevice dst = null;
-		double latency = (double) (link.get("latency"));
-		//double bw = (double) link.get("bw");
-
-		for(FogDevice device : fogDevices) {
-			if (device.getName()==srcID) src=device;
-			if (device.getName()==dstID) dst=device;
+		int num_user = 1;
+		Calendar calendar = Calendar.getInstance();
+		boolean trace_flag = false;
+		
+		CloudSim.init(num_user, calendar, trace_flag);
+		PowerDatacenterBroker broker = new FogBroker("broker");
+		appId = "vr_game"; // identifier of the application
+		userId = broker.getId();
+		
+		Application application = new Application(appId, userId);
+		
+		System.out.println("Starting parsing...");
+        Config.RESOURCE_MANAGE_INTERVAL = simGranularity;
+        Config.RESOURCE_MGMT_INTERVAL = simGranularity;
+        Config.MAX_SIMULATION_TIME = simTime;
+        Config.TOP_NODE = topLevelNode;
+        
+//        JSONArray modArr = (JSONArray) jsonObject.get("modules");	
+//        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
+//        JSONArray edgeArr = (JSONArray) jsonObject.get("edges");
+//        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
+//    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
+//		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
+//		JSONArray sensorArr = (JSONArray) jsonObject.get("sensors");
+//		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));
+//		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");
+//		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));
+//        JSONArray linkArr = (JSONArray) jsonObject.get("links");
+//        linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+		
+		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
+		moduleMapping.addModuleToDevice("connector", "cloud");
+		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
+		
+		if(simPlacementPolicy.equals("Edgewards")) {
+			controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
+		}else {
+			controller.submitApplication(application, 0,(new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application)));
 		}
-		if(!(src==null || dst==null)) {
-			src.setParentId(dst.getId());
-			src.setUplinkLatency(latency);
-		}
+		
+		TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
+		CloudSim.startSimulation();
+		CloudSim.stopSimulation();
+		Log.printLine("VRGame finished!");
 	}
-
-	private static void parseNodeObject(JSONObject node, int userId, String appId, int cloudid) {
+	
+	private static void parseNodeObject(JSONObject node) {
         double nodeBusyPower = (double) node.get("apower");
         int nodeLevel = Integer.parseUnsignedInt(node.get("level").toString());
         double nodeRatePerMips = (double) node.get("rate");
@@ -193,36 +140,86 @@ public class VRGameFog_src {
         String nodeID = (String) node.get("name");
         long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
         long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
-        long nodeMips = (long) node.get("mips");
+        long nodeMips = Long.parseUnsignedLong(node.get("mips").toString());
+//        double transmissionTime = (double) node.get("transmission_time");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
-		FogDevice mobile = addMobile(userId, appId, cloudid, nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
-		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
-		fogDevices.add(mobile);
+		fogDevices.add(createFogDevice(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower));
     }
+	
+	private static void parseSensorObject(JSONObject sensor) {	
+		String sensorName = (String) sensor.get("sensorName");
+		String distribution = (String) sensor.get("distribution");
+		double deterministicValue = (double) sensor.get("deterministicValue");
+		double normalMean = (double) sensor.get("normalMean");
+		double normalStdDev = (double) sensor.get("normalStdDev");
+		double uniformMax = (double) sensor.get("uniformMax");
+		double uniformMin = (double) sensor.get("uniformMin");
+			
+		if(distribution.equals("Deterministic")) {	
+			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+			sensors.add(newSensor);	
+		}
+		else if(distribution.equals("Normal")) {	
+			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new NormalDistribution(normalMean, normalStdDev)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+			sensors.add(newSensor);	
+		}
+		else if(distribution.equals("Uniform")) {	
+			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new UniformDistribution(uniformMin, uniformMax)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+			sensors.add(newSensor);	
+		}	
+	}
+		
+	private static void parseActuatorObject(JSONObject actuator) {	
+		String actuatorName = (String) actuator.get("Actuator Name");
+		Actuator display = new Actuator(actuatorName, userId, appId, actuatorType);
+		actuators.add(display);
+	}
+	
+	private static void parseLinkObject(JSONObject link) {
+		double latency = (double) (link.get("latency"));
+		String srcID = (String) link.get("srcID");
+		String dstID = (String) link.get("dstID");
+		FogDevice src = null;
+		FogDevice dst = null;
+		Sensor sensorSrc = null;	
+		Actuator actuatorSrc = null;
+
+		for(FogDevice device : fogDevices) {
+			if (device.getName().equals(srcID)) src=device;
+			if (device.getName().equals(dstID)) dst=device;
+		}
+		for(Sensor sensor : sensors) {	
+			if (sensor.getName().equals(srcID)) sensorSrc=sensor;	
+		}	
+			
+		for(Actuator actuator : actuators) {	
+			if (actuator.getName().equals(srcID)) actuatorSrc = actuator;	
+		}
+		if(!(src==null || dst==null)) {
+			src.setParentId(dst.getId());
+			src.setUplinkLatency(latency);
+		}else if(!(sensorSrc==null || dst==null)) {	
+			sensorSrc.setGatewayDeviceId(dst.getId());	
+			sensorSrc.setLatency(latency);	
+		}else if(!(actuatorSrc==null || dst==null)) {	
+			actuatorSrc.setGatewayDeviceId(dst.getId());	
+			actuatorSrc.setLatency(latency);
+		}else System.out.println("Error src/dst not found");
+	}
 	
 	private static void parseModuleObject(JSONObject module, Application application) {
 		String name = (String) module.get("name");
 		int ram = Integer.parseUnsignedInt(module.get("ram").toString());
 		int mips = Integer.parseUnsignedInt(module.get("mips").toString());
 		long size = Long.parseUnsignedLong(module.get("size").toString());
-		long bw = Long.parseUnsignedLong(module.get("bw").toString());
+		long bw = Long.parseUnsignedLong(module.get("bandwidth").toString());
 		
 		application.addAppModule(name, ram, mips, size, bw);
 		
 		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
 		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
-		
 	}
-	
-	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
-		String inTuple = (String) tuplemaps.get("inTuple");
-		String outTuple = (String) tuplemaps.get("outTuple");
-		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
-		
-		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
-	}
-	
 	private static void parseEdgeObject(JSONObject edges, Application application) {
 		String src = (String) edges.get("src");
 		String dest = (String) edges.get("dest");
@@ -234,28 +231,18 @@ public class VRGameFog_src {
 		int edgeType = Integer.parseUnsignedInt(edges.get("edgeType").toString());
 		
 		if(edgeType == 1) {
-			application.addAppEdge("EEG", dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+			sensorTuple = tupleType;
 		}
 		else if(edgeType == 2) {
-			application.addAppEdge(src, "DISPLAY", periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+			actuatorType = dest;
 		}
-		else {
-			application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
-		}
+		application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
 	}
-	
-	private static FogDevice addMobile(int userId, String appId, int parentId, String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
-		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
-		mobile.setParentId(parentId);
-		Sensor newSensor = new Sensor("s-"+nodeName, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
-		sensors.add(newSensor);
-		Actuator display = new Actuator("a-"+nodeName, userId, appId, "DISPLAY");
-		actuators.add(display);
-		newSensor.setGatewayDeviceId(mobile.getId());
-		newSensor.setLatency(6.0);  // latency of connection between EEG sensors and the parent Smartphone is 6 ms
-		display.setGatewayDeviceId(mobile.getId());
-		display.setLatency(1.0);  // latency of connection between Display actuator and the parent Smartphone is 1 ms
-		return mobile;
+	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
+		String inTuple = (String) tuplemaps.get("inTuple");
+		String outTuple = (String) tuplemaps.get("outTuple");
+		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
+		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
 	}
 	
 	/**
@@ -275,13 +262,12 @@ public class VRGameFog_src {
 			int ram, long upBw, long downBw, int level, double ratePerMips, double busyPower, double idlePower) {
 		
 		List<Pe> peList = new ArrayList<Pe>();
-		// 3. Create PEs and add these into a list.
 		peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-
+		
 		int hostId = FogUtils.generateEntityId();
 		long storage = 1000000; // host storage
 		int bw = 10000;
-
+		
 		PowerHost host = new PowerHost(
 				hostId,
 				new RamProvisionerSimple(ram),
@@ -299,11 +285,13 @@ public class VRGameFog_src {
 		String os = "Linux"; // operating system
 		String vmm = "Xen";
 		double time_zone = 10.0; // time zone this resource located
-		double cost = ratePerMips; // the cost of using processing in this resource
-		double costPerMem = 5000; // the cost of using memory in this resource
-		double costPerStorage = 1000; // the cost of using storage in this resource
-		double costPerBw = cost; // the cost of using bw in this resource
-		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN devices by now
+		double cost = 3.0; // the cost of using processing in this resource
+		double costPerMem = 0.05; // the cost of using memory in this resource
+		double costPerStorage = 0.001; // the cost of using storage in this
+										// resource
+		double costPerBw = 0.0; // the cost of using bw in this resource
+		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
+													// devices by now
 
 		FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(
 				arch, os, vmm, host, time_zone, cost, costPerMem,
@@ -316,7 +304,6 @@ public class VRGameFog_src {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		fogdevice.setLevel(level);
 		return fogdevice;
 	}

@@ -22,167 +22,46 @@ public class SetupJSONParser {
 	private List<ActuatorSpec> actuators = new ArrayList<ActuatorSpec>();
 	private int globalID = 0;
 	
-	public ActuatorSpec createActuator(String sensorLine) throws NumberFormatException, IOException  {	
-		
-		String actuName;
-//		String actuUserID;
-//		String actuAppID;
-//		String actuActuatorType;
-		
-		String stParts[] = sensorLine.split(" ");
-		actuName = stParts[0];
-//		actuUserID = stParts[1];
-//		actuAppID = stParts[2];
-//		actuActuatorType = stParts[3];
-			
-		ActuatorSpec a = new ActuatorSpec(actuName/*, actuUserID, actuAppID, actuActuatorType*/);		
+	public ActuatorSpec createActuator(String actuatorName) {			
+		ActuatorSpec a = new ActuatorSpec(actuatorName);		
 		return a;
 	}
-	class ActuatorSpec extends NodeSpec {	
-		String name;
-//		String UserID;
-//		String AppID;
-//		String ActuatorType;
-			
-		@SuppressWarnings("unchecked")	
-		JSONObject toJSON() {	
-			ActuatorSpec actuator = this;	
-			JSONObject obj = new JSONObject();	
-			obj.put("Actuator Name", actuator.name);	
-//			obj.put("User_ID", actuator.UserID);	
-//			obj.put("App_ID", actuator.AppID);	
-//			obj.put("Type", actuator.ActuatorType);	
-			return obj;	
-		}	
-			
-		public ActuatorSpec(String actuatorName/*, String UserID, String AppID, String ActuatorType*/) {	
-			this.name = actuatorName;	
-//			this.UserID = UserID;	
-//			this.AppID = AppID;	
-//			this.ActuatorType = ActuatorType;				
-			this.id = getID();	
-			this.type = "actuator";	
-		}	
-	}
-	
-	
-	public DeviceSpec createDevice(String nodeLine) throws NumberFormatException, IOException {
-		long insProcessingSpeed = 0;
-		int insMemory = 0;
-		long insNetworkSpeedUp = 0;
-		long insNetworkSpeedDown = 0;
-		int insLevel = 0;
-		double latency;
-		double insCostProcessing;
-		double insBusyPower;
-		double insIdlePower;
-		double insServiceCharge;
-		double insCostNetworking;
-		
-		String stParts[] = nodeLine.split(" ");
-		String hostname = stParts[0];
-		insProcessingSpeed = (long) Double.parseDouble(stParts[1]);
-		insMemory = (int) Double.parseDouble(stParts[2]);
-		insNetworkSpeedUp = (long) Double.parseDouble(stParts[3]);
-		insNetworkSpeedDown = (long) Double.parseDouble(stParts[4]);
-		insLevel = (int) Double.parseDouble(stParts[5]);
-		insCostProcessing = Double.parseDouble(stParts[6]);
-		// insCostNetworking = Double.parseDouble(stParts[7]);
-		insBusyPower = Double.parseDouble(stParts[7]);
-		insIdlePower = Double.parseDouble(stParts[8]);
-		String parentName = stParts[9];
-		latency = Double.parseDouble(stParts[10]);
-		DeviceSpec h = new DeviceSpec(hostname, parentName, insProcessingSpeed, insMemory, insNetworkSpeedUp, insNetworkSpeedDown, insLevel,
-				insCostProcessing, insBusyPower, insIdlePower,latency);
+	public DeviceSpec createDevice(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate, double apower, double ipower, double latency) {
+		DeviceSpec h = new DeviceSpec(name, parent, mips, ram, upbw, downbw, level, rate, apower, ipower, latency);
 		return h;
 	}
 	
-	public LinkSpec createLink(String linkLine) throws NumberFormatException, IOException {
-		String srcID;
-		String dstID;
-		double latency;
-		
-		String stParts[] = linkLine.split(" ");
-		srcID = stParts[0];
-		dstID = stParts[1];
-		latency = Double.parseDouble(stParts[2]);
-			LinkSpec l = new LinkSpec(srcID, dstID, latency);		
+	public LinkSpec createLink(String srcID, String dstID, double latency) {
+		LinkSpec l = new LinkSpec(srcID, dstID, latency);		
 		return l;
 	}
 	
-	public ModuEdgeSpec createModuleEdge(String edgeLine) throws NumberFormatException, IOException {
-		double insPeriodicity;
-		double insCpuLength;
-		double insNwLength;
-		int insDirection = 1;
-		
-		String stParts[] = edgeLine.split(" ");
-		String insParent = stParts[0];
-		String insChild = stParts[1];
-		String insTupleType = stParts[2];
-		insPeriodicity = Double.parseDouble(stParts[3]);
-		insCpuLength = Double.parseDouble(stParts[4]);
-		insNwLength = Double.parseDouble(stParts[5]);
-		String insEdgeType = stParts[6];
-		insDirection = (int) Double.parseDouble(stParts[7]);
-		
-		ModuEdgeSpec e = new ModuEdgeSpec(insParent, insChild, insTupleType, insPeriodicity, insCpuLength, insNwLength, insEdgeType,
-				insDirection);
+	public ModuEdgeSpec createModuleEdge(String parent, String child, String tupleType, double periodicity, double cpuLength, double newLength, String edgeType, int direction) {
+		ModuEdgeSpec e = new ModuEdgeSpec(parent, child, tupleType, periodicity, cpuLength, newLength, edgeType, direction);
 		return e;
 	}
 	
-	public SensorSpec createSensor(String sensorLine) throws NumberFormatException, IOException  {	
-		double deterministicValue;	
-		double normalMean;	
-		double normalStdDev;	
-		double uniformMax;	
-		double uniformMin;	
-		double sensorLatency;
-		
-		String stParts[] = sensorLine.split(" ");
-		String nodeName = stParts[0];
-		sensorLatency = Double.parseDouble(stParts[1]);
-		String sensorName = stParts[2];
-		deterministicValue = Double.parseDouble(stParts[3]);
-		normalMean = Double.parseDouble(stParts[4]);
-		normalStdDev = Double.parseDouble(stParts[5]);
-		uniformMax = Double.parseDouble(stParts[6]);
-		uniformMin = Double.parseDouble(stParts[7]);
-		String distribution = stParts[8];
-		
-		SensorSpec s = new SensorSpec(sensorName, distribution, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin);
-		
+	public SensorSpec createSensor(String sensorName, String sensorParent, double latency, double deterministicValue, double normalMean, double normalStdDev, double uniformMax, double uniformMin)  {
+		SensorSpec s = new SensorSpec(sensorName, sensorParent, latency, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin);
 		return s;
 	}
 	
-	public ModuSpec createModule(String moduleLine) throws NumberFormatException, IOException {
-		// String insNodeName;
-		// String insModuleName;
-		int insRam;
-		long insBandwidth = 0;
-		// String insInTuple;
-		// String insOutTuple;
-		long insSize = 0;
-		int insMIPS;
-		double insFractionalSensitivity;
-		
-		String stParts[] = moduleLine.split(" ");
-		String insNodeName = stParts[0];
-		String insModuleName = stParts[1];
-		insRam = (int) Double.parseDouble(stParts[2]);
-		insBandwidth = (long) Double.parseDouble(stParts[3]);
-		String insInTuple = stParts[4];
-		String insOutTuple = stParts[5];
-		insSize = (long) Double.parseDouble(stParts[6]);
-		insMIPS = (int) Double.parseDouble(stParts[7]);
-		insFractionalSensitivity = Double.parseDouble(stParts[8]);
-		
-		ModuSpec m = new ModuSpec(insNodeName, insModuleName, insRam, insBandwidth, insInTuple, insOutTuple, insSize, insMIPS,
-				insFractionalSensitivity);
+	public ModuSpec createModule(String nodeName, String moduleName, int modRam, long bandwidth, String inTuple, String outTuple, long size, int MIPS, double fractionalSensitivity) {
+		ModuSpec m = new ModuSpec(nodeName, moduleName, modRam, bandwidth, inTuple, outTuple, size, MIPS, fractionalSensitivity);
 		return m;
 	}
 	
-	class NodeSpec {
+	public int getID() {
+		return globalID++;
+	}
+	
+	public void popNodeByID (int _id) {
+		for(NodeSpec h: hosts) if(h.id == _id) hosts.remove(h);
+		for(NodeSpec h: edges) if(h.id == _id) hosts.remove(h);
+		for(NodeSpec h: modules) if(h.id == _id) hosts.remove(h);
+	}
+
+	public class NodeSpec {
 		String name;
 		String parent;
 		String type;
@@ -193,82 +72,8 @@ public class SetupJSONParser {
 		double y;
 		double dispSize;
 	}
-	
-	class LinkSpec extends NodeSpec{
-		String srcID;
-		String dstID;
-		double latency;
-		
-		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			LinkSpec link = this;
-			JSONObject obj = new JSONObject();
-			obj.put("srcID", link.srcID);
-			obj.put("dstID", link.dstID);
-			obj.put("latency", link.latency);
-			return obj;
-		}
-		
-		public LinkSpec(String srcID, String dstID, double latency) {
-			this.srcID = srcID;
-			this.dstID = dstID;
-			this.latency = latency;
-			this.id = getID();
-		}
-	}
-	
-	
-	
-	public int getID() {
-		return globalID++;
-	}
-	
-	public void popNode(int _id) {
-		for(NodeSpec h: hosts) if(h.id == _id) hosts.remove(h);
-		for(NodeSpec h: edges) if(h.id == _id) hosts.remove(h);
-		for(NodeSpec h: modules) if(h.id == _id) hosts.remove(h);
-	}
-	
-	class SensorSpec extends NodeSpec {	
-		String distribution;	
-		double deterministicValue;	
-		double normalMean;	
-		double normalStdDev;	
-		double uniformMax;	
-		double uniformMin;	
-			
-		@SuppressWarnings("unchecked")	
-		JSONObject toJSON() {	
-			SensorSpec sensor = this;	
-			JSONObject obj = new JSONObject();	
-			obj.put("sensorName", sensor.name);	
-			obj.put("distribution", sensor.distribution);	
-			obj.put("deterministicValue", sensor.deterministicValue);	
-			obj.put("normalMean", sensor.normalMean);	
-			obj.put("normalStdDev", sensor.normalStdDev);	
-			obj.put("uniformMax", sensor.uniformMax);	
-			obj.put("uniformMin", sensor.uniformMin);
-			obj.put("x_cord", sensor.x);
-			obj.put("y_cord", sensor.y);
-			obj.put("radius", sensor.dispSize);
-			return obj;	
-		}	
-			
-		public SensorSpec(String sensorName, String distribution, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
-				double uniformMin) {	
-			this.name = sensorName;	
-			this.distribution = distribution;	
-			this.deterministicValue = deterministicValue;	
-			this.normalMean = normalMean;	
-			this.normalStdDev = normalStdDev;	
-			this.uniformMax = uniformMax;	
-			this.uniformMin = uniformMin;	
-			this.id = getID();	
-			this.type = "sensor";	
-		}	
-	}
-	
-	class DeviceSpec extends NodeSpec {
+
+	public class DeviceSpec extends NodeSpec {
 		int pe;
 		long mips;
 		int ram;
@@ -299,14 +104,12 @@ public class SetupJSONParser {
 			return obj;
 		}
 		
-		
 		public String toString() {
             String str = this.type + " ID: " + this.id+ "\nNode Name: " + this.name + "\nNode Parent Name:  " + this.parent + "\nUp Bandwidth: " 
         + this.upbw + "\nDown Bandwidth:  " + this.downbw + "\nMIPS: " + this.mips + "\nRAM: " + this.ram + "\nLevel: " + this.level + "\nRate: " + this.rate + "\nIdle Power: " + this.ipower + "\nActive Power: " + this.apower + "\n";
             String str1 = "--------------------------------------------------------------------------------";
             return str+str1;
         }
-		
 		
 		public DeviceSpec(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate, double apower,
 				double ipower, double latency) {
@@ -326,7 +129,7 @@ public class SetupJSONParser {
 		}
 	}
 	
-	class ModuSpec extends NodeSpec {
+	public class ModuSpec extends NodeSpec {
 		String nodeName;
 		int modRam;
 		long bandwidth;
@@ -340,8 +143,7 @@ public class SetupJSONParser {
 		JSONObject toJSON() {
 			ModuSpec module = this;
 			JSONObject obj = new JSONObject();
-			obj.put("node name", module.nodeName);
-			obj.put("module name", module.name);
+			obj.put("name", module.name);
 			obj.put("ram", module.modRam);
 			obj.put("bandwidth", module.bandwidth);
 			obj.put("inTuple", module.inTuple);
@@ -352,6 +154,7 @@ public class SetupJSONParser {
 			obj.put("x_cord", module.x);
 			obj.put("y_cord", module.y);
 			obj.put("radius", module.size);
+			obj.put("tupleMaps", "");
 			return obj;
 		}
 		
@@ -378,7 +181,85 @@ public class SetupJSONParser {
 		}
 	}
 	
-	class ModuEdgeSpec extends NodeSpec {
+	public class SensorSpec extends NodeSpec {
+		double latency;
+		double deterministicValue;
+		double normalMean;
+		double normalStdDev;
+		double uniformMax;
+		double uniformMin;
+			
+		@SuppressWarnings("unchecked")	
+		JSONObject toJSON() {	
+			SensorSpec sensor = this;	
+			JSONObject obj = new JSONObject();
+			obj.put("sensorName", sensor.name);
+			obj.put("parentName", sensor.parent);
+			obj.put("latency", sensor.latency);
+			obj.put("deterministicValue", sensor.deterministicValue);	
+			obj.put("normalMean", sensor.normalMean);	
+			obj.put("normalStdDev", sensor.normalStdDev);	
+			obj.put("uniformMax", sensor.uniformMax);	
+			obj.put("uniformMin", sensor.uniformMin);
+			obj.put("x_cord", sensor.x);
+			obj.put("y_cord", sensor.y);
+			obj.put("radius", sensor.dispSize);
+			return obj;	
+		}
+		
+		public SensorSpec(String sensorName, String sensorParent, double latency, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,	
+				double uniformMin) {	
+			this.name = sensorName;
+			this.parent = sensorParent;
+			this.latency = latency;
+			this.deterministicValue = deterministicValue;
+			this.normalMean = normalMean;
+			this.normalStdDev = normalStdDev;
+			this.uniformMax = uniformMax;
+			this.uniformMin = uniformMin;
+			this.id = getID();
+			this.type = "sensor";
+		}	
+	}
+
+	public class ActuatorSpec extends NodeSpec {
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			JSONObject obj = new JSONObject();	
+			obj.put("name", this.name);
+			return obj;	
+		}
+		
+		public ActuatorSpec(String actuatorName) {
+			this.name = actuatorName;
+			this.type = "actuator";
+		}
+	}
+	
+	public class LinkSpec extends NodeSpec{
+		String srcID;
+		String dstID;
+		double latency;
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			LinkSpec link = this;
+			JSONObject obj = new JSONObject();
+			obj.put("srcID", link.srcID);
+			obj.put("dstID", link.dstID);
+			obj.put("latency", link.latency);
+			return obj;
+		}
+		
+		public LinkSpec(String srcID, String dstID, double latency) {
+			this.srcID = srcID;
+			this.dstID = dstID;
+			this.latency = latency;
+			this.id = getID();
+		}
+	}
+
+	public class ModuEdgeSpec extends NodeSpec {
 		String parent;
 		String child;
 		String tupleType;

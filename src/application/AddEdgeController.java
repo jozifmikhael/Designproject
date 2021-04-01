@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import application.SetupJSONParser.DeviceSpec;
 import application.SetupJSONParser.ModuEdgeSpec;
 import application.SetupJSONParser.ModuSpec;
 import javafx.collections.FXCollections;
@@ -56,43 +57,21 @@ public class AddEdgeController {
 	@FXML
 	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
-		if (parentChoice.getSelectionModel().getSelectedItem() == null
-				|| parentChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			parentChoice.setValue("No Mods Found");
-		}
-		if (childChoice.getSelectionModel().getSelectedItem() == null
-				|| childChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			childChoice.setValue("No Mods Found");
-		}
-		if (periodicity.getText().trim().isEmpty()) {
-			periodicity.setText("0");
-		}
-		if (cpuLength.getText().trim().isEmpty()) {
-			cpuLength.setText("0");
-		}
-		if (newLength.getText().trim().isEmpty()) {
-			newLength.setText("0");
-		}
-		if (tupleType.getText().trim().isEmpty()) {
-			tupleType.setText("0");
-		}
-		if (direction.getText().trim().isEmpty()) {
-			direction.setText("0");
-		}
-		if (edgeType.getText().trim().isEmpty()) {
-			edgeType.setText("0");
-		}
-
-		v = textfile.createModuleEdge(parentChoice.getSelectionModel().getSelectedItem() + " "
-				+ childChoice.getSelectionModel().getSelectedItem() + " " + tupleType.getText() + " "
-				+ periodicity.getText() + " " + cpuLength.getText() + " " + newLength.getText() + " "
-				+ edgeType.getText() + " " + direction.getText() + "\n");
+		v = textfile.createModuleEdge(
+				parentChoice.getSelectionModel().getSelectedItem(),
+				childChoice.getSelectionModel().getSelectedItem(),
+				tupleType.getText(),
+				Double.parseDouble(periodicity.getText()),
+				Double.parseDouble(cpuLength.getText()),
+				Double.parseDouble(newLength.getText()),
+				edgeType.getText(),
+				Integer.parseInt(direction.getText()));
 		stage.close();
 	}
 	
-	void populateList(List<String> str_list) {
+	void populateList(List<ModuSpec> modulesList) {
 		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
+		for(ModuSpec m : modulesList) items.add(m.name);
 		parentChoice.setItems(items);
 		childChoice.setItems(items);
 		if(items.size()>1) {
@@ -103,5 +82,12 @@ public class AddEdgeController {
 	
 	public ModuEdgeSpec getSpec() {
 		return v;
+	}
+
+	public void setChoices(List<String> selectedModulesList) {
+		ObservableList<String> items = FXCollections.observableArrayList();
+		items.addAll(selectedModulesList);
+		parentChoice.setValue(items.get(0));
+		childChoice.setValue(items.get(1));
 	}
 }

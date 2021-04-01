@@ -47,7 +47,7 @@
                   </MenuBar>
                 <AnchorPane fx:id="backPane" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #ffffff;">
                      <children>
-                        <Canvas fx:id="topoField" height="383.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" width="870.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                        <Canvas fx:id="topoField" height="383.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="870.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
                      </children>
                   </AnchorPane>
                 <AnchorPane maxHeight="45.0" minHeight="45.0" minWidth="0.0" prefHeight="45.0" prefWidth="701.0">

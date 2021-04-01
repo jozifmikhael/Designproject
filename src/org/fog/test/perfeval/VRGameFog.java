@@ -70,7 +70,6 @@ public class VRGameFog {
 	static List<Sensor> sensors = new ArrayList<Sensor>();
 	static List<Actuator> actuators = new ArrayList<Actuator>();
 	
-	
 	static String sensorTuple = null;	
 	static String actuatorType = null;
 	
@@ -121,15 +120,15 @@ public class VRGameFog {
         System.out.println("Finished meta");
         
         JSONArray modArr = (JSONArray) jsonObject.get("modules");	
-        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));	
-        JSONArray edgeArr = (JSONArray) jsonObject.get("Edges");	
-        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));	
-    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");	
-		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));	
-		JSONArray sensorArr = (JSONArray) jsonObject.get("sensors");	
-		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));	
-		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");	
-		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));	
+        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
+        JSONArray edgeArr = (JSONArray) jsonObject.get("edges");
+        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
+    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
+		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
+		JSONArray sensorArr = (JSONArray) jsonObject.get("sensors");
+		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));
+		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");
+		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));
         JSONArray linkArr = (JSONArray) jsonObject.get("links");	
         linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 		
@@ -153,7 +152,7 @@ public class VRGameFog {
         long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
         long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
         long nodeMips = Long.parseUnsignedLong(node.get("mips").toString());
-        double transmissionTime = (double) node.get("transmission_time");
+//        double transmissionTime = (double) node.get("transmission_time");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
 		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
@@ -163,31 +162,30 @@ public class VRGameFog {
     }
 	
 	private static void parseSensorObject(JSONObject sensor) {	
-		String sensorName = (String) sensor.get("sensorName");	
-		String distribution = (String) sensor.get("distribution");	
-		double deterministicValue = (double) sensor.get("deterministicValue");	
-		double normalMean = (double) sensor.get("normalMean");	
-		double normalStdDev = (double) sensor.get("normalStdDev");	
-		double uniformMax = (double) sensor.get("uniformMax");	
-		double uniformMin = (double) sensor.get("uniformMin");	
+		String sensorName = (String) sensor.get("sensorName");
+		String distribution = (String) sensor.get("distribution");
+		double deterministicValue = (double) sensor.get("deterministicValue");
+		double normalMean = (double) sensor.get("normalMean");
+		double normalStdDev = (double) sensor.get("normalStdDev");
+		double uniformMax = (double) sensor.get("uniformMax");
+		double uniformMin = (double) sensor.get("uniformMin");
 			
 		if(distribution.equals("Deterministic")) {	
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
 			sensors.add(newSensor);	
-		}	
+		}
 		else if(distribution.equals("Normal")) {	
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new NormalDistribution(normalMean, normalStdDev)); // inter-transmission time of EEG sensor follows a deterministic distribution	
 			sensors.add(newSensor);	
-		}	
+		}
 		else if(distribution.equals("Uniform")) {	
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new UniformDistribution(uniformMin, uniformMax)); // inter-transmission time of EEG sensor follows a deterministic distribution	
 			sensors.add(newSensor);	
 		}	
-	}	
+	}
 		
 	private static void parseActuatorObject(JSONObject actuator) {	
-		String actuatorName = (String) actuator.get("Actuator Name");	
-		
+		String actuatorName = (String) actuator.get("Actuator Name");
 		Actuator display = new Actuator(actuatorName, userId, appId, actuatorType);
 		actuators.add(display);
 	}
@@ -235,7 +233,7 @@ public class VRGameFog {
 		
 		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
 		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
-	}	
+	}
 	private static void parseEdgeObject(JSONObject edges, Application application) {
 		String src = (String) edges.get("src");
 		String dest = (String) edges.get("dest");
@@ -246,12 +244,12 @@ public class VRGameFog {
 		int direction = Integer.parseUnsignedInt(edges.get("direction").toString());
 		int edgeType = Integer.parseUnsignedInt(edges.get("edgeType").toString());
 		
-		if(edgeType == 1) {	
-			sensorTuple = tupleType;	
-		}	
-		else if(edgeType == 2) {	
-			actuatorType = dest;	
-		}	
+		if(edgeType == 1) {
+			sensorTuple = tupleType;
+		}
+		else if(edgeType == 2) {
+			actuatorType = dest;
+		}
 		application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
 	}
 	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
