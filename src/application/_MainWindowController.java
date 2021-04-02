@@ -277,119 +277,143 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for(dispLink link : textfile.dispLinksList) link.draw(gc);
-		if (draggingLink!=null) draggingLink.draw(gc);
-		for(dispNode node : textfile.dispNodesList) node.draw(gc);
-		if (draggingNode!=null) draggingNode.draw(gc);
+//		for(dispLink link : textfile.dispLinksList) link.draw(gc);
+//		if (draggingLink!=null) draggingLink.draw(gc);
+		for(DeviceSpec node : textfile.devicesList) node.drawLink(gc);
+		if (draggingDeviceNode!=null) draggingDeviceNode.drawLink(gc);
+		for(ModuSpec node : textfile.modulesList) node.drawLink(gc);
+		if (draggingModuNode!=null) draggingModuNode.drawLink(gc);
+		for(SensorSpec node : textfile.sensorsList) node.drawLink(gc);
+		if (draggingSensorNode!=null) draggingSensorNode.drawLink(gc);
+		for(ActuatorSpec node : textfile.actuatorsList) node.drawLink(gc);
+		if (draggingActuatorNode!=null) draggingActuatorNode.drawLink(gc);
+		for(DeviceSpec node : textfile.devicesList) node.drawNode(gc);
+		if (draggingDeviceNode!=null) draggingDeviceNode.drawNode(gc);
+		for(ModuSpec node : textfile.modulesList) node.drawNode(gc);
+		if (draggingModuNode!=null) draggingModuNode.drawNode(gc);
+		for(SensorSpec node : textfile.sensorsList) node.drawNode(gc);
+		if (draggingSensorNode!=null) draggingSensorNode.drawNode(gc);
+		for(ActuatorSpec node : textfile.actuatorsList) node.drawNode(gc);
+		if (draggingActuatorNode!=null) draggingActuatorNode.drawNode(gc);
 	}
 
-	dispNode draggingNode = null;
-	dispLink draggingLink = null;
-	dispNode linkSrcNode = null;
+	DeviceSpec draggingDeviceNode = null;
+	ModuSpec draggingModuNode = null;
+	SensorSpec draggingSensorNode = null;
+	ActuatorSpec draggingActuatorNode = null;
+//	dispLink draggingLink = null;
+	NodeSpec draggingNode = null;
+//	DeviceSpec linkSrcDeviceNode = null;
+	NodeSpec linkSrcNode = null;
+//	ModuSpec linkSrcModuNode = null;
     @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
-		dispNode selNode = getNodeOnClick(mEvent);
+    	NodeSpec selNode = getNodeOnClick(mEvent);
+//		DeviceSpec selDeviceNode = getDeviceOnClick(mEvent);
+//		ModuSpec selModuNode = getModuleOnClick(mEvent);
+//		SensorSpec selSensorNode = getSensorOnClick(mEvent);
+//		ActuatorSpec selActuatorNode = getActuatorOnClick(mEvent);
 		if (state == 0) {
 			draggingNode = selNode;
 		} else if (state == 1) {
 			if (selNode == null) {
-				dispNode newNode = textfile.createDispNode("New Node", deviceColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				DeviceSpec newNode = textfile.createDevice("New Node", deviceColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 2) {
 			if (selNode == null) {
-				dispNode newNode = textfile.createDispNode("New Module", moduleColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				ModuSpec newNode = textfile.createModule("New Module", moduleColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 3) {
 			linkSrcNode = selNode;
-			dispNode newNode = textfile.createDispNode("", transpColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
-			draggingNode = newNode;
-			draggingLink = textfile.createDispLink(linkSrcNode, draggingNode);
+			DeviceSpec newNode = textfile.createDevice("", transpColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+			draggingDeviceNode = newNode;
+//			draggingLink = textfile.createDispLink(linkSrcNode, draggingNode);
 		} else if (state == 4) {
 			if (selNode == null) {
-				dispNode newNode = textfile.createDispNode("New Sensor", sensorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				SensorSpec newNode = textfile.createSensor("New Sensor", sensorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 5) {
 			if (selNode == null) {
-				dispNode newNode = textfile.createDispNode("New Actuator", actuatorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				ActuatorSpec newNode = textfile.createActuator("New Actuator", actuatorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
-			}
-		}		
-		redrawNodes();
+			}	
+		}
+		redrawNodes();		
 	}
    
 	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
     	if (state==0) {
-    		if(textfile.dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
+    		if(textfile.devicesList.indexOf(draggingDeviceNode)>=0)draggingDeviceNode.setPos(mEvent);
     	} else if (state==1) {
-    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newDevice=addDevice();
+    		if(textfile.devicesList.indexOf(draggingDeviceNode)<0) {
+    			DeviceSpec newDevice=addDevice();
     			if(newDevice!=null) newDevice.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-        	draggingNode=null;
+    		} else draggingDeviceNode.setPos(mEvent);
+        	draggingDeviceNode=null;
     	} else if (state==2) {
-    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newModule = addModule();
+    		if(textfile.modulesList.indexOf(draggingModuNode)<0) {
+    			ModuSpec newModule = addModule();
     			if(newModule!=null) newModule.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-        	draggingNode=null;
-    	} else if (state == 3) {
-        	draggingLink=null;
-        	draggingNode=null;
-    		dispNode linkDstNode = getNodeOnClick(mEvent);
-			if(linkSrcNode!=null && linkDstNode!=null) {
-				String srcType = linkSrcNode.data.type;
-				String dstType = linkSrcNode.data.type;
-				if(srcType.equals(dstType)) {
-					if(srcType.equals("device")) {
-						DeviceSpec srcDev = getDevice(linkSrcNode.name);
-						srcDev.parent = linkDstNode.name;
-						DeviceSpec dstDev = getDevice(srcDev.parent);
-						dispLink srcLink = getLinkBySrc(linkSrcNode.name);   				        	
-			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
-						Scene scene = new Scene(dataFXML.load(),414,139);
-						Stage stage = new Stage();
-						stage.setScene(scene);							
-			     		stage.setTitle("Setting Link Latency");    		
-			     		stage.showAndWait();
-			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
-						if(srcLink!=null)srcLink.dst = linkDstNode;
-						else textfile.dispLinksList.add(textfile.createDispLink(srcDev, dstDev));
-					}else if(srcType.equals("module")) {
-						textfile.selectedModulesList.add(linkDstNode.name);
-						textfile.selectedModulesList.add(linkSrcNode.name);
-						selectedModulesList.add(linkDstNode.name);
-						selectedModulesList.add(linkSrcNode.name);
-						addEdge();
-					}
-				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
-					System.out.println("Sensor-Node link detected");
-				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
-			} else if (linkSrcNode==null) {
-				System.out.println("_MainWindowController.java: Linker Src is null");
-			} else if (linkDstNode==null) {
-				System.out.println("_MainWindowController.java: Linker Dst is null");
-			}
-		} else if (state==4) {
-    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newSensor = addSensor();
+    		} else draggingModuNode.setPos(mEvent);
+        	draggingModuNode=null; 
+//        	else if (state == 3) {
+////        	draggingLink=null;
+//        	draggingDeviceNode=null;
+//    		NodeSpec linkDstNode = getNodeOnClick(mEvent);
+//			if(linkSrcNode!=null && linkDstNode!=null) {
+//				String srcType = linkSrcNode.data.type;
+//				String dstType = linkSrcNode.data.type;
+//				if(srcType.equals(dstType)) {
+//					if(srcType.equals("device")) {
+//						DeviceSpec srcDev = getDevice(linkSrcNode.name);
+//						srcDev.parent = linkDstNode.name;
+//						DeviceSpec dstDev = getDevice(srcDev.parent);
+////						dispLink srcLink = getLinkBySrc(linkSrcNode.name);   				        	
+//			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+//						Scene scene = new Scene(dataFXML.load(),414,139);
+//						Stage stage = new Stage();
+//						stage.setScene(scene);							
+//			     		stage.setTitle("Setting Link Latency");    		
+//			     		stage.showAndWait();
+//			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
+////						if(srcLink!=null)srcLink.dst = linkDstNode;
+////						else textfile.dispLinksList.add(textfile.createDispLink(srcDev, dstDev));
+//					}else if(srcType.equals("module")) {
+//						textfile.selectedModulesList.add(linkDstNode.name);
+//						textfile.selectedModulesList.add(linkSrcNode.name);
+//						selectedModulesList.add(linkDstNode.name);
+//						selectedModulesList.add(linkSrcNode.name);
+//						addEdge();
+//					}
+//				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
+//					System.out.println("Sensor-Node link detected");
+//				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
+//			} else if (linkSrcNode==null) {
+//				System.out.println("_MainWindowController.java: Linker Src is null");
+//			} else if (linkDstNode==null) {
+//				System.out.println("_MainWindowController.java: Linker Dst is null");
+//			}
+    	} else if (state==4) {
+    		if(textfile.sensorsList.indexOf(draggingSensorNode)<0) {
+    			SensorSpec newSensor = addSensor();
     			if(newSensor!=null) newSensor.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-        	draggingNode=null;
+    		} else draggingSensorNode.setPos(mEvent);
+        	draggingSensorNode=null;
 		} else if (state==5) {			
-    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newActuator = addActuator();
+    		if(textfile.actuatorsList.indexOf(draggingActuatorNode)<0) {
+    			ActuatorSpec newActuator = addActuator();
     			if(newActuator!=null) newActuator.setPos(mEvent);   			
     		}
 		}
@@ -398,9 +422,24 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
-    	if(draggingNode != null){
-			draggingNode.x = mEvent.getX();
-			draggingNode.y = mEvent.getY();
+    	if(draggingDeviceNode != null){
+			draggingDeviceNode.x = mEvent.getX();
+			draggingDeviceNode.y = mEvent.getY();
+			redrawNodes();
+    	}
+    	if(draggingModuNode != null){
+    		draggingModuNode.x = mEvent.getX();
+    		draggingModuNode.y = mEvent.getY();
+			redrawNodes();
+    	}
+    	if(draggingSensorNode != null){
+    		draggingSensorNode.x = mEvent.getX();
+    		draggingSensorNode.y = mEvent.getY();
+			redrawNodes();
+    	}
+    	if(draggingActuatorNode != null){
+    		draggingActuatorNode.x = mEvent.getX();
+    		draggingActuatorNode.y = mEvent.getY();
 			redrawNodes();
     	}
     }
@@ -413,8 +452,31 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		redrawNodes();
     }
 	
-	private dispNode getNodeOnClick(MouseEvent mEvent) {
-		for(dispNode n : textfile.dispNodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) return n;
+	private NodeSpec getNodeOnClick(MouseEvent mEvent) {
+		for(DeviceSpec n : textfile.devicesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		for(ModuSpec n : textfile.modulesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		for(SensorSpec n : textfile.sensorsList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		for(ActuatorSpec n : textfile.actuatorsList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		return null;
+	}
+	
+	private DeviceSpec getDeviceOnClick(MouseEvent mEvent) {
+		for(DeviceSpec n : textfile.devicesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		return null;
+	}
+	
+	private ModuSpec getModuleOnClick(MouseEvent mEvent) {
+		for(ModuSpec n : textfile.modulesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		return null;
+	}
+	
+	private SensorSpec getSensorOnClick(MouseEvent mEvent) {
+		for(SensorSpec n : textfile.sensorsList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
+		return null;
+	}
+	
+	private ActuatorSpec getActuatorOnClick(MouseEvent mEvent) {
+		for(ActuatorSpec n : textfile.actuatorsList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.dispSize*zoomFactor) return n;
 		return null;
 	}
     
@@ -515,15 +577,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		double y_cord = (double) device.get("y_cord");
 		double size = (double) device.get("radius");
 		double latency = 6.0;
-		DeviceSpec d = textfile.createDevice(nodename, parentname, mips, ram, upbw, downbw, level, rate, apower, ipower, latency);
+		DeviceSpec d = textfile.createDevice(nodename, parentname, mips, ram, upbw, downbw, level, rate, apower, ipower, latency, x_cord, y_cord, size);
 		d.x = x_cord;
 		d.y = y_cord;
 		d.dispSize = size;
 		textfile.devicesList.add(d);
 		devicesList.add(d);
-		dispNode newDevice = textfile.createDispNode(nodename, d, d.x, d.y, d.dispSize);
-		textfile.dispNodesList.add(newDevice);
-		textfile.dispLinksList.add(textfile.createDispLink(d));
+//		DeviceSpec newDevice = textfile.createDevice(nodename, d, d.x, d.y, d.dispSize);
+//		textfile.dispNodesList.add(newDevice);
+//		textfile.dispLinksList.add(textfile.createDispLink(d));
 		redrawNodes();
 	}
 	
@@ -532,14 +594,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         double x_cord = (double) actuator.get("x_cord");
         double y_cord = (double) actuator.get("y_cord");
         double size = (double) actuator.get("radius");
-        ActuatorSpec a = textfile.createActuator(actuatorName + " \n");
+        ActuatorSpec a = textfile.createActuator(actuatorName, x_cord, y_cord, size);
         a.x = x_cord;
         a.y = y_cord;
         a.dispSize = size;
         textfile.actuatorsList.add(a);
         actuatorsList.add(a);
-        dispNode newDevice = textfile.createDispNode(actuatorName, a, a.x, a.y, a.dispSize);
-        textfile.dispNodesList.add(newDevice);
+//        dispNode newDevice = textfile.createDispNode(actuatorName, a, a.x, a.y, a.dispSize);
+//        textfile.dispNodesList.add(newDevice);
         redrawNodes();
     }
 	
@@ -555,14 +617,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		double x_cord = (double) sensor.get("x_cord");
 		double y_cord = (double) sensor.get("y_cord");
 		double size = (double) sensor.get("radius");
-		SensorSpec s = textfile.createSensor(sensorName, parentName, latency, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin);
+		SensorSpec s = textfile.createSensor(sensorName, parentName, latency, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin, x_cord, y_cord, size);
 		s.x = x_cord;
 		s.y = y_cord;
 		s.dispSize = size;
 		textfile.sensorsList.add(s);
 		sensorsList.add(s);
-		dispNode newSensor =textfile.createDispNode(sensorName, s, s.x, s.y, s.dispSize);
-		textfile.dispNodesList.add(newSensor);
+//		dispNode newSensor =textfile.createDispNode(sensorName, s, s.x, s.y, s.dispSize);
+//		textfile.dispNodesList.add(newSensor);
 		redrawNodes();
 	}
 	
@@ -597,14 +659,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		double sz = (double) szT;
 		
 		ModuSpec m = textfile.createModule(nodeName, moduleName, modRam, bandwidth, inTuple, outTuple,
-				size, mips, fractionalSensitivity);
+				size, mips, fractionalSensitivity, x_cord, y_cord, sz);
 		m.x = x_cord;
 		m.y = y_cord;
 		m.dispSize = sz;
 		textfile.modulesList.add(m);
 		modulesList.add(m);
-		dispNode newMod = textfile.createDispNode(nodeName, m, m.x, m.y, m.dispSize);
-		textfile.dispNodesList.add(newMod);
+//		dispNode newMod = textfile.createDispNode(nodeName, m, m.x, m.y, m.dispSize);
+//		textfile.dispNodesList.add(newMod);
 		redrawNodes();
 	}
 	
@@ -622,7 +684,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
     @FXML
-    dispNode addActuator() {
+    ActuatorSpec addActuator() {
     	try {
     		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
     		Scene scene = new Scene(addNewActuatorLoader.load(),264,133);
@@ -635,11 +697,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		if (a==null) return null;
     		String name = a.name;
 
-    		dispNode newActuator = textfile.createDispNode(a.name, a, xCenter, yCenter, R+R);
+    		ActuatorSpec newActuator = textfile.createActuator(a.name, xCenter, yCenter, R+R);
 			if (name != "Error" && getActuator(name)==null) {
-				textfile.actuatorsList.add(a);
+				textfile.actuatorsList.add(newActuator);
 				actuatorsList.add(a);
-				textfile.dispNodesList.add(newActuator);
+//				textfile.dispNodesList.add(newActuator);
 			}
 			redrawNodes();
     		return newActuator;
@@ -650,7 +712,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    dispNode addDevice() {
+    DeviceSpec addDevice() {
     	try {
     		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
     		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
@@ -663,17 +725,18 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		LinkSpec l = controller.getLinkSpec();
     		if (d==null) return null;
     		String name = d==null?"Error":d.name;
-    		dispNode newDevice = textfile.createDispNode(name, d, xCenter, yCenter, R+R);
+    		DeviceSpec d1 = textfile.createDevice(d.name, d.parent, d.mips, d.ram, d.upbw, d.downbw, d.level, d.rate, d.apower, d.ipower, 
+    				d.latency, xCenter, yCenter, R+R);
 			if (name != "Error" && getDevice(name)==null) {
-				textfile.devicesList.add(d);
+				textfile.devicesList.add(d1);
 				textfile.linksList.add(l);
-				devicesList.add(d);
+				devicesList.add(d1);
 				linksList.add(l);
-				textfile.dispNodesList.add(newDevice);
-				textfile.dispLinksList.add(textfile.createDispLink(d));
+				//textfile.dispNodesList.add(newDevice);
+//				textfile.dispLinksList.add(textfile.createDispLink(d));
 			}
 			redrawNodes();
-    		return newDevice;
+    		return d1;
     	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
@@ -681,7 +744,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    dispNode addSensor() {
+    SensorSpec addSensor() {
     	try {
     		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
     		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
@@ -694,11 +757,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		SensorSpec s = sensorController.getSpec();
     		if (s==null) return null;
     		String name = s==null?"Error":s.name;
-    		dispNode newDevice = textfile.createDispNode(name, s, xCenter, yCenter, R+R);
+    		SensorSpec newDevice = textfile.createSensor(name, s.parent, s.latency, s.deterministicValue, s.normalMean, s.normalStdDev, s.uniformMax, s.uniformMin,xCenter, yCenter, R+R);
 			if (name != "Error" && getSensor(name)==null) {
-				textfile.sensorsList.add(s);
+				textfile.sensorsList.add(newDevice);
 				sensorsList.add(s);
-				textfile.dispNodesList.add(newDevice);
+//				textfile.dispNodesList.add(newDevice);
 			}
 			redrawNodes();
     		return newDevice;
@@ -709,7 +772,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    dispNode addModule() {
+    ModuSpec addModule() {
     	try {
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
     		Scene scene = new Scene(dataFXML.load(),414,346);
@@ -722,11 +785,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ModuSpec m = controller.getSpec();
     		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
-    		dispNode newMod = textfile.createDispNode(name, m, xCenter, yCenter, R+R);
+    		ModuSpec newMod = textfile.createModule(m.nodeName, m.name, m.modRam, m.bandwidth, m.inTuple, m.outTuple,m.size,m.MIPS,m.fractionalSensitivity,xCenter, yCenter, R+R);
 			if (name != "Error" && getModule(name)==null) {
-				textfile.modulesList.add(m);
+				textfile.modulesList.add(newMod);
 				modulesList.add(m);
-				textfile.dispNodesList.add(newMod);
+//				textfile.dispNodesList.add(newMod);
 			}
     		redrawNodes();
     		return newMod;
@@ -752,7 +815,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ModuEdgeSpec v = controller.getSpec();
     		if(v!=null) {
     			moduleEdgesList.add(v);
-    			textfile.dispLinksList.add(textfile.createDispLink(v));
+//    			textfile.dispLinksList.add(textfile.createDispLink(v));
     		}
     		redrawNodes();
     		return v;
@@ -782,11 +845,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	for (ActuatorSpec a : actuatorsList) if (a.name.equals(_name)) return a;
 		return null;
     }
-    public dispLink getLinkBySrc(String _src) {
-    	if (_src==null) return null;
-    	for (dispLink l : textfile.dispLinksList) if (l.src.name.equals(_src)) return l;
-		return null;
-    }
+//    public dispLink getLinkBySrc(String _src) {
+//    	if (_src==null) return null;
+//    	for (dispLink l : textfile.dispLinksList) if (l.src.name.equals(_src)) return l;
+//		return null;
+//    }
     
     @FXML
     void deleteHandler(ActionEvent event) {
