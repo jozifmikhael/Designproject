@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -171,7 +172,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				devicesList.add(d);
 			}else if(data.type.equals("module")) {
 				ModuSpec m = getModule(this.data.name);
-				devicesList.remove(m);
+				modulesList.remove(m);
 				m.x=this.x; m.y=this.y; m.dispSize=this.sz;
 				modulesList.add(m);
 			}else if(data.type.equals("sensor")) {
@@ -243,20 +244,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    	for(dispNode dn : dispNodesList) if(dn.name.equals(_dst.name)) {this.dst=dn;}
 		}
 		dispLink(ModuEdgeSpec _spec) {
-	    	for(dispNode dn : dispNodesList) if(dn.name.equals(_spec.child)) this.src=dn;
-	    	for(dispNode dn : dispNodesList) if(dn.name.equals(_spec.parent)) this.dst=dn;
+	    	for(dispNode dn : dispNodesList) if(dn.name.equals(_spec.child)) this.dst=dn;
+	    	for(dispNode dn : dispNodesList) if(dn.name.equals(_spec.parent)) this.src=dn;
 		}
 		public dispLink(ModuSpec _src, ModuSpec _dst) {
 			for(dispNode dn : dispNodesList) if(dn.name.equals(_src.name)) {this.src=dn;}
 	    	for(dispNode dn : dispNodesList) if(dn.name.equals(_dst.name)) {this.dst=dn;}
 		}
-		dispLink(SensorSpec _src, DeviceSpec _dst){
+		dispLink(SensorSpec _dst, DeviceSpec _src){
 			for (dispNode dn : dispNodesList) if (dn.name.equals(_src.name)) this.src = dn;
 			for (dispNode dn : dispNodesList) if (dn.name.equals(_dst.parent)) this.dst = dn;
 		}
-		dispLink(DeviceSpec _src, SensorSpec _dst){
-			for (dispNode dn : dispNodesList) if (dn.name.equals(_src.name)) this.src = dn;
-			for (dispNode dn : dispNodesList) if (dn.name.equals(_dst.parent)) this.dst = dn;
+		dispLink(SensorSpec _dst){
+			for (dispNode dn : dispNodesList) if (dn.name.equals(_dst.parent)) this.src = dn;
+			for (dispNode dn : dispNodesList) if (dn.name.equals(_dst.name)) this.dst = dn;
 		}
 		public void setSrc(dispNode node) {
 			this.src = node;
@@ -332,11 +333,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	if(selectedNode != null)selectedNode.selected = false;
     	if(selectedLink != null)selectedLink.selected = false;
     	selectedLink = getLinkOnClick(mEvent);
-    	System.out.println(dispLinksList.size());
     	//TODO
 		dispNode selNode = getNodeOnClick(mEvent);
 		if(selectedLink != null && selNode != null) selectedLink = null;
-		if(selectedLink != null)System.out.println("SRC " + selectedLink.src.name + " DST " + selectedLink.dst.name);
 		if (state == 0) {
 			draggingNode = selNode;
 			selectedNode = selNode;
@@ -389,12 +388,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	} else if (state==1) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newDevice=addDevice();
+    			selectedNode = null;
     			if(newDevice!=null) newDevice.setPos(mEvent);
     		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
     	} else if (state==2) {
     		if(dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newModule = addModule();
+    			selectedNode = null;
     			if(newModule!=null) newModule.setPos(mEvent);
     		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
@@ -414,8 +415,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 						if(srcLink!=null) srcLink.dst = linkDstNode;
 						else dispLinksList.add(new dispLink(srcDev, dstDev));
 					}else if(srcType.equals("module")) {
-						selectedModulesList.add(linkDstNode.name);
 						selectedModulesList.add(linkSrcNode.name);
+						selectedModulesList.add(linkDstNode.name);
 						addEdge();
 					}
 				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
@@ -454,6 +455,23 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     public dispNode getDispNode(String _name) {
     	if (_name==null) return null;
     	for (dispNode d : dispNodesList) if (d.name.equals(_name)) return d;
+		return null;
+    }
+    public dispLink getDispLink(String _src, String _dst) {
+    	if (_src==null) return null;
+    	if (_dst==null) return null;
+    	for (dispLink l : dispLinksList) if (l.src.name.equals(_src) && l.dst.name.equals(_dst)) return l;
+		return null;
+    }
+    public ModuEdgeSpec getModuleEdge(String _src) {
+    	if (_src==null) return null;
+    	for (ModuEdgeSpec e : moduleEdgesList) if (e.parent.equals(_src) || e.child.equals(_src)) return e;
+		return null;
+    }   
+    public ModuEdgeSpec getModuleEdge(String _src,String _dst) {
+    	if (_src==null) return null;
+    	if (_dst==null) return null;
+    	for (ModuEdgeSpec e : moduleEdgesList) if (e.parent.equals(_src) && e.child.equals(_dst)) return e;
 		return null;
     }
     public dispLink getLinkBySrc(String _src) {
@@ -719,13 +737,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     dispNode addSensor() {
-    	try {
+    	try {//TODO CREATE A LINK AUTO FROM SELECTED PARENT
     		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
     		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
-    		sensorController.initialize();
+    		sensorController.initialize(editSensor);
     		sensorController.populateList(deviceNamesList);
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
@@ -733,10 +751,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		if (s==null) return null;
     		String name = s==null?"Error":s.name;
     		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
-			if (name != "Error" && sensorNameList.indexOf(name) < 0) {
+			if (name != "Error" && getSensor(name) == null) {
 				sensorsList.add(s);
 				sensorNameList.add(name);
 				dispNodesList.add(newDevice);
+				dispLinksList.add(new dispLink(s));
 			}
 			redrawNodes();
     		return newDevice;
@@ -770,7 +789,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				dispLinksList.add(new dispLink(d));
 			}
 			redrawNodes();
-			System.out.println(newDevice.toString());
     		return newDevice;
     	} catch(Exception e) {
     		e.printStackTrace();
@@ -787,7 +805,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
-    		controller.initialize();
+    		controller.initialize(editModule);
     		controller.populateList(deviceNamesList);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
@@ -795,7 +813,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
     		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R);
-			if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
+			if (name != "Error" && getModule(name) == null) {
 				modulesList.add(m);
 				moduleNamesList.add(name);
 				dispNodesList.add(newMod);
@@ -818,6 +836,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			AddEdgeController controller = dataFXML.getController();
 			if(selectedModulesList.isEmpty()) controller.populateList(moduleNamesList);
 			else controller.populateList(selectedModulesList);
+			controller.initialize(editEdge);
 			selectedModulesList.removeAll(selectedModulesList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
@@ -835,234 +854,215 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void deleteHandler(ActionEvent event) {
-    	if(!(selectedNode == null)) {
-    		if(selectedNode.data.type.equals("device")) {
-    			for(String nodeName: deviceNamesList) {
-    		        if(selectedNode.name.equals(nodeName)) {
-    		            deviceNamesList.remove(nodeName);
-    		            break;
-    		        }
-    		    }
-    			for(DeviceSpec node : devicesList) {
-    		        if(selectedNode.name.equals(node.name)) {
-    		            devicesList.remove(node);
-    		            break;
-    		        }
-    		    }
-    			for(ModuSpec module : modulesList) {
-    		        if(selectedNode.name.equals(module.nodeName)) {
-    		        	module.setNodeName("Module_default_node");
-    		        }
-    		    }
-    		    for(LinkSpec links: linksList) {
-    		        if(selectedNode.name.equals(links.dstID)||selectedNode.name.equals(links.srcID)) {
-    		            linksList.remove(links);
-    		        }
-    		    }
-    		    for(SensorSpec sensor : sensorsList ) {
-    		        if(selectedNode.name.equals(sensor.parent)) {
-    		            sensor.setParent("0");
-    		        }
-    		    }
-    		    for(dispLink link: dispLinksList) {
-    		        if(selectedNode.equals(link.src) || selectedNode.equals(link.dst)) {
-    		            dispLinksList.remove(link);
-    		        }
-    		    }
-    		    dispNodesList.remove(selectedNode);
-    		    selectedNode = null;
-    	        redrawNodes();
-    		}
-    		else if(selectedNode.data.type.equals("module")) {
-    			for(String m: moduleNamesList) {
-    				if(selectedNode.name.equals(m)) {
-    					moduleNamesList.remove(m);
-    				}
-    			}
-    			for(String m: selectedModulesList) {
-    				if(selectedNode.name.equals(m)) {
-    					selectedModulesList.remove(m);
-    				}
-    			}
-    			for(ModuEdgeSpec edge: moduleEdgesList) {
-    				if(selectedNode.name.equals(edge.parent) || selectedNode.name.equals(edge.child)) {
-    					moduleEdgesList.remove(edge);
-    				}
-    			}
-    			for(ModuSpec module: modulesList) {
-    				if(selectedNode.name.equals(module.name)) {
-    					modulesList.remove(module);
-    				}
-    			}
-    			for(dispLink link: dispLinksList) {
-    		        if(selectedNode.equals(link.src) || selectedNode.equals(link.dst)) {
-    		            dispLinksList.remove(link);
-    		        }
-    		    }
-    			dispNodesList.remove(selectedNode);
-    		    selectedNode = null;
-    	        redrawNodes();
-    		}
-    		else if(selectedNode.data.type.equals("sensor")) {
-    			for(String sensorName: sensorNameList) {
-    				if(selectedNode.name.equals(sensorName)) {
-    					sensorNameList.remove(sensorName);
-    				}
-    			}
-    			for(LinkSpec links: linksList) {
-    		        if(selectedNode.name.equals(links.dstID)) {
-    		            linksList.remove(links);
-    		            break;
-    		        }
-    		    }
-    			for(SensorSpec s: sensorsList) {
-    				if(selectedNode.name.equals(s.name)) {
-    					sensorsList.remove(s);
-    				}
-    			}
-    			for(dispLink displayLink: dispLinksList) {
-    				if(selectedNode.equals(displayLink.dst)) {
-    					dispLinksList.remove(displayLink);
-    					break;
-    				}
-    			}
-    			dispNodesList.remove(selectedNode);
-    		    selectedNode = null;
-    	        redrawNodes();
-    		}
-    		else if(selectedNode.data.type.equals("acutator")) {
-    			//TODO Actuators
-    		}
-    	}
+    dispNode deleteHandler(ActionEvent event) {
+    	if(selectedNode == null && selectedLink == null) return null;
+    	
+		if(selectedNode != null) {
+			if(selectedNode.data.type.equals("device")) {
+				DeviceSpec device = getDevice(selectedNode.name);
+				if(device != null)devicesList.remove(device);
+				
+				for(ModuSpec m : modulesList)
+					if(m.nodeName.equals(device.name))m.nodeName = "0";
+				
+				for(SensorSpec s : sensorsList)
+					if(s.parent.equals(device.name))s.parent = "0";
+				
+				for(Iterator<dispLink> iterator = dispLinksList.iterator(); iterator.hasNext();) {
+					dispLink l = iterator.next();
+					if(l.src.name.equals(device.name)) iterator.remove();
+					else if(l.dst.name.equals(device.name))iterator.remove();
+				}
+			}
+			else if(selectedNode.data.type.equals("module")) {
+				ModuSpec module = getModule(selectedNode.name);
+				if(module != null)modulesList.remove(module);
+				
+				for(Iterator<ModuEdgeSpec> iterator = moduleEdgesList.iterator(); iterator.hasNext();) {
+					ModuEdgeSpec me = iterator.next();
+					if(me.parent.equals(module.name)) iterator.remove();
+					else if(me.child.equals(module.name))iterator.remove();
+				}
+				
+				for(Iterator<dispLink> iterator = dispLinksList.iterator(); iterator.hasNext();) {
+					dispLink l = iterator.next();
+					if(l.src.name.equals(module.name)) iterator.remove();
+					else if(l.dst.name.equals(module.name))iterator.remove();
+				}
+			}
+			else if(selectedNode.data.type.equals("sensor")) {
+				SensorSpec sensor = getSensor(selectedNode.name);
+				sensorsList.remove(sensor);
+				
+				for(Iterator<dispLink> iterator = dispLinksList.iterator(); iterator.hasNext();) {
+					dispLink l = iterator.next();
+					if(l.src.name.equals(sensor.name)) iterator.remove();
+					else if(l.dst.name.equals(sensor.name))iterator.remove();
+				}
+			}
+			else if(selectedNode.data.type.equals("acutator")) {
+				//TODO Actuators
+//				ActuatorSpec acuator = getActuator(selectedNode.name);
+//				actuatorsList.remove(acuator);
+//				
+//				for(Iterator<dispLink> iterator = dispLinksList.iterator(); iterator.hasNext();) {
+//					dispLink l = iterator.next();
+//					if(l.src.name.equals(actuator.name)) iterator.remove();
+//					else if(l.dst.name.equals(actuator.name))iterator.remove();
+//				}
+			}
+			dispNodesList.remove(selectedNode);
+		    selectedNode = null;
+	        redrawNodes();
+		}
+		else if(selectedLink != null) {
+			if(getModule(selectedLink.dst.name) == null || getModule(selectedLink.src.name) == null) {
+				if(getDevice(selectedLink.dst.name) != null) {
+					NodeSpec node = getDevice(selectedLink.src.name);
+					node.parent = "defaultParent";
+				}
+				else if(getSensor(selectedLink.dst.name) != null) {
+					SensorSpec sensor = getSensor(selectedLink.dst.name);
+					sensor.parent = "defaultParent";
+				}
+				//TODO ACUTATORS
+//				else if(getActuator(selectedLink.dst.name) != null) {
+//					ActuatorSpec actuator = getActuator(selectedLink.dst.name);
+//					actuator.parent = "defaultParent";
+//				}
+				dispLinksList.remove(selectedLink);
+			}
+			else {
+				for(Iterator<ModuEdgeSpec> iterator = moduleEdgesList.iterator(); iterator.hasNext();) {
+					ModuEdgeSpec me = iterator.next();
+					if(selectedLink.dst.name.equals(me.child) && selectedLink.src.name.equals(me.parent))iterator.remove();
+					else if(selectedLink.dst.name.equals(me.parent) && selectedLink.src.name.equals(me.child))iterator.remove();
+				}
+			}
+			
+			selectedLink = null;
+			redrawNodes();
+		}
+		return null;
     }
     
     DeviceSpec editDevice = null;
+    ModuSpec editModule = null;
+    SensorSpec editSensor = null;
+//    ActuatorSpec editAcuator = null;
+    ModuEdgeSpec editEdge = null;
     
     @FXML
     dispNode editHandler(ActionEvent event) {
-    	//TODO
-    	if(selectedNode == null) return null;
-		if(selectedNode.data.type.equals("device")) {
-			DeviceSpec device = getDevice(selectedNode.name);
-			if(device == null) return null;
-			editDevice = device;
-			devicesList.remove(device);
-			dispNode oldDispNode = getDispNode(editDevice.name);
-			if(oldDispNode != null)dispNodesList.remove(oldDispNode);
-			dispNode afterEdit = addDevice();
-			afterEdit.x = editDevice.x;
-			afterEdit.y = editDevice.y;
-			redrawNodes();
-			editDevice = null;
-		}
-		else if(selectedNode.data.type.equals("module")) {
-			for(ModuSpec module : modulesList) {
-				if(selectedNode.name.equals(module.name)) {
-					try {
-			    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
-			    		Scene scene = new Scene(dataFXML.load(),414,346);
-			    		Stage stage = new Stage();
-			    		stage.setScene(scene);
-			    		AddModuleController controller = dataFXML.getController();
-			    		controller.initializeEdit(module);
-			    		controller.populateList(deviceNamesList);
-			    		stage.setTitle("Add Module");
-			    		stage.showAndWait();
-			    		ModuSpec m = controller.getSpec();
-			    		if (m==null) return null;
-			    		String name = m.name==null?"Error":m.name;
-			    		dispNode newMod = new dispNode(name, m, selectedNode.x, selectedNode.y, R+R);
-			    		
-			    		for(String moduleName: moduleNamesList) {
-			    			if(moduleName.equals(selectedNode.name)) {
-			    				moduleNamesList.remove(moduleName);
-			    				break;
-			    			}
-			    		}
-			    		
-			    		for(ModuEdgeSpec mes: moduleEdgesList) {
-			    			if(mes.parent.equals(selectedNode.name)) {
-			    				mes.setParent(m.name);
-			    			}
-			    			if(mes.child.equals(selectedNode.name)) {
-			    				mes.setChild(m.name);
-			    			}
-			    		}
-	    	    		
-			    		modulesList.remove(module);
-						if (name != "Error" && moduleNamesList.indexOf(name) < 0) {
-							modulesList.add(m);
-							moduleNamesList.add(name);
-							dispNodesList.add(newMod);
-						}
-						selectedNode = null;
-			    		redrawNodes();
-			    		return newMod;
-			    	} catch(Exception e) {
-			    		e.printStackTrace();
-			    		return null;
-			    	}
+    	if(selectedNode == null && selectedLink == null) return null;
+		if(selectedNode != null) {
+			if(selectedNode.data.type.equals("device")) {
+				DeviceSpec device = getDevice(selectedNode.name);
+				if(device == null) return null;
+				devicesList.remove(device);
+				editDevice = device;
+				dispNode afterEditNode = addDevice();
+				if(afterEditNode != null) {
+					afterEditNode.x = editDevice.x;
+					afterEditNode.y = editDevice.y;
+					dispNode oldDispNode = getDispNode(editDevice.name);
+					dispLink oldLink = getDispLink(editDevice.parent, editDevice.name);
+					for(dispLink l: dispLinksList) 
+						if(l.src.equals(oldDispNode))l.src = afterEditNode;
+					if(oldDispNode != null)dispNodesList.remove(oldDispNode);
+					if(oldLink != null) dispLinksList.remove(oldLink);
 				}
+				else devicesList.add(device);
+				redrawNodes();
+				editDevice = null;
+			}
+			else if(selectedNode.data.type.equals("module")) {
+				ModuSpec module = getModule(selectedNode.name);
+				if(module == null) return null;
+				modulesList.remove(module);
+				editModule = module;
+				dispNode afterEditModule = addModule();
+				if(afterEditModule != null) {
+					afterEditModule.x = editModule.x;
+					afterEditModule.y = editModule.y;
+					dispNode oldDispModule = getDispNode(editModule.name);
+					if(oldDispModule != null)dispNodesList.remove(oldDispModule);
+					for(dispLink l: dispLinksList) {
+						if(l.src.equals(oldDispModule))l.src = afterEditModule;
+						if(l.dst.equals(oldDispModule))l.dst = afterEditModule;
+					}
+					for(ModuEdgeSpec ml: moduleEdgesList) {
+						if(ml.parent.equals(oldDispModule.name))ml.parent = afterEditModule.name;
+						if(ml.child.equals(oldDispModule.name))ml.child = afterEditModule.name;
+					}
+				}
+				else modulesList.add(module);
+				redrawNodes();
+				editModule = null;
+			}//TODO Maybe an issue if link is draw from sensor to node and created with node as dst
+			else if(selectedNode.data.type.equals("sensor")) {
+				SensorSpec sensor = getSensor(selectedNode.name);
+				if(sensor == null) return null;
+				sensorsList.remove(sensor);
+				editSensor = sensor;
+				dispNode afterEditSensor = addSensor();
+				if(afterEditSensor != null) {
+					afterEditSensor.x = editSensor.x;
+					afterEditSensor.y = editSensor.y;
+					dispNode oldDispSensor = getDispNode(editSensor.name);
+					dispLink oldLink = getDispLink(editSensor.parent, editSensor.name);
+					for(dispLink l: dispLinksList) 
+						if(l.dst.equals(oldDispSensor))l.dst = afterEditSensor;
+					if(oldDispSensor != null)dispNodesList.remove(oldDispSensor);
+					if(oldLink != null) dispLinksList.remove(oldLink);
+				}
+				else sensorsList.add(sensor);
+				redrawNodes();
+				editSensor = null;
+			}
+			else if(selectedNode.data.type.equals("acutator")) {
+				//TODO Actuators
+//				ActuatorSpec actuator = getActuator(selectedNode.name);
+//				if(actuator == null) return null;
+//				actuatorList.remove(actuator);
+//				editActuator = actuator;
+//				dispNode afterEditActuator = addActuator();
+//				if(afterEditActuator != null) {
+//					afterEditActuator.x = editActuator.x;
+//					afterEditActuator.y = editActuator.y;
+//					dispNode oldDispActuator = getDispNode(editActuator.name);
+//					dispLink oldLink = getDispLink(editActuator.parent, editActuator.name);
+//					for(dispLink l: dispLinksList) 
+//						if(l.dst.equals(oldDispActuator))l.dst = afterEditActuator;
+//					if(oldDispActuator != null)dispNodesList.remove(oldDispActuator);
+//					if(oldLink != null) dispLinksList.remove(oldLink);
+//				}
+//				redrawNodes();
+//				editActuator = null;
 			}
 		}
-		else if(selectedNode.data.type.equals("sensor")) {
-			for(SensorSpec sensor: sensorsList) {
-				if(selectedNode.name.equals(sensor.name)) {
-			    	try {
-			    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-			    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
-			    		Stage stage = new Stage();
-			    		stage.setScene(scene);
-			    		AddSensorController sensorController = addNewSensorLoader.getController();
-			    		sensorController.initializeEdit(sensor);
-			    		sensorController.populateList(deviceNamesList);
-			    		stage.setTitle("Add Sensor");
-			    		stage.showAndWait();
-			    		SensorSpec s = sensorController.getSpec();
-			    		if (s==null) return null;
-			    		String name = s==null?"Error":s.name;
-			    		dispNode newDevice = new dispNode(name, s, selectedNode.x, selectedNode.y, R+R);
-			    		
-			    		for(String sensorName : sensorNameList) {
-			    			if(sensorName.equals(sensor.name)) {
-			    				sensorNameList.remove(sensorName);
-			    				break;
-			    			}
-			    		}
-			    		
-			    		for(LinkSpec link: linksList) {
-			    			if(link.dstID.equals(sensor.name)) {
-			    				linksList.remove(link);
-			    				break;
-			    			}
-			    		}
-			    		
-			    		for(dispLink displayLink: dispLinksList) {
-			    			if(selectedNode.equals(displayLink.dst)) {
-			    				dispLinksList.remove(displayLink);
-			    				break;
-			    			}
-			    		}
-			    		
-			    		sensorsList.remove(sensor);
-						if (name != "Error" && sensorNameList.indexOf(name) < 0) {
-							sensorsList.add(s);
-							sensorNameList.add(name);
-							dispNodesList.add(newDevice);
-						}
-						selectedNode = null;
-						redrawNodes();
-			    		return newDevice;
-			    	} catch(Exception e) {
-			    		e.printStackTrace();
-			    		return null;
-			    	}
+		else if(selectedLink != null) {
+			if(getModule(selectedLink.dst.name) == null || getModule(selectedLink.src.name) == null) {
+				//TODO 
+			}
+			else {
+				ModuEdgeSpec oldEdge = getModuleEdge(selectedLink.src.name, selectedLink.dst.name);
+				dispLink oldDispEdge = getDispLink(selectedLink.src.name, selectedLink.dst.name);
+				if(oldDispEdge == null) oldDispEdge = getDispLink(selectedLink.dst.name, selectedLink.src.name);
+				if(oldDispEdge == null) return null;
+				if(oldEdge == null) oldEdge = getModuleEdge(selectedLink.dst.name, selectedLink.src.name);
+				if(oldEdge == null) return null;
+				System.out.println("SRC " + oldEdge.parent + " DST " + oldEdge.child);
+				System.out.println("SRC " + oldDispEdge.src.name + " DST " + oldDispEdge.dst.name);
+				dispLinksList.remove(oldDispEdge);
+				moduleEdgesList.remove(oldEdge);
+				editEdge = oldEdge;
+				ModuEdgeSpec newEdge = addEdge();
+				if(newEdge == null) {
+					moduleEdgesList.add(oldEdge);
+					dispLinksList.add(oldDispEdge);
 				}
 			}
-		}
-		else if(selectedNode.data.type.equals("acutator")) {
-			//TODO Actuators
 		}
     	return null;
     }

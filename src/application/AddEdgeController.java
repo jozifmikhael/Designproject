@@ -21,12 +21,6 @@ public class AddEdgeController {
 	SetupJSONParser textfile = new SetupJSONParser();
 	
 	@FXML
-	private TextField parent;
-	
-	@FXML
-	private TextField child;
-	
-	@FXML
 	private TextField tupleType;
 	
 	@FXML
@@ -98,6 +92,25 @@ public class AddEdgeController {
 		if(items.size()>1) {
 			parentChoice.setValue(items.get(0));
 			childChoice.setValue(items.get(1));
+		}
+	}
+	
+	void initialize(ModuEdgeSpec moduleEdge) {
+		if(moduleEdge == null) {
+			tupleType.setText("EEG");
+			periodicity.setText("0.0");
+			cpuLength.setText("3500.0");
+			newLength.setText("500.0");
+			direction.setText("1");
+			edgeType.setText("1");
+		}
+		else {
+			tupleType.setText(moduleEdge.tupleType);
+			periodicity.setText(String.valueOf(moduleEdge.periodicity));
+			cpuLength.setText(String.valueOf(moduleEdge.cpuLength));
+			newLength.setText(String.valueOf(moduleEdge.newLength));
+			direction.setText(String.valueOf(moduleEdge.direction));
+			edgeType.setText(String.valueOf(moduleEdge.edgeType));
 		}
 	}
 	

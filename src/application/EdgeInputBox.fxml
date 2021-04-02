@@ -16,20 +16,20 @@
                   <Text layoutX="20.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Destination:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="58.0" />
                   <Text layoutX="22.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tuple Type:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="100.05078125" />
                   <Text layoutX="45.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source:" AnchorPane.leftAnchor="45.0" AnchorPane.topAnchor="20.0" />
-                  <TextField fx:id="tupleType" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" text="EEG" AnchorPane.topAnchor="96.0" />
+                  <TextField fx:id="tupleType" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="96.0" />
                   <Button fx:id="saveAppEdge" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveAppEdgeHandler" text="Save App Edge" />
-                  <TextField fx:id="periodicity" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" text="0.0" AnchorPane.topAnchor="136.0" />
-                  <TextField fx:id="cpuLength" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" text="3500.0" />
-                  <TextField fx:id="newLength" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" text="500.0" />
-                  <TextField fx:id="edgeType" layoutX="281.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" text="1" />
+                  <TextField fx:id="periodicity" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" AnchorPane.topAnchor="136.0" />
+                  <TextField fx:id="cpuLength" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" />
+                  <TextField fx:id="newLength" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" />
+                  <TextField fx:id="edgeType" layoutX="281.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
                   <Text layoutX="31.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Period:" AnchorPane.topAnchor="140.0" />
                   <Text layoutX="16.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CPU Length:" />
                   <Text layoutX="8.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Network Length:" />
                   <Text layoutX="207.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edge Type:" />
-                  <TextField fx:id="direction" layoutX="281.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" text="1" />
+                  <TextField fx:id="direction" layoutX="281.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
                   <Text layoutX="207.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Direction:" />
-                  <ChoiceBox fx:id="parentChoice" layoutX="103.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
-                  <ChoiceBox fx:id="childChoice" layoutX="103.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
+                  <ChoiceBox fx:id="childChoice" layoutX="103.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
+                  <ChoiceBox fx:id="parentChoice" layoutX="103.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
                </children>
             </AnchorPane>
          </children>

@@ -362,8 +362,8 @@ public class SetupJSONParser {
 		JSONObject toJSON() {
 			ModuEdgeSpec edge = this;
 			JSONObject obj = new JSONObject();
-			obj.put("src", edge.child);
-			obj.put("dest", edge.parent);
+			obj.put("src", edge.parent);
+			obj.put("dest", edge.child);
 			obj.put("tupleType", edge.tupleType);
 			obj.put("periodicity", edge.periodicity);
 			obj.put("tupleCpuLength", edge.cpuLength);

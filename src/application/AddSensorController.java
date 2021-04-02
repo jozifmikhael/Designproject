@@ -124,25 +124,26 @@ public class AddSensorController {
 		nodeBox.setItems(items);
 	}
 	
-	public void initialize() {
-		sensorLatency.setText("6.0");
-		sensorName.setText("sensor1");
-		DeterministicValue.setText("5.1");
-		mean.setText("5.0");
-		stdDev.setText("1.0");
-		max.setText("5.0");
-		min.setText("1.0");
-	}
-	
-	public void initializeEdit(SensorSpec sensor) {
-		nodeBox.getSelectionModel().select(sensor.parent);
-		sensorLatency.setText(String.valueOf(sensor.latency));
-		sensorName.setText(sensor.name);
-		DeterministicValue.setText(String.valueOf(sensor.deterministicValue));
-		mean.setText(String.valueOf(sensor.normalMean));
-		stdDev.setText(String.valueOf(sensor.normalStdDev));
-		max.setText(String.valueOf(sensor.uniformMax));
-		min.setText(String.valueOf(sensor.uniformMin));
+	public void initialize(SensorSpec sensor) {
+		if(sensor == null) {
+			sensorLatency.setText("6.0");
+			sensorName.setText("sensor1");
+			DeterministicValue.setText("5.1");
+			mean.setText("5.0");
+			stdDev.setText("1.0");
+			max.setText("5.0");
+			min.setText("1.0");
+		}
+		else {
+			nodeBox.getSelectionModel().select(sensor.parent);
+			sensorLatency.setText(String.valueOf(sensor.latency));
+			sensorName.setText(sensor.name);
+			DeterministicValue.setText(String.valueOf(sensor.deterministicValue));
+			mean.setText(String.valueOf(sensor.normalMean));
+			stdDev.setText(String.valueOf(sensor.normalStdDev));
+			max.setText(String.valueOf(sensor.uniformMax));
+			min.setText(String.valueOf(sensor.uniformMin));
+		}
 	}
   	
 	public SensorSpec getSpec() {return s;}
