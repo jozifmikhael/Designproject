@@ -42,6 +42,8 @@ public class TimeKeeper {
 			return;
 		double executionTime = CloudSim.clock() - tupleIdToCpuStartTime.get(tuple.getCloudletId());
 //		System.out.println(tuple.getTupleType() + " : " + executionTime);
+//		if (tuple.getTupleType().equals("EEG"))
+//			System.out.println(tuple.getTupleType() +": " + executionTime);
 		if(!tupleTypeToAverageCpuTime.containsKey(tuple.getTupleType())){
 			tupleTypeToAverageCpuTime.put(tuple.getTupleType(), executionTime);
 			tupleTypeToExecutedTupleCount.put(tuple.getTupleType(), 1);
@@ -49,6 +51,9 @@ public class TimeKeeper {
 			double currentAverage = tupleTypeToAverageCpuTime.get(tuple.getTupleType());
 			int currentCount = tupleTypeToExecutedTupleCount.get(tuple.getTupleType());
 			tupleTypeToAverageCpuTime.put(tuple.getTupleType(), (currentAverage*currentCount+executionTime)/(currentCount+1));
+			System.out.println(tupleTypeToAverageCpuTime);
+//			if(tuple.getTupleType().equals("PLAYER_GAME_STATE")) 				
+//				System.out.println(tupleIdToCpuStartTime.get(tuple.getCloudletId()) - tuple.getArrivalTime());
 		}
 	}
 	

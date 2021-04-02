@@ -222,106 +222,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     GraphicsContext gc;
     SetupJSONParser textfile = new SetupJSONParser();
 	
-	class dispNode {
-		String name = "err";
-		double x,y,sz;
-		int id;
-		Color c;
-		NodeSpec data;
-		
-		void draw() {
-			gc.setFill(c);
-			gc.fillOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-			if(c!=transpColor) gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-			gc.setFill(Color.BLACK);
-			gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
-		}
-		void setPos(MouseEvent mEvent) {
-			this.x=mEvent.getX(); this.y=mEvent.getY();
-			if(data.type.equals("device")) {
-				DeviceSpec d = getDevice(this.data.name);
-				devicesList.remove(d);
-				d.x=this.x;
-				d.y=this.y;
-				d.dispSize=this.sz;
-				devicesList.add(d);
-			}else if(data.type.equals("module")) {
-				ModuSpec m = getModule(this.data.name);
-				devicesList.remove(m);
-				m.x=this.x; m.y=this.y; m.dispSize=this.sz;
-				modulesList.add(m);
-			}else if(data.type.equals("sensor")) {
-				SensorSpec s = getSensor(this.data.name);
-				sensorsList.remove(s);
-				s.x=this.x; s.y=this.y;
-				s.dispSize=this.sz;
-				sensorsList.add(s);
-			}else if(data.type.equals("actuator")) {
-				ActuatorSpec a = getActuator(this.data.name);
-				actuatorsList.remove(a);
-				a.x=this.x; a.y=this.y;
-				a.dispSize=this.sz;
-				actuatorsList.add(a);
-			}
-		}
-		dispNode(String _name, NodeSpec _n) {this(_name, _n, xCenter, yCenter, R+R);}
-		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r) {
-			name = _name;
-			x = _x;
-			y = _y;
-			sz = _r;
-			data = _n;
-			if(data.type.equals("device")) c = deviceColor;
-			else if(data.type.equals("module")) c = moduleColor;
-			else if(data.type.equals("sensor")) c = sensorColor;
-			else if(data.type.equals("actuator")) c = actuatorColor;
-			else c = _errorColor;
-			id = globalID++;
-		}
-		dispNode(String _name, Color _c, double _x, double _y, double _r) {
-			name = _name;
-			x = _x;
-			y = _y;
-			sz = _r;
-			c = _c;
-		}
-	}
-	
-	class dispLink{
-		dispNode src, dst;
-		void draw() {
-			double x1=0; double y1=0;
-			double x2=0; double y2=0;
-			if(src!=null) {x1=src.x; y1= src.y;}
-			if(dst!=null) {x2=dst.x; y2= dst.y;}
-			if(src!=null&&dst!=null) {
-				gc.beginPath();
-		    	gc.moveTo(x1, y1);
-				gc.lineTo(x2, y2);
-				gc.stroke();
-			}
-		}
-		dispLink(dispNode _src, dispNode _dst){this.src=_src; this.dst=_dst;}
-		dispLink(DeviceSpec _device) {
-			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.name)) this.src = dn;
-			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.parent)) this.dst = dn;
-		}
-		dispLink(DeviceSpec _src, DeviceSpec _dst) {
-	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
-		}
-		dispLink(ModuEdgeSpec _spec) {
-	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.child)) this.src=dn;
-	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.parent)) this.dst=dn;
-		}
-		public dispLink(ModuSpec _src, ModuSpec _dst) {
-			for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
-		}
-	}
-	
-	public List<dispNode> dispNodesList = new ArrayList<dispNode>();
-	public List<dispLink> dispLinksList = new ArrayList<dispLink>();
 	public List<String> selectedModulesList = new ArrayList<String>();
 	
 	public List<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
@@ -331,13 +231,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
 	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
-		
-    @Override
+
+	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
     	
-    }
-    
-    
+    } 
 
 	public int state = 1;
 	@Override
@@ -375,14 +273,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	System.out.println(zoomFactor);
     	redrawNodes();
     }
-    
+	
     private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for(dispLink link : dispLinksList) link.draw();
-		if (draggingLink!=null) draggingLink.draw();
-		for(dispNode node : dispNodesList) node.draw();
-		if (draggingNode!=null) draggingNode.draw();
+		for(dispLink link : textfile.dispLinksList) link.draw(gc);
+		if (draggingLink!=null) draggingLink.draw(gc);
+		for(dispNode node : textfile.dispNodesList) node.draw(gc);
+		if (draggingNode!=null) draggingNode.draw(gc);
 	}
 
 	dispNode draggingNode = null;
@@ -395,53 +293,53 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			draggingNode = selNode;
 		} else if (state == 1) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				dispNode newNode = textfile.createDispNode("New Node", deviceColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 2) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				dispNode newNode = textfile.createDispNode("New Module", moduleColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 3) {
 			linkSrcNode = selNode;
-			dispNode newNode = new dispNode("", transpColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+			dispNode newNode = textfile.createDispNode("", transpColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 			draggingNode = newNode;
-			draggingLink = new dispLink(linkSrcNode, draggingNode);
+			draggingLink = textfile.createDispLink(linkSrcNode, draggingNode);
 		} else if (state == 4) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				dispNode newNode = textfile.createDispNode("New Sensor", sensorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
 		} else if (state == 5) {
 			if (selNode == null) {
-				dispNode newNode = new dispNode("New Actuator", actuatorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
+				dispNode newNode = textfile.createDispNode("New Actuator", actuatorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
 				draggingNode = newNode;
 			} else {
 				draggingNode = selNode;
 			}
-		}
+		}		
 		redrawNodes();
 	}
-    
-    @FXML
+   
+	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
     	if (state==0) {
-    		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
+    		if(textfile.dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
     	} else if (state==1) {
-    		if(dispNodesList.indexOf(draggingNode)<0) {
+    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newDevice=addDevice();
     			if(newDevice!=null) newDevice.setPos(mEvent);
     		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
     	} else if (state==2) {
-    		if(dispNodesList.indexOf(draggingNode)<0) {
+    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newModule = addModule();
     			if(newModule!=null) newModule.setPos(mEvent);
     		} else draggingNode.setPos(mEvent);
@@ -467,8 +365,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			     		stage.showAndWait();
 			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
 						if(srcLink!=null)srcLink.dst = linkDstNode;
-						else dispLinksList.add(new dispLink(srcDev, dstDev));
+						else textfile.dispLinksList.add(textfile.createDispLink(srcDev, dstDev));
 					}else if(srcType.equals("module")) {
+						textfile.selectedModulesList.add(linkDstNode.name);
+						textfile.selectedModulesList.add(linkSrcNode.name);
 						selectedModulesList.add(linkDstNode.name);
 						selectedModulesList.add(linkSrcNode.name);
 						addEdge();
@@ -482,20 +382,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				System.out.println("_MainWindowController.java: Linker Dst is null");
 			}
 		} else if (state==4) {
-    		if(dispNodesList.indexOf(draggingNode)<0) {
+    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newSensor = addSensor();
     			if(newSensor!=null) newSensor.setPos(mEvent);
     		} else draggingNode.setPos(mEvent);
         	draggingNode=null;
 		} else if (state==5) {			
-    		if(dispNodesList.indexOf(draggingNode)<0) {
+    		if(textfile.dispNodesList.indexOf(draggingNode)<0) {
     			dispNode newActuator = addActuator();
     			if(newActuator!=null) newActuator.setPos(mEvent);   			
     		}
 		}
     	redrawNodes();
     }
-    
     
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
@@ -515,7 +414,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
 	
 	private dispNode getNodeOnClick(MouseEvent mEvent) {
-		for(dispNode n : dispNodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) return n;
+		for(dispNode n : textfile.dispNodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) return n;
 		return null;
 	}
     
@@ -574,7 +473,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				JSONArray modulesList = (JSONArray) jsonObject.get("modules");
 				for (int i = 0; i < modulesList.size(); i++) {
 					JSONObject module = (JSONObject) modulesList.get(i);
-					parseSensorObj(module);
+					parseModuleObj(module);
 				}
 				
 				JSONArray sensorsList = (JSONArray) jsonObject.get("sensors");
@@ -620,10 +519,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		d.x = x_cord;
 		d.y = y_cord;
 		d.dispSize = size;
+		textfile.devicesList.add(d);
 		devicesList.add(d);
-		dispNode newDevice = new dispNode(nodename, d, d.x, d.y, d.dispSize);
-		dispNodesList.add(newDevice);
-		dispLinksList.add(new dispLink(d));
+		dispNode newDevice = textfile.createDispNode(nodename, d, d.x, d.y, d.dispSize);
+		textfile.dispNodesList.add(newDevice);
+		textfile.dispLinksList.add(textfile.createDispLink(d));
 		redrawNodes();
 	}
 	
@@ -636,9 +536,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         a.x = x_cord;
         a.y = y_cord;
         a.dispSize = size;
+        textfile.actuatorsList.add(a);
         actuatorsList.add(a);
-        dispNode newDevice = new dispNode(actuatorName, a, a.x, a.y, a.dispSize);
-        dispNodesList.add(newDevice);
+        dispNode newDevice = textfile.createDispNode(actuatorName, a, a.x, a.y, a.dispSize);
+        textfile.dispNodesList.add(newDevice);
         redrawNodes();
     }
 	
@@ -658,9 +559,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		s.x = x_cord;
 		s.y = y_cord;
 		s.dispSize = size;
+		textfile.sensorsList.add(s);
 		sensorsList.add(s);
-		dispNode newSensor = new dispNode(sensorName, s, s.x, s.y, s.dispSize);
-		dispNodesList.add(newSensor);
+		dispNode newSensor =textfile.createDispNode(sensorName, s, s.x, s.y, s.dispSize);
+		textfile.dispNodesList.add(newSensor);
 		redrawNodes();
 	}
 	
@@ -675,7 +577,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		int direction = (int) edge.get("direction");
 		ModuEdgeSpec e = textfile.createModuleEdge(dest, src, tupleType, periodicity, tupleCpuLength,
 				tupleNwLength, edgeType, direction);
-		moduleEdgesList.add(e);		
+		textfile.moduleEdgesList.add(e);
+		moduleEdgesList.add(e);
 	}
 	
 	void parseModuleObj(JSONObject module) throws NumberFormatException, IOException {
@@ -698,9 +601,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		m.x = x_cord;
 		m.y = y_cord;
 		m.dispSize = sz;
+		textfile.modulesList.add(m);
 		modulesList.add(m);
-		dispNode newMod = new dispNode(nodeName, m, m.x, m.y, m.dispSize);
-		dispNodesList.add(newMod);
+		dispNode newMod = textfile.createDispNode(nodeName, m, m.x, m.y, m.dispSize);
+		textfile.dispNodesList.add(newMod);
 		redrawNodes();
 	}
 	
@@ -730,10 +634,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ActuatorSpec a = actuatorController.getSpec();
     		if (a==null) return null;
     		String name = a.name;
-    		dispNode newActuator = new dispNode(a.name, a, xCenter, yCenter, R+R);
+
+    		dispNode newActuator = textfile.createDispNode(a.name, a, xCenter, yCenter, R+R);
 			if (name != "Error" && getActuator(name)==null) {
+				textfile.actuatorsList.add(a);
 				actuatorsList.add(a);
-				dispNodesList.add(newActuator);
+				textfile.dispNodesList.add(newActuator);
 			}
 			redrawNodes();
     		return newActuator;
@@ -757,12 +663,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		LinkSpec l = controller.getLinkSpec();
     		if (d==null) return null;
     		String name = d==null?"Error":d.name;
-    		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R);
+    		dispNode newDevice = textfile.createDispNode(name, d, xCenter, yCenter, R+R);
 			if (name != "Error" && getDevice(name)==null) {
+				textfile.devicesList.add(d);
+				textfile.linksList.add(l);
 				devicesList.add(d);
 				linksList.add(l);
-				dispNodesList.add(newDevice);
-				dispLinksList.add(new dispLink(d));
+				textfile.dispNodesList.add(newDevice);
+				textfile.dispLinksList.add(textfile.createDispLink(d));
 			}
 			redrawNodes();
     		return newDevice;
@@ -786,10 +694,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		SensorSpec s = sensorController.getSpec();
     		if (s==null) return null;
     		String name = s==null?"Error":s.name;
-    		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
+    		dispNode newDevice = textfile.createDispNode(name, s, xCenter, yCenter, R+R);
 			if (name != "Error" && getSensor(name)==null) {
+				textfile.sensorsList.add(s);
 				sensorsList.add(s);
-				dispNodesList.add(newDevice);
+				textfile.dispNodesList.add(newDevice);
 			}
 			redrawNodes();
     		return newDevice;
@@ -813,10 +722,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ModuSpec m = controller.getSpec();
     		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
-    		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R);
+    		dispNode newMod = textfile.createDispNode(name, m, xCenter, yCenter, R+R);
 			if (name != "Error" && getModule(name)==null) {
+				textfile.modulesList.add(m);
 				modulesList.add(m);
-				dispNodesList.add(newMod);
+				textfile.dispNodesList.add(newMod);
 			}
     		redrawNodes();
     		return newMod;
@@ -842,7 +752,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ModuEdgeSpec v = controller.getSpec();
     		if(v!=null) {
     			moduleEdgesList.add(v);
-    			dispLinksList.add(new dispLink(v));
+    			textfile.dispLinksList.add(textfile.createDispLink(v));
     		}
     		redrawNodes();
     		return v;
@@ -874,7 +784,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     public dispLink getLinkBySrc(String _src) {
     	if (_src==null) return null;
-    	for (dispLink l : dispLinksList) if (l.src.name.equals(_src)) return l;
+    	for (dispLink l : textfile.dispLinksList) if (l.src.name.equals(_src)) return l;
 		return null;
     }
     
@@ -1060,4 +970,5 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     public void exitApplication(ActionEvent event) {
        Platform.exit();
     }
+
 }

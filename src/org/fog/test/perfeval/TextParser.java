@@ -267,6 +267,6 @@ public class TextParser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(obj);
+		//System.out.println(obj);
 	}
 }

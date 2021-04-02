@@ -19,6 +19,36 @@
 			"up_bw": 10000,
 			"ram": 1000
 			 
+		},
+		{
+			"apower": 87.53,
+			"level": 3,
+			"rate": 0.0,
+			"ipower": 82.44,
+			"y_cord":190.0,	
+			"x_cord":242.0,	
+			"radius":100.0,	
+			"name": "node2",
+			"down_bw": 270,
+			"mips": 1000,
+			"up_bw": 10000,
+			"ram": 1000
+			 
+		},
+		{
+			"apower": 87.53,
+			"level": 3,
+			"rate": 0.0,
+			"ipower": 82.44,
+			"y_cord":190.0,	
+			"x_cord":242.0,	
+			"radius":100.0,	
+			"name": "node3",
+			"down_bw": 270,
+			"mips": 10000,
+			"up_bw": 10000,
+			"ram": 1000
+			 
 		},			
 		{
 			"apower": 107.339,
@@ -76,6 +106,30 @@
 			"normalStdDev": 0.0,
 			"uniformMax": 0.0,
 			"uniformMin": 0.0
+		},
+		{
+			"sensorName": "sensor2",
+			"distribution": "Deterministic",
+			"deterministicValue": 5.1,
+			"y_cord":126.0,
+			"x_cord":458.0,
+			"radius":100.0,
+			"normalMean": 0.0,
+			"normalStdDev": 0.0,
+			"uniformMax": 0.0,
+			"uniformMin": 0.0
+		},
+		{
+			"sensorName": "sensor3",
+			"distribution": "Deterministic",
+			"deterministicValue": 5.1,
+			"y_cord":126.0,
+			"x_cord":458.0,
+			"radius":100.0,
+			"normalMean": 0.0,
+			"normalStdDev": 0.0,
+			"uniformMax": 0.0,
+			"uniformMin": 0.0
 		}
 	],
 	"actuators": [
@@ -84,11 +138,33 @@
 			"y_cord":150.0,
 			"x_cord":67.0,
 			"radius":100.0,
+		},
+		{
+			"Actuator Name": "actuator2"
+			"y_cord":150.0,
+			"x_cord":67.0,
+			"radius":100.0,
+		},
+		{
+			"Actuator Name": "actuator3"
+			"y_cord":150.0,
+			"x_cord":67.0,
+			"radius":100.0,
 		}
 	],
 	"links": [
 		{
 			"srcID": "node1",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node2",
+			"dstID": "gateway1",
+			"latency": 2.0	
+		},
+		{
+			"srcID": "node3",
 			"dstID": "gateway1",
 			"latency": 2.0	
 		},
@@ -108,11 +184,30 @@
 			"latency": 6.0	
 		},
 		{
+			"srcID": "sensor2",
+			"dstID": "node2",
+			"latency": 6.0	
+		},
+		{
+			"srcID": "sensor3",
+			"dstID": "node3",
+			"latency": 6.0	
+		},
+		{
 			"srcID": "actuator1",
 			"dstID": "node1",
 			"latency": 1.0	
+		},
+		{
+			"srcID": "actuator2",
+			"dstID": "node2",
+			"latency": 1.0	
+		},
+		{
+			"srcID": "actuator3",
+			"dstID": "node3",
+			"latency": 1.0	
 		}
-		
 	],
 	"modules": [
 		{	

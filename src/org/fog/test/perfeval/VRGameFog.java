@@ -76,6 +76,10 @@ public class VRGameFog {
 	static int userId;
 	static String appId;
 	
+	public static void main(String[] args) throws Exception {
+		VRGameFog vrGame = new VRGameFog("test11.json");
+	}
+	
 	public VRGameFog(String jsonFile) throws Exception {
 
 		System.out.println("Starting VRGame... ");
@@ -134,6 +138,7 @@ public class VRGameFog {
 		
 		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 		moduleMapping.addModuleToDevice("connector", "cloud");
+		moduleMapping.addModuleToDevice("concentration_calculator", "gateway1");
 		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
 		controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
 		

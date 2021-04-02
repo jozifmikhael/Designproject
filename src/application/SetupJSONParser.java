@@ -12,7 +12,17 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import application._MainWindowController.dispNode;
+import application.SetupJSONParser.ActuatorSpec;
+import application.SetupJSONParser.DeviceSpec;
+import application.SetupJSONParser.LinkSpec;
+import application.SetupJSONParser.ModuEdgeSpec;
+import application.SetupJSONParser.ModuSpec;
+import application.SetupJSONParser.NodeSpec;
+import application.SetupJSONParser.SensorSpec;
+import application.SetupJSONParser.dispNode;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 public class SetupJSONParser {
 	private List<DeviceSpec> hosts = new ArrayList<DeviceSpec>();
@@ -20,6 +30,21 @@ public class SetupJSONParser {
 	private List<ModuSpec> modules = new ArrayList<ModuSpec>();
 	private List<LinkSpec> links = new ArrayList<LinkSpec>();
 	private List<ActuatorSpec> actuators = new ArrayList<ActuatorSpec>();
+	static _MainWindowController mainWindowObj = new _MainWindowController();
+	
+	public List<dispNode> dispNodesList = new ArrayList<dispNode>();
+	public List<dispLink> dispLinksList = new ArrayList<dispLink>();
+	public List<String> selectedModulesList = new ArrayList<String>();
+	
+	public List<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
+	public List<ActuatorSpec> actuatorsList = new ArrayList<ActuatorSpec>();
+	public List<LinkSpec> linksList = new ArrayList<LinkSpec>();
+	
+	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
+	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
+	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
+	
+	
 	private int globalID = 0;
 	
 	public ActuatorSpec createActuator(String actuatorName) {			
@@ -29,6 +54,41 @@ public class SetupJSONParser {
 	public DeviceSpec createDevice(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate, double apower, double ipower, double latency) {
 		DeviceSpec h = new DeviceSpec(name, parent, mips, ram, upbw, downbw, level, rate, apower, ipower, latency);
 		return h;
+	}
+	
+	public dispNode createDispNode(String _name, NodeSpec _n, double _x, double _y, double _r) {
+		dispNode d = new dispNode(_name, _n, _x, _y, _r);
+		return d;
+	}
+	
+	public dispNode createDispNode(String _name, Color _c, double _x, double _y, double _r) {
+		dispNode d = new dispNode(_name, _c, _x, _y, _r);
+		return d;
+	}
+	
+	public dispLink createDispLink(dispNode _src, dispNode _dst) {
+		dispLink dl = new dispLink(_src, _dst);
+		return dl;
+	}
+	
+	public dispLink createDispLink(DeviceSpec _device) {
+		dispLink dl = new dispLink(_device);
+		return dl;
+	}
+
+	public dispLink createDispLink(DeviceSpec _src, DeviceSpec _dst) {
+		dispLink dl = new dispLink(_src, _dst);
+		return dl;
+	}
+	
+	public dispLink createDispLink(ModuEdgeSpec _spec) {
+		dispLink dl = new dispLink(_spec);
+		return dl;
+	}
+	
+	public dispLink createDispLink(ModuSpec _src, ModuSpec _dst) {
+		dispLink dl = new dispLink(_src, _dst);
+		return dl;
 	}
 	
 	public LinkSpec createLink(String srcID, String dstID, double latency) {
@@ -83,6 +143,7 @@ public class SetupJSONParser {
 		double apower;
 		double latency;
 		
+		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
 			DeviceSpec o = this;
@@ -127,6 +188,9 @@ public class SetupJSONParser {
 			this.latency = latency;
 			this.type = "device";		
 		}
+		
+		
+		
 	}
 	
 	public class ModuSpec extends NodeSpec {
@@ -178,6 +242,156 @@ public class SetupJSONParser {
 			this.fractionalSensitivity = fractionalSensitivity;
 			this.id = getID();
 			this.type = "module";
+		}
+	}
+	
+	static double R=50;
+	static double xCenter=100;
+	static double yCenter=100;
+	
+	public class dispNode {
+		int globalId=0;		
+		double zoomFactor=1;		
+		int fontSize = 16;
+		String font = "monospaced";
+		Color deviceColor=Color.RED;
+		Color moduleColor=Color.CYAN;
+		Color sensorColor=Color.PINK;
+		Color actuatorColor=Color.ORANGE;
+		Color transpColor=Color.TRANSPARENT;
+		Color _errorColor=Color.GREEN;
+		String name = "err";
+		double x,y,sz;
+		int id;
+		Color c;
+		NodeSpec data;
+		GraphicsContext gc;
+		
+		public void setGc(GraphicsContext gc) {
+			this.gc = gc;
+		}
+		
+		void draw(GraphicsContext gc) {
+			gc.setFill(c);
+			gc.fillOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
+			if(c!=transpColor) gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
+			gc.setFill(Color.BLACK);
+			gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
+		}
+		
+		void setPos(MouseEvent mEvent) {
+			this.x=mEvent.getX(); this.y=mEvent.getY();
+			if(data.type.equals("device")) {
+				DeviceSpec d = getDevice(this.data.name);
+				devicesList.remove(d);
+				d.x=this.x;
+				d.y=this.y;
+				d.dispSize=this.sz;				
+				devicesList.add(d);
+			}else if(data.type.equals("module")) {
+				ModuSpec m = getModule(this.data.name);
+				devicesList.remove(m);
+				m.x=this.x; m.y=this.y; m.dispSize=this.sz;
+				modulesList.add(m);				
+			}else if(data.type.equals("sensor")) {
+				SensorSpec s = getSensor(this.data.name);
+				sensorsList.remove(s);				
+				s.x=this.x; s.y=this.y;
+				s.dispSize=this.sz;
+				sensorsList.add(s);
+			}else if(data.type.equals("actuator")) {
+				ActuatorSpec a = mainWindowObj.getActuator(this.data.name);
+				actuatorsList.remove(a);
+				a.x=this.x; a.y=this.y;
+				a.dispSize=this.sz;
+				actuatorsList.add(a);
+			}
+		}
+		
+		public ModuSpec getModule(String _name) {
+	    	if (_name==null) return null;
+	    	for (ModuSpec m : modulesList) if (m.name.equals(_name)) return m;
+			return null;
+	    }
+	    public SensorSpec getSensor(String _name) {
+	    	if (_name==null) return null;
+	    	for (SensorSpec s : sensorsList) if (s.name.equals(_name)) return s;
+			return null;
+	    }
+	    public DeviceSpec getDevice(String _name) {
+	    	if (_name==null) return null;
+	    	for (DeviceSpec d : devicesList) if (d.name.equals(_name)) return d;
+			return null;
+	    }
+	    public ActuatorSpec getActuator(String _name) {
+	    	if (_name==null) return null;
+	    	for (ActuatorSpec a : actuatorsList) if (a.name.equals(_name)) return a;
+			return null;
+	    }
+	    public dispLink getLinkBySrc(String _src) {
+	    	if (_src==null) return null;
+	    	for (dispLink l : dispLinksList) if (l.src.name.equals(_src)) return l;
+			return null;
+	    }
+		
+		dispNode(String _name, NodeSpec _n) {
+			this(_name, _n, xCenter, yCenter, R+R);
+			}
+		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r) {
+			name = _name;
+			x = _x;
+			y = _y;
+			sz = _r;
+			data = _n;
+			if(data.type.equals("device")) c = deviceColor;
+			else if(data.type.equals("module")) c = moduleColor;
+			else if(data.type.equals("sensor")) c = sensorColor;
+			else if(data.type.equals("actuator")) c = actuatorColor;
+			else c = _errorColor;
+			id = globalId++;
+		}
+		dispNode(String _name, Color _c, double _x, double _y, double _r) {
+			name = _name;
+			x = _x;
+			y = _y;
+			sz = _r;
+			c = _c;
+		}
+
+		public dispNode() {
+		}
+	}
+	
+	class dispLink{
+		dispNode src, dst;
+		void draw(GraphicsContext gc) {
+			double x1=0; double y1=0;
+			double x2=0; double y2=0;
+			if(src!=null) {x1=src.x; y1= src.y;}
+			if(dst!=null) {x2=dst.x; y2= dst.y;}
+			if(src!=null&&dst!=null) {
+				gc.beginPath();
+		    	gc.moveTo(x1, y1);
+				gc.lineTo(x2, y2);
+				gc.stroke();
+			}
+		}
+		dispLink(dispNode _src, dispNode _dst){this.src=_src; this.dst=_dst;}
+		dispLink(DeviceSpec _device) {
+			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.name)) this.src = dn;
+			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.parent)) this.dst = dn;
+		}
+		dispLink(DeviceSpec _src, DeviceSpec _dst) {
+	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
+		}
+		dispLink(ModuEdgeSpec _spec) {
+	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.child)) this.src=dn;
+	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.parent)) this.dst=dn;
+		}
+		public dispLink(ModuSpec _src, ModuSpec _dst) {
+			for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
+	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
 		}
 	}
 	
