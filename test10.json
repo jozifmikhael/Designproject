@@ -70,29 +70,6 @@
 			"tupleType": "DISPLAY"
 		}
 	],
-	"links": [
-		{
-			"srcID": "node1",
-			"dstID": "gateway1",
-			"latency": 2.0	
-		},
-		{
-			"srcID": "gateway1",
-			"dstID": "proxy-server",
-			"latency": 4.0	
-		},
-		{
-			"srcID": "proxy-server",
-			"dstID": "cloud",
-			"latency": 100.0			
-		},
-		{
-			"srcID": "actuator1",
-			"dstID": "node1",
-			"latency": 1.0			
-		}
-		
-	],
 	"modules": [
 		{
 			"name": "client",
