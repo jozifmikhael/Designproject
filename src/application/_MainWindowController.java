@@ -258,16 +258,18 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for (DeviceSpec node : specsHandler.devicesList) node.drawLink(gc);
-		for (ModuleSpec node : specsHandler.modulesList) node.drawLink(gc);
-		for (SensorSpec node : specsHandler.sensorsList) node.drawLink(gc);
-		for (ActuatSpec node : specsHandler.actuatsList) node.drawLink(gc);
-		if (draggingNode != null) draggingNode.drawLink(gc);
-		for (DeviceSpec node : specsHandler.devicesList) node.drawNode(gc);
-		for (ModuleSpec node : specsHandler.modulesList) node.drawNode(gc);
-		for (SensorSpec node : specsHandler.sensorsList) node.drawNode(gc);
-		for (ActuatSpec node : specsHandler.actuatsList) node.drawNode(gc);
-		if (draggingNode != null) draggingNode.drawLink(gc);
+//		for (DeviceSpec node : specsHandler.devicesList) node.drawLink(gc);
+//		for (ModuleSpec node : specsHandler.modulesList) node.drawLink(gc);
+//		for (SensorSpec node : specsHandler.sensorsList) node.drawLink(gc);
+//		for (ActuatSpec node : specsHandler.actuatsList) node.drawLink(gc);
+//		if (draggingNode != null) draggingNode.drawLink(gc);
+//		for (DeviceSpec node : SetupJSONParser.devicesList) node.drawNode(gc);
+//		for (ModuleSpec node : SetupJSONParser.modulesList) node.drawNode(gc);
+//		for (SensorSpec node : SetupJSONParser.sensorsList) node.drawNode(gc);
+//		for (ActuatSpec node : SetupJSONParser.actuatsList) node.drawNode(gc);
+		for (NodeSpec node : SetupJSONParser.nodesList) node.drawLink(gc);
+		for (NodeSpec node : SetupJSONParser.nodesList) node.drawNode(gc);
+//		if (draggingNode != null) draggingNode.drawLink(gc);
 	}
     
     boolean mouseL=false;
@@ -281,9 +283,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         mouseR|=mEvent.isSecondaryButtonDown();
         mouseM|=mEvent.isMiddleButtonDown();
         
-    	System.out.println(" L:"+mouseL+" M:"+mouseM+" R:"+mouseR);
+//    	System.out.println(" L:"+mouseL+" M:"+mouseM+" R:"+mouseR);
     	if(mouseL) {
-    		System.out.println("Inside mouseL click");
 			NodeSpec selNode = specsHandler.getNode(mEvent);
 			if(selNode==null) {
 				switch(state) {
@@ -291,7 +292,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case 2: draggingNode = specsHandler.new NodeSpec("module", mEvent); break;
 					case 3: draggingNode = specsHandler.new NodeSpec("sensor", mEvent); break;
 					case 4: draggingNode = specsHandler.new NodeSpec("actuator", mEvent); break;
-					case 5: draggingNode = specsHandler.new NodeSpec("link", mEvent); break;
+					case 5: System.out.println("src empty");
 					default: draggingNode = selNode; break;
 				}
 			}else draggingNode = selNode;
@@ -309,67 +310,63 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
-    	System.out.println(" L:"+mouseL+" M:"+mouseM+" R:"+mouseR);
     	if(mouseL) {
-    		System.out.println("Inside mouseL release");
     		mouseL=false;
-    		if (draggingNode==null) {
-    			NodeSpec newNode = null;
-    			switch(state) {
-    				case 1: newNode=addDevice(); break;
-    				case 2: newNode=addModule(); break;
-    				case 3: newNode=addSensor(); break;
-    				case 4: newNode=addActuat(); break;
-//    				case 5: newNode=addActuat(); break; // link creation stuff, previous case 3
-    				default: break;
-    			}
-    			if(newNode!=null) newNode.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-    		draggingNode=null;
+    		if (draggingNode!=null) {draggingNode.setPos(mEvent);}
+			NodeSpec newNode = null;
+			switch(state) {
+				case 1: newNode=addDevice(); break;
+				case 2: newNode=addModule(); break;
+				case 3: newNode=addSensor(); break;
+				case 4: newNode=addActuat(); break;
+				case 5: newNode=addActuat(); break;
+				default: break;
+			}
+			if (draggingNode!=null) {draggingNode.pop(); draggingNode=null;}
+			if(newNode!=null) newNode.setPos(mEvent);
+    		System.out.println();
     	}
     	redrawNodes();
-    		
-		if (state == 3) {
-        	draggingLink=null;
-        	draggingNode=null;
-    		dispNode linkDstNode = getNodeOnClick(mEvent);
-			if(linkSrcNode!=null && linkDstNode!=null) {
-				String srcType = linkSrcNode.data.type;
-				String dstType = linkSrcNode.data.type;
-				if(srcType.equals(dstType)) {
-					if(srcType.equals("device")) {
-						DeviceSpec srcDev = getDevice(linkSrcNode.name);
-						srcDev.parent = linkDstNode.name;
-						DeviceSpec dstDev = getDevice(srcDev.parent);
-						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
-			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
-						Scene scene = new Scene(dataFXML.load(),414,139);
-						Stage stage = new Stage();
-						stage.setScene(scene);
-			     		stage.setTitle("Setting Link Latency");
-			     		stage.showAndWait();
-			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
-						if(srcLink!=null)srcLink.dst = linkDstNode;
-						else dispLinksList.add(new dispLink(srcDev, dstDev));
-					}else if(srcType.equals("module")) {
-						selectedModulesList.add(linkDstNode.name);
-						selectedModulesList.add(linkSrcNode.name);
-						addEdge();
-					}
-				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
-					System.out.println("Sensor-Node link detected");
-				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
-			} else if (linkSrcNode==null) {
-				System.out.println("_MainWindowController.java: Linker Src is null");
-			} else if (linkDstNode==null) {
-				System.out.println("_MainWindowController.java: Linker Dst is null");
-			}
-    	}
+//    	
+//		if (state == 3) {
+//			if(linkSrcNode!=null && linkDstNode!=null) {
+//				String srcType = linkSrcNode.data.type;
+//				String dstType = linkSrcNode.data.type;
+//				if(srcType.equals(dstType)) {
+//					if(srcType.equals("device")) {
+//						DeviceSpec srcDev = getDevice(linkSrcNode.name);
+//						srcDev.parent = linkDstNode.name;
+//						DeviceSpec dstDev = getDevice(srcDev.parent);
+//						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
+//			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+//						Scene scene = new Scene(dataFXML.load(),414,139);
+//						Stage stage = new Stage();
+//						stage.setScene(scene);
+//			     		stage.setTitle("Setting Link Latency");
+//			     		stage.showAndWait();
+//			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
+//						if(srcLink!=null)srcLink.dst = linkDstNode;
+//						else dispLinksList.add(new dispLink(srcDev, dstDev));
+//					}else if(srcType.equals("module")) {
+//						selectedModulesList.add(linkDstNode.name);
+//						selectedModulesList.add(linkSrcNode.name);
+//						addEdge();
+//					}
+//				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
+//					System.out.println("Sensor-Node link detected");
+//				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
+//			} else if (linkSrcNode==null) {
+//				System.out.println("_MainWindowController.java: Linker Src is null");
+//			} else if (linkDstNode==null) {
+//				System.out.println("_MainWindowController.java: Linker Dst is null");
+//			}
+//    	}
 	}
     
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
     	if(draggingNode != null) {
+//    		System.out.println("Dragging Node not null");
     		draggingNode.setPos(mEvent);
 			redrawNodes();
     	}
@@ -449,7 +446,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
     @FXML
-    ActuatSpec addActuator() {
+    ActuatSpec addActuat() {
     	try {
     		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
     		Scene scene = new Scene(addNewActuatorLoader.load(),264,133);

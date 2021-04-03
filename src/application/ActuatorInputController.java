@@ -38,13 +38,15 @@ public class ActuatorInputController {
 	@FXML
 	private TextField actuatorName;
 	@FXML
+	private TextField parentName;
+	@FXML
 	private Button saveActuator;
 
 
 	@FXML
 	void saveActuatorHandler(ActionEvent event) {
 		Stage stage = (Stage) saveActuator.getScene().getWindow();
-		a = textfile.createActuator(actuatorName.getText().toString());
+		a = textfile.new ActuatSpec(actuatorName.getText().toString(), parentName.getText().toString());
 		stage.close();
 	}
 	public ActuatSpec getSpec() {return a;}

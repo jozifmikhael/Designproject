@@ -171,15 +171,15 @@ public class VRGameFog {
 		
 		if(distribution.equals("Deterministic")) {	
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
-			sensors.add(newSensor);	
+			sensors.add(newSensor);
 		}
-		else if(distribution.equals("Normal")) {	
+		else if(distribution.equals("Normal")) {
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new NormalDistribution(normalMean, normalStdDev)); // inter-transmission time of EEG sensor follows a deterministic distribution	
-			sensors.add(newSensor);	
+			sensors.add(newSensor);
 		}
-		else if(distribution.equals("Uniform")) {	
+		else if(distribution.equals("Uniform")) {
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new UniformDistribution(uniformMin, uniformMax)); // inter-transmission time of EEG sensor follows a deterministic distribution	
-			sensors.add(newSensor);	
+			sensors.add(newSensor);
 		}	
 	}
 		

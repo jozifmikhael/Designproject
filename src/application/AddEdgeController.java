@@ -40,13 +40,15 @@ public class AddEdgeController {
 	private TextField cpuLength;
 	
 	@FXML
-	private TextField newLength;
+	private TextField nwLength;
 	
 	@FXML
 	private TextField edgeType;
-	
+
 	@FXML
 	private TextField direction;
+	@FXML
+	private TextField latency;
 	
 	@FXML
 	private ChoiceBox<String> parentChoice;
@@ -57,14 +59,15 @@ public class AddEdgeController {
 	@FXML
 	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
-		v = textfile.createModuleEdge(
-				parentChoice.getSelectionModel().getSelectedItem(),
+		v = textfile.new EdgeSpec(
 				childChoice.getSelectionModel().getSelectedItem(),
+				parentChoice.getSelectionModel().getSelectedItem(),
+				edgeType.getText(),
+				Double.parseDouble(latency.getText()),
 				tupleType.getText(),
 				Double.parseDouble(periodicity.getText()),
 				Double.parseDouble(cpuLength.getText()),
-				Double.parseDouble(newLength.getText()),
-				edgeType.getText(),
+				Double.parseDouble(nwLength.getText()),
 				Integer.parseInt(direction.getText()));
 		stage.close();
 	}

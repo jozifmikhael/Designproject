@@ -56,22 +56,19 @@ public class AddDeviceController {
 		Stage stage = (Stage) saveNode.getScene().getWindow();
 		if (name.getText().trim().isEmpty()) {name.setText("default_device");}
 		if (parentName.getText().trim().isEmpty()) {parentName.setText("default_parent");}
-		h = textfile.createDevice(
+		h = textfile.new DeviceSpec(
 				name.getText().toString(),
-				parentName.getText().toString(),
+				parentName.getText().toString(),0,
 				Long.parseLong(mips.getText()),
-				Integer.parseInt(ram.getText()),
-				Long.parseLong(upbw.getText()),
-				Long.parseLong(downbw.getText()),
-				Integer.parseInt(nodelvl.getText()),
+				Integer.parseInt(ram.getText()),Integer.parseInt(nodelvl.getText()),
 				Double.parseDouble(ratePerMIPS.getText()),
-				Double.parseDouble(busyPower.getText()),
 				Double.parseDouble(idlePower.getText()),
-				Double.parseDouble(upLinkLatency.getText()));
+				Double.parseDouble(busyPower.getText()),Double.parseDouble(upLinkLatency.getText()),
+				Long.parseLong(upbw.getText()),
+				Long.parseLong(downbw.getText())
+				);
 		
-		l = textfile.createLink(name.getText().toString(), parentName.getText().toString(), Double.parseDouble(upLinkLatency.getText()));
 		stage.close();
 	}
 	public DeviceSpec getSpec() {return h;}
-	public LinkSpec getLinkSpec() {return l;}
 }

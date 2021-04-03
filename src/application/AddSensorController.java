@@ -98,7 +98,7 @@ public class AddSensorController {
 			stdDev.setText("0.0");
 		}
 		
-		s = textfile.createSensor(
+		s = textfile.new SensorSpec(
 				sensorName.getText().toString(),
 				nodeBox.getSelectionModel().getSelectedItem(),
 				Double.parseDouble(sensorLatency.getText()),

@@ -20,6 +20,6 @@ public class scratch {
 	}
 	public static void main(String[] args) {
 		scratch testobj = new scratch(6, 7, "whatever");
-		System.out.println(testobj.toString());
+		System.out.println(testobj.getClass());
 	}
 }

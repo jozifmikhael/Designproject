@@ -55,11 +55,14 @@ public class AddModuleController {
 	
 	@FXML
 	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
+		
+//		public ModuleSpec(String name, String parent, String type, String nodeName, int modRam,
+//				long bandwidth, String inTuple, String outTuple, long size, int mIPS, double fractionalSensitivity)
 		Stage stage = (Stage) saveModule.getScene().getWindow();
-		m = textfile.createModule(
-				nodeBox.getSelectionModel().getSelectedItem(),
+		m = textfile.new ModuleSpec(
 				moduleName.getText(),
-				Integer.parseInt(ram.getText()),
+				nodeBox.getSelectionModel().getSelectedItem(),
+				null, Integer.parseInt(ram.getText()),
 				Long.parseLong(bandwidth.getText()),
 				inTuple.getText(), outTuple.getText(),
 				Long.parseLong(size.getText()),
