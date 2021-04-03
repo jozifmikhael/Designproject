@@ -252,16 +252,17 @@ public class SetupJSONParser {
 		double latency;
 		long upbw;
 		long downbw;
-		Field[] test = DeviceSpec.class.getFields();
 		
 		//TODO Need to move this to a dynamic function - running off of this.toString() would be one way?
-		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			String thisRepresentation = this.toString();
-			JSONObject obj = new JSONObject();
-			
-			return obj;
-		}
+//		@SuppressWarnings("unchecked")
+//		JSONObject toJSON() {
+//			String thisRepresentation = this.toString();
+//			JSONObject obj = new JSONObject();
+//			for each first_split{
+//				obj.put(resplit[0],resplit[1]);
+//			}
+//			return obj;
+//		}
 		
 //		public DeviceSpec(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate,
 //				double apower, double ipower, double latency, double x, double y, double r, int pe) {
