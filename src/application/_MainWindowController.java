@@ -313,77 +313,64 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	if(mouseL) {
     		System.out.println("Inside mouseL release");
     		mouseL=false;
-    		if (state==0) {
-        		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
-        	} else if (state==1) {
-        		if(dispNodesList.indexOf(draggingNode)<0) {
-        			dispNode newDevice=addDevice();
-        			if(newDevice!=null) newDevice.setPos(mEvent);
-        		} else draggingNode.setPos(mEvent);
-            	draggingNode=null;
-        	} else if (state==2) {
-        		if(dispNodesList.indexOf(draggingNode)<0) {
-        			dispNode newModule = addModule();
-        			if(newModule!=null) newModule.setPos(mEvent);
-        		} else draggingNode.setPos(mEvent);
-            	draggingNode=null;
-        	} else if (state == 3) {
-            	draggingLink=null;
-            	draggingNode=null;
-        		dispNode linkDstNode = getNodeOnClick(mEvent);
-    			if(linkSrcNode!=null && linkDstNode!=null) {
-    				String srcType = linkSrcNode.data.type;
-    				String dstType = linkSrcNode.data.type;
-    				if(srcType.equals(dstType)) {
-    					if(srcType.equals("device")) {
-    						DeviceSpec srcDev = getDevice(linkSrcNode.name);
-    						srcDev.parent = linkDstNode.name;
-    						DeviceSpec dstDev = getDevice(srcDev.parent);
-    						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
-    			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
-    						Scene scene = new Scene(dataFXML.load(),414,139);
-    						Stage stage = new Stage();
-    						stage.setScene(scene);
-    			     		stage.setTitle("Setting Link Latency");
-    			     		stage.showAndWait();
-    			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
-    						if(srcLink!=null)srcLink.dst = linkDstNode;
-    						else dispLinksList.add(new dispLink(srcDev, dstDev));
-    					}else if(srcType.equals("module")) {
-    						selectedModulesList.add(linkDstNode.name);
-    						selectedModulesList.add(linkSrcNode.name);
-    						addEdge();
-    					}
-    				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
-    					System.out.println("Sensor-Node link detected");
-    				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
-    			} else if (linkSrcNode==null) {
-    				System.out.println("_MainWindowController.java: Linker Src is null");
-    			} else if (linkDstNode==null) {
-    				System.out.println("_MainWindowController.java: Linker Dst is null");
+    		if (draggingNode==null) {
+    			NodeSpec newNode = null;
+    			switch(state) {
+    				case 1: newNode=addDevice(); break;
+    				case 2: newNode=addModule(); break;
+    				case 3: newNode=addSensor(); break;
+    				case 4: newNode=addActuat(); break;
+//    				case 5: newNode=addActuat(); break; // link creation stuff, previous case 3
+    				default: break;
     			}
-    		} else if (state==4) {
-        		if(dispNodesList.indexOf(draggingNode)<0) {
-        			dispNode newSensor = addSensor();
-        			if(newSensor!=null) newSensor.setPos(mEvent);
-        		} else draggingNode.setPos(mEvent);
-            	draggingNode=null;
-    		} else if (state==5) {			
-        		if(dispNodesList.indexOf(draggingNode)<0) {
-        			dispNode newActuator = addActuator();
-        			if(newActuator!=null) newActuator.setPos(mEvent);   			
-        		}
-    		}
+    			if(newNode!=null) newNode.setPos(mEvent);
+    		} else draggingNode.setPos(mEvent);
+    		draggingNode=null;
     	}
     	redrawNodes();
-    }
-    
+    		
+		if (state == 3) {
+        	draggingLink=null;
+        	draggingNode=null;
+    		dispNode linkDstNode = getNodeOnClick(mEvent);
+			if(linkSrcNode!=null && linkDstNode!=null) {
+				String srcType = linkSrcNode.data.type;
+				String dstType = linkSrcNode.data.type;
+				if(srcType.equals(dstType)) {
+					if(srcType.equals("device")) {
+						DeviceSpec srcDev = getDevice(linkSrcNode.name);
+						srcDev.parent = linkDstNode.name;
+						DeviceSpec dstDev = getDevice(srcDev.parent);
+						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
+			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+						Scene scene = new Scene(dataFXML.load(),414,139);
+						Stage stage = new Stage();
+						stage.setScene(scene);
+			     		stage.setTitle("Setting Link Latency");
+			     		stage.showAndWait();
+			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
+						if(srcLink!=null)srcLink.dst = linkDstNode;
+						else dispLinksList.add(new dispLink(srcDev, dstDev));
+					}else if(srcType.equals("module")) {
+						selectedModulesList.add(linkDstNode.name);
+						selectedModulesList.add(linkSrcNode.name);
+						addEdge();
+					}
+				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
+					System.out.println("Sensor-Node link detected");
+				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
+			} else if (linkSrcNode==null) {
+				System.out.println("_MainWindowController.java: Linker Src is null");
+			} else if (linkDstNode==null) {
+				System.out.println("_MainWindowController.java: Linker Dst is null");
+			}
+    	}
+	}
     
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
-    	if(draggingNode != null){
-			draggingNode.x = mEvent.getX();
-			draggingNode.y = mEvent.getY();
+    	if(draggingNode != null) {
+    		draggingNode.setPos(mEvent);
 			redrawNodes();
     	}
     }
@@ -462,7 +449,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
     @FXML
-    dispNode addActuator() {
+    ActuatSpec addActuator() {
     	try {
     		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
     		Scene scene = new Scene(addNewActuatorLoader.load(),264,133);
@@ -472,15 +459,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Add Actuator");
     		stage.showAndWait();
     		ActuatSpec a = actuatorController.getSpec();
-    		if (a==null) return null;
-    		String name = a.name;
-    		dispNode newActuator = new dispNode(a.name, a, xCenter, yCenter, R+R);
-			if (name != "Error" && getActuator(name)==null) {
-				actuatorsList.add(a);
-				dispNodesList.add(newActuator);
-			}
 			redrawNodes();
-    		return newActuator;
+    		return a;
     	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
@@ -488,7 +468,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    dispNode addDevice() {
+    DeviceSpec addDevice() {
     	try {
     		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
     		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
@@ -498,18 +478,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
-    		LinkSpec l = controller.getLinkSpec();
-    		if (d==null) return null;
-    		String name = d==null?"Error":d.name;
-    		dispNode newDevice = new dispNode(name, d, xCenter, yCenter, R+R);
-			if (name != "Error" && getDevice(name)==null) {
-				devicesList.add(d);
-				linksList.add(l);
-				dispNodesList.add(newDevice);
-				dispLinksList.add(new dispLink(d));
-			}
 			redrawNodes();
-    		return newDevice;
+    		return d;
     	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
@@ -517,53 +487,39 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    dispNode addSensor() {
-    	try {
-    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		AddSensorController sensorController = addNewSensorLoader.getController();
-    		sensorController.populateList(devicesList);
-    		stage.setTitle("Add Sensor");
-    		stage.showAndWait();
-    		SensorSpec s = sensorController.getSpec();
-    		if (s==null) return null;
-    		String name = s==null?"Error":s.name;
-    		dispNode newDevice = new dispNode(name, s, xCenter, yCenter, R+R);
-			if (name != "Error" && getSensor(name)==null) {
-				sensorsList.add(s);
-				dispNodesList.add(newDevice);
-			}
-			redrawNodes();
-    		return newDevice;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
-    
-    @FXML
-    dispNode addModule() {
+    ModuleSpec addModule() {
     	try {
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
     		Scene scene = new Scene(dataFXML.load(),414,346);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
-    		controller.populateList(devicesList);
+    		controller.populateList(specsHandler.devicesList);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
     		ModuleSpec m = controller.getSpec();
-    		if (m==null) return null;
-    		String name = m.name==null?"Error":m.name;
-    		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R);
-			if (name != "Error" && getModule(name)==null) {
-				modulesList.add(m);
-				dispNodesList.add(newMod);
-			}
     		redrawNodes();
-    		return newMod;
+    		return m;
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
+    @FXML
+    SensorSpec addSensor() {
+    	try {
+    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
+    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		AddSensorController sensorController = addNewSensorLoader.getController();
+    		sensorController.populateList(specsHandler.devicesList);
+    		stage.setTitle("Add Sensor");
+    		stage.showAndWait();
+    		SensorSpec s = sensorController.getSpec();
+			redrawNodes();
+    		return s;
     	} catch(Exception e) {
     		e.printStackTrace();
     		return null;
@@ -578,48 +534,18 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			AddEdgeController controller = dataFXML.getController();
-			if(selectedModulesList.isEmpty()) controller.populateList(modulesList);
+			if(selectedModulesList.isEmpty()) controller.populateList(specsHandler.modulesList);
 			else controller.setChoices(selectedModulesList);
 			selectedModulesList.removeAll(selectedModulesList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
     		EdgeSpec v = controller.getSpec();
-    		if(v!=null) {
-    			moduleEdgesList.add(v);
-    			dispLinksList.add(new dispLink(v));
-    		}
     		redrawNodes();
     		return v;
 		} catch(Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    public ModuleSpec getModule(String _name) {
-    	if (_name==null) return null;
-    	for (ModuleSpec m : modulesList) if (m.name.equals(_name)) return m;
-		return null;
-    }
-    public SensorSpec getSensor(String _name) {
-    	if (_name==null) return null;
-    	for (SensorSpec s : sensorsList) if (s.name.equals(_name)) return s;
-		return null;
-    }
-    public DeviceSpec getDevice(String _name) {
-    	if (_name==null) return null;
-    	for (DeviceSpec d : devicesList) if (d.name.equals(_name)) return d;
-		return null;
-    }
-    public ActuatSpec getActuator(String _name) {
-    	if (_name==null) return null;
-    	for (ActuatSpec a : actuatorsList) if (a.name.equals(_name)) return a;
-		return null;
-    }
-    public dispLink getLinkBySrc(String _src) {
-    	if (_src==null) return null;
-    	for (dispLink l : dispLinksList) if (l.src.name.equals(_src)) return l;
-		return null;
     }
     
     @FXML

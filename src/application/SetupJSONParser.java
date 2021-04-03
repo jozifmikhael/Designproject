@@ -99,7 +99,6 @@ public class SetupJSONParser {
     }
 
 	public static List<NodeSpec> nodesList = new ArrayList<NodeSpec>();
-	//TODO Ask why there were like 3 different constructors in each extension
 	public class NodeSpec {
 		public NodeSpec(double x, double y, String name, String parent, String type) {
 			this.x = x;
@@ -113,7 +112,6 @@ public class SetupJSONParser {
 		}
 		
 		public NodeSpec(String type, MouseEvent mEvent) {
-			// TODO Auto-generated constructor stub
 			this.x = mEvent.getX();
 			this.y = mEvent.getY();
 			this.sz = R+R;
@@ -252,17 +250,6 @@ public class SetupJSONParser {
 		double latency;
 		long upbw;
 		long downbw;
-		
-		//TODO Need to move this to a dynamic function - running off of this.toString() would be one way?
-//		@SuppressWarnings("unchecked")
-//		JSONObject toJSON() {
-//			String thisRepresentation = this.toString();
-//			JSONObject obj = new JSONObject();
-//			for each first_split{
-//				obj.put(resplit[0],resplit[1]);
-//			}
-//			return obj;
-//		}
 		
 //		public DeviceSpec(String name, String parent, long mips, int ram, long upbw, long downbw, int level, double rate,
 //				double apower, double ipower, double latency, double x, double y, double r, int pe) {
@@ -450,7 +437,7 @@ public class SetupJSONParser {
 		for (EdgeSpec e : moduleEdgesList) edgesJSONObj.add(e.toJSON());
 
 		JSONObject metaList = new JSONObject();
-		//TODO colors + zoomlv need to be in here as well
+		//TODO colors + zoomLevel need to be in here as well
 		metaList.put("simGranularity", simGranularity);
 		metaList.put("simDuration", simTotLength);
 		metaList.put("topLevelNode", topLvNode);
