@@ -1,0 +1,131 @@
+		{
+			"src": "EEG",
+			"dest": "client",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 1
+		},
+		{
+			"src": "client",
+			"dest": "concentration_calculator",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3500.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "_SENSOR",
+			"direction": 1,
+			"edgeType": 3
+		},
+		{
+			"src": "concentration_calculator",
+			"dest": "connector",
+			"periodicity": 100.0,
+			"tupleCpuLength": 1000.0,
+			"tupleNwLength": 1000.0,
+			"tupleType": "PLAYER_GAME_STATE",
+			"direction": 2,
+			"edgeType": 3
+		},
+		{
+			"src": "concentration_calculator",
+			"dest": "client",
+			"periodicity": 0.0,
+			"tupleCpuLength": 14.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "CONCENTRATION",
+			"direction": 2,
+			"edgeType": 3
+		},
+		{
+			"src": "connector",
+			"dest": "client",
+			"periodicity": 100.0,
+			"tupleCpuLength": 28.0,
+			"tupleNwLength": 1000.0,
+			"tupleType": "GLOBAL_GAME_STATE",
+			"direction": 2,
+			"edgeType": 3
+		},
+		{
+			"src": "client",
+			"dest": "DISPLAY",
+			"periodicity": 0.0,
+			"tupleCpuLength": 1000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "SELF_STATE_UPDATE",
+			"direction": 2,
+			"edgeType": 2
+		},
+		{
+			"src": "client",
+			"dest": "DISPLAY",
+			"periodicity": 0.0,
+			"tupleCpuLength": 1000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "GLOBAL_STATE_UPDATE",
+			"direction": 2,
+			"edgeType": 2
+		}
+
+		{
+			"src": "node1",
+			"dest": "actuator1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 0.0,
+			"tupleNwLength": 0.0,
+			"tupleType": "DISPLAY",
+			"direction": 1,
+			"edgeType": 2,
+			"latency": 1.0
+		},
+
+
+
+
+
+
+
+
+	if(edgeType == 3)application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
+		else if (edgeType == 2) {
+			Actuator display = new Actuator(dest, userId, appId, tupleType);
+			actuators.add(display);
+			for (FogDevice device : fogDevices) {
+				if (device.getName().equals(src)){
+					display.setGatewayDeviceId(device.getId());
+					display.setLatency(latency);
+				}
+			}	
+		} else if (edgeType == 1) {
+			Sensor eegSensor = new Sensor(dest, tupleType, userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
+			sensors.add(eegSensor);
+			for (FogDevice device : fogDevices) {
+				if (device.getName().equals(src)){
+					eegSensor.setGatewayDeviceId(device.getId());
+					eegSensor.setLatency(latency);
+				}
+				JSONObject sensor = new JSONObject();
+				String sensorName = (String) sensor.get("sensorName");
+				String distribution = (String) sensor.get("distribution");
+				double deterministicValue = (double) sensor.get("deterministicValue");
+				double normalMean = (double) sensor.get("normalMean");
+				double normalStdDev = (double) sensor.get("normalStdDev");
+				double uniformMax = (double) sensor.get("uniformMax");
+				double uniformMin = (double) sensor.get("uniformMin");
+				
+				if(distribution.equals("Deterministic")) {	
+					Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+					sensors.add(newSensor);	
+				}
+				else if(distribution.equals("Normal")) {	
+					Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new NormalDistribution(normalMean, normalStdDev)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+					sensors.add(newSensor);	
+				}
+				else if(distribution.equals("Uniform")) {	
+					Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new UniformDistribution(uniformMin, uniformMax)); // inter-transmission time of EEG sensor follows a deterministic distribution	
+					sensors.add(newSensor);	
+				}
+			}
+		}

@@ -1,0 +1,27 @@
+Mapping with no force:
+new
+Creating client on device node1
+Creating client on device node2
+Creating client on device node3
+Creating connector on device cloud
+Creating concentration_calculator on device cloud
+
+
+
+Mapping with force:
+new
+Creating client on device node1
+Creating client on device node2
+Creating client on device node3
+Creating concentration_calculator on device gateway1
+Creating connector on device cloud
+
+
+
+
+old
+Creating connector on device cloud
+Creating concentration_calculator on device d-0
+Creating client on device m-0-1
+Creating client on device m-0-2
+Creating client on device m-0-3

@@ -216,18 +216,21 @@ public class SetupJSONParser {
 		return null;
     }
     
+	
+	public static void main(String[] args) {
+		SetupJSONParser testobj = new SetupJSONParser();
+		JSONObject obj = new JSONObject();
+		DeviceSpec device = testobj.new DeviceSpec(1.0, 1.0, "device1", "device2",  "device", 1, 1, 1, 1, 1.0, 1.0, 1.0, 1.0, 1, 1);
+		System.out.println(device.toJSON().toString());
+	}
+	
+    
     ////7 Base Fields + 8 Fields = 17
 	public class DeviceSpec extends NodeSpec {
-		@Override
-		public String toString() {
-			return "pe=" + pe + ", mips=" + mips + ", ram=" + ram + ", level=" + level + ", rate=" + rate + ", ipower="
-					+ ipower + ", apower=" + apower + ", latency=" + latency + ", upbw=" + upbw + ", downbw=" + downbw
-					+ ", test=" + Arrays.toString(test);
-		}
 
 		public DeviceSpec(double x, double y, String name, String parent, String type,
 				int pe, long mips, int ram, int level, double rate, double ipower, double apower, double latency,
-				long upbw, long downbw, Field[] test) {
+				long upbw, long downbw) {
 			super(x, y, name, parent, type);
 			this.pe = pe;
 			this.mips = mips;
@@ -239,7 +242,6 @@ public class SetupJSONParser {
 			this.latency = latency;
 			this.upbw = upbw;
 			this.downbw = downbw;
-			this.test = test;
 		}
 		
 		int pe;
@@ -252,13 +254,25 @@ public class SetupJSONParser {
 		double latency;
 		long upbw;
 		long downbw;
-		Field[] test = DeviceSpec.class.getFields();
 		
-		//TODO Need to move this to a dynamic function - running off of this.toString() would be one way?
+		@Override
+		public String toString() {
+			return "pe=" + pe + ",mips=" + mips + ",ram=" + ram + ",level=" + level + ",rate=" + rate + ",ipower="
+					+ ipower + ",apower=" + apower + ",latency=" + latency + ",upbw=" + upbw + ",downbw=" + downbw
+					+ ",x=" + x + ",y=" + y + ",sz=" + sz
+					+ ",name=" + name + ",parent=" + parent + ",type=" + type;
+		}
+
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
-			String thisRepresentation = this.toString();
 			JSONObject obj = new JSONObject();
+			String deviceString = this.toString();
+			String[] deviceSplit = deviceString.split(",");
+			
+			for(int i = 0; i<deviceSplit.length;i++) {
+				String[] deviceSplit2 = deviceSplit[i].split("=");
+				obj.put(deviceSplit2[0], deviceSplit2[1]);
+			}
 			
 			return obj;
 		}
@@ -287,13 +301,6 @@ public class SetupJSONParser {
 	}
 	
 	public class ModuleSpec extends NodeSpec {
-		@Override
-		public String toString() {
-			return "ModuSpec [nodeName=" + nodeName + ", modRam=" + modRam + ", bandwidth=" + bandwidth + ", inTuple="
-					+ inTuple + ", outTuple=" + outTuple + ", size=" + size + ", MIPS=" + MIPS
-					+ ", fractionalSensitivity=" + fractionalSensitivity + ", x=" + x + ", y=" + y + ", sz=" + sz
-					+ ", nodeColor=" + nodeColor + ", name=" + name + ", parent=" + parent + ", type=" + type + "]";
-		}
 
 		String nodeName;
 		int modRam;
@@ -303,35 +310,63 @@ public class SetupJSONParser {
 		long size;
 		int MIPS;
 		double fractionalSensitivity;
+		Field[] moduleField = ModuleSpec.class.getFields();
+		
+		public ModuleSpec(double x, double y, String name, String parent, String type, String nodeName, int modRam,
+				long bandwidth, String inTuple, String outTuple, long size, int mIPS, double fractionalSensitivity) {
+			super(x, y, name, parent, type);
+			this.nodeName = nodeName;
+			this.modRam = modRam;
+			this.bandwidth = bandwidth;
+			this.inTuple = inTuple;
+			this.outTuple = outTuple;
+			this.size = size;
+			MIPS = mIPS;
+			this.fractionalSensitivity = fractionalSensitivity;
+		}
+		
+		@Override
+		public String toString() {
+			return "nodeName=" + nodeName + ",modRam=" + modRam + ",bandwidth=" + bandwidth + ",inTuple=" + inTuple
+					+ ",outTuple=" + outTuple + ",size=" + size + ",MIPS=" + MIPS + ",fractionalSensitivity="
+					+ fractionalSensitivity + ",x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name="
+					+ name + ",parent=" + parent + ",type=" + type;
+		}
+
+		ModuleSpec fromJSON(JSONObject obj) {
+			String moduleString = Arrays.toString(moduleField);
+			moduleString = moduleString.replace("[", "");
+			moduleString = moduleString.replace("]", "");
+			moduleString = moduleString.replace(this.getClass().toString().replace("class ", "")+".", "");
+			moduleString = moduleString.replace("public ", "");
+			moduleString = moduleString.replace("java.lang.", "");
+			String[] tokens = moduleString.split(", ");
+			//int level = Integer.parseUnsignedInt(device.get("level").toString());
+			for (int i = 0; i <tokens.length;i++) {
+				String[] tokens2 = tokens[i].split(" ");
+				if (tokens2[0].equals("int"))
+					System.out.println(tokens2[0] + " " + tokens2[1] + " = " + "Integer.parseUnsignedInt(device.get(" + tokens2[1] + ").toString());");	
+				if (tokens2[0])
+			}
+			return null;
+		}
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
-			ModuleSpec module = this;
 			JSONObject obj = new JSONObject();
-			obj.put("name", module.name);
-			obj.put("ram", module.modRam);
-			obj.put("bandwidth", module.bandwidth);
-			obj.put("inTuple", module.inTuple);
-			obj.put("outTuple", module.outTuple);
-			obj.put("size", module.size);
-			obj.put("mips", module.MIPS);
-			obj.put("Fractional Sensitivity", module.fractionalSensitivity);
-			obj.put("x_cord", module.x);
-			obj.put("y_cord", module.y);
-			obj.put("radius", module.size);
-			obj.put("tupleMaps", "");
+			String moduleString = this.toString();
+			String[] moduleSplit = moduleString.split(",");
+			
+			for(int i = 0; i<moduleSplit.length; i++) {
+				String[] sensorSplit2 = moduleSplit[i].split("=");
+				obj.put(sensorSplit2[0], sensorSplit2[1]);
+			}
+
 			return obj;
 		}
 	}
 	
 	public class SensorSpec extends NodeSpec {
-		@Override
-		public String toString() {
-			return "SensorSpec [latency=" + latency + ", deterministicValue=" + deterministicValue + ", normalMean="
-					+ normalMean + ", normalStdDev=" + normalStdDev + ", uniformMax=" + uniformMax + ", uniformMin="
-					+ uniformMin + ", x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name="
-					+ name + ", parent=" + parent + ", type=" + type + "]";
-		}
 
 		double latency;
 		double deterministicValue;
@@ -340,47 +375,91 @@ public class SetupJSONParser {
 		double uniformMax;
 		double uniformMin;
 		
+		public SensorSpec(double x, double y, String name, String parent, String type, double latency,
+				double deterministicValue, double normalMean, double normalStdDev, double uniformMax,
+				double uniformMin) {
+			super(x, y, name, parent, type);
+			this.latency = latency;
+			this.deterministicValue = deterministicValue;
+			this.normalMean = normalMean;
+			this.normalStdDev = normalStdDev;
+			this.uniformMax = uniformMax;
+			this.uniformMin = uniformMin;
+		}
+
+		
+		@Override
+		public String toString() {
+			return "latency=" + latency + ",deterministicValue=" + deterministicValue + ",normalMean=" + normalMean
+					+ ",normalStdDev=" + normalStdDev + ",uniformMax=" + uniformMax + ",uniformMin=" + uniformMin
+					+ ",x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",parent="
+					+ parent + ",type=" + type;
+		}
+		
 		@SuppressWarnings("unchecked")	
 		JSONObject toJSON() {	
-			SensorSpec sensor = this;	
 			JSONObject obj = new JSONObject();
-			obj.put("sensorName", sensor.name);
-			obj.put("parentName", sensor.parent);
-			obj.put("latency", sensor.latency);
-			obj.put("deterministicValue", sensor.deterministicValue);	
-			obj.put("normalMean", sensor.normalMean);	
-			obj.put("normalStdDev", sensor.normalStdDev);	
-			obj.put("uniformMax", sensor.uniformMax);	
-			obj.put("uniformMin", sensor.uniformMin);
-			obj.put("x_cord", sensor.x);
-			obj.put("y_cord", sensor.y);
-			obj.put("radius", sensor.sz);
+			String sensorString = this.toString();
+			String[] sensorSplit = sensorString.split(",");
+			
+			for(int i = 0; i<sensorSplit.length;i++) {
+				String[] sensorSplit2 = sensorSplit[i].split("=");
+				obj.put(sensorSplit2[0], sensorSplit2[1]);
+			}
+
 			return obj;	
 		}
 	}
 	
 	public class ActuatSpec extends NodeSpec {
+		
+		public ActuatSpec(double x, double y, String name, String parent, String type) {
+			super(x, y, name, parent, type);
+		}
+
+		@Override
+		public String toString() {
+			return "x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",parent="
+					+ parent + ",type=" + type;
+		}
+
 		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			JSONObject obj = new JSONObject();	
-			obj.put("name", this.name);
+		JSONObject toJSON() {	
+			JSONObject obj = new JSONObject();
+			String actuatorString = this.toString();
+			String[] actuatorSplit = actuatorString.split(",");
+			
+			for(int i = 0; i<actuatorSplit.length;i++) {
+				String[] actuatorSplit2 = actuatorSplit[i].split("=");
+				obj.put(actuatorSplit2[0], actuatorSplit2[1]);
+			}
+
 			return obj;	
 		}
 	}
-	
+
 	public class LinkSpec{
 		String srcID;
 		String dstID;
 		double latency;
 		
+		@Override
+		public String toString() {
+			return "srcID=" + srcID + ",dstID=" + dstID + ",latency=" + latency;
+		}
+
 		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			LinkSpec link = this;
+		JSONObject toJSON() {	
 			JSONObject obj = new JSONObject();
-			obj.put("srcID", link.srcID);
-			obj.put("dstID", link.dstID);
-			obj.put("latency", link.latency);
-			return obj;
+			String linkString = this.toString();
+			String[] linkSplit = linkString.split(",");
+			
+			for(int i = 0; i<linkSplit.length;i++) {
+				String[] linkSplit2 = linkSplit[i].split("=");
+				obj.put(linkSplit2[0], linkSplit2[1]);
+			}
+
+			return obj;	
 		}
 	}
 
@@ -402,20 +481,24 @@ public class SetupJSONParser {
 //		public static final int ACTUATOR = 3; //I THINK src->actuator
 		int direction = 1;
 		
+		@Override
+		public String toString() {
+			return "src=" + src + ",dst=" + dst + ",edgeType=" + edgeType + ",latency=" + latency + ",tupleType="
+					+ tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength + ",nwLength=" + nwLength
+					+ ",direction=" + direction;
+		}
+
 		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			EdgeSpec edge = this;
+		JSONObject toJSON() {	
 			JSONObject obj = new JSONObject();
-			obj.put("src", edge.src);
-			obj.put("dest", edge.dst);
-			obj.put("edgeType", edge.edgeType);
-			obj.put("latency", edge.latency);
-			obj.put("tupleType", edge.tupleType);
-			obj.put("periodicity", edge.periodicity);
-			obj.put("tupleCpuLength", edge.cpuLength);
-			obj.put("tupleNwLength", edge.nwLength);
-			obj.put("direction", edge.direction);
-			return obj;
+			String edgeString = this.toString();
+			String[] edgeSplit = edgeString.split(",");
+			for(int i = 0; i<edgeSplit.length;i++) {
+				String[] edgeSplit2 = edgeSplit[i].split("=");
+				obj.put(edgeSplit2[0], edgeSplit2[1]);
+			}
+
+			return obj;	
 		}
 		
 		public EdgeSpec(String src, String dst, String edgeType, double latency, String tupleType,

@@ -42,6 +42,10 @@ public class Application {
 	
 	private Map<String, AppEdge> edgeMap;
 
+	public static Application createApplication(String appId, int userId){
+		return new Application(appId, userId);
+	}
+	
 	/**
 	 * Adds an application module to the application.
 	 * @param moduleName
