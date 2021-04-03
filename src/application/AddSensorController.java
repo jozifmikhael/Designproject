@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.ModuSpec;
+import application.SetupJSONParser.ModuleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

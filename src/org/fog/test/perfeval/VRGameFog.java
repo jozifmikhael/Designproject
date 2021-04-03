@@ -129,7 +129,7 @@ public class VRGameFog {
 		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));
 		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");
 		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));
-        JSONArray linkArr = (JSONArray) jsonObject.get("links");	
+        JSONArray linkArr = (JSONArray) jsonObject.get("links");
         linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 		
 		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
@@ -155,9 +155,8 @@ public class VRGameFog {
 //        double transmissionTime = (double) node.get("transmission_time");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
-		FogDevice mobile = addMobile(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower); // adding a fog device for every Gateway in physical topology. The parent of each gateway is the Proxy Server
-//      FogDevice mobile = addMobile(nodeID, 5);
-//		mobile.setUplinkLatency(2); // latency of connection between the smartphone and proxy server is 4 ms
+        FogDevice mobile = createFogDevice(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
+		
 		fogDevices.add(mobile);
     }
 	
@@ -169,7 +168,7 @@ public class VRGameFog {
 		double normalStdDev = (double) sensor.get("normalStdDev");
 		double uniformMax = (double) sensor.get("uniformMax");
 		double uniformMin = (double) sensor.get("uniformMin");
-			
+		
 		if(distribution.equals("Deterministic")) {	
 			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
 			sensors.add(newSensor);	
@@ -196,7 +195,7 @@ public class VRGameFog {
 		String dstID = (String) link.get("dstID");
 		FogDevice src = null;
 		FogDevice dst = null;
-		Sensor sensorSrc = null;	
+		Sensor sensorSrc = null;
 		Actuator actuatorSrc = null;
 
 		for(FogDevice device : fogDevices) {
@@ -258,13 +257,6 @@ public class VRGameFog {
 		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
 		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
 	}
-	private static FogDevice addMobile(String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
-		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
-		if (nodeLevel == 0) {
-			mobile.setParentId(-1);
-		}
-		return mobile;
-	}
 	
 	/**
 	 * Creates a vanilla fog device
@@ -286,7 +278,7 @@ public class VRGameFog {
 		
 		// 3. Create PEs and add these into a list.
 		peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-
+		
 		int hostId = FogUtils.generateEntityId();
 		long storage = 1000000; // host storage
 		int bw = 10000;

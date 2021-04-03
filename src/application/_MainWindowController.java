@@ -206,132 +206,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     ////////////////////////////////////////////////////////////////////////////
     
-    int globalID=0;
-	double R=50;
-	double zoomFactor=1;
+//	double R=50;
 	double xCenter=100;
 	double yCenter=100;
-	int fontSize = 16;
-	String font = "monospaced";
-	Color deviceColor=Color.RED;
-	Color moduleColor=Color.CYAN;
-	Color sensorColor=Color.PINK;
-	Color actuatorColor=Color.ORANGE;
-	Color transpColor=Color.TRANSPARENT;
-	Color _errorColor=Color.GREEN;
+	
     GraphicsContext gc;
-    SetupJSONParser textfile = new SetupJSONParser();
-	
-	class dispNode {
-		String name = "err";
-		double x,y,sz;
-		int id;
-		Color c;
-		NodeSpec data;
-		
-		void draw() {
-			gc.setFill(c);
-			gc.fillOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-			if(c!=transpColor) gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-			gc.setFill(Color.BLACK);
-			gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
-		}
-		void setPos(MouseEvent mEvent) {
-			this.x=mEvent.getX(); this.y=mEvent.getY();
-			if(data.type.equals("device")) {
-				DeviceSpec d = getDevice(this.data.name);
-				devicesList.remove(d);
-				d.x=this.x;
-				d.y=this.y;
-				d.dispSize=this.sz;
-				devicesList.add(d);
-			}else if(data.type.equals("module")) {
-				ModuSpec m = getModule(this.data.name);
-				devicesList.remove(m);
-				m.x=this.x; m.y=this.y; m.dispSize=this.sz;
-				modulesList.add(m);
-			}else if(data.type.equals("sensor")) {
-				SensorSpec s = getSensor(this.data.name);
-				sensorsList.remove(s);
-				s.x=this.x; s.y=this.y;
-				s.dispSize=this.sz;
-				sensorsList.add(s);
-			}else if(data.type.equals("actuator")) {
-				ActuatorSpec a = getActuator(this.data.name);
-				actuatorsList.remove(a);
-				a.x=this.x; a.y=this.y;
-				a.dispSize=this.sz;
-				actuatorsList.add(a);
-			}
-		}
-		dispNode(String _name, NodeSpec _n) {this(_name, _n, xCenter, yCenter, R+R);}
-		dispNode(String _name, NodeSpec _n, double _x, double _y, double _r) {
-			name = _name;
-			x = _x;
-			y = _y;
-			sz = _r;
-			data = _n;
-			if(data.type.equals("device")) c = deviceColor;
-			else if(data.type.equals("module")) c = moduleColor;
-			else if(data.type.equals("sensor")) c = sensorColor;
-			else if(data.type.equals("actuator")) c = actuatorColor;
-			else c = _errorColor;
-			id = globalID++;
-		}
-		dispNode(String _name, Color _c, double _x, double _y, double _r) {
-			name = _name;
-			x = _x;
-			y = _y;
-			sz = _r;
-			c = _c;
-		}
-	}
-	
-	class dispLink{
-		dispNode src, dst;
-		void draw() {
-			double x1=0; double y1=0;
-			double x2=0; double y2=0;
-			if(src!=null) {x1=src.x; y1= src.y;}
-			if(dst!=null) {x2=dst.x; y2= dst.y;}
-			if(src!=null&&dst!=null) {
-				gc.beginPath();
-		    	gc.moveTo(x1, y1);
-				gc.lineTo(x2, y2);
-				gc.stroke();
-			}
-		}
-		dispLink(dispNode _src, dispNode _dst){this.src=_src; this.dst=_dst;}
-		dispLink(DeviceSpec _device) {
-			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.name)) this.src = dn;
-			for (dispNode dn : dispNodesList) if (dn.name.matches(_device.parent)) this.dst = dn;
-		}
-		dispLink(DeviceSpec _src, DeviceSpec _dst) {
-	    	for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
-		}
-		dispLink(ModuEdgeSpec _spec) {
-	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.child)) this.src=dn;
-	    	for(dispNode dn : dispNodesList) if(dn.name.matches(_spec.parent)) this.dst=dn;
-		}
-		public dispLink(ModuSpec _src, ModuSpec _dst) {
-			for(dispNode dn : dispNodesList) if(dn.name==_src.name) {this.src=dn;}
-	    	for(dispNode dn : dispNodesList) if(dn.name==_dst.name) {this.dst=dn;}
-		}
-	}
-	
-	public List<dispNode> dispNodesList = new ArrayList<dispNode>();
-	public List<dispLink> dispLinksList = new ArrayList<dispLink>();
-	public List<String> selectedModulesList = new ArrayList<String>();
-	
-	public List<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
-	public List<ActuatorSpec> actuatorsList = new ArrayList<ActuatorSpec>();
-	public List<LinkSpec> linksList = new ArrayList<LinkSpec>();
-	
-	public List<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
-	public List<ModuSpec> modulesList = new ArrayList<ModuSpec>();
-	public List<ModuEdgeSpec> moduleEdgesList = new ArrayList<ModuEdgeSpec>();
-		
+    
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
     	
@@ -357,142 +237,144 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			default : {} // Nothing
 		}
 	}
+	public List<String> selectedModulesList = new ArrayList<String>();
     
+	public SetupJSONParser specsHandler;
     public void setupListeners(Stage parentStage, Scene scene) {
-    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenDragHandler();
+        specsHandler = new SetupJSONParser();
+    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
     	gc = topoField.getGraphicsContext2D();
 		gc.setTextAlign(TextAlignment.CENTER);
-		gc.setFont(new Font(font, fontSize));
+		gc.setFont(new Font(SetupJSONParser.font, SetupJSONParser.fontSize));
     	scene.setOnKeyPressed(this); // uses handle method
     }
     
     @FXML
 	private void mouseScrollHandler(ScrollEvent event) {
-    	System.out.println(event.getDeltaY() +" "+ event.getX() +" "+ event.getY());
-    	zoomFactor+=(event.getDeltaY()>0)?0.05:-0.05;
-    	System.out.println(zoomFactor);
-    	redrawNodes();
+    	specsHandler.shiftPositionsByZoom(event);
     }
-    
-    private void redrawNodes() {
+	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for(dispLink link : dispLinksList) link.draw();
-		if (draggingLink!=null) draggingLink.draw();
-		for(dispNode node : dispNodesList) node.draw();
-		if (draggingNode!=null) draggingNode.draw();
+		for (DeviceSpec node : specsHandler.devicesList) node.drawLink(gc);
+		for (ModuleSpec node : specsHandler.modulesList) node.drawLink(gc);
+		for (SensorSpec node : specsHandler.sensorsList) node.drawLink(gc);
+		for (ActuatSpec node : specsHandler.actuatsList) node.drawLink(gc);
+		if (draggingNode != null) draggingNode.drawLink(gc);
+		for (DeviceSpec node : specsHandler.devicesList) node.drawNode(gc);
+		for (ModuleSpec node : specsHandler.modulesList) node.drawNode(gc);
+		for (SensorSpec node : specsHandler.sensorsList) node.drawNode(gc);
+		for (ActuatSpec node : specsHandler.actuatsList) node.drawNode(gc);
+		if (draggingNode != null) draggingNode.drawLink(gc);
 	}
-
-	dispNode draggingNode = null;
-	dispLink draggingLink = null;
-	dispNode linkSrcNode = null;
+    
+    boolean mouseL=false;
+    boolean mouseR=false;
+    boolean mouseM=false;
+    NodeSpec draggingNode = null;
+    NodeSpec linkSrcNode = null;
     @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
-		dispNode selNode = getNodeOnClick(mEvent);
-		if (state == 0) {
-			draggingNode = selNode;
-		} else if (state == 1) {
-			if (selNode == null) {
-				dispNode newNode = new dispNode("New Node", deviceColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
-				draggingNode = newNode;
-			} else {
-				draggingNode = selNode;
-			}
-		} else if (state == 2) {
-			if (selNode == null) {
-				dispNode newNode = new dispNode("New Module", moduleColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
-				draggingNode = newNode;
-			} else {
-				draggingNode = selNode;
-			}
-		} else if (state == 3) {
-			linkSrcNode = selNode;
-			dispNode newNode = new dispNode("", transpColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
-			draggingNode = newNode;
-			draggingLink = new dispLink(linkSrcNode, draggingNode);
-		} else if (state == 4) {
-			if (selNode == null) {
-				dispNode newNode = new dispNode("New Sensor", sensorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
-				draggingNode = newNode;
-			} else {
-				draggingNode = selNode;
-			}
-		} else if (state == 5) {
-			if (selNode == null) {
-				dispNode newNode = new dispNode("New Actuator", actuatorColor, mEvent.getX(), mEvent.getY(), R*2*zoomFactor);
-				draggingNode = newNode;
-			} else {
-				draggingNode = selNode;
-			}
-		}
+        mouseL|=mEvent.isPrimaryButtonDown();
+        mouseR|=mEvent.isSecondaryButtonDown();
+        mouseM|=mEvent.isMiddleButtonDown();
+        
+    	System.out.println(" L:"+mouseL+" M:"+mouseM+" R:"+mouseR);
+    	if(mouseL) {
+    		System.out.println("Inside mouseL click");
+			NodeSpec selNode = specsHandler.getNode(mEvent);
+			if(selNode==null) {
+				switch(state) {
+					case 1: draggingNode = specsHandler.new NodeSpec("device", mEvent); break;
+					case 2: draggingNode = specsHandler.new NodeSpec("module", mEvent); break;
+					case 3: draggingNode = specsHandler.new NodeSpec("sensor", mEvent); break;
+					case 4: draggingNode = specsHandler.new NodeSpec("actuator", mEvent); break;
+					case 5: draggingNode = specsHandler.new NodeSpec("link", mEvent); break;
+					default: draggingNode = selNode; break;
+				}
+			}else draggingNode = selNode;
+	    }
+    	if(mouseM) {
+    		screenPanHandler();
+    	}
 		redrawNodes();
 	}
     
-    @FXML
+    private void screenPanHandler() {
+		// TODO Shift the position of everything
+		
+	}
+
+	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
-    	if (state==0) {
-    		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
-    	} else if (state==1) {
-    		if(dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newDevice=addDevice();
-    			if(newDevice!=null) newDevice.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-        	draggingNode=null;
-    	} else if (state==2) {
-    		if(dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newModule = addModule();
-    			if(newModule!=null) newModule.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-        	draggingNode=null;
-    	} else if (state == 3) {
-        	draggingLink=null;
-        	draggingNode=null;
-    		dispNode linkDstNode = getNodeOnClick(mEvent);
-			if(linkSrcNode!=null && linkDstNode!=null) {
-				String srcType = linkSrcNode.data.type;
-				String dstType = linkSrcNode.data.type;
-				if(srcType.equals(dstType)) {
-					if(srcType.equals("device")) {
-						DeviceSpec srcDev = getDevice(linkSrcNode.name);
-						srcDev.parent = linkDstNode.name;
-						DeviceSpec dstDev = getDevice(srcDev.parent);
-						dispLink srcLink = getLinkBySrc(linkSrcNode.name);   				        	
-			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
-						Scene scene = new Scene(dataFXML.load(),414,139);
-						Stage stage = new Stage();
-						stage.setScene(scene);							
-			     		stage.setTitle("Setting Link Latency");    		
-			     		stage.showAndWait();
-			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
-						if(srcLink!=null)srcLink.dst = linkDstNode;
-						else dispLinksList.add(new dispLink(srcDev, dstDev));
-					}else if(srcType.equals("module")) {
-						selectedModulesList.add(linkDstNode.name);
-						selectedModulesList.add(linkSrcNode.name);
-						addEdge();
-					}
-				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
-					System.out.println("Sensor-Node link detected");
-				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
-			} else if (linkSrcNode==null) {
-				System.out.println("_MainWindowController.java: Linker Src is null");
-			} else if (linkDstNode==null) {
-				System.out.println("_MainWindowController.java: Linker Dst is null");
-			}
-		} else if (state==4) {
-    		if(dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newSensor = addSensor();
-    			if(newSensor!=null) newSensor.setPos(mEvent);
-    		} else draggingNode.setPos(mEvent);
-        	draggingNode=null;
-		} else if (state==5) {			
-    		if(dispNodesList.indexOf(draggingNode)<0) {
-    			dispNode newActuator = addActuator();
-    			if(newActuator!=null) newActuator.setPos(mEvent);   			
+    	System.out.println(" L:"+mouseL+" M:"+mouseM+" R:"+mouseR);
+    	if(mouseL) {
+    		System.out.println("Inside mouseL release");
+    		mouseL=false;
+    		if (state==0) {
+        		if(dispNodesList.indexOf(draggingNode)>=0)draggingNode.setPos(mEvent);
+        	} else if (state==1) {
+        		if(dispNodesList.indexOf(draggingNode)<0) {
+        			dispNode newDevice=addDevice();
+        			if(newDevice!=null) newDevice.setPos(mEvent);
+        		} else draggingNode.setPos(mEvent);
+            	draggingNode=null;
+        	} else if (state==2) {
+        		if(dispNodesList.indexOf(draggingNode)<0) {
+        			dispNode newModule = addModule();
+        			if(newModule!=null) newModule.setPos(mEvent);
+        		} else draggingNode.setPos(mEvent);
+            	draggingNode=null;
+        	} else if (state == 3) {
+            	draggingLink=null;
+            	draggingNode=null;
+        		dispNode linkDstNode = getNodeOnClick(mEvent);
+    			if(linkSrcNode!=null && linkDstNode!=null) {
+    				String srcType = linkSrcNode.data.type;
+    				String dstType = linkSrcNode.data.type;
+    				if(srcType.equals(dstType)) {
+    					if(srcType.equals("device")) {
+    						DeviceSpec srcDev = getDevice(linkSrcNode.name);
+    						srcDev.parent = linkDstNode.name;
+    						DeviceSpec dstDev = getDevice(srcDev.parent);
+    						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
+    			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+    						Scene scene = new Scene(dataFXML.load(),414,139);
+    						Stage stage = new Stage();
+    						stage.setScene(scene);
+    			     		stage.setTitle("Setting Link Latency");
+    			     		stage.showAndWait();
+    			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
+    						if(srcLink!=null)srcLink.dst = linkDstNode;
+    						else dispLinksList.add(new dispLink(srcDev, dstDev));
+    					}else if(srcType.equals("module")) {
+    						selectedModulesList.add(linkDstNode.name);
+    						selectedModulesList.add(linkSrcNode.name);
+    						addEdge();
+    					}
+    				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
+    					System.out.println("Sensor-Node link detected");
+    				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
+    			} else if (linkSrcNode==null) {
+    				System.out.println("_MainWindowController.java: Linker Src is null");
+    			} else if (linkDstNode==null) {
+    				System.out.println("_MainWindowController.java: Linker Dst is null");
+    			}
+    		} else if (state==4) {
+        		if(dispNodesList.indexOf(draggingNode)<0) {
+        			dispNode newSensor = addSensor();
+        			if(newSensor!=null) newSensor.setPos(mEvent);
+        		} else draggingNode.setPos(mEvent);
+            	draggingNode=null;
+    		} else if (state==5) {			
+        		if(dispNodesList.indexOf(draggingNode)<0) {
+        			dispNode newActuator = addActuator();
+        			if(newActuator!=null) newActuator.setPos(mEvent);   			
+        		}
     		}
-		}
+    	}
     	redrawNodes();
     }
     
@@ -506,18 +388,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
     
-	private void screenDragHandler() {
+	private void screenSizeChangeHandler() {
     	double w=backPane.getWidth(); double h=backPane.getHeight();
 		xCenter=0.5*w; yCenter=0.5*h;
 		topoField.setWidth(w); topoField.setHeight(h);
     	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
 		redrawNodes();
     }
-	
-	private dispNode getNodeOnClick(MouseEvent mEvent) {
-		for(dispNode n : dispNodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) return n;
-		return null;
-	}
     
     String selectedJSON="test9.json";
     String policy = "Edgewards";
@@ -539,171 +416,38 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
 	
 	void writeJSON() {
+		//TODO change this so that the meta-specs are actually inside the SetupJSONParser
+		//and we only set from here on change
+		//So ideally just JSONHandler.writeJSON();
 		String policy = setParamsController.policyType;
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
     	String centralNode = getCentralNode();
-     	textfile.writeJSON(selectedJSON, devicesList, modulesList, moduleEdgesList, sensorsList, linksList, time, granularity, policy, centralNode);
+     	specsHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
 	}
 	
+	//TODO Change Parse[X] to be methods of the respective classes
+	//i.e. a "[X]Spec fromJSON(JSONObject){}"
+	//like existing "JSONObject toJSON(this)"
 	@FXML
-	void loadJson(ActionEvent event) {
-		JSONParser parser = new JSONParser();
+	void loadJson(ActionEvent event) throws FileNotFoundException, IOException, ParseException {
 		Stage stage = new Stage();
+		//TODO FileChooser?
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Open JSON File");
 		chooser.setInitialDirectory(new File("saves"));
 		File selectedDirectory = chooser.showOpenDialog(stage);
 		if (selectedDirectory != null) {
 			System.out.println("Loaded Json: "+selectedDirectory.getName());
-			try {
-				Object obj = parser.parse(new FileReader(selectedDirectory.getName()));
-				JSONObject jsonObject = (JSONObject) obj;
+			JSONObject jsonObject = (JSONObject)new JSONParser().parse(new FileReader(selectedDirectory.getName()));
 				
-				JSONArray devicesList = (JSONArray) jsonObject.get("nodes");				
-				for (int i = 0; i < devicesList.size(); i++) {
-					JSONObject device = (JSONObject) devicesList.get(i);
-					parseDeviceObj(device);
-				}
-				JSONArray edgesList = (JSONArray) jsonObject.get("edges");
-				for (int i = 0; i < edgesList.size(); i++) {
-					JSONObject edge = (JSONObject) edgesList.get(i);
-					parseEdgeObj(edge);
-				}
-				
-				JSONArray modulesList = (JSONArray) jsonObject.get("modules");
-				for (int i = 0; i < modulesList.size(); i++) {
-					JSONObject module = (JSONObject) modulesList.get(i);
-					parseSensorObj(module);
-				}
-				
-				JSONArray sensorsList = (JSONArray) jsonObject.get("sensors");
-				for (int i = 0; i < sensorsList.size(); i++) {
-					JSONObject sensor = (JSONObject) sensorsList.get(i);
-					parseSensorObj(sensor);
-				}
-				JSONArray actuatorsList = (JSONArray) jsonObject.get("actuators");
-				for (int i = 0; i < actuatorsList.size(); i++) {
-                    JSONObject actuator = (JSONObject) actuatorsList.get(i);
-                    parseSensorObj(actuator);
-                }
-			}
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			JSONArray devicesList = (JSONArray) jsonObject.get("nodes");
+			JSONArray actuatsList = (JSONArray) jsonObject.get("actuats");
+			JSONArray modulesList = (JSONArray) jsonObject.get("modules");
+			JSONArray sensorsList = (JSONArray) jsonObject.get("sensors");
+			JSONArray edgesList = (JSONArray) jsonObject.get("edges");	
 		}
 	}
-	
-	void parseDeviceObj(JSONObject device) throws NumberFormatException, IOException {
-		//JSONObject deviceObj = (JSONObject) device.get("nodes");
-		String parentname = (String) device.get("parent");
-		String nodename = (String) device.get("name");
-		double apower = (double) device.get("apower");
-		int level = Integer.parseUnsignedInt(device.get("level").toString());
-		double rate = (double) device.get("rate");
-		double ipower = (double) device.get("ipower");
-		int downbw = Integer.parseUnsignedInt(device.get("down_bw").toString());
-		int upbw = Integer.parseUnsignedInt(device.get("up_bw").toString());
-		int ram =  Integer.parseUnsignedInt(device.get("ram").toString());
-		int mips = Integer.parseUnsignedInt(device.get("mips").toString());
-		double x_cord = (double) device.get("x_cord");
-		double y_cord = (double) device.get("y_cord");
-		double size = (double) device.get("radius");
-		double latency = 6.0;
-		DeviceSpec d = textfile.createDevice(nodename, parentname, mips, ram, upbw, downbw, level, rate, apower, ipower, latency);
-		d.x = x_cord;
-		d.y = y_cord;
-		d.dispSize = size;
-		devicesList.add(d);
-		dispNode newDevice = new dispNode(nodename, d, d.x, d.y, d.dispSize);
-		dispNodesList.add(newDevice);
-		dispLinksList.add(new dispLink(d));
-		redrawNodes();
-	}
-	
-	void parseActuatorObj(JSONObject actuator) throws NumberFormatException, IOException {
-        String actuatorName = (String) actuator.get("Actuator Name");
-        double x_cord = (double) actuator.get("x_cord");
-        double y_cord = (double) actuator.get("y_cord");
-        double size = (double) actuator.get("radius");
-        ActuatorSpec a = textfile.createActuator(actuatorName + " \n");
-        a.x = x_cord;
-        a.y = y_cord;
-        a.dispSize = size;
-        actuatorsList.add(a);
-        dispNode newDevice = new dispNode(actuatorName, a, a.x, a.y, a.dispSize);
-        dispNodesList.add(newDevice);
-        redrawNodes();
-    }
-	
-	void parseSensorObj(JSONObject sensor) throws NumberFormatException, IOException {
-		double uniformMax = (double) sensor.get("uniformMax");
-		String sensorName = (String) sensor.get("sensorName");
-		double normalStdDev = (double) sensor.get("normalStdDev");
-		double normalMean = (double) sensor.get("normalMean");
-		double latency = (double) sensor.get("latency");
-		double deterministicValue = (double) sensor.get("deterministicValue");
-		String parentName = (String) sensor.get("parentName");
-		double uniformMin = (double) sensor.get("uniformMin");
-		double x_cord = (double) sensor.get("x_cord");
-		double y_cord = (double) sensor.get("y_cord");
-		double size = (double) sensor.get("radius");
-		SensorSpec s = textfile.createSensor(sensorName, parentName, latency, deterministicValue, normalMean, normalStdDev, uniformMax, uniformMin);
-		s.x = x_cord;
-		s.y = y_cord;
-		s.dispSize = size;
-		sensorsList.add(s);
-		dispNode newSensor = new dispNode(sensorName, s, s.x, s.y, s.dispSize);
-		dispNodesList.add(newSensor);
-		redrawNodes();
-	}
-	
-	void parseEdgeObj(JSONObject edge) throws NumberFormatException, IOException {
-		String src = (String) edge.get("src");
-		String dest = (String) edge.get("dest");
-		double tupleCpuLength = (double) edge.get("tupleCpuLength");
-		String edgeType = (String) edge.get("edgeType");
-		double periodicity = (double) edge.get("periodicity");
-		String tupleType = (String) edge.get("typleType");
-		double tupleNwLength = (double) edge.get("tupleNwLength");
-		int direction = (int) edge.get("direction");
-		ModuEdgeSpec e = textfile.createModuleEdge(dest, src, tupleType, periodicity, tupleCpuLength,
-				tupleNwLength, edgeType, direction);
-		moduleEdgesList.add(e);		
-	}
-	
-	void parseModuleObj(JSONObject module) throws NumberFormatException, IOException {
-		String nodeName = (String) module.get("node name");
-		String moduleName = (String) module.get("module name");
-		int size = (int) module.get("size");
-		long bandwidth = (long) module.get("bandwidth");
-		double fractionalSensitivity = (double) module.get("Fractional Sensitivity");
-		String inTuple = (String) module.get("inTuple");
-		int mips = (int) module.get("mips");
-		String outTuple = (String) module.get("outTuple");
-		int modRam = (int) module.get("ram");
-		double x_cord = (double) module.get("x_cord");
-		double y_cord = (double) module.get("y_cord");
-		long szT = (long) module.get("radius");
-		double sz = (double) szT;
-		
-		ModuSpec m = textfile.createModule(nodeName, moduleName, modRam, bandwidth, inTuple, outTuple,
-				size, mips, fractionalSensitivity);
-		m.x = x_cord;
-		m.y = y_cord;
-		m.dispSize = sz;
-		modulesList.add(m);
-		dispNode newMod = new dispNode(nodeName, m, m.x, m.y, m.dispSize);
-		dispNodesList.add(newMod);
-		redrawNodes();
-	}
-	
     @FXML
     void showOutput(ActionEvent event) {
         try {
@@ -727,7 +471,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		ActuatorInputController actuatorController = addNewActuatorLoader.getController();
     		stage.setTitle("Add Actuator");
     		stage.showAndWait();
-    		ActuatorSpec a = actuatorController.getSpec();
+    		ActuatSpec a = actuatorController.getSpec();
     		if (a==null) return null;
     		String name = a.name;
     		dispNode newActuator = new dispNode(a.name, a, xCenter, yCenter, R+R);
@@ -810,7 +554,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		controller.populateList(devicesList);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
-    		ModuSpec m = controller.getSpec();
+    		ModuleSpec m = controller.getSpec();
     		if (m==null) return null;
     		String name = m.name==null?"Error":m.name;
     		dispNode newMod = new dispNode(name, m, xCenter, yCenter, R+R);
@@ -827,7 +571,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    ModuEdgeSpec addEdge() {
+    EdgeSpec addEdge() {
 	    try {
 			FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("EdgeInputBox.fxml"));
 			Scene scene = new Scene(dataFXML.load(),414,346);
@@ -839,7 +583,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			selectedModulesList.removeAll(selectedModulesList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
-    		ModuEdgeSpec v = controller.getSpec();
+    		EdgeSpec v = controller.getSpec();
     		if(v!=null) {
     			moduleEdgesList.add(v);
     			dispLinksList.add(new dispLink(v));
@@ -852,9 +596,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		}
     }
     
-    public ModuSpec getModule(String _name) {
+    public ModuleSpec getModule(String _name) {
     	if (_name==null) return null;
-    	for (ModuSpec m : modulesList) if (m.name.equals(_name)) return m;
+    	for (ModuleSpec m : modulesList) if (m.name.equals(_name)) return m;
 		return null;
     }
     public SensorSpec getSensor(String _name) {
@@ -867,9 +611,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	for (DeviceSpec d : devicesList) if (d.name.equals(_name)) return d;
 		return null;
     }
-    public ActuatorSpec getActuator(String _name) {
+    public ActuatSpec getActuator(String _name) {
     	if (_name==null) return null;
-    	for (ActuatorSpec a : actuatorsList) if (a.name.equals(_name)) return a;
+    	for (ActuatSpec a : actuatorsList) if (a.name.equals(_name)) return a;
 		return null;
     }
     public dispLink getLinkBySrc(String _src) {
@@ -964,67 +708,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         stage.showAndWait();
         
     }
-    private static FogDevice addMobile(String nodeName, long nodeMips, int nodeRam, long nodeUpBw, long nodeDownBw, int nodeLevel, double nodeRatePerMips, double nodeBusyPower, double nodeIdlePower){
-		FogDevice mobile = createFogDevice(nodeName, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
-		if (nodeLevel == 0) {
-			mobile.setParentId(-1);
-		}
-		return mobile;
-	}
-
-	private static FogDevice createFogDevice(String nodeName, long mips,
-			int ram, long upBw, long downBw, int level, double ratePerMips, double busyPower, double idlePower) {
-		
-		List<Pe> peList = new ArrayList<Pe>();
-		
-		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-
-		int hostId = FogUtils.generateEntityId();
-		long storage = 1000000; // host storage
-		int bw = 10000;
-
-		PowerHost host = new PowerHost(
-				hostId,
-				new RamProvisionerSimple(ram),
-				new BwProvisionerOverbooking(bw),
-				storage,
-				peList,
-				new StreamOperatorScheduler(peList),
-				new FogLinearPowerModel(busyPower, idlePower)
-			);
-
-		List<Host> hostList = new ArrayList<Host>();
-		hostList.add(host);
-
-		String arch = "x86"; // system architecture
-		String os = "Linux"; // operating system
-		String vmm = "Xen";
-		double time_zone = 10.0; // time zone this resource located
-		double cost = 3.0; // the cost of using processing in this resource
-		double costPerMem = 0.05; // the cost of using memory in this resource
-		double costPerStorage = 0.001; // the cost of using storage in this
-										// resource
-		double costPerBw = 0.0; // the cost of using bw in this resource
-		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
-													// devices by now
-
-		FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(
-				arch, os, vmm, host, time_zone, cost, costPerMem,
-				costPerStorage, costPerBw);
-
-		FogDevice fogdevice = null;
-		try {
-			fogdevice = new FogDevice(nodeName, characteristics, 
-					new AppModuleAllocationPolicy(hostList), storageList, 10, upBw, downBw, 0, ratePerMips);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		fogdevice.setLevel(level);
-		return fogdevice;
-	}
-    
     @FXML
     public void createJson(ActionEvent event) {
     	try {

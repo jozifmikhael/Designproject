@@ -3,7 +3,7 @@ package application;
 
 import java.io.IOException;
 
-import application.SetupJSONParser.ActuatorSpec;
+import application.SetupJSONParser.ActuatSpec;
 import application.SetupJSONParser.SensorSpec;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,7 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.ModuSpec;
+import application.SetupJSONParser.ModuleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -32,7 +32,7 @@ import application.SetupJSONParser.DeviceSpec;
 
 public class ActuatorInputController {
 	SetupJSONParser textfile = new SetupJSONParser();
-	ActuatorSpec a;
+	ActuatSpec a;
 	
 	String actuator_Name;
 	@FXML
@@ -47,5 +47,5 @@ public class ActuatorInputController {
 		a = textfile.createActuator(actuatorName.getText().toString());
 		stage.close();
 	}
-	public ActuatorSpec getSpec() {return a;}
+	public ActuatSpec getSpec() {return a;}
 }

@@ -76,10 +76,10 @@ public class VRGameFog_src {
 	@SuppressWarnings("unchecked")
 	public VRGameFog_src(
 			List<DeviceSpec> deviceSpecs,
-			List<ModuSpec> moduleSpecs,
+			List<ModuleSpec> moduleSpecs,
 			List<SensorSpec> sensorSpecs,
-			List<ActuatorSpec> actuatorSpecs,
-			List<ModuEdgeSpec> edgeSpecs,
+			List<ActuatSpec> actuatorSpecs,
+			List<EdgeSpec> edgeSpecs,
 			int simTime, int simGranularity,
 			String simPlacementPolicy,
 			String topLevelNode) throws Exception {

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.ModuSpec;
+import application.SetupJSONParser.ModuleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddModuleController {
-	ModuSpec m;
+	ModuleSpec m;
 	SetupJSONParser textfile = new SetupJSONParser();
 	
 	@FXML
@@ -73,5 +73,5 @@ public class AddModuleController {
 		for(DeviceSpec d : devicesList) items.add(d.name);
 		nodeBox.setItems(items);
 	}
-	public ModuSpec getSpec() {return m;}
+	public ModuleSpec getSpec() {return m;}
 }

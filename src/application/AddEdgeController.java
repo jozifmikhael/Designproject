@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.List;
 
 import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.ModuEdgeSpec;
-import application.SetupJSONParser.ModuSpec;
+import application.SetupJSONParser.EdgeSpec;
+import application.SetupJSONParser.ModuleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddEdgeController {
-	ModuEdgeSpec v;
+	EdgeSpec v;
 	SetupJSONParser textfile = new SetupJSONParser();
 	
 	@FXML
@@ -69,9 +69,9 @@ public class AddEdgeController {
 		stage.close();
 	}
 	
-	void populateList(List<ModuSpec> modulesList) {
+	void populateList(List<ModuleSpec> modulesList) {
 		ObservableList<String> items = FXCollections.observableArrayList();
-		for(ModuSpec m : modulesList) items.add(m.name);
+		for(ModuleSpec m : modulesList) items.add(m.name);
 		parentChoice.setItems(items);
 		childChoice.setItems(items);
 		if(items.size()>1) {
@@ -80,7 +80,7 @@ public class AddEdgeController {
 		}
 	}
 	
-	public ModuEdgeSpec getSpec() {
+	public EdgeSpec getSpec() {
 		return v;
 	}
 
