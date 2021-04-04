@@ -144,8 +144,8 @@ public class VRGameFog {
         edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
     	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
 		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
-        JSONArray linkArr = (JSONArray) jsonObject.get("links");
-        linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+//        JSONArray linkArr = (JSONArray) jsonObject.get("links");
+//        linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 		
 		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
 		moduleMapping.addModuleToDevice("connector", "cloud");
@@ -166,10 +166,9 @@ public class VRGameFog {
         double nodeRatePerMips = (double) node.get("rate");
         double nodeIdlePower = (double) node.get("ipower");
         String nodeID = (String) node.get("name");
-        long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
-        long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
+        long nodeDownBw = Long.parseUnsignedLong(node.get("downbw").toString());
+        long nodeUpBw = Long.parseUnsignedLong(node.get("upbw").toString());
         long nodeMips = Long.parseUnsignedLong(node.get("mips").toString());
-//        double transmissionTime = (double) node.get("transmission_time");
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
         
         
@@ -188,7 +187,7 @@ public class VRGameFog {
     }
 
 	private static void parseSensorObject(JSONObject sensor) {	
-		String sensorName = (String) sensor.get("sensorName");
+		String sensorName = (String) sensor.get("name");
 		String distribution = (String) sensor.get("distribution");
 		double deterministicValue = (double) sensor.get("deterministicValue");
 		double normalMean = (double) sensor.get("normalMean");
@@ -210,9 +209,8 @@ public class VRGameFog {
 			sensors.add(newSensor);	
 		}	
 	}
-		
 	private static void parseActuatorObject(JSONObject actuator) {	
-		String actuatorName = (String) actuator.get("Actuator Name");
+		String actuatorName = (String) actuator.get("name");
 		String tupleType = (String) actuator.get("tupleType");
 		Actuator display = new Actuator(actuatorName, userId, appId, tupleType);
 		actuators.add(display);

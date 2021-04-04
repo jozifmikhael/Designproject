@@ -1,7 +1,7 @@
 {
 	"meta":{"central":"cloud",
-			"granularity":10,
-			"time":1000,
+			"granularity":100,
+			"time":10000,
 			"policy":"Profit Aware Policy"
 			},	
 	"nodes": [
@@ -11,9 +11,9 @@
 			"rate": 0.0,
 			"ipower": 82.44,			
 			"name": "node1",
-			"down_bw": 270,
+			"downbw": 270,
 			"mips": 1000,
-			"up_bw": 10000,
+			"upbw": 10000,
 			"ram": 1000
 			 
 		},			
@@ -23,9 +23,9 @@
 			"rate": 0.0,
 			"ipower": 83.4333,
 			"name": "gateway1",
-			"down_bw": 10000,
+			"downbw": 10000,
 			"mips": 2800,
-			"up_bw": 10000,
+			"upbw": 10000,
 			"ram": 4000
 		},
 		{
@@ -34,9 +34,9 @@
 			"rate": 0.0,
 			"ipower": 83.4333,
 			"name": "proxy-server",
-			"down_bw": 10000,
+			"downbw": 10000,
 			"mips": 2800,
-			"up_bw": 10000,
+			"upbw": 10000,
 			"ram": 4000
 		},
 		{
@@ -46,15 +46,15 @@
 			"ipower": 1332.0,
 			"name": "cloud",
 			"transmission_time": 0.0,
-			"down_bw": 10000,
+			"downbw": 10000,
 			"mips": 44800,
-			"up_bw": 100,
+			"upbw": 100,
 			"ram": 40000
 		}
 	],
 	"sensors": [
 		{
-			"sensorName": "sensor1",
+			"name": "sensor1",
 			"distribution": "Deterministic",
 			"deterministicValue": 5.1,
 			"normalMean": 0.0,
@@ -66,7 +66,7 @@
 	],
 	"actuators": [
 		{
-			"Actuator Name": "actuator1"
+			"name": "actuator1"
 			"tupleType": "DISPLAY"
 		}
 	],
@@ -135,6 +135,61 @@
 			"direction": 1,
 			"edgeType": 1,
 			"latency": 6.0
+		},
+		{
+			"src": "node1",
+			"dest": "gateway1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 2.0
+		},
+		{
+			"src": "gateway1",
+			"dest": "proxy-server",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 4.0
+		},
+		{
+			"src": "proxy-server",
+			"dest": "cloud",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 100.0
+		},
+		{
+			"src": "node1",
+			"dest": "actuator1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 2,
+			"latency": 1.0
+		},
+		{
+			"src": "sensor1",
+			"dest": "node1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 1,
+			"latency": 1.0
 		},
 		{
 			"src": "client",
