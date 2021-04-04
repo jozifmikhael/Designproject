@@ -14,6 +14,7 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import javafx.beans.property.SimpleStringProperty;
 //import application.SetupJSONParser.dispNode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -243,6 +244,7 @@ public class SetupJSONParser {
 			this.latency = latency;
 			this.upbw = upbw;
 			this.downbw = downbw;
+			devicesList.add(this);
 		}
 		
 		int pe;
@@ -303,48 +305,38 @@ public class SetupJSONParser {
 	
 	public class ModuleSpec extends NodeSpec {
 
-		String nodeName;
-		int modRam;
-		long bandwidth;
-		String inTuple;
-		String outTuple;
-		long size;
-		int MIPS;
-		double fractionalSensitivity;
-		
-		public ModuleSpec(String name, String parent, String nodeName, int modRam,
-				long bandwidth, String inTuple, String outTuple, long size, int mIPS, double fractionalSensitivity) {
-			super(name, parent, "module");
-			this.nodeName = nodeName;
-			this.modRam = modRam;
-			this.bandwidth = bandwidth;
-			this.inTuple = inTuple;
-			this.outTuple = outTuple;
-			this.size = size;
-			MIPS = mIPS;
-			this.fractionalSensitivity = fractionalSensitivity;
-		}
-		
 		@Override
 		public String toString() {
-			return "nodeName=" + nodeName + ",modRam=" + modRam + ",bandwidth=" + bandwidth + ",inTuple=" + inTuple
-					+ ",outTuple=" + outTuple + ",size=" + size + ",MIPS=" + MIPS + ",fractionalSensitivity="
-					+ fractionalSensitivity + ",x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name="
-					+ name + ",parent=" + parent + ",type=" + type;
+			return "nodeName=" + nodeName + ",ram=" + ram + ",bandwidth=" + bandwidth + ",size="
+					+ size + ",mips=" + mips + ",x=" + x + ",y=" + y + ",name=" + name;
 		}
 
-		ModuleSpec fromJSON(JSONObject obj) {
-			Field[] module = ModuleSpec.class.getFields();
-			String moduleString = Arrays.toString(module);
-			moduleString = moduleString.replaceAll("[", "");
-			moduleString = moduleString.replaceAll("]", "");
-			moduleString = moduleString.replace(this.getClass().toString().replace("class ", "")+".", "");
-			moduleString = moduleString.replace("public", "");
-			moduleString = moduleString.replace("java.lang.", "");
-			String[] tokens = moduleString.split(", ");
-			return null;
+
+		String nodeName;
+		int ram;
+		long bandwidth;
+		long size;
+		int mips;
+		ArrayList<TupleSpec> tupleMapping;
+//TODO why do modules have parents, I changed so that the parent is the nodeName
+		
+		public ModuleSpec(String nodeName, long size, long bandwidth,
+				int ram, double x, String name, double y, int mips, ArrayList<TupleSpec> tupleMapping) {
+			
+			//TODO X AND Y
+			super(name, nodeName, "module");
+			this.size = size;
+			this.bandwidth = bandwidth;
+			this.ram = ram;
+			this.sz = R+R;
+			this.x = x;
+			this.y = y;
+			this.mips = mips;
+			this.tupleMapping = new ArrayList<TupleSpec>(tupleMapping);
+			modulesList.add(this);
 		}
 		
+
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
 			JSONObject obj = new JSONObject();
@@ -352,12 +344,34 @@ public class SetupJSONParser {
 			String[] moduleSplit = moduleString.split(",");
 			
 			for(int i = 0; i<moduleSplit.length; i++) {
-				String[] sensorSplit2 = moduleSplit[i].split("=");
-				obj.put(sensorSplit2[0], sensorSplit2[1]);
+				String[]  moduleSplit2 = moduleSplit[i].split("=");
+				obj.put(moduleSplit2[0], moduleSplit2[1]);
 			}
 
+			JSONArray tupleMapsList = new JSONArray();
+			for (TupleSpec t : tupleMapping) tupleMapsList.add(t.toJSON());
+			
+			obj.put("TupleMaps",tupleMapsList);
 			return obj;
 		}
+	}
+	
+	void moduleFromJSON(JSONObject obj) {
+		System.out.println("test");
+		JSONArray tupleMaps = (JSONArray) obj.get("tupleMaps");
+		tupleMaps.forEach(n -> tupleFromJSON((JSONObject) n));
+		ModuleSpec m = new ModuleSpec((String) obj.get("nodeName"), Long.parseUnsignedLong((String) obj.get("size")),
+				Long.parseUnsignedLong((String) obj.get("bandwidth")),Integer.parseUnsignedInt((String) obj.get("bandwidth")),
+				Double.parseDouble((String)obj.get("x")), (String) obj.get("name"), Double.parseDouble((String)obj.get("y")), 
+				Integer.parseUnsignedInt((String) obj.get("MIPS")), new ArrayList<TupleSpec>(tempTupleList));
+		tempTupleList.clear();
+	}
+	
+	void tupleFromJSON(JSONObject obj) {
+		TupleSpec t = new TupleSpec((String) obj.get("inTuple"),
+				(String) obj.get("inTuple"),
+				10.0);//(Double) obj.get("sensitivity")
+		tempTupleList.add(t);
 	}
 	
 	public class SensorSpec extends NodeSpec {
@@ -368,26 +382,28 @@ public class SetupJSONParser {
 		double normalStdDev;
 		double uniformMax;
 		double uniformMin;
+		String distribution;
 		
-		public SensorSpec(String name, String parent, double latency,
+		public SensorSpec(String name, String parent, String distribution, double latency,
 				double deterministicValue, double normalMean, double normalStdDev, double uniformMax,
 				double uniformMin) {
 			super(name, parent, "sensor");
+			this.distribution = distribution;
 			this.latency = latency;
 			this.deterministicValue = deterministicValue;
 			this.normalMean = normalMean;
 			this.normalStdDev = normalStdDev;
 			this.uniformMax = uniformMax;
 			this.uniformMin = uniformMin;
+			sensorsList.add(this);
 		}
 
 		
 		@Override
 		public String toString() {
-			return "latency=" + latency + ",deterministicValue=" + deterministicValue + ",normalMean=" + normalMean
+			return "deterministicValue=" + deterministicValue + ",normalMean=" + normalMean
 					+ ",normalStdDev=" + normalStdDev + ",uniformMax=" + uniformMax + ",uniformMin=" + uniformMin
-					+ ",x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",parent="
-					+ parent + ",type=" + type;
+					+ ",x=" + x + ",y=" + y + ",name=" + name + ",distribution=" + distribution;
 		}
 		
 		@SuppressWarnings("unchecked")	
@@ -408,7 +424,9 @@ public class SetupJSONParser {
 	public class ActuatSpec extends NodeSpec {
 		
 		public ActuatSpec(String name, String parent) {
-			super(name, parent, "sensor");
+			//TODO this might be sensor in the quotations
+			super(name, parent, "actuator");
+			actuatsList.add(this);
 		}
 		
 		@Override
@@ -481,7 +499,7 @@ public class SetupJSONParser {
 					+ tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength + ",nwLength=" + nwLength
 					+ ",direction=" + direction;
 		}
-
+		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {	
 			JSONObject obj = new JSONObject();
@@ -506,8 +524,66 @@ public class SetupJSONParser {
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
 			this.direction = direction;
+			moduleEdgesList.add(this);
 		}
 	}
+	
+	public ArrayList<TupleSpec> tempTupleList = new ArrayList<TupleSpec>();
+	
+	public class TupleSpec{
+		@Override
+		public String toString() {
+			return "inTuple=" + inTuple.get() + ",outTuple=" + outTuple.get() + ",fractionalSensitivity=" + fractionalSensitivity;
+		}
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {	
+			JSONObject obj = new JSONObject();
+			String tupleString = this.toString();
+			String[] tupleSplit = tupleString.split(",");
+			for(int i = 0; i<tupleSplit.length;i++) {
+				String[] tupleSplit2 = tupleSplit[i].split("=");
+				obj.put(tupleSplit2[0], tupleSplit2[1]);
+			}
+
+			return obj;	
+		}
+
+		public String getInTuple() {
+			return inTuple.get();
+		}
+
+		public void setInTuple(String inTuple) {
+			this.inTuple.set(inTuple); 
+		}
+
+		public String getOutTuple() {
+			return outTuple.get();
+		}
+
+		public void setOutTuple(String outTuple) {
+			this.outTuple.set(outTuple); 
+		}
+
+		public double getSensitivity() {
+			return fractionalSensitivity;
+		}
+
+		public void setSensitivity(double sensitivity) {
+			this.fractionalSensitivity = sensitivity;
+		}
+
+		SimpleStringProperty  inTuple;
+		SimpleStringProperty  outTuple;
+		double fractionalSensitivity;
+		
+		public TupleSpec(String  inTuple, String  outTuple, double fractionalSensitivity) {
+			this.inTuple = new SimpleStringProperty(inTuple);
+			this.outTuple = new SimpleStringProperty(outTuple);
+			this.fractionalSensitivity = fractionalSensitivity;
+		}
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	public void writeJSON(String jsonFileName,

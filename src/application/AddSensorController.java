@@ -101,6 +101,7 @@ public class AddSensorController {
 		s = textfile.new SensorSpec(
 				sensorName.getText().toString(),
 				nodeBox.getSelectionModel().getSelectedItem(),
+				distType,
 				Double.parseDouble(sensorLatency.getText()),
 				Double.parseDouble(DeterministicValue.getText()),
 				Double.parseDouble(mean.getText()),

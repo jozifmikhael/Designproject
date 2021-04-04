@@ -1,0 +1,9 @@
+{"sensors":[],
+"devices":[],
+"meta":{"topLevelNode":"cloud",
+"simGranularity":1000,
+"simDuration":10,
+"placementPolicy":"Edgewards"},
+"edges":[],
+"actuats":[],
+"modules":[]}

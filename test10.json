@@ -1,7 +1,7 @@
 {
 	"meta":{"central":"cloud",
-			"granularity":10,
-			"time":1000,
+			"granularity":100,
+			"time":10000,
 			"policy":"Profit Aware Policy"
 			},	
 	"nodes": [
@@ -11,9 +11,9 @@
 			"rate": 0.0,
 			"ipower": 82.44,			
 			"name": "node1",
-			"down_bw": 270,
-			"mips": 1000,
-			"up_bw": 10000,
+			"downbw": 270,
+			"mips": 2000,
+			"upbw": 10000,
 			"ram": 1000
 			 
 		},			
@@ -23,9 +23,9 @@
 			"rate": 0.0,
 			"ipower": 83.4333,
 			"name": "gateway1",
-			"down_bw": 10000,
+			"downbw": 10000,
 			"mips": 2800,
-			"up_bw": 10000,
+			"upbw": 10000,
 			"ram": 4000
 		},
 		{
@@ -34,9 +34,9 @@
 			"rate": 0.0,
 			"ipower": 83.4333,
 			"name": "proxy-server",
-			"down_bw": 10000,
+			"downbw": 10000,
 			"mips": 2800,
-			"up_bw": 10000,
+			"upbw": 10000,
 			"ram": 4000
 		},
 		{
@@ -45,56 +45,29 @@
 			"rate": 0.01,
 			"ipower": 1332.0,
 			"name": "cloud",
-			"transmission_time": 0.0,
-			"down_bw": 10000,
+			"downbw": 10000,
 			"mips": 44800,
-			"up_bw": 100,
+			"upbw": 100,
 			"ram": 40000
 		}
 	],
 	"sensors": [
 		{
-			"sensorName": "sensor1",
+			"name": "sensor1",
 			"distribution": "Deterministic",
 			"deterministicValue": 5.1,
 			"normalMean": 0.0,
 			"normalStdDev": 0.0,
 			"uniformMax": 0.0,
-			"uniformMin": 0.0
+			"uniformMin": 0.0,
+			"tupleType": "EEG"
 		}
 	],
 	"actuators": [
 		{
-			"Actuator Name": "actuator1"
+			"name": "actuator1"
+			"tupleType": "DISPLAY"
 		}
-	],
-	"links": [
-		{
-			"srcID": "node1",
-			"dstID": "gateway1",
-			"latency": 2.0	
-		},
-		{
-			"srcID": "gateway1",
-			"dstID": "proxy-server",
-			"latency": 4.0	
-		},
-		{
-			"srcID": "proxy-server",
-			"dstID": "cloud",
-			"latency": 100.0			
-		},
-		{
-			"srcID": "sensor1",
-			"dstID": "node1",
-			"latency": 6.0	
-		},
-		{
-			"srcID": "actuator1",
-			"dstID": "node1",
-			"latency": 1.0	
-		}
-		
 	],
 	"modules": [
 		{
@@ -117,11 +90,6 @@
 				{
 					"inTuple": "CONCENTRATION",
 					"outTuple": "SELF_STATE_UPDATE",
-					"fractionalSensitivity": 1.0
-				},
-				{
-					"inTuple": "GLOBAL_GAME_STATE",
-					"outTuple": "GLOBAL_STATE_UPDATE",
 					"fractionalSensitivity": 1.0
 				}
 			]
@@ -164,7 +132,63 @@
 			"tupleNwLength": 500.0,
 			"tupleType": "EEG",
 			"direction": 1,
-			"edgeType": 1
+			"edgeType": 1,
+			"latency": 0.0
+		},
+		{
+			"src": "node1",
+			"dest": "gateway1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 2.0
+		},
+		{
+			"src": "gateway1",
+			"dest": "proxy-server",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 4.0
+		},
+		{
+			"src": "proxy-server",
+			"dest": "cloud",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 100.0
+		},
+		{
+			"src": "node1",
+			"dest": "actuator1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 2,
+			"latency": 1.0
+		},
+		{
+			"src": "sensor1",
+			"dest": "node1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 1,
+			"latency": 6.0
 		},
 		{
 			"src": "client",
@@ -174,7 +198,8 @@
 			"tupleNwLength": 500.0,
 			"tupleType": "_SENSOR",
 			"direction": 1,
-			"edgeType": 3
+			"edgeType": 3,
+			"latency": 0.0
 		},
 		{
 			"src": "concentration_calculator",
@@ -183,8 +208,9 @@
 			"tupleCpuLength": 1000.0,
 			"tupleNwLength": 1000.0,
 			"tupleType": "PLAYER_GAME_STATE",
-			"direction": 2,
-			"edgeType": 3
+			"direction": 1,
+			"edgeType": 3,
+			"latency": 0.0
 		},
 		{
 			"src": "concentration_calculator",
@@ -194,7 +220,8 @@
 			"tupleNwLength": 500.0,
 			"tupleType": "CONCENTRATION",
 			"direction": 2,
-			"edgeType": 3
+			"edgeType": 3,
+			"latency": 0.0
 		},
 		{
 			"src": "connector",
@@ -204,27 +231,30 @@
 			"tupleNwLength": 1000.0,
 			"tupleType": "GLOBAL_GAME_STATE",
 			"direction": 2,
-			"edgeType": 3
+			"edgeType": 3,
+			"latency": 0.0
 		},
 		{
 			"src": "client",
 			"dest": "DISPLAY",
 			"periodicity": 0.0,
-			"tupleCpuLength": 100.0,
+			"tupleCpuLength": 1000.0,
 			"tupleNwLength": 500.0,
 			"tupleType": "SELF_STATE_UPDATE",
 			"direction": 2,
-			"edgeType": 2
+			"edgeType": 2,
+			"latency": 0.0
 		},
 		{
 			"src": "client",
 			"dest": "DISPLAY",
 			"periodicity": 0.0,
-			"tupleCpuLength": 100.0,
+			"tupleCpuLength": 1000.0,
 			"tupleNwLength": 500.0,
 			"tupleType": "GLOBAL_STATE_UPDATE",
 			"direction": 2,
-			"edgeType": 2
+			"edgeType": 2,
+			"latency": 0.0
 		}
 	]
 }

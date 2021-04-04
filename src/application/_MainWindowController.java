@@ -295,7 +295,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case 5: System.out.println("src empty");
 					default: draggingNode = selNode; break;
 				}
-			}else draggingNode = selNode;
+			}else if (state==5) linkSrcNode = selNode;
+            else draggingNode = selNode;
 	    }
     	if(mouseM) {
     		screenPanHandler();
@@ -316,7 +317,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			NodeSpec newNode = null;
 			switch(state) {
 				case 1: newNode=addDevice(); break;
-				case 2: newNode=addModule(); break;
+				case 2: newNode=addModule(mEvent); break;
 				case 3: newNode=addSensor(); break;
 				case 4: newNode=addActuat(); break;
 				case 5: newNode=addActuat(); break;
@@ -324,7 +325,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			}
 			if (draggingNode!=null) {draggingNode.pop(); draggingNode=null;}
 			if(newNode!=null) newNode.setPos(mEvent);
-    		System.out.println();
     	}
     	redrawNodes();
 //    	
@@ -424,12 +424,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		if (selectedDirectory != null) {
 			System.out.println("Loaded Json: "+selectedDirectory.getName());
 			JSONObject jsonObject = (JSONObject)new JSONParser().parse(new FileReader(selectedDirectory.getName()));
-				
 			JSONArray devicesList = (JSONArray) jsonObject.get("nodes");
 			JSONArray actuatsList = (JSONArray) jsonObject.get("actuats");
 			JSONArray modulesList = (JSONArray) jsonObject.get("modules");
+			modulesList.forEach(n -> specsHandler.moduleFromJSON((JSONObject) n));
 			JSONArray sensorsList = (JSONArray) jsonObject.get("sensors");
-			JSONArray edgesList = (JSONArray) jsonObject.get("edges");	
+			JSONArray edgesList = (JSONArray) jsonObject.get("edges");
+			System.out.println(specsHandler.modulesList.size());
+	    		
 		}
 	}
     @FXML
@@ -484,13 +486,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    ModuleSpec addModule() {
+    ModuleSpec addModule(MouseEvent mEvent) {
     	try {
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
-    		Scene scene = new Scene(dataFXML.load(),414,346);
+    		Scene scene = new Scene(dataFXML.load(),511,339);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
+    		controller.initialize();
     		controller.populateList(specsHandler.devicesList);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
@@ -622,7 +625,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void startSim(ActionEvent event) throws Exception {
-//    	writeJSON();
+    	writeJSON();
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();
