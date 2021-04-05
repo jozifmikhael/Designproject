@@ -62,10 +62,16 @@ public class SetupJSONParser {
     }
 	
 	public NodeSpec getNode(MouseEvent mEvent) {
-		for(NodeSpec n : nodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) return n;
+		NodeSpec selNode = null;
+		for(NodeSpec n : nodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) selNode=n;
+		if (selNode==null) return null;
+		return selNode.setSelected();
+	}
+
+	public static NodeSpec getSelected() {
+		for(NodeSpec n: nodesList) if (n.selected) return n;
 		return null;
 	}
-	
     //TODO Ask why there were like 3 different constructors in each extension
 		public class NodeSpec {
 			double x;
@@ -76,11 +82,6 @@ public class SetupJSONParser {
 			String type;
 			boolean selected;
 			ArrayList<NodeSpec> assocList = nodesList;
-			
-			@Override
-			public String toString() {
-				return "x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name=" + name + ", type=" + type;
-			}
 	
 			public NodeSpec(double x, double y, String name, String type) {
 				this.x = x;
@@ -88,12 +89,19 @@ public class SetupJSONParser {
 				this.sz = R+R;
 				this.name = name;
 				this.type = type;
+				this.selected = false;
 				setColor();
-				assocList.add(this);
+				this.add();
 			}
 			public NodeSpec(String name, String type) {this(0, 0, name, type);}
 			public NodeSpec(String type, MouseEvent mEvent) {this(mEvent.getX(), mEvent.getY(), "New "+type, type);}
+
 			
+			@Override
+			public String toString() {
+				return "x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name=" + name + ", type="
+						+ type + ", selected=" + selected;
+			}
 			private void setColor() {
 				if (this.type==null) this.nodeColor=_errorColor;
 				else if(this.type.equals("device")) this.nodeColor=deviceColor;
@@ -110,32 +118,37 @@ public class SetupJSONParser {
 				if (validColors.contains(this.nodeColor)) gc.setFill(this.nodeColor);
 				else gc.setFill(_errorColor);
 				gc.fillOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-				if(nodeColor!=transpColor) gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-				gc.setFill(Color.BLACK);
+				if(nodeColor!=transpColor) {
+					gc.setStroke(this.selected?Color.BLUE:Color.BLACK);
+					gc.setLineWidth(this.selected?10.0:1.0);
+					gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
+				}
+				gc.setStroke(Color.BLACK); gc.setLineWidth(1.0);
 				gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
+//				System.out.println(this.toString());
 			}
 			
-			void setPos(MouseEvent mEvent) {
+			NodeSpec setPos(MouseEvent mEvent) {
 	//			System.out.println("SPos "+this.toString());
 				this.x=mEvent.getX(); this.y=mEvent.getY();
+				return this;
 			}
 			public NodeSpec pop() {
 				assocList.remove(this);
 				return this;
 			}
+			public NodeSpec add() {
+				if(!(assocList.stream().anyMatch(a->a.name.equals(this.name)))) assocList.add(this);
+				return this;
+			}
+			public NodeSpec setSelected() {
+				NodeSpec possiblePrev = getSelected();
+				if (possiblePrev!=null) possiblePrev.selected=false;
+				this.selected = true;
+				return this;
+			}
 		}
 		
-	public static NodeSpec getSelected() {
-		for(NodeSpec n: nodesList) if (n.selected) return n;
-		return null;
-	}
-	
-	public NodeSpec setSelected(MouseEvent mEvent) {
-		NodeSpec possiblePrev = getSelected();
-		if (possiblePrev!=null) possiblePrev.selected=false;
-		getNode(mEvent).selected = true;
-		return getSelected();
-	}
 
 	////7 Base Fields + 8 Fields = 17
 	public class DeviceSpec extends NodeSpec {
@@ -155,6 +168,7 @@ public class SetupJSONParser {
 			this.upbw = upbw;
 			this.downbw = downbw;
 		    this.assocList =  (ArrayList<NodeSpec>) ((ArrayList<?>) devicesList);
+		    this.add();
 		}
 		
 		int pe;
@@ -170,10 +184,10 @@ public class SetupJSONParser {
 		
 		@Override
 		public String toString() {
-			return "pe=" + pe + ",mips=" + mips + ",ram=" + ram + ",level=" + level + ",rate=" + rate + ",ipower="
-					+ ipower + ",apower=" + apower + ",latency=" + latency + ",upbw=" + upbw + ",downbw=" + downbw
-					+ ",x=" + x + ",y=" + y + ",sz=" + sz
-					+ ",name=" + name + ",type=" + type;
+			return "pe=" + pe + ", mips=" + mips + ", ram=" + ram + ", level=" + level + ", rate=" + rate + ", ipower="
+					+ ipower + ", apower=" + apower + ", latency=" + latency + ", upbw=" + upbw + ", downbw=" + downbw
+					+ ", x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name=" + name + ", type="
+					+ type + ", selected=" + selected;
 		}
 
 		@SuppressWarnings("unchecked")

@@ -261,33 +261,35 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		for (EdgeSpec edge : SetupJSONParser.edgesList) edge.draw(gc);
 		for (NodeSpec node : SetupJSONParser.nodesList) node.draw(gc);
 	}
+	
+	private String stateToType() {
+		switch(state) {
+			case 1: return "device";
+			case 2: return "module";
+			case 3: return "sensor";
+			case 4: return "actuator";
+			default: return "error";
+		}
+	}
     
     boolean mouseL=false;
     boolean mouseR=false;
     boolean mouseM=false;
     NodeSpec draggingNode = null;
     NodeSpec linkSrcNode = null;
+    NodeSpec selNode = null;
     @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
         mouseL|=mEvent.isPrimaryButtonDown();
         mouseR|=mEvent.isSecondaryButtonDown();
         mouseM|=mEvent.isMiddleButtonDown();
         
-//    	System.out.println(" L:"+mouseL+" M:"+mouseM+" R:"+mouseR);
     	if(mouseL) {
-			NodeSpec selNode = specsHandler.getNode(mEvent);
-			if(selNode==null) {
-				switch(state) {
-					case 1: draggingNode = specsHandler.new NodeSpec("device", mEvent); break;
-					case 2: draggingNode = specsHandler.new NodeSpec("module", mEvent); break;
-					case 3: draggingNode = specsHandler.new NodeSpec("sensor", mEvent); break;
-					case 4: draggingNode = specsHandler.new NodeSpec("actuator", mEvent); break;
-					case 5: System.out.println("src empty");
-					default: draggingNode = selNode; break;
-				}
-			}else if (state==5) linkSrcNode = selNode;
-			else draggingNode = selNode;
-	    }
+			selNode = specsHandler.getNode(mEvent);
+			if(state==5) linkSrcNode=selNode;
+			else if(selNode==null) draggingNode = specsHandler.new NodeSpec(stateToType(), mEvent);
+			else if(selNode!=null) draggingNode = selNode;
+    	}
     	if(mouseM) {
     		screenPanHandler();
     	}
@@ -303,7 +305,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
     	if(mouseL) {
     		mouseL=false;
-    		if (draggingNode!=null) {draggingNode.setPos(mEvent);}
+    		if (selNode!=null) {
+    			selNode.setPos(mEvent);
+    			selNode=null; draggingNode=null; return;
+    		}
+    		if(draggingNode!=null) {draggingNode.pop();}
 			NodeSpec newNode = null;
 			switch(state) {
 				case 1: newNode=addDevice(); break;
@@ -313,9 +319,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				case 5: newNode=addActuat(); break;
 				default: break;
 			}
-			if (draggingNode!=null) {draggingNode.pop(); draggingNode=null;}
-			if(newNode!=null) newNode.setPos(mEvent);
-    		System.out.println();
+			if(newNode!=null) newNode.setSelected().setPos(mEvent);
     	}
     	redrawNodes();
 //    	
@@ -357,7 +361,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
     	if(draggingNode != null) {
-//    		System.out.println("Dragging Node not null");
     		draggingNode.setPos(mEvent);
 			redrawNodes();
     	}
@@ -464,6 +467,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddDeviceController controller = addNewNodeLoader.getController();
+    		controller.initialize((DeviceSpec) editDevice);
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
@@ -474,28 +478,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		return null;
     	}
     }
-    DeviceSpec editDevice = null;
+    NodeSpec editDevice = null;
     
     @FXML
-    NodeSpec editHandler(ActionEvent event) {
-    	NodeSpec selectedNode = SetupJSONParser.getSelected();
-    	if(selectedNode == null) return null;
+    void editHandler(ActionEvent event) {
+    	NodeSpec selectedNode = SetupJSONParser.getSelected().pop();
+    	if(selectedNode == null) return;
+		editDevice = selectedNode;
 		if(selectedNode.type.equals("device")) {
-			editDevice = getDevice();
-			if(editDevice == null) return null;
+			System.out.println(editDevice.toString());
 			DeviceSpec tryEditNode = addDevice();
 			if (tryEditNode == null) {
-				SetupJSONParser.devicesList.add(editDevice);
-				return null;
+				editDevice.add();
+				return;
 			}
-			afterEditNode.x = editDevice.x;
-			afterEditNode.y = editDevice.y;
-			dispNode oldDispNode = getDispNode(editDevice.name);
-			dispLink oldLink = getDispLink(editDevice.parent, editDevice.name);
-			for(dispLink l: dispLinksList) 
-				if(l.src.equals(oldDispNode))l.src = afterEditNode;
-			if(oldDispNode != null)dispNodesList.remove(oldDispNode);
-			if(oldLink != null) dispLinksList.remove(oldLink);
 			redrawNodes();
 			editDevice = null;
 		}
@@ -509,7 +505,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
-    		controller.initialize(selectedModule, specsHandler);
+//    		controller.initialize(selectedModule, specsHandler);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
     		ModuleSpec m = controller.getSpec();
@@ -529,7 +525,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
-    		sensorController.populateList(SetupJSONParser.devicesList);
+//    		sensorController.initialize(SetupJSONParser.devicesList);
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
     		SensorSpec s = sensorController.getSpec();
