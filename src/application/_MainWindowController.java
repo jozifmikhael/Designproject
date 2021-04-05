@@ -258,18 +258,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-//		for (DeviceSpec node : specsHandler.devicesList) node.drawLink(gc);
-//		for (ModuleSpec node : specsHandler.modulesList) node.drawLink(gc);
-//		for (SensorSpec node : specsHandler.sensorsList) node.drawLink(gc);
-//		for (ActuatSpec node : specsHandler.actuatsList) node.drawLink(gc);
-//		if (draggingNode != null) draggingNode.drawLink(gc);
-//		for (DeviceSpec node : SetupJSONParser.devicesList) node.drawNode(gc);
-//		for (ModuleSpec node : SetupJSONParser.modulesList) node.drawNode(gc);
-//		for (SensorSpec node : SetupJSONParser.sensorsList) node.drawNode(gc);
-//		for (ActuatSpec node : SetupJSONParser.actuatsList) node.drawNode(gc);
-		for (NodeSpec node : SetupJSONParser.nodesList) node.drawLink(gc);
-		for (NodeSpec node : SetupJSONParser.nodesList) node.drawNode(gc);
-//		if (draggingNode != null) draggingNode.drawLink(gc);
+		for (EdgeSpec edge : SetupJSONParser.edgesList) edge.draw(gc);
+		for (NodeSpec node : SetupJSONParser.nodesList) node.draw(gc);
 	}
     
     boolean mouseL=false;
@@ -295,7 +285,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case 5: System.out.println("src empty");
 					default: draggingNode = selNode; break;
 				}
-			}else draggingNode = selNode;
+			}else if (state==5) linkSrcNode = selNode;
+			else draggingNode = selNode;
 	    }
     	if(mouseM) {
     		screenPanHandler();
@@ -453,6 +444,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		ActuatorInputController actuatorController = addNewActuatorLoader.getController();
+    		actuatorController.initialize();
     		stage.setTitle("Add Actuator");
     		stage.showAndWait();
     		ActuatSpec a = actuatorController.getSpec();
@@ -482,6 +474,32 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		return null;
     	}
     }
+    DeviceSpec editDevice = null;
+    
+    @FXML
+    NodeSpec editHandler(ActionEvent event) {
+    	NodeSpec selectedNode = SetupJSONParser.getSelected();
+    	if(selectedNode == null) return null;
+		if(selectedNode.type.equals("device")) {
+			editDevice = getDevice();
+			if(editDevice == null) return null;
+			DeviceSpec tryEditNode = addDevice();
+			if (tryEditNode == null) {
+				SetupJSONParser.devicesList.add(editDevice);
+				return null;
+			}
+			afterEditNode.x = editDevice.x;
+			afterEditNode.y = editDevice.y;
+			dispNode oldDispNode = getDispNode(editDevice.name);
+			dispLink oldLink = getDispLink(editDevice.parent, editDevice.name);
+			for(dispLink l: dispLinksList) 
+				if(l.src.equals(oldDispNode))l.src = afterEditNode;
+			if(oldDispNode != null)dispNodesList.remove(oldDispNode);
+			if(oldLink != null) dispLinksList.remove(oldLink);
+			redrawNodes();
+			editDevice = null;
+		}
+    }
     
     @FXML
     ModuleSpec addModule() {
@@ -491,7 +509,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
-    		controller.populateList(specsHandler.devicesList);
+    		controller.initialize(selectedModule, specsHandler);
     		stage.setTitle("Add Module");
     		stage.showAndWait();
     		ModuleSpec m = controller.getSpec();
@@ -511,7 +529,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
-    		sensorController.populateList(specsHandler.devicesList);
+    		sensorController.populateList(SetupJSONParser.devicesList);
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
     		SensorSpec s = sensorController.getSpec();
@@ -531,7 +549,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			AddEdgeController controller = dataFXML.getController();
-			if(selectedModulesList.isEmpty()) controller.populateList(specsHandler.modulesList);
+			if(selectedModulesList.isEmpty()) controller.populateList(SetupJSONParser.modulesList);
 			else controller.setChoices(selectedModulesList);
 			selectedModulesList.removeAll(selectedModulesList);
 			stage.setTitle("Add App Edge");
@@ -547,11 +565,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void deleteHandler(ActionEvent event) {
-    	
-    }
-    
-    @FXML
-    void editHandler(ActionEvent event) {
     	
     }
     

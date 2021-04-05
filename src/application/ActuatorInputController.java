@@ -8,6 +8,7 @@ import application.SetupJSONParser.SensorSpec;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import application.SetupJSONParser.DeviceSpec;
@@ -30,7 +31,7 @@ import org.fog.test.perfeval.TextParser;
 import application.SetupJSONParser.DeviceSpec;
 
 
-public class ActuatorInputController {
+public class ActuatorInputController{
 	SetupJSONParser textfile = new SetupJSONParser();
 	ActuatSpec a;
 	
@@ -41,8 +42,11 @@ public class ActuatorInputController {
 	private TextField parentName;
 	@FXML
 	private Button saveActuator;
-
-
+	
+    public void initialize() {
+		saveActuator.setDisable(true);
+    }
+	
 	@FXML
 	void saveActuatorHandler(ActionEvent event) {
 		Stage stage = (Stage) saveActuator.getScene().getWindow();

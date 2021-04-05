@@ -56,10 +56,10 @@ public class FogGui extends JFrame {
 	private JPanel panel;
 	private JPanel graph;
 	
-	private Graph physicalGraph;
-	//private Graph virtualGraph;
-	private GraphView physicalCanvas;
-	//private GraphView virtualCanvas;
+//	private Graph physicalGraph;
+	private Graph virtualGraph;
+//	private GraphView physicalCanvas;
+	private GraphView virtualCanvas;
 	
 	private JButton btnRun;
 	
@@ -137,61 +137,61 @@ public class FogGui extends JFrame {
 		    	checkImportStatus();
 		    }
 		};
+//		
+//		ActionListener addFogDeviceListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	openAddFogDeviceDialog();
+//		    }
+//		};
+//		
+//		ActionListener addPhysicalNodeListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	openAddPhysicalNodeDialog();
+//		    }
+//		};
+//
+//		ActionListener addPhysicalEdgeListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	openAddPhysicalEdgeDialog();
+//		    }
+//		};
+//		
+//		ActionListener addLinkListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	openAddLinkDialog();
+//		    }
+//		};
+//		
+//		ActionListener addActuatorListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	openAddActuatorDialog();
+//		    }
+//		};
 		
-		ActionListener addFogDeviceListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	openAddFogDeviceDialog();
-		    }
-		};
+//		ActionListener addSensorListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	openAddSensorDialog();
+//		    }
+//		};
+//		ActionListener importPhyTopoListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	String fileName = importFile("josn");
+//		    	Graph phyGraph= Bridge.jsonToGraph(fileName, 0);
+//		    	physicalGraph = phyGraph;
+//		    	physicalCanvas.setGraph(physicalGraph);
+//		    	physicalCanvas.repaint();
+//		    }
+//		};
 		
-		ActionListener addPhysicalNodeListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	openAddPhysicalNodeDialog();
-		    }
-		};
-
-		ActionListener addPhysicalEdgeListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	openAddPhysicalEdgeDialog();
-		    }
-		};
-		
-		ActionListener addLinkListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	openAddLinkDialog();
-		    }
-		};
-		
-		ActionListener addActuatorListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	openAddActuatorDialog();
-		    }
-		};
-		
-		ActionListener addSensorListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	openAddSensorDialog();
-		    }
-		};
-		ActionListener importPhyTopoListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	String fileName = importFile("josn");
-		    	Graph phyGraph= Bridge.jsonToGraph(fileName, 0);
-		    	physicalGraph = phyGraph;
-		    	physicalCanvas.setGraph(physicalGraph);
-		    	physicalCanvas.repaint();
-		    }
-		};
-		
-		ActionListener savePhyTopoListener = new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	try {
-					saveFile("json", physicalGraph);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-		    }
-		};
+//		ActionListener savePhyTopoListener = new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		    	try {
+//					saveFile("json", physicalGraph);
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
+//		    }
+//		};
 				
 		//---------- End ActionListener ----------
     	
@@ -239,12 +239,12 @@ public class FogGui extends JFrame {
         toolbar.setAlignmentX(0);
         
         
-        btnSensor.addActionListener(addSensorListener);
-        btnActuator.addActionListener(addActuatorListener);
-        btnFogDevice.addActionListener(addFogDeviceListener);
-        btnLink.addActionListener(addLinkListener);
-        btnHopen.addActionListener(importPhyTopoListener);
-        btnHsave.addActionListener(savePhyTopoListener);
+//        btnSensor.addActionListener(addSensorListener);
+//        btnActuator.addActionListener(addActuatorListener);
+//        btnFogDevice.addActionListener(addFogDeviceListener);
+//        btnLink.addActionListener(addLinkListener);
+//        btnHopen.addActionListener(importPhyTopoListener);
+//        btnHsave.addActionListener(savePhyTopoListener);
         
         btnRun.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -334,15 +334,15 @@ public class FogGui extends JFrame {
         MuPhy.add(MiPhyOpen);
         MuPhy.add(MiPhySave);
         
-        MiPhy.addActionListener(readPhyTopoListener);
+//        MiPhy.addActionListener(readPhyTopoListener);
         MiVir.addActionListener(readVirTopoListener);
         MiWl1.addActionListener(readWorkloadBkListener);
         MiWl2.addActionListener(readWorkloadListener);
              
-        MiFogDevice.addActionListener(addFogDeviceListener);
-        MiPhyEdge.addActionListener(addPhysicalEdgeListener);
-        MiPhyOpen.addActionListener(importPhyTopoListener);
-        MiPhySave.addActionListener(savePhyTopoListener);
+//        MiFogDevice.addActionListener(addFogDeviceListener);
+//        MiPhyEdge.addActionListener(addPhysicalEdgeListener);
+//        MiPhyOpen.addActionListener(importPhyTopoListener);
+//        MiPhySave.addActionListener(savePhyTopoListener);
 
         graph.add(MuPhy);
         graph.add(MiVir);
@@ -470,53 +470,53 @@ public class FogGui extends JFrame {
         //----- End Initialize menu and tool bar -----
 
     }
-
-	protected void openAddActuatorDialog() {
-		AddActuator actuator = new AddActuator(physicalGraph, FogGui.this);
-		physicalCanvas.repaint();
-	}
-	
-	protected void openAddLinkDialog() {
-		AddLink phyEdge = new AddLink(physicalGraph, FogGui.this);
-    	physicalCanvas.repaint();
-		
-	}
-
-	protected void openAddFogDeviceDialog() {
-		AddFogDevice fogDevice = new AddFogDevice(physicalGraph, FogGui.this);
-    	physicalCanvas.repaint();
-		
-	}
+//
+//	protected void openAddActuatorDialog() {
+//		AddActuator actuator = new AddActuator(physicalGraph, FogGui.this);
+//		physicalCanvas.repaint();
+//	}
+//	
+//	protected void openAddLinkDialog() {
+//		AddLink phyEdge = new AddLink(physicalGraph, FogGui.this);
+//    	physicalCanvas.repaint();
+//		
+//	}
+//
+//	protected void openAddFogDeviceDialog() {
+//		AddFogDevice fogDevice = new AddFogDevice(physicalGraph, FogGui.this);
+//    	physicalCanvas.repaint();
+//		
+//	}
 
 	/** initialize Canvas */
     private void initGraph(){
-    	physicalGraph = new Graph();
-    	//virtualGraph = new Graph();
+//    	physicalGraph = new Graph();
+    	virtualGraph = new Graph();
     	
-    	physicalCanvas = new GraphView(physicalGraph);
-    	//virtualCanvas = new GraphView(virtualGraph);
+//    	physicalCanvas = new GraphView(physicalGraph);
+    	virtualCanvas = new GraphView(virtualGraph);
     	
-		graph.add(physicalCanvas);
-		//graph.add(virtualCanvas);
+//		graph.add(physicalCanvas);
+		graph.add(virtualCanvas);
 		contentPane.add(graph, BorderLayout.CENTER);
     }
     
     
-    /** dialog opening */
-    private void openAddPhysicalNodeDialog(){
-    	AddPhysicalNode phyNode = new AddPhysicalNode(physicalGraph, FogGui.this);
-    	physicalCanvas.repaint();
-    }
-    private void openAddPhysicalEdgeDialog(){
-    	AddPhysicalEdge phyEdge = new AddPhysicalEdge(physicalGraph, FogGui.this);
-    	physicalCanvas.repaint();
-    }
-
-    protected void openAddSensorDialog() {
-		AddSensor sensor = new AddSensor(physicalGraph, FogGui.this);
-		physicalCanvas.repaint();
-	}
-    
+//    /** dialog opening */
+//    private void openAddPhysicalNodeDialog(){
+//    	AddPhysicalNode phyNode = new AddPhysicalNode(physicalGraph, FogGui.this);
+//    	physicalCanvas.repaint();
+//    }
+//    private void openAddPhysicalEdgeDialog(){
+//    	AddPhysicalEdge phyEdge = new AddPhysicalEdge(physicalGraph, FogGui.this);
+//    	physicalCanvas.repaint();
+//    }
+//
+//    protected void openAddSensorDialog() {
+//		AddSensor sensor = new AddSensor(physicalGraph, FogGui.this);
+//		physicalCanvas.repaint();
+//	}
+//    
     /** common utility */
     private String importFile(String type){
         JFileChooser fileopen = new JFileChooser();

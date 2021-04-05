@@ -16,14 +16,12 @@ import org.fog.test.perfeval.TextParser;
 import application.SetupJSONParser.DeviceSpec;
 
 import java.io.IOException;
-import application.SetupJSONParser.LinkSpec;
 
 
 public class AddDeviceController {
 	DeviceSpec h;
-	LinkSpec l;
 	SetupJSONParser textfile = new SetupJSONParser();
-
+	
 	@FXML
 	private TextField name;
 	@FXML
@@ -69,6 +67,32 @@ public class AddDeviceController {
 				);
 		
 		stage.close();
+	}
+	public void initialize(DeviceSpec device) {
+		if(device == null) {
+			name.setText("node1");
+			mips.setText("1500");
+			ram.setText("10240");
+			upLinkLatency.setText("2.0");
+			upbw.setText("850");
+			downbw.setText("850");
+			nodelvl.setText("1");
+			ratePerMIPS.setText("50.0");
+			busyPower.setText("3.0");
+			idlePower.setText("1.0");
+		}
+		else {
+			name.setText(device.name);
+			mips.setText(String.valueOf(device.mips));
+			ram.setText(String.valueOf(device.ram));
+			upLinkLatency.setText(String.valueOf(device.ram));
+			upbw.setText(String.valueOf(device.upbw));
+			downbw.setText(String.valueOf(device.downbw));
+			nodelvl.setText(String.valueOf(device.level));
+			ratePerMIPS.setText(String.valueOf(device.rate));
+			busyPower.setText(String.valueOf(device.apower));
+			idlePower.setText(String.valueOf(device.ipower));
+		}
 	}
 	public DeviceSpec getSpec() {return h;}
 }
