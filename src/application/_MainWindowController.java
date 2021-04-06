@@ -309,15 +309,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     			selNode=null; draggingNode=null; return;
     		}
     		if(draggingNode!=null) {draggingNode.pop();}
-			NodeSpec newNode = null;
-			switch(state) {
-				case 1: newNode=addDevice(); break;
-				case 2: newNode=addModule(); break;
-				case 3: newNode=addSensor(); break;
-				case 4: newNode=addActuat(); break;
-				case 5: newNode=addActuat(); break;
-				default: break;
-			}
+			NodeSpec newNode = addNodeType(stateToType());
 			if(newNode!=null) newNode.setSelected().setPos(mEvent);
     	}
     	redrawNodes();
@@ -438,6 +430,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
             e.printStackTrace();
         }
     }
+    NodeSpec addNodeType(String _type) {
+    	NodeSpec newNode = null;
+    	if(_type.equals("device")) newNode = addDevice();
+		if(_type.equals("module")) newNode = addModule();
+		if(_type.equals("sensor")) newNode = addSensor();
+		if(_type.equals("actuat")) newNode = addActuat();
+		return newNode;
+    }
     @FXML
     ActuatSpec addActuat() {
     	try {
@@ -484,15 +484,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	NodeSpec selectedNode = SetupJSONParser.getSelected().pop();
     	if(selectedNode == null) return;
 		editDevice = selectedNode;
-		NodeSpec tryEditNode = null;
-		if(selectedNode.type.equals("device")) tryEditNode = addDevice();
-		if(selectedNode.type.equals("module")) tryEditNode = addModule();
-		if(selectedNode.type.equals("sensor")) tryEditNode = addSensor();
-		if(selectedNode.type.equals("actuat")) tryEditNode = addActuat();
-		
+		NodeSpec tryEditNode = addNodeType(editDevice.type);
 		if (tryEditNode == null) editDevice.add();
 		else tryEditNode.setPos(editDevice);
 		editDevice = null;
+		redrawNodes();
+    }
+    
+    @FXML
+    void deleteHandler(ActionEvent event) {
+    	SetupJSONParser.getSelected().pop();
 		redrawNodes();
     }
     
@@ -556,11 +557,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			e.printStackTrace();
 			return null;
 		}
-    }
-    
-    @FXML
-    void deleteHandler(ActionEvent event) {
-    	
     }
     
     @FXML

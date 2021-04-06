@@ -120,7 +120,7 @@ public class AddModuleController {
 			mips.setText("100");
 		}
 		else {
-			nodeBox.getSelectionModel().select(module.nodeName);
+			nodeBox.getSelectionModel().select(module.name);
 			moduleName.setText(module.name);
 			ram.setText(String.valueOf(module.ram));
 			bandwidth.setText(String.valueOf(module.bandwidth));
