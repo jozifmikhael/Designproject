@@ -45,7 +45,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import application.SetupJSONParser.*;
+import application._SpecHandler.*;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -239,15 +239,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	}
 	public List<String> selectedModulesList = new ArrayList<String>();
     
-	public SetupJSONParser specsHandler;
+	public _SpecHandler specsHandler;
     public void setupListeners(Stage parentStage, Scene scene) {
-        specsHandler = new SetupJSONParser();
+        specsHandler = new _SpecHandler();
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
     	gc = topoField.getGraphicsContext2D();
 		gc.setTextAlign(TextAlignment.CENTER);
-		gc.setFont(new Font(SetupJSONParser.font, SetupJSONParser.fontSize));
+		gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
     	scene.setOnKeyPressed(this); // uses handle method
     }
     
@@ -258,8 +258,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for (EdgeSpec edge : SetupJSONParser.edgesList) edge.draw(gc);
-		for (NodeSpec node : SetupJSONParser.nodesList) node.draw(gc);
+		for (EdgeSpec edge : _SpecHandler.edgesList) edge.draw(gc);
+		for (NodeSpec node : _SpecHandler.nodesList) node.draw(gc);
 	}
 	
 	private String stateToType() {
@@ -481,7 +481,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void editHandler(ActionEvent event) {
-    	NodeSpec selectedNode = SetupJSONParser.getSelected().pop();
+    	NodeSpec selectedNode = _SpecHandler.getSelected().pop();
     	if(selectedNode == null) return;
 		editDevice = selectedNode;
 		NodeSpec tryEditNode = addNodeType(editDevice.type);
@@ -493,7 +493,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void deleteHandler(ActionEvent event) {
-    	SetupJSONParser.getSelected().pop();
+    	_SpecHandler.getSelected().pop();
 		redrawNodes();
     }
     
@@ -545,7 +545,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			AddEdgeController controller = dataFXML.getController();
-			if(selectedModulesList.isEmpty()) controller.populateList(SetupJSONParser.modulesList);
+			if(selectedModulesList.isEmpty()) controller.populateList(_SpecHandler.modulesList);
 			else controller.setChoices(selectedModulesList);
 			selectedModulesList.removeAll(selectedModulesList);
 			stage.setTitle("Add App Edge");

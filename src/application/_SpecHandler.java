@@ -15,7 +15,7 @@ import org.fog.entities.FogDevice;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import application.SetupJSONParser.TupleSpec;
+import application._SpecHandler.TupleSpec;
 //import application.SetupJSONParser.dispNode;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,7 +23,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 
-public class SetupJSONParser {
+public class _SpecHandler {
 	public static ArrayList<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
 	public static ArrayList<ModuleSpec> modulesList = new ArrayList<ModuleSpec>();
 	public static ArrayList<ActuatSpec> actuatsList = new ArrayList<ActuatSpec>();

@@ -5,9 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.EdgeSpec;
-import application.SetupJSONParser.ModuleSpec;
+import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.EdgeSpec;
+import application._SpecHandler.ModuleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 
 public class AddEdgeController {
 	EdgeSpec v;
-	SetupJSONParser textfile = new SetupJSONParser();
+	_SpecHandler textfile = new _SpecHandler();
 	
 	@FXML
 	private TextField parent;

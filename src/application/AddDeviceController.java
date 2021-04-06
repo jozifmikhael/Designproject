@@ -13,14 +13,14 @@ import java.io.PrintWriter;
 
 import org.fog.test.perfeval.TextParser;
 
-import application.SetupJSONParser.DeviceSpec;
+import application._SpecHandler.DeviceSpec;
 
 import java.io.IOException;
 
 
 public class AddDeviceController {
 	DeviceSpec h;
-	SetupJSONParser textfile = new SetupJSONParser();
+	_SpecHandler textfile = new _SpecHandler();
 	
 	@FXML
 	private TextField name;

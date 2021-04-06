@@ -5,9 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.ModuleSpec;
-import application.SetupJSONParser.TupleSpec;
+import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.ModuleSpec;
+import application._SpecHandler.TupleSpec;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,7 +30,7 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 
 public class AddModuleController {
 	ModuleSpec m;
-	SetupJSONParser parser;
+	_SpecHandler parser;
 	ObservableList<TupleSpec> data = FXCollections.observableArrayList();
 	
 	@FXML
@@ -123,10 +123,10 @@ public class AddModuleController {
                 t.getTablePosition().getRow()).setSensitivity(Double.parseDouble(t.getNewValue()));
     }
 	
-	public void initialize(ModuleSpec module, SetupJSONParser _parser) {
+	public void initialize(ModuleSpec module, _SpecHandler _parser) {
 		parser=_parser;
 		ObservableList<String> items = FXCollections.observableArrayList();
-		SetupJSONParser.devicesList.forEach(d->items.add(d.name));
+		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
 		
 		if(module == null) {

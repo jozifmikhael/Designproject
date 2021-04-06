@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import application.SetupJSONParser.DeviceSpec;
-import application.SetupJSONParser.ModuleSpec;
+import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.ModuleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,11 +17,11 @@ import javafx.scene.control.TitledPane;
 import javafx.stage.Stage;
 import javafx.scene.control.ChoiceBox;
 import javafx.event.EventHandler;
-import application.SetupJSONParser.SensorSpec;
+import application._SpecHandler.SensorSpec;
 
 public class AddSensorController {
 	SensorSpec s;
-	SetupJSONParser parser;
+	_SpecHandler parser;
 	
 	@FXML
 	private TextField sensorLatency;
@@ -124,10 +124,10 @@ public class AddSensorController {
 				distType);
 	}
 	
-	public void initialize(SensorSpec sensor, SetupJSONParser _parser) {
+	public void initialize(SensorSpec sensor, _SpecHandler _parser) {
 		parser=_parser;
 		ObservableList<String> items = FXCollections.observableArrayList();
-		SetupJSONParser.devicesList.forEach(d->items.add(d.name));
+		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
 		
 		if(sensor == null) {

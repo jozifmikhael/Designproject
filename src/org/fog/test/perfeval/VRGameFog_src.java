@@ -17,7 +17,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import application.SetupJSONParser.*;
+import application._SpecHandler.*;
 
 //import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
