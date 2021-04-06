@@ -112,8 +112,12 @@ public class TextParser {
 		}
 		public filterableTuples printAverage() {
 			double avg=0;
-			for(TupleSpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
-			System.out.println(avg);
+			int count=0;
+			for(TupleSpec t : this.localList) {
+				avg+=(t.tupleArrivTime-t.tupleSentTime);
+				count++;
+			}	
+			System.out.println(avg/count);
 			return this;
 		}
 		public filterableTuples printVariance() {

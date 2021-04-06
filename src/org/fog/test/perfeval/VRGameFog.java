@@ -81,7 +81,7 @@ public class VRGameFog {
 	static double EEG_TRANSMISSION_TIME = 5.1;
 	
 	public static void main(String[] args) throws Exception {
-		VRGameFog obj = new VRGameFog("test10.json");
+		VRGameFog obj = new VRGameFog("threenodenoproxb.json");
 	}
 	
 	public VRGameFog(String jsonFile) throws Exception {
@@ -103,11 +103,13 @@ public class VRGameFog {
 		FileReader reader = new FileReader(jsonFile);
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
-        Application application = createApplication(appId, broker.getId(), jsonObject);
+        Application application = new Application(appId, broker.getId());
         application.setUserId(broker.getId());
         
         
-		
+//        final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("client");add("DISPLAY");}});
+//		List<AppLoop> loops = new ArrayList<AppLoop>(){{add(loop1);}};
+//		application.setLoops(loops);
 		
 		
 //		FogDevice cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
@@ -136,21 +138,23 @@ public class VRGameFog {
         
         System.out.println("Finished meta");
         
+    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
+		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
 		JSONArray sensorArr = (JSONArray) jsonObject.get("sensors");
 		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));
 		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");
 		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));
+		JSONArray modArr = (JSONArray) jsonObject.get("modules");	
+        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
         JSONArray edgeArr = (JSONArray) jsonObject.get("edges");
         edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
-    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
-		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
 //        JSONArray linkArr = (JSONArray) jsonObject.get("links");
 //        linkArr.forEach(l -> parseLinkObject((JSONObject) l));
 		
 		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-		moduleMapping.addModuleToDevice("connector", "cloud");
-//		moduleMapping.addModuleToDevice("concentration_calculator", "gateway1");
+//		moduleMapping.addModuleToDevice("connector", "cloud");
 		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
+//		controller.submitApplication(application, 0,(new ModulePlacementMapping(fogDevices,application, moduleMapping)));
 		controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
 		
 		TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
@@ -158,7 +162,6 @@ public class VRGameFog {
 		CloudSim.stopSimulation();
 		Log.printLine("VRGame finished!");	
 	}
-	
 	
 	private static void parseNodeObject(JSONObject node) {
         double nodeBusyPower = (double) node.get("apower");
@@ -170,20 +173,10 @@ public class VRGameFog {
         long nodeUpBw = Long.parseUnsignedLong(node.get("upbw").toString());
         long nodeMips = Long.parseUnsignedLong(node.get("mips").toString());
         int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
-        
-        
+         
 		
-        FogDevice mobile = createFogDevice(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
-		
+        FogDevice mobile = createFogDevice(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);	
 		fogDevices.add(mobile);
-		Sensor eegSensor = new Sensor("s-"+nodeID, "EEG", userId, appId, new DeterministicDistribution(EEG_TRANSMISSION_TIME)); // inter-transmission time of EEG sensor follows a deterministic distribution
-		sensors.add(eegSensor);
-		eegSensor.setGatewayDeviceId(mobile.getId());
-		eegSensor.setLatency(6.0);
-//		Actuator display = new Actuator("a-"+nodeID, userId, appId, "DISPLAY");
-//		actuators.add(display);
-//		display.setGatewayDevice////Id(mobile.getId());
-//		display.setLatency(1.0);
     }
 
 	private static void parseSensorObject(JSONObject sensor) {	
@@ -259,8 +252,8 @@ public class VRGameFog {
 		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
 		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
 	}
-	
-	private static void parseEdgeObject(JSONObject edges, Application application) {
+
+	private static Object parseEdgeObject(JSONObject edges, Application application) {
 		String src = (String) edges.get("src");
 		String dest = (String) edges.get("dest");
 		double periodicity = (double) edges.get("periodicity");
@@ -273,13 +266,26 @@ public class VRGameFog {
 		
 		if (edgeType == 2) {
 			for (Actuator actuator : actuators) {
-				if (actuator.getName().equals(dest)) actuator.setLatency(latency);
+				if (actuator.getName().equals(dest)) {
+					// TODO may have to switch source and destination of actuator and device
+					for (FogDevice device : fogDevices) if (device.getName().equals(src)) {	
+						actuator.setGatewayDeviceId(device.getId());
+						actuator.setLatency(latency);
+						return null;
+					}					
+				}	
 			}
 		} else if (edgeType == 1) {
 			for (Sensor sensor : sensors) {
-				if(sensor.getName().equals(src)) sensor.setLatency(latency);
+				if(sensor.getName().equals(src)) 
+					// TODO may have to switch source and destination of sensor and device 
+					for (FogDevice device : fogDevices) if (device.getName().equals(dest)) {	
+						sensor.setGatewayDeviceId(device.getId());
+						sensor.setLatency(latency);
+						return null;
+					}
 			}
-		} else if (edgeType == 0){
+		}else if (edgeType == 0){
 			FogDevice srcDev =null;
 		    FogDevice dstDev =null;
 		    for(FogDevice f : fogDevices) {
@@ -290,9 +296,11 @@ public class VRGameFog {
 		        srcDev.setUplinkLatency(latency);
 		        srcDev.setParentId(dstDev.getId());
 		    }
+		    return null;
 		}
 		
 		application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);	
+		return null;
 	}
 	
 	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
@@ -366,43 +374,5 @@ public class VRGameFog {
 		
 		fogdevice.setLevel(level);
 		return fogdevice;
-	}
-	
-	@SuppressWarnings({"serial" })
-	private static Application createApplication(String appId, int userId,JSONObject jsonObject){		
-		Application application = Application.createApplication(appId, userId); // creates an empty application model (empty directed graph)
-		JSONArray modArr = (JSONArray) jsonObject.get("modules");	
-        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
-		/*
-		 * Adding modules (vertices) to the application model (directed graph)
-		 */
-		/*
-		 * Connecting the application modules (vertices) in the application model (directed graph) with edges
-		 */
-//		application.addAppEdge("EEG", "client", 0.0,3000, 500, "EEG", Tuple.UP, AppEdge.SENSOR);
-//		application.addAppEdge("client", "concentration_calculator", 0.0,3500, 500, "_SENSOR", Tuple.UP, AppEdge.MODULE); // adding edge from Client to Concentration Calculator module carrying tuples of type _SENSOR
-//		application.addAppEdge("concentration_calculator", "connector", 100, 1000, 1000, "PLAYER_GAME_STATE", Tuple.UP, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Concentration Calculator to Connector module carrying tuples of type PLAYER_GAME_STATE
-//		application.addAppEdge("concentration_calculator", "client", 0.0,14, 500, "CONCENTRATION", Tuple.DOWN, AppEdge.MODULE);  // adding edge from Concentration Calculator to Client module carrying tuples of type CONCENTRATION
-//		application.addAppEdge("connector", "client", 100, 28, 1000, "GLOBAL_GAME_STATE", Tuple.DOWN, AppEdge.MODULE); // adding periodic edge (period=1000ms) from Connector to Client module carrying tuples of type GLOBAL_GAME_STATE
-//		application.addAppEdge("client", "DISPLAY", 0.0,1000, 500, "SELF_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
-//		application.addAppEdge("client", "DISPLAY", 0.0,1000, 500, "GLOBAL_STATE_UPDATE", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type GLOBAL_STATE_UPDATE
-//		
-		/*
-		 * Defining the input-output relationships (represented by selectivity) of the application modules. 
-		 */
-//		application.addTupleMapping("client", "EEG", "_SENSOR", new FractionalSelectivity(1.0)); // 0.9 tuples of type _SENSOR are emitted by Client module per incoming tuple of type EEG 
-//		application.addTupleMapping("client", "CONCENTRATION", "SELF_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type SELF_STATE_UPDATE are emitted by Client module per incoming tuple of type CONCENTRATION 
-//		application.addTupleMapping("concentration_calculator", "_SENSOR", "CONCENTRATION", new FractionalSelectivity(1.0)); // 1.0 tuples of type CONCENTRATION are emitted by Concentration Calculator module per incoming tuple of type _SENSOR 
-//		application.addTupleMapping("client", "GLOBAL_GAME_STATE", "GLOBAL_STATE_UPDATE", new FractionalSelectivity(1.0)); // 1.0 tuples of type GLOBAL_STATE_UPDATE are emitted by Client module per incoming tuple of type GLOBAL_GAME_STATE 
-	
-		/*
-		 * Defining application loops to monitor the latency of. 
-		 * Here, we add only one loop for monitoring : EEG(sensor) -> Client -> Concentration Calculator -> Client -> DISPLAY (actuator)
-		 */
-		final AppLoop loop1 = new AppLoop(new ArrayList<String>(){{add("EEG");add("client");add("concentration_calculator");add("client");add("DISPLAY");}});
-		List<AppLoop> loops = new ArrayList<AppLoop>(){{add(loop1);}};
-		application.setLoops(loops);
-		
-		return application;
 	}
 }

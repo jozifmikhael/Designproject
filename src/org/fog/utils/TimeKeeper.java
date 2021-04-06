@@ -41,7 +41,8 @@ public class TimeKeeper {
 		if(!tupleIdToCpuStartTime.containsKey(tuple.getCloudletId()))
 			return;
 		double executionTime = CloudSim.clock() - tupleIdToCpuStartTime.get(tuple.getCloudletId());
-//		System.out.println(tuple.getTupleType() + " : " + executionTime);
+//		if (tuple.getTupleType().equals("PLAYER_GAME_STATE"))
+//			System.out.println(tuple.getTupleType() + " : " + executionTime);
 		if(!tupleTypeToAverageCpuTime.containsKey(tuple.getTupleType())){
 			tupleTypeToAverageCpuTime.put(tuple.getTupleType(), executionTime);
 			tupleTypeToExecutedTupleCount.put(tuple.getTupleType(), 1);
@@ -50,6 +51,7 @@ public class TimeKeeper {
 			int currentCount = tupleTypeToExecutedTupleCount.get(tuple.getTupleType());
 			tupleTypeToAverageCpuTime.put(tuple.getTupleType(), (currentAverage*currentCount+executionTime)/(currentCount+1));
 		}
+//		System.out.println(tupleTypeToAverageCpuTime);
 	}
 	
 	public Map<Integer, List<Integer>> loopIdToTupleIds(){

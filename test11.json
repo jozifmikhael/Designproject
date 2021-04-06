@@ -15,7 +15,28 @@
 			"mips": 1000,
 			"upbw": 10000,
 			"ram": 1000
-			 
+		},	
+		{
+			"apower": 87.53,
+			"level": 3,
+			"rate": 0.0,
+			"ipower": 82.44,			
+			"name": "node2",
+			"downbw": 270,
+			"mips": 1000,
+			"upbw": 10000,
+			"ram": 1000
+		},	
+		{
+			"apower": 87.53,
+			"level": 3,
+			"rate": 0.0,
+			"ipower": 82.44,			
+			"name": "node3",
+			"downbw": 270,
+			"mips": 1000,
+			"upbw": 10000,
+			"ram": 1000
 		},			
 		{
 			"apower": 107.339,
@@ -45,7 +66,6 @@
 			"rate": 0.01,
 			"ipower": 1332.0,
 			"name": "cloud",
-			"transmission_time": 0.0,
 			"downbw": 10000,
 			"mips": 44800,
 			"upbw": 100,
@@ -63,10 +83,38 @@
 			"uniformMin": 0.0,
 			"tupleType": "EEG"
 		}
+		{
+			"name": "sensor2",
+			"distribution": "Deterministic",
+			"deterministicValue": 5.1,
+			"normalMean": 0.0,
+			"normalStdDev": 0.0,
+			"uniformMax": 0.0,
+			"uniformMin": 0.0,
+			"tupleType": "EEG"
+		}
+		{
+			"name": "sensor3",
+			"distribution": "Deterministic",
+			"deterministicValue": 5.1,
+			"normalMean": 0.0,
+			"normalStdDev": 0.0,
+			"uniformMax": 0.0,
+			"uniformMin": 0.0,
+			"tupleType": "EEG"
+		}
 	],
 	"actuators": [
 		{
 			"name": "actuator1"
+			"tupleType": "DISPLAY"
+		}
+		{
+			"name": "actuator2"
+			"tupleType": "DISPLAY"
+		}
+		{
+			"name": "actuator3"
 			"tupleType": "DISPLAY"
 		}
 	],
@@ -148,6 +196,28 @@
 			"latency": 2.0
 		},
 		{
+			"src": "node2",
+			"dest": "gateway1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 2.0
+		},
+		{
+			"src": "node3",
+			"dest": "gateway1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 0,
+			"latency": 2.0
+		},
+		{
 			"src": "gateway1",
 			"dest": "proxy-server",
 			"periodicity": 0.0,
@@ -181,8 +251,52 @@
 			"latency": 1.0
 		},
 		{
+			"src": "node2",
+			"dest": "actuator2",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 2,
+			"latency": 1.0
+		},
+		{
+			"src": "node3",
+			"dest": "actuator3",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 2,
+			"latency": 1.0
+		},
+		{
 			"src": "sensor1",
 			"dest": "node1",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 1,
+			"latency": 6.0
+		},
+		{
+			"src": "sensor2",
+			"dest": "node2",
+			"periodicity": 0.0,
+			"tupleCpuLength": 3000.0,
+			"tupleNwLength": 500.0,
+			"tupleType": "EEG",
+			"direction": 1,
+			"edgeType": 1,
+			"latency": 6.0
+		},
+		{
+			"src": "sensor3",
+			"dest": "node3",
 			"periodicity": 0.0,
 			"tupleCpuLength": 3000.0,
 			"tupleNwLength": 500.0,
@@ -200,7 +314,7 @@
 			"tupleType": "_SENSOR",
 			"direction": 1,
 			"edgeType": 3,
-			"latency": 6.0
+			"latency": 0.0
 		},
 		{
 			"src": "concentration_calculator",

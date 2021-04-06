@@ -1,75 +1,13 @@
-=========================================
-============== RESULTS ==================
-=========================================
-EXECUTION TIME : 4295
-=========================================
-APPLICATION LOOP DELAYS
-=========================================
-Calculated total time: 0.0
-=========================================
+Creating connector on device cloud
+Creating concentration_calculator on device d-0
+Creating client on device m-0-1
+Creating client on device m-0-2
+Creating client on device m-0-3
+
 TUPLE CPU EXECUTION DELAY
 =========================================
-PLAYER_GAME_STATE ---> {}
-EEG ---> {}
-CONCENTRATION ---> {}
-_SENSOR ---> {}
-GLOBAL_GAME_STATE ---> {}
-PLAYER_GAME_STATE ---> 1.1062501136711878
-EEG ---> 5.099998724460787
-CONCENTRATION ---> 0.1845066738485172
-_SENSOR ---> 0.32949188946548946
-GLOBAL_GAME_STATE ---> 0.056819675072827334
-Calculated total time with delays: 6.777067076518809
-=========================================
-node1 : Energy Consumed = 875.3
-node2 : Energy Consumed = 865.12
-node3 : Energy Consumed = 875.3
-node4 : Energy Consumed = 875.3
-node5 : Energy Consumed = 875.3
-node6 : Energy Consumed = 865.12
-node7 : Energy Consumed = 875.3
-node8 : Energy Consumed = 875.3
-node9 : Energy Consumed = 875.3
-node10 : Energy Consumed = 875.3
-node11 : Energy Consumed = 875.3
-node12 : Energy Consumed = 875.2999999999998
-node13 : Energy Consumed = 864.117269976214
-node14 : Energy Consumed = 875.3
-node15 : Energy Consumed = 875.3
-node16 : Energy Consumed = 875.3
-node17 : Energy Consumed = 875.3
-node18 : Energy Consumed = 875.3
-node19 : Energy Consumed = 875.3
-node20 : Energy Consumed = 875.3
-node21 : Energy Consumed = 875.3
-node22 : Energy Consumed = 875.3
-node23 : Energy Consumed = 875.3000000000001
-node24 : Energy Consumed = 875.3
-Total network usage = 24662.4
-
-node1 : Cost = 0.0
-node2 : Cost = 0.0
-node3 : Cost = 0.0
-node4 : Cost = 0.0
-node5 : Cost = 0.0
-node6 : Cost = 0.0
-node7 : Cost = 0.0
-node8 : Cost = 0.0
-node9 : Cost = 0.0
-node10 : Cost = 0.0
-node11 : Cost = 0.0
-node12 : Cost = 0.0
-node13 : Cost = 0.0
-node14 : Cost = 0.0
-node15 : Cost = 0.0
-node16 : Cost = 0.0
-node17 : Cost = 0.0
-node18 : Cost = 0.0
-node19 : Cost = 0.0
-node20 : Cost = 0.0
-node21 : Cost = 0.0
-node22 : Cost = 0.0
-node23 : Cost = 0.0
-node24 : Cost = 0.0
-Total cost of execution in the nodes = 0.0
-Total Cost = 0.0 Total Engery Usage = 2.0927246962112635E7
+PLAYER_GAME_STATE ---> 0.09056122448938758
+EEG ---> 5.003540903540709
+CONCENTRATION ---> 0.30730012210177815
+_SENSOR ---> 8.81658119658707
+GLOBAL_GAME_STATE ---> 0.2668171658911005

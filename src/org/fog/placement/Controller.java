@@ -146,17 +146,17 @@ public class Controller extends SimEntity{
 				}
 			}
 			System.out.println("Total Cost = " + totalNodeCost + " Total Engery Usage = " + totalEnergyUsage);
-			TextParser.filterableTuples query = textfile.new filterableTuples();
-			query.ofType("PLAYER_GAME_STATE").printStrs();
-			TextParser.filterableTuples query1 = textfile.new filterableTuples();
-			query1.ofType("_SENSOR").printStrs();
-			TextParser.filterableTuples query2 = textfile.new filterableTuples();
-			query2.ofType("EEG").printStrs();
-			TextParser.filterableTuples query3 = textfile.new filterableTuples();
-			query3.ofType("GLOBAL_GAME_STATE").printStrs();
-			TextParser.filterableTuples query4 = textfile.new filterableTuples();
-			query4.ofType("CONCENTRATION").printStrs();
-			TextParser.filterableTuples query5 = textfile.new filterableTuples();
+//			TextParser.filterableTuples query = textfile.new filterableTuples();
+//			query.ofType("PLAYER_GAME_STATE").printStrs();
+//			TextParser.filterableTuples query1 = textfile.new filterableTuples();
+//			query1.ofType("_SENSOR").printStrs();
+//			TextParser.filterableTuples query2 = textfile.new filterableTuples();
+//			query2.ofType("EEG").printStrs();
+//			TextParser.filterableTuples query3 = textfile.new filterableTuples();
+//			query3.ofType("GLOBAL_GAME_STATE").printStrs();
+//			TextParser.filterableTuples query4 = textfile.new filterableTuples();
+//			query4.ofType("CONCENTRATION").printStrs();
+//			TextParser.filterableTuples query5 = textfile.new filterableTuples();
     		textfile.writeJSON("output.json");
 			CloudSim.stopSimulation();	
 			CloudSim.terminateSimulation();

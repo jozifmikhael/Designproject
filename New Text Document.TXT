@@ -104,6 +104,7 @@
 			"dstID": "node1",
 			"latency": 1.0			
 		}
+		],
 
 
 

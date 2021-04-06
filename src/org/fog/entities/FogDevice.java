@@ -53,7 +53,7 @@ public class FogDevice extends PowerDatacenter {
 	protected Map<String, Application> applicationMap;
 	protected Map<String, List<String>> appToModulesMap;
 	protected Map<Integer, Double> childToLatencyMap;
-	
+	TextParser textfile = new TextParser();
 	protected Map<Integer, Integer> cloudTrafficMap;
 	
 	protected double lockTime;
@@ -494,6 +494,12 @@ public class FogDevice extends PowerDatacenter {
 		// TODO ADD CODE FOR UPDATING TIMINGS WHEN A TUPLE IS GENERATED FROM A PREVIOUSLY RECIEVED TUPLE. 
 		// WILL NEED TO CHECK IF A NEW LOOP STARTS AND INSERT A UNIQUE TUPLE ID TO IT.
 		//System.out.println("test");
+//		if (resTuple.getTupleType().equals("PLAYER_GAME_STATE")) {
+//			System.out.println(resTuple.getArrivalTime()-resTuple.getsendTime());
+//		}
+			
+//		TextParser.filterableTuples query = textfile.new filterableTuples();
+//		query.ofType("PLAYER_GAME_STATE").printStrs();
 		String srcModule = resTuple.getSrcModuleName();
 		String destModule = resTuple.getDestModuleName();
 		for(AppLoop loop : getApplicationMap().get(resTuple.getAppId()).getLoops()){
