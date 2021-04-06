@@ -15,9 +15,9 @@
          <children>
             <AnchorPane minHeight="320.0" minWidth="450.0" prefHeight="320.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Accordion layoutY="150.0" prefHeight="252.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <Accordion fx:id="accord" layoutY="150.0" prefHeight="252.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <panes>
-                      <TitledPane animated="false" prefHeight="215.0" prefWidth="450.0" text="Deterministic Distribution">
+                      <TitledPane fx:id="deterministicPane" animated="false" prefHeight="215.0" prefWidth="450.0" text="Deterministic Distribution">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -28,7 +28,7 @@
                               </AnchorPane>
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" text="Normal Distribution">
+                      <TitledPane fx:id="normalPane" animated="false" text="Normal Distribution">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -41,7 +41,7 @@
                               </AnchorPane>
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" prefHeight="142.0" prefWidth="441.0" text="Uniform Distribution">
+                      <TitledPane fx:id="uniformPain" animated="false" prefHeight="142.0" prefWidth="441.0" text="Uniform Distribution">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>

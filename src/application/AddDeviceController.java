@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import org.fog.test.perfeval.TextParser;
 
 import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.SensorSpec;
 
 import java.io.IOException;
 
@@ -54,7 +55,7 @@ public class AddDeviceController {
 		Stage stage = (Stage) saveNode.getScene().getWindow();
 		if (name.getText().trim().isEmpty()) {name.setText("default_device");}
 		if (parentName.getText().trim().isEmpty()) {parentName.setText("default_parent");}
-		h = textfile.new DeviceSpec(
+		h = new DeviceSpec(
 				name.getText().toString(),
 				parentName.getText().toString(),0,
 				Long.parseLong(mips.getText()),
@@ -68,7 +69,8 @@ public class AddDeviceController {
 		
 		stage.close();
 	}
-	public void initialize(DeviceSpec device) {
+	public void initialize() {
+		DeviceSpec device= (DeviceSpec)_SpecHandler.getSelected("device");
 		if(device == null) {
 			name.setText("node1");
 			mips.setText("1500");
@@ -80,8 +82,7 @@ public class AddDeviceController {
 			ratePerMIPS.setText("50.0");
 			busyPower.setText("3.0");
 			idlePower.setText("1.0");
-		}
-		else {
+		} else {
 			name.setText(device.name);
 			mips.setText(String.valueOf(device.mips));
 			ram.setText(String.valueOf(device.ram));

@@ -287,7 +287,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	if(mouseL) {
 			selNode = specsHandler.getNode(mEvent);
 			if(state==5) linkSrcNode=selNode;
-			else if(selNode==null) draggingNode = specsHandler.new NodeSpec(stateToType(), mEvent);
+			else if(selNode==null) draggingNode = new NodeSpec(stateToType(), mEvent);
 			else if(selNode!=null) draggingNode = selNode;
     	}
     	if(mouseM) {
@@ -466,7 +466,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddDeviceController controller = addNewNodeLoader.getController();
-    		controller.initialize((DeviceSpec) editDevice);
+    		controller.initialize();
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
     		DeviceSpec d = controller.getSpec();
@@ -477,17 +477,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		return null;
     	}
     }
-    NodeSpec editDevice = null;
     
     @FXML
     void editHandler(ActionEvent event) {
     	NodeSpec selectedNode = _SpecHandler.getSelected().pop();
     	if(selectedNode == null) return;
-		editDevice = selectedNode;
-		NodeSpec tryEditNode = addNodeType(editDevice.type);
-		if (tryEditNode == null) editDevice.add();
-		else tryEditNode.setPos(editDevice);
-		editDevice = null;
+		NodeSpec tryEditNode = addNodeType(selectedNode.type);
+		if (tryEditNode == null) selectedNode.add();
+		else tryEditNode.setPos(selectedNode);
 		redrawNodes();
     }
     
@@ -501,11 +498,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     ModuleSpec addModule() {
     	try {
     		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
-    		Scene scene = new Scene(dataFXML.load(),414,346);
+    		Scene scene = new Scene(dataFXML.load(),800,800);
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddModuleController controller = dataFXML.getController();
-//    		controller.initialize(selectedModule, specsHandler);
+    		controller.initialize();
     		stage.setTitle("Add Module");
     		stage.showAndWait();
     		ModuleSpec m = controller.getSpec();
@@ -525,7 +522,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		Stage stage = new Stage();
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
-//    		sensorController.initialize(SetupJSONParser.devicesList);
+    		sensorController.initialize();
     		stage.setTitle("Add Sensor");
     		stage.showAndWait();
     		SensorSpec s = sensorController.getSpec();

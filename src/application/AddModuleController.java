@@ -86,7 +86,7 @@ public class AddModuleController {
 		Stage stage = (Stage) saveModule.getScene().getWindow();
 		ArrayList<TupleSpec> tupleMappings = new ArrayList<TupleSpec>();
 		for(TupleSpec t: data)tupleMappings.add(t);
-		m = parser.new ModuleSpec(
+		m = new ModuleSpec(
 				moduleName.getText(),
 				nodeBox.getSelectionModel().getSelectedItem(),
 				Integer.parseInt(ram.getText()),
@@ -98,7 +98,7 @@ public class AddModuleController {
 	
 	@FXML
     void addTupleMap(ActionEvent event) {
-		data.add(parser.new TupleSpec(inTuple.getText(),outTuple.getText(),Double.parseDouble(fractionalSensitivity.getText())));
+		data.add(new TupleSpec(inTuple.getText(),outTuple.getText(),Double.parseDouble(fractionalSensitivity.getText())));
 		inTuple.clear();
 		outTuple.clear();
 		fractionalSensitivity.clear();
@@ -123,21 +123,18 @@ public class AddModuleController {
                 t.getTablePosition().getRow()).setSensitivity(Double.parseDouble(t.getNewValue()));
     }
 	
-	public void initialize(ModuleSpec module, _SpecHandler _parser) {
-		parser=_parser;
+	public void initialize() {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
-		
+		ModuleSpec module = (ModuleSpec) _SpecHandler.getSelected("module");
 		if(module == null) {
 			moduleName.setText("client");
 			ram.setText("10");
 			bandwidth.setText("100");
 			size.setText("100");
 			mips.setText("100");
-		}
-		else {//TODO we need a new way to do forced module placement
-//			nodeBox.getSelectionModel().select(module.nodeName);
+		} else {
 			moduleName.setText(module.name);
 			ram.setText(String.valueOf(module.ram));
 			bandwidth.setText(String.valueOf(module.bandwidth));

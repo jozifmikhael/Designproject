@@ -3,9 +3,12 @@ package application;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.ModuleSpec;
+import application._SpecHandler.NodeSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -112,7 +115,7 @@ public class AddSensorController {
 			stdDev.setText("0.0");
 		}
 		
-		s = parser.new SensorSpec(
+		s = new SensorSpec(
 				sensorName.getText().toString(),
 				nodeBox.getSelectionModel().getSelectedItem(),
 				Double.parseDouble(sensorLatency.getText()),
@@ -124,11 +127,11 @@ public class AddSensorController {
 				distType);
 	}
 	
-	public void initialize(SensorSpec sensor, _SpecHandler _parser) {
-		parser=_parser;
+	public void initialize() {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
+		SensorSpec sensor= (SensorSpec)_SpecHandler.getSelected("sensor");
 		
 		if(sensor == null) {
 			sensorLatency.setText("6.0");
@@ -139,8 +142,7 @@ public class AddSensorController {
 			max.setText("5.0");
 			min.setText("1.0");
 			accord.setExpandedPane(deterministicPane);
-		}
-		else {
+		} else {
 			sensorLatency.setText(String.valueOf(sensor.latency));
 			sensorName.setText(sensor.name);
 			DeterministicValue.setText(String.valueOf(sensor.deterministicValue));
@@ -148,16 +150,10 @@ public class AddSensorController {
 			stdDev.setText(String.valueOf(sensor.normalStdDev));
 			max.setText(String.valueOf(sensor.uniformMax));
 			min.setText(String.valueOf(sensor.uniformMin));
-			switch(sensor.type) {
-				case "Deterministic":
-					accord.setExpandedPane(deterministicPane);
-					break;
-				case "Normal":
-					accord.setExpandedPane(normalPane);
-					break;
-				case "Uniform":
-					accord.setExpandedPane(uniformPane);
-					break;
+			switch(sensor.distType) {
+				case "Deterministic": accord.setExpandedPane(deterministicPane); break;
+				case "Normal": accord.setExpandedPane(normalPane); break;
+				case "Uniform": accord.setExpandedPane(uniformPane); break;
 			}
 		}
 	}

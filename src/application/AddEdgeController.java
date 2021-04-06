@@ -47,6 +47,7 @@ public class AddEdgeController {
 
 	@FXML
 	private TextField direction;
+	
 	@FXML
 	private TextField latency;
 	

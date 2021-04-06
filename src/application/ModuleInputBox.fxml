@@ -10,13 +10,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="339.0" prefWidth="511.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
+<BorderPane prefHeight="339.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
    <center>
       <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>
             <AnchorPane prefHeight="409.0" prefWidth="680.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Text layoutX="19.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Name:" AnchorPane.leftAnchor="19.0" AnchorPane.topAnchor="20.05078125" />
+                  <Text layoutX="504.0" layoutY="309.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Name:" AnchorPane.leftAnchor="504.0" AnchorPane.topAnchor="296.05078125" />
                   <Text layoutX="37.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="RAM:" AnchorPane.leftAnchor="37.0" AnchorPane.topAnchor="100.0" />
                   <Text layoutX="14.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Module Name:" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="58.0" />
                   <TextField fx:id="moduleName" layoutX="103.0" layoutY="64.0" prefHeight="25.0" prefWidth="99.0" text="client" AnchorPane.topAnchor="54.0" />
@@ -28,7 +28,7 @@
                   <TextField fx:id="size" layoutX="103.0" layoutY="172.0" prefHeight="25.0" prefWidth="98.0" text="100" />
                   <Text layoutX="36.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MIPS:" />
                   <TextField fx:id="mips" layoutX="105.0" layoutY="210.0" prefHeight="25.0" prefWidth="98.0" text="100" />
-                  <ChoiceBox fx:id="nodeBox" layoutX="104.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="16.0" />
+                  <ChoiceBox fx:id="nodeBox" layoutX="589.0" layoutY="292.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="292.0" />
                   <Text layoutX="227.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tuple Mapping" />
                   <Button fx:id="addTupleMapping" layoutX="402.0" layoutY="243.0" mnemonicParsing="false" onAction="#addTupleMap" text="Add Mapping" />
                   <VBox layoutX="219.0" layoutY="52.0" prefHeight="183.0" prefWidth="278.0">
@@ -45,6 +45,17 @@
                   <TextField fx:id="inTuple" layoutX="127.0" layoutY="256.0" />
                   <TextField fx:id="outTuple" layoutX="181.0" layoutY="292.0" />
                   <TextField fx:id="fractionalSensitivity" layoutX="348.0" layoutY="292.0" />
+                  <VBox layoutX="536.0" layoutY="51.0" prefHeight="188.0" prefWidth="100.0">
+                     <children>
+                        <TableView prefHeight="185.0" prefWidth="100.0">
+                          <columns>
+                            <TableColumn prefWidth="99.0" text="C1" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </VBox>
+                  <Text layoutX="536.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Maping" />
+                  <Button layoutX="574.0" layoutY="244.0" mnemonicParsing="false" text="Add Node" />
                </children>
             </AnchorPane>
          </children>
