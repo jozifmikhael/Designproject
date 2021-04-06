@@ -133,11 +133,17 @@ public class SetupJSONParser {
 				this.x=mEvent.getX(); this.y=mEvent.getY();
 				return this;
 			}
+			NodeSpec setPos(NodeSpec _node) {
+				this.x=_node.x; this.y=_node.y;
+				return this;
+			}
 			public NodeSpec pop() {
+				nodesList.remove(this);
 				assocList.remove(this);
 				return this;
 			}
 			public NodeSpec add() {
+				if(!(nodesList.stream().anyMatch(a->a.name.equals(this.name)))) nodesList.add(this);
 				if(!(assocList.stream().anyMatch(a->a.name.equals(this.name)))) assocList.add(this);
 				return this;
 			}
@@ -145,6 +151,7 @@ public class SetupJSONParser {
 				NodeSpec possiblePrev = getSelected();
 				if (possiblePrev!=null) possiblePrev.selected=false;
 				this.selected = true;
+				System.out.println(this.toString());
 				return this;
 			}
 		}
@@ -248,6 +255,7 @@ public class SetupJSONParser {
 			this.size = size;
 			this.mips = mips;
 			this.tupleMappings.addAll(tupleMappings);
+			this.add();
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -313,8 +321,8 @@ public class SetupJSONParser {
 	
 	public class ActuatSpec extends NodeSpec {
 		
-		public ActuatSpec(String name, String parent) {
-			super(name, "sensor");
+		public ActuatSpec(String name, String type) {
+			super(name, "actuat");
 		}
 		
 		@Override

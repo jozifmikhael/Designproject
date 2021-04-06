@@ -293,7 +293,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	if(mouseM) {
     		screenPanHandler();
     	}
-		redrawNodes();
 	}
     
     private void screenPanHandler() {
@@ -485,16 +484,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	NodeSpec selectedNode = SetupJSONParser.getSelected().pop();
     	if(selectedNode == null) return;
 		editDevice = selectedNode;
-		if(selectedNode.type.equals("device")) {
-			System.out.println(editDevice.toString());
-			DeviceSpec tryEditNode = addDevice();
-			if (tryEditNode == null) {
-				editDevice.add();
-				return;
-			}
-			redrawNodes();
-			editDevice = null;
-		}
+		NodeSpec tryEditNode = null;
+		if(selectedNode.type.equals("device")) tryEditNode = addDevice();
+		if(selectedNode.type.equals("module")) tryEditNode = addModule();
+		if(selectedNode.type.equals("sensor")) tryEditNode = addSensor();
+		if(selectedNode.type.equals("actuat")) tryEditNode = addActuat();
+		
+		if (tryEditNode == null) editDevice.add();
+		else tryEditNode.setPos(editDevice);
+		editDevice = null;
+		redrawNodes();
     }
     
     @FXML
