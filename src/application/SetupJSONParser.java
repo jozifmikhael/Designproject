@@ -15,6 +15,7 @@ import org.fog.entities.FogDevice;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import application.SetupJSONParser.TupleSpec;
 //import application.SetupJSONParser.dispNode;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
@@ -81,6 +82,7 @@ public class SetupJSONParser {
 			String name;
 			String type;
 			boolean selected;
+			ArrayList<EdgeSpec> edgesList = null;
 			ArrayList<NodeSpec> assocList = nodesList;
 	
 			public NodeSpec(double x, double y, String name, String type) {
@@ -90,6 +92,7 @@ public class SetupJSONParser {
 				this.name = name;
 				this.type = type;
 				this.selected = false;
+				this.edgesList = new ArrayList<EdgeSpec>();
 				setColor();
 				this.add();
 			}
@@ -125,6 +128,7 @@ public class SetupJSONParser {
 				}
 				gc.setStroke(Color.BLACK); gc.setLineWidth(1.0);
 				gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
+				
 //				System.out.println(this.toString());
 			}
 			
@@ -240,7 +244,6 @@ public class SetupJSONParser {
 			return "ram=" + ram + ", bandwidth=" + bandwidth + ", size=" + size + ", mips="
 					+ mips + ", x=" + x + ", y=" + y + ", name=" + name;
 		}
-		
 		int ram;
 		long bandwidth;
 		long size;
@@ -283,10 +286,11 @@ public class SetupJSONParser {
 		double normalStdDev;
 		double uniformMax;
 		double uniformMin;
+		String distType;
 		
 		public SensorSpec(String name, String parent, double latency,
 				double deterministicValue, double normalMean, double normalStdDev, double uniformMax,
-				double uniformMin) {
+				double uniformMin, String distType) {
 			super(name, "sensor");
 			this.latency = latency;
 			this.deterministicValue = deterministicValue;
@@ -294,14 +298,15 @@ public class SetupJSONParser {
 			this.normalStdDev = normalStdDev;
 			this.uniformMax = uniformMax;
 			this.uniformMin = uniformMin;
+			this.distType = distType;
 		}
 
 		
 		@Override
 		public String toString() {
-			return "latency=" + latency + ",deterministicValue=" + deterministicValue + ",normalMean=" + normalMean
-					+ ",normalStdDev=" + normalStdDev + ",uniformMax=" + uniformMax + ",uniformMin=" + uniformMin
-					+ ",x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",type=" + type;
+			return "latency=" + latency + ", deterministicValue=" + deterministicValue + ", normalMean=" + normalMean
+					+ ", normalStdDev=" + normalStdDev + ", uniformMax=" + uniformMax + ", uniformMin=" + uniformMin
+					+ ", distType=" + distType;
 		}
 		
 		@SuppressWarnings("unchecked")	
@@ -369,7 +374,7 @@ public class SetupJSONParser {
 					+ tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength + ",nwLength=" + nwLength
 					+ ",direction=" + direction;
 		}
-
+		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {	
 			JSONObject obj = new JSONObject();

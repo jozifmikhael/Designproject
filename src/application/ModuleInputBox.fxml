@@ -27,7 +27,7 @@
                   <Text layoutX="39.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Size:" />
                   <TextField fx:id="size" layoutX="103.0" layoutY="172.0" prefHeight="25.0" prefWidth="98.0" text="100" />
                   <Text layoutX="36.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MIPS:" />
-                  <TextField fx:id="MIPS" layoutX="105.0" layoutY="210.0" prefHeight="25.0" prefWidth="98.0" text="100" />
+                  <TextField fx:id="mips" layoutX="105.0" layoutY="210.0" prefHeight="25.0" prefWidth="98.0" text="100" />
                   <ChoiceBox fx:id="nodeBox" layoutX="104.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="16.0" />
                   <Text layoutX="227.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tuple Mapping" />
                   <Button fx:id="addTupleMapping" layoutX="402.0" layoutY="243.0" mnemonicParsing="false" onAction="#addTupleMap" text="Add Mapping" />

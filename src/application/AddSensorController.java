@@ -10,8 +10,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.stage.Stage;
 import javafx.scene.control.ChoiceBox;
 import javafx.event.EventHandler;
@@ -19,7 +21,7 @@ import application.SetupJSONParser.SensorSpec;
 
 public class AddSensorController {
 	SensorSpec s;
-	SetupJSONParser textfile = new SetupJSONParser();
+	SetupJSONParser parser;
 	
 	@FXML
 	private TextField sensorLatency;
@@ -53,6 +55,18 @@ public class AddSensorController {
 	
 	@FXML
 	private ChoiceBox<String> nodeBox;
+	
+	@FXML
+	private Accordion accord;
+	
+	@FXML
+	private TitledPane deterministicPane;
+	
+	@FXML
+	private TitledPane normalPane;
+	
+	@FXML
+	private TitledPane uniformPane;
 	
 	@FXML
 	void saveDeterministic(ActionEvent event) throws NumberFormatException, IOException {
@@ -98,7 +112,7 @@ public class AddSensorController {
 			stdDev.setText("0.0");
 		}
 		
-		s = textfile.new SensorSpec(
+		s = parser.new SensorSpec(
 				sensorName.getText().toString(),
 				nodeBox.getSelectionModel().getSelectedItem(),
 				Double.parseDouble(sensorLatency.getText()),
@@ -106,7 +120,46 @@ public class AddSensorController {
 				Double.parseDouble(mean.getText()),
 				Double.parseDouble(stdDev.getText()),
 				Double.parseDouble(max.getText()),
-				Double.parseDouble(min.getText()));
+				Double.parseDouble(min.getText()),
+				distType);
+	}
+	
+	public void initialize(SensorSpec sensor, SetupJSONParser _parser) {
+		parser=_parser;
+		ObservableList<String> items = FXCollections.observableArrayList();
+		SetupJSONParser.devicesList.forEach(d->items.add(d.name));
+		nodeBox.setItems(items);
+		
+		if(sensor == null) {
+			sensorLatency.setText("6.0");
+			sensorName.setText("sensor1");
+			DeterministicValue.setText("5.1");
+			mean.setText("5.0");
+			stdDev.setText("1.0");
+			max.setText("5.0");
+			min.setText("1.0");
+			accord.setExpandedPane(deterministicPane);
+		}
+		else {
+			sensorLatency.setText(String.valueOf(sensor.latency));
+			sensorName.setText(sensor.name);
+			DeterministicValue.setText(String.valueOf(sensor.deterministicValue));
+			mean.setText(String.valueOf(sensor.normalMean));
+			stdDev.setText(String.valueOf(sensor.normalStdDev));
+			max.setText(String.valueOf(sensor.uniformMax));
+			min.setText(String.valueOf(sensor.uniformMin));
+			switch(sensor.type) {
+				case "Deterministic":
+					accord.setExpandedPane(deterministicPane);
+					break;
+				case "Normal":
+					accord.setExpandedPane(normalPane);
+					break;
+				case "Uniform":
+					accord.setExpandedPane(uniformPane);
+					break;
+			}
+		}
 	}
 	
 	void populateList(List<DeviceSpec> devicesList) {
