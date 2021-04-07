@@ -17,7 +17,6 @@ public abstract class Controller {
 	@FXML
 	void saveSpecHandler() {
 		Stage stage = (Stage) saveSpec.getScene().getWindow();
-		setDefaults();
 		makeSpec();
 		stage.close();
 	}

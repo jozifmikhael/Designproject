@@ -445,9 +445,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
             e.printStackTrace();
         }
     }
-    
+
+	NodeSpec newNode = null;
     NodeSpec addNodeType(String _type) {
-    	NodeSpec newNode = null;
     	if(_type.equals("device")) newNode = addDevice();
 		if(_type.equals("module")) newNode = addModule();
 		if(_type.equals("sensor")) newNode = addSensor();
@@ -455,30 +455,27 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		return newNode;
     }
     
-    void setupController(String fxmlFile, int w, int h) {
-    	
+    NodeSpec setupController(String type, int w, int h) {
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
+		Scene scene = null;
+		try {
+			scene = new Scene(loader.load(),450,320);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		AddDeviceController controller = loader.getController();
+//		controller.initialize();
+		stage.setTitle("Add "+type+" Node");
+		stage.showAndWait();
+		redrawNodes();
+		return controller.getSpec();
     }
 
     @FXML
-    DeviceSpec addDevice() {
-    	try {
-    		FXMLLoader loader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
-    		Scene scene = new Scene(loader.load(),450,320);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		AddDeviceController controller = loader.getController();
-    		controller.initialize();
-    		stage.setTitle("Add Device Node");
-    		stage.showAndWait();
-    		DeviceSpec d = controller.getSpec();
-			redrawNodes();
-    		return d;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
-
+    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 450, 320);}
+    
     @FXML
     ModuleSpec addModule() {
     	try {
