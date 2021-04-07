@@ -85,6 +85,11 @@ public class AddModuleController {
 	@FXML
 	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveModule.getScene().getWindow();
+		makeSpec();
+		stage.close();
+	}
+	
+	void makeSpec(){
 		ArrayList<TupleSpec> tupleMappings = new ArrayList<TupleSpec>();
 		for(TupleSpec t: data)tupleMappings.add(t);
 		m = new ModuleSpec(
@@ -94,7 +99,6 @@ public class AddModuleController {
 				Long.parseLong(bandwidth.getText()),
 				Long.parseLong(size.getText()), Integer.parseInt(mips.getText()),
 				tupleMappings);
-		stage.close();
 	}
 	
 	@FXML

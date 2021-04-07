@@ -68,12 +68,21 @@ public class _SpecHandler {
 		for(NodeSpec n: nodesList) n.edgesList=(ArrayList<EdgeSpec>) n.edgesList.stream().filter(e->e.dst!=null).collect(Collectors.toList());
 		for(NodeSpec n: nodesList) n.edgesList=(ArrayList<EdgeSpec>) n.edgesList.stream().filter(e->!e.dst.isTemp).collect(Collectors.toList());
 	}
+
+	
+	public static void deselectAll() {
+		nodesList.forEach(n->n.selected=false);
+	}
 	public static NodeSpec getSelected() {
 		for(NodeSpec n: nodesList) if (n.selected) return n;
 		return null;
 	}
 	public static NodeSpec getSelected(String _type) {
-		for(NodeSpec n: nodesList) if (n.selected && n.type.equals(_type)) return n;
+		for(NodeSpec n: nodesList) {
+			if (n.selected && n.type.equals(_type)) {
+				return n;
+			}
+		}
 		return null;
 	}
 	public static NodeSpec getLinkableNode(ArrayList<String> types, String _name) {
@@ -88,7 +97,7 @@ public class _SpecHandler {
 		Color nodeColor;
 		String name;
 		String type;
-		boolean selected;
+		boolean selected=false;
 		boolean isTemp=false;
 		ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
@@ -99,14 +108,23 @@ public class _SpecHandler {
 			this.sz = R+R;
 			this.name = name;
 			this.type = type;
-			this.selected = false;
 			this.edgesList = new ArrayList<EdgeSpec>();
 			this.setSelected();
 			this.setColor();
 			this.add();
 		}
 		public NodeSpec(String name, String type) {this(0, 0, name, type);}
-		public NodeSpec(String type, MouseEvent mEvent) {this(mEvent.getX(), mEvent.getY(), "New "+type, type); this.isTemp=true;}
+		public NodeSpec(String type, MouseEvent mEvent) {
+			this.x = mEvent.getX();
+			this.y = mEvent.getY();
+			this.sz = R+R;
+			this.name = "New "+type;
+			this.type = type;
+			this.edgesList = new ArrayList<EdgeSpec>();
+			this.isTemp = true;
+			this.setColor();
+			this.add();
+		}
 		
 		@Override
 		public String toString() {
@@ -173,13 +191,11 @@ public class _SpecHandler {
 			return this;
 		}
 		NodeSpec setSelected() {
-			NodeSpec possiblePrev = getSelected();
-			if (possiblePrev!=null) possiblePrev.selected=false;
+			deselectAll();
 			this.selected = true;
-			System.out.println(this.toString()+this.toStringLinks());
+//			System.out.println(this.toString()+this.toStringLinks());
 			return this;
 		}
-		
 		ArrayList<String> linkableDestinations() {
             ArrayList<String> linkables = new ArrayList<String>();
             if (this.type.equals("device")) linkables.add("device");
@@ -193,6 +209,10 @@ public class _SpecHandler {
                 linkables.add("device");
             }
             return linkables;
+        }
+		NodeSpec addLink(EdgeSpec e) {
+        	this.edgesList.add(e);
+            return this;
         }
 		
         NodeSpec addLink(NodeSpec dst) {

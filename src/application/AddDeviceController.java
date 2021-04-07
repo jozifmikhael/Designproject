@@ -19,9 +19,9 @@ import application._SpecHandler.SensorSpec;
 
 import java.io.IOException;
 
-
-public class AddDeviceController {
+public class AddDeviceController extends Controller {
 	DeviceSpec h;
+	DeviceSpec sel;
 	_SpecHandler textfile = new _SpecHandler();
 	
 	@FXML
@@ -54,6 +54,7 @@ public class AddDeviceController {
 	@FXML
 	void saveNodeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveNode.getScene().getWindow();
+		
 		if (name.getText().trim().isEmpty()) {name.setText("default_device");}
 		if (parentName.getText().trim().isEmpty()) {parentName.setText("default_parent");}
 		h = new DeviceSpec(
@@ -68,11 +69,12 @@ public class AddDeviceController {
 				Long.parseLong(downbw.getText())
 				);
 		h.addLink(parentName.getText(), Double.parseDouble(upLinkLatency.getText()));
+		System.out.println("Made new dev");
 		stage.close();
 	}
 	public void initialize() {
-		DeviceSpec device= (DeviceSpec)_SpecHandler.getSelected("device");
-		if(device == null) {
+		sel = (DeviceSpec)_SpecHandler.getSelected("device");
+		if(sel == null) {
 			name.setText("node1");
 			mips.setText("1500");
 			ram.setText("10240");
@@ -83,18 +85,30 @@ public class AddDeviceController {
 			ratePerMIPS.setText("50.0");
 			busyPower.setText("3.0");
 			idlePower.setText("1.0");
-		} else {
-			name.setText(device.name);
-			mips.setText(String.valueOf(device.mips));
-			ram.setText(String.valueOf(device.ram));
-			upLinkLatency.setText(String.valueOf(device.ram));
-			upbw.setText(String.valueOf(device.upbw));
-			downbw.setText(String.valueOf(device.downbw));
-			nodelvl.setText(String.valueOf(device.level));
-			ratePerMIPS.setText(String.valueOf(device.rate));
-			busyPower.setText(String.valueOf(device.apower));
-			idlePower.setText(String.valueOf(device.ipower));
+			return;
 		}
+		
+		sel=(DeviceSpec) sel.pop();
+		name.setText(sel.name);
+		mips.setText(String.valueOf(sel.mips));
+		ram.setText(String.valueOf(sel.ram));
+		upLinkLatency.setText(String.valueOf(sel.ram));
+		upbw.setText(String.valueOf(sel.upbw));
+		downbw.setText(String.valueOf(sel.downbw));
+		nodelvl.setText(String.valueOf(sel.level));
+		ratePerMIPS.setText(String.valueOf(sel.rate));
+		busyPower.setText(String.valueOf(sel.apower));
+		idlePower.setText(String.valueOf(sel.ipower));
 	}
 	public DeviceSpec getSpec() {return h;}
+	@Override
+	void makeSpec() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	void setDefaults() {
+		// TODO Auto-generated method stub
+		
+	}
 }

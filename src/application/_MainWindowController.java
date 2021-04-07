@@ -216,10 +216,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public void initialize(URL arg0, ResourceBundle arg1) {
     	
     }
-    
-	public int KeyboardState = 1;
 	
-	public List<String> selectedModulesList = new ArrayList<String>();
+	public List<String> selectedNodesList = new ArrayList<String>();
     
     public void setupListeners(Stage parentStage, Scene scene) {
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
@@ -237,15 +235,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
 	}
-	
-	
     boolean mouseL=false;
     boolean mouseR=false;
     boolean mouseM=false;
     NodeSpec draggingNode = null;
     NodeSpec linkSrcNode = null;
     NodeSpec selNode = null;
-
+    
 	@Override
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
@@ -257,6 +253,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		}
 		if(!keySetSuccess) return;
 		switch (InteractionState.getSetKey()){
+			case ESCAPE	: _SpecHandler.deselectAll(); break;
 			case F5		: System.out.println("Unimplemented save tool"); break; // Save File
 			case DELETE : System.out.println("Unimplemented delete tool"); break; // Copy Selected
 			case E		: System.out.println("Unimplemented edit tool"); break; // Copy Selected
@@ -265,6 +262,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case Z		: System.out.println("Unimplemented undo tool"); break; // Undo Last
 			default : {}
 		}
+		redrawNodes();
 	}
 	
 	public static enum InteractionState {
@@ -299,10 +297,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
-				//
 				selNode = _SpecHandler.getNode(mEvent);
+				if (selNode!=null) selNode.setSelected();
 				switch(InteractionState.getSetKey()) {
-					case ESCAPE : draggingNode=selNode;
+					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
 					case DIGIT1 : draggingNode=(selNode==null)?new NodeSpec("device", mEvent):selNode; break;// Select Device Placer
 					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec("module", mEvent):selNode; break;// Select Module Placer
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
@@ -310,12 +308,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(draggingNode);break;
 					default : {} // Nothing
 				} break;
-			case MIDDLE_BTN: screenPanHandler(); break;
-			case RIGHT_BTN: break; //If we have time, make a little right-click menu show with two options: Edit, Delete
+			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
+			case RIGHT_BTN: break; //TODO If we have time, make a little right-click menu show with two options: Edit, Delete
 			case NONE: System.out.println("_MainWindowController.java: ClickHandler Error - State NONE"); break;
 			default: System.out.println("_MainWindowController.java: ClickHandler Error - State Default"); break;
         }
-//		System.out.println("MouseState: " + InteractionState.lastMouseState + " KeyState: " + InteractionState.setKey);
         redrawNodes();
 	}
     
@@ -325,7 +322,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case LEFT_BTN:
 //				System.out.println("In Left: KeyState: " + InteractionState.setKey);
 				NodeSpec newNode = null;
-				draggingNode=(draggingNode.isTemp)?draggingNode.pop():null;
+				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
 					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
@@ -333,6 +330,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
 					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
 					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode); _SpecHandler.pruneLinks(); break;
+//					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
 				}
 				if (newNode!=null) newNode.setSelected().setPos(mEvent);
@@ -346,47 +344,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			default:
 			break;
 		}
-//		System.out.println("MouseState: " + InteractionState.lastMouseState + " KeyState: " + InteractionState.setKey);
-		
     	redrawNodes();
-//    	
-//		if (state == 3) {
-//			if(linkSrcNode!=null && linkDstNode!=null) {
-//				String srcType = linkSrcNode.data.type;
-//				String dstType = linkSrcNode.data.type;
-//				if(srcType.equals(dstType)) {
-//					if(srcType.equals("device")) {
-//						DeviceSpec srcDev = getDevice(linkSrcNode.name);
-//						srcDev.parent = linkDstNode.name;
-//						DeviceSpec dstDev = getDevice(srcDev.parent);
-//						dispLink srcLink = getLinkBySrc(linkSrcNode.name);
-//			        	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
-//						Scene scene = new Scene(dataFXML.load(),414,139);
-//						Stage stage = new Stage();
-//						stage.setScene(scene);
-//			     		stage.setTitle("Setting Link Latency");
-//			     		stage.showAndWait();
-//			     		double selLatency=LinkLatencyInputController.LinkLatencyValue;
-//						if(srcLink!=null)srcLink.dst = linkDstNode;
-//						else dispLinksList.add(new dispLink(srcDev, dstDev));
-//					}else if(srcType.equals("module")) {
-//						selectedModulesList.add(linkDstNode.name);
-//						selectedModulesList.add(linkSrcNode.name);
-//						addEdge();
-//					}
-//				} else if(srcType.equals("sensor")&&dstType.equals("modules")) {
-//					System.out.println("Sensor-Node link detected");
-//				} else System.out.println("_MainWindowController.java: Linker can't form Node-Module links");
-//			} else if (linkSrcNode==null) {
-//				System.out.println("_MainWindowController.java: Linker Src is null");
-//			} else if (linkDstNode==null) {
-//				System.out.println("_MainWindowController.java: Linker Dst is null");
-//			}
-//    	}
 	}
-    
+	
+	private EdgeSpec makeReqLink(NodeSpec src, NodeSpec dst) {
+		//check the types of the src and dst and call the full edge controller or the mini one
+		return null;
+	}
+	
     @FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
+    	if (!draggingNode.selected) draggingNode.setSelected();
     	if(draggingNode != null) {
     		draggingNode.setPos(mEvent);
 			redrawNodes();
@@ -486,6 +454,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		if(_type.equals("actuat")) newNode = addActuat();
 		return newNode;
     }
+    
+    void setupController(String fxmlFile, int w, int h) {
+    	
+    }
 
     @FXML
     DeviceSpec addDevice() {
@@ -575,9 +547,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			AddEdgeController controller = dataFXML.getController();
-			if(selectedModulesList.isEmpty()) controller.populateList(_SpecHandler.modulesList);
-			else controller.setChoices(selectedModulesList);
-			selectedModulesList.removeAll(selectedModulesList);
+			if(selectedNodesList.isEmpty()) controller.populateList(_SpecHandler.modulesList);
+			else controller.setChoices(selectedNodesList);
+			selectedNodesList.removeAll(selectedNodesList);
 			stage.setTitle("Add App Edge");
 			stage.showAndWait();
     		EdgeSpec v = controller.getSpec();
@@ -591,14 +563,18 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void editHandler() {
-    	NodeSpec selectedNode = _SpecHandler.getSelected().pop();
+		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
+    	NodeSpec selectedNode = _SpecHandler.getSelected();
     	if(selectedNode == null) return;
 		NodeSpec tryEditNode = addNodeType(selectedNode.type);
-		
 		if (tryEditNode != null) {
-			tryEditNode.setPos(selectedNode);
+			System.out.println("EditNode " + tryEditNode.toString());
+			System.out.println("SelNode " + selectedNode.toString());
+			tryEditNode=tryEditNode.setPos(selectedNode);
+			System.out.println("SelNode " + selectedNode.toString());
+			System.out.println("Post Edit there are " + _SpecHandler.nodesList.size() + " nodes");
 			_SpecHandler.pruneLinks();
-		} else selectedNode.add();
+		}
 		redrawNodes();
     }
     
