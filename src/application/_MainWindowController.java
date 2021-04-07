@@ -299,6 +299,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
+				//
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
 					case ESCAPE : draggingNode=selNode;
