@@ -3,9 +3,10 @@ package application;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.ResourceBundle;
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.ModuleSpec;
 import application._SpecHandler.NodeSpec;
@@ -16,9 +17,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
@@ -29,8 +32,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn.CellEditEvent;
 
-
-public class AddModuleController {
+public class AddModuleController extends Controller implements Initializable{
 	ModuleSpec m;
 	_SpecHandler parser;
 	ObservableList<TupleSpec> data = FXCollections.observableArrayList();
@@ -98,14 +100,7 @@ public class AddModuleController {
 	
 	@FXML
 	private Button deleteButton;
-	
-	@FXML
-	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveModule.getScene().getWindow();
-		makeSpec();
-		stage.close();
-	}
-	
+		
 	@FXML
 	void addNodeHandler(ActionEvent event) {
 		String name = nodeBox.getSelectionModel().getSelectedItem();
@@ -135,8 +130,6 @@ public class AddModuleController {
 				tupleMappings);
 	}
 	
-	
-	
 	@FXML
     public void inTupleEdit(CellEditEvent<TupleSpec, String> t) {
 		System.out.println("test");
@@ -155,7 +148,8 @@ public class AddModuleController {
         ((TupleSpec) t.getTableView().getItems().get(t.getTablePosition().getRow())).setSensitivity(Double.valueOf(t.getNewValue()));
     }
 	
-	public void initialize() {
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);

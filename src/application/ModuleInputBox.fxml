@@ -21,7 +21,7 @@
                   <Text layoutX="14.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Module Name:" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="58.0" />
                   <TextField fx:id="moduleName" layoutX="103.0" layoutY="64.0" prefHeight="25.0" prefWidth="99.0" text="client" AnchorPane.topAnchor="54.0" />
                   <TextField fx:id="ram" layoutX="103.0" layoutY="96.0" prefHeight="25.0" prefWidth="99.0" text="10" AnchorPane.topAnchor="96.0" />
-                  <Button fx:id="saveModule" defaultButton="true" layoutX="26.0" layoutY="292.0" mnemonicParsing="false" onAction="#saveModuleHandler" text="Save App Module" />
+                  <Button fx:id="saveSpec" defaultButton="true" layoutX="26.0" layoutY="292.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save App Module" />
                   <TextField fx:id="bandwidth" layoutX="103.0" layoutY="131.0" prefHeight="25.0" prefWidth="98.0" text="100" />
                   <Text layoutX="22.0" layoutY="148.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bandwidth:" />
                   <Text layoutX="39.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Size:" />

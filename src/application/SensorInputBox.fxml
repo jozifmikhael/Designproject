@@ -23,7 +23,7 @@
                                  <children>
                                     <Text layoutX="40.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Deterministic Value:" />
                                     <TextField fx:id="DeterministicValue" layoutX="224.0" layoutY="23.0" />
-                                    <Button fx:id="saveDeterministic" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveDeterministic" text="Save Sensor" />
+                                    <Button fx:id="saveSpec" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveDeterministic" text="Save Sensor" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -32,7 +32,7 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button fx:id="saveNormal" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveNormal" text="Save Sensor" />
+                                    <Button fx:id="saveSpec" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveNormal" text="Save Sensor" />
                                     <Text layoutX="40.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mean:" />
                                     <TextField fx:id="mean" layoutX="225.0" layoutY="23.0" />
                                     <Text layoutX="40.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Standard Deviation:" />
@@ -45,7 +45,7 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button fx:id="saveUniform" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveUniform" text="Save Sensor" />
+                                    <Button fx:id="saveSpec" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveUniform" text="Save Sensor" />
                                     <TextField fx:id="max" layoutX="225.0" layoutY="23.0" />
                                     <Text layoutX="40.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Maximum:" />
                                     <Text layoutX="40.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Minimum:" />

@@ -30,7 +30,8 @@ import org.cloudbus.cloudsim.sdn.overbooking.PeProvisionerOverbooking;
 import org.fog.entities.FogBroker;
 import org.fog.entities.FogDevice;
 import org.fog.entities.FogDeviceCharacteristics;
-import org.fog.placement.Controller;
+import application.Controller;
+//import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.policy.AppModuleAllocationPolicy;
@@ -52,15 +53,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -126,7 +123,7 @@ import org.fog.entities.FogDevice;
 import org.fog.entities.FogDeviceCharacteristics;
 import org.fog.entities.Sensor;
 import org.fog.entities.Tuple;
-import org.fog.placement.Controller;
+//import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.placement.ModulePlacementMapping;
@@ -140,6 +137,23 @@ import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
 import org.fog.utils.distribution.NormalDistribution;	
 import org.fog.utils.distribution.UniformDistribution;
+
+import org.fog.placement.ModuleMapping;
+import org.fog.placement.ModulePlacementEdgewards;
+import org.fog.placement.ModulePlacementMapping;
+import org.fog.placement.ModulePlacementOnlyCloud;
+import org.fog.policy.AppModuleAllocationPolicy;
+import org.fog.scheduler.StreamOperatorScheduler;
+import org.fog.utils.Config;
+import org.fog.utils.FogLinearPowerModel;
+import org.fog.utils.FogUtils;
+import org.fog.utils.TimeKeeper;
+import org.fog.utils.distribution.DeterministicDistribution;
+import org.fog.utils.distribution.NormalDistribution;	
+import org.fog.utils.distribution.UniformDistribution;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 
 public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{	
 	@FXML
@@ -207,16 +221,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private AnchorPane backPane;
-    
     @FXML
     private ChoiceBox<String> PolicyChoiceMain;
-    
     @FXML
     private Button previewButton;
     
+   
     @FXML
     private TreeTableView<String> tableView;
-    
     @FXML
     private TreeTableColumn<String, String> col1;
     
@@ -225,8 +237,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //	double R=50;
 	double xCenter=100;
 	double yCenter=100;
-
-	public static String policyType;
+	
     GraphicsContext gc;
     
     @Override
@@ -309,6 +320,25 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    }
 	}
 	
+	void populateList(List<String> str_list) {
+		System.out.println(str_list);
+		ObservableList<String> items = FXCollections.observableArrayList();
+		items.addAll(str_list);
+		System.out.println(items);
+		PolicyChoiceMain.setItems(items);
+ 		PolicyChoiceMain.setValue(items.get(0));
+	}
+	
+	@FXML
+	void savePolicyHandler(ActionEvent event) {
+		String policyType;
+		if (PolicyChoiceMain.getSelectionModel().getSelectedItem() == null
+				|| PolicyChoiceMain.getSelectionModel().getSelectedItem().trim().isEmpty()) {
+			PolicyChoiceMain.setValue("Edgewards");
+		} else
+			policyType = PolicyChoiceMain.getSelectionModel().getSelectedItem().toString();
+	}
+	
     @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
         switch(InteractionState.getMouseState(mEvent)) {
@@ -342,10 +372,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
-//					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
-//					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
-//					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
-//					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
+					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
+					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
+					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
+					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
 					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode); _SpecHandler.pruneLinks(); break;
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
@@ -432,20 +462,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	@FXML
 	void loadJson(ActionEvent event) throws FileNotFoundException, IOException, ParseException {
 		Stage stage = new Stage();
-		//TODO FileChooser?
+		// TODO FileChooser?
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Open JSON File");
 		chooser.setInitialDirectory(new File("saves"));
 		File selectedDirectory = chooser.showOpenDialog(stage);
 		if (selectedDirectory != null) {
-			System.out.println("Loaded Json: "+selectedDirectory.getName());
-			JSONObject jsonObject = (JSONObject)new JSONParser().parse(new FileReader(selectedDirectory.getName()));
-				
+			System.out.println("Loaded Json: " + selectedDirectory.getName());
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(new FileReader(selectedDirectory.getName()));
 			JSONArray devicesList = (JSONArray) jsonObject.get("nodes");
 			JSONArray actuatsList = (JSONArray) jsonObject.get("actuats");
 			JSONArray modulesList = (JSONArray) jsonObject.get("modules");
 			JSONArray sensorsList = (JSONArray) jsonObject.get("sensors");
-			JSONArray edgesList = (JSONArray) jsonObject.get("edges");	
+			JSONArray edgesList = (JSONArray) jsonObject.get("edges");
 		}
 	}
 	
@@ -465,121 +494,44 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	NodeSpec newNode = null;
     NodeSpec addNodeType(String _type) {
-//    	if(_type.equals("device")) newNode = addDevice();
-//		if(_type.equals("module")) newNode = addModule();
-//		if(_type.equals("sensor")) newNode = addSensor();
-//		if(_type.equals("actuat")) newNode = addActuat();
+    	if(_type.equals("device")) newNode = addDevice();
+		if(_type.equals("module")) newNode = addModule();
+		if(_type.equals("sensor")) newNode = addSensor();
+		if(_type.equals("actuat")) newNode = addActuat();
 		return newNode;
     }
     
-    void setupController(String type, int w, int h) throws IOException {
+    Spec setupController(String type, int w, int h) {
     	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
 		Scene scene = null;
 		try {
-			scene = new Scene(loader.load(),450,320);
+			scene = new Scene(loader.load(),w,h);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		Stage stage = new Stage();
 		stage.setScene(scene);
-
-		BorderPane root = (BorderPane)loader.load();
 		Controller controller = loader.getController();
-		ObservableList<Node> test=root.getChildren();
-		test.forEach(n->System.out.println(n.toString()));
-//		controller.initialize();
 		stage.setTitle("Add "+type+" Node");
 		stage.showAndWait();
 		redrawNodes();
-    }
-//
-    @FXML
-    DeviceSpec addDevice() {
-//    	return (DeviceSpec) setupController("Device", 450, 320);
-    	}
-//    
-    @FXML
-    ModuleSpec addModule() {
-    	try {
-    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
-    		Scene scene = new Scene(dataFXML.load(),800,800);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		AddModuleController controller = dataFXML.getController();
-    		controller.initialize();
-    		stage.setTitle("Add Module");
-    		stage.showAndWait();
-    		ModuleSpec m = controller.getSpec();
-    		redrawNodes();
-    		return m;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
-    
-    @FXML
-    SensorSpec addSensor() {
-    	try {
-    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
-    		Stage stage = new Stage();
-    		
-    		stage.setScene(scene);
-    		AddSensorController sensorController = addNewSensorLoader.getController();
-    		sensorController.initialize();
-    		stage.setTitle("Add Sensor");
-    		stage.showAndWait();
-    		SensorSpec s = sensorController.getSpec();
-			redrawNodes();
-    		return s;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
-    
-    @FXML
-    ActuatSpec addActuat() {
-    	try {
-    		FXMLLoader loader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
-    		Scene scene = new Scene(loader.load(),500,500);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		ActuatorInputController actuatorController = loader.getController();
-    		actuatorController.initialize();
-    		stage.setTitle("Add Actuator");
-    		stage.showAndWait();
-    		ActuatSpec a = actuatorController.getSpec();
-			redrawNodes();
-    		return a;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
+		return controller.getSpec();
     }
 
     @FXML
-    EdgeSpec addEdge() {
-	    try {
-			FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("EdgeInputBox.fxml"));
-			Scene scene = new Scene(dataFXML.load(),414,346);
-			Stage stage = new Stage();
-			stage.setScene(scene);
-			AddEdgeController controller = dataFXML.getController();
-			if(selectedNodesList.isEmpty()) controller.populateList(_SpecHandler.modulesList);
-			else controller.setChoices(selectedNodesList);
-			selectedNodesList.removeAll(selectedNodesList);
-			stage.setTitle("Add App Edge");
-			stage.showAndWait();
-    		EdgeSpec v = controller.getSpec();
-    		redrawNodes();
-    		return v;
-		} catch(Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-    }
+    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 450, 320);}
+    
+    @FXML
+    ModuleSpec addModule() {return (ModuleSpec) setupController("Module", 800, 800);}
+    
+    @FXML
+    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 320);}
+    
+    @FXML
+    ActuatSpec addActuat() {return (ActuatSpec) setupController("Actuator", 450, 320);}
+
+    @FXML
+    EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
     
     @FXML
     void editHandler() {
@@ -602,23 +554,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void deleteHandler() {
     	_SpecHandler.getSelected().pop();
 		redrawNodes();
-    }
-	
-	void populateList(List<String> str_list) {
-		System.out.println(str_list);
-		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
-		System.out.println(items);
-		PolicyChoiceMain.setItems(items);
- 		PolicyChoiceMain.setValue(items.get(0));
-	}
-    
-    @FXML
-    void savePolicyHandler(ActionEvent event) {
-    	if (PolicyChoiceMain.getSelectionModel().getSelectedItem() == null
-				|| PolicyChoiceMain.getSelectionModel().getSelectedItem().trim().isEmpty()) {			
-			PolicyChoiceMain.setValue("Edgewards");
-		} else policyType = PolicyChoiceMain.getSelectionModel().getSelectedItem().toString();
     }
     
     

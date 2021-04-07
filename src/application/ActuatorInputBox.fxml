@@ -15,7 +15,7 @@
                <children>
                   <TextField fx:id="actuatorName" layoutX="140.0" layoutY="36.0" prefHeight="25.0" prefWidth="97.0" AnchorPane.topAnchor="36.0" />
                   <Text layoutX="28.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Actuator Name:" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="40.0" />
-                  <Button fx:id="saveActuator" layoutX="95.0" layoutY="187.0" mnemonicParsing="false" onAction="#saveActuatorHandler" text="Save Actuator" />
+                  <Button fx:id="saveSpec" layoutX="95.0" layoutY="187.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save Actuator" />
                   <Text layoutX="38.0" layoutY="104.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Node:" />
                   <ChoiceBox fx:id="nodeBox" layoutX="126.0" layoutY="88.0" prefWidth="150.0" />
                   <Text layoutX="28.0" layoutY="149.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latency:" />

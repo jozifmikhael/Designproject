@@ -3,6 +3,7 @@ package application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -10,16 +11,19 @@ import javafx.stage.Stage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import org.fog.test.perfeval.TextParser;
 
 import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.EdgeSpec;
 import application._SpecHandler.SensorSpec;
 
 import java.io.IOException;
 
-public class AddDeviceController extends Controller {
+public class AddDeviceController extends Controller implements Initializable {
 	DeviceSpec h;
 	DeviceSpec sel;
 	_SpecHandler textfile = new _SpecHandler();
@@ -33,9 +37,7 @@ public class AddDeviceController extends Controller {
 	@FXML
 	private TextField ram;
 	@FXML
-	private Button saveNode;
-	@FXML
-    private TextField upLinkLatency;
+	private TextField upLinkLatency;
 	@FXML
 	private TextField upbw;
 	@FXML
@@ -49,32 +51,32 @@ public class AddDeviceController extends Controller {
 	@FXML
 	private TextField idlePower;
 	@FXML
-    private TextField transmissionTime;
+	private TextField transmissionTime;
 	
 	@FXML
-	void saveNodeHandler(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveNode.getScene().getWindow();
+	void saveSpecHandler(ActionEvent event) throws NumberFormatException, IOException {
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		
-		if (name.getText().trim().isEmpty()) {name.setText("default_device");}
-		if (parentName.getText().trim().isEmpty()) {parentName.setText("default_parent");}
-		h = new DeviceSpec(
-				name.getText().toString(),
-				parentName.getText().toString(),0,
-				Long.parseLong(mips.getText()),
-				Integer.parseInt(ram.getText()),Integer.parseInt(nodelvl.getText()),
-				Double.parseDouble(ratePerMIPS.getText()),
-				Double.parseDouble(idlePower.getText()),
-				Double.parseDouble(busyPower.getText()),Double.parseDouble(upLinkLatency.getText()),
-				Long.parseLong(upbw.getText()),
-				Long.parseLong(downbw.getText())
-				);
+		if (name.getText().trim().isEmpty()) {
+			name.setText("default_device");
+		}
+		if (parentName.getText().trim().isEmpty()) {
+			parentName.setText("default_parent");
+		}
+		h = new DeviceSpec(name.getText().toString(), parentName.getText().toString(), 0,
+				Long.parseLong(mips.getText()), Integer.parseInt(ram.getText()), Integer.parseInt(nodelvl.getText()),
+				Double.parseDouble(ratePerMIPS.getText()), Double.parseDouble(idlePower.getText()),
+				Double.parseDouble(busyPower.getText()), Double.parseDouble(upLinkLatency.getText()),
+				Long.parseLong(upbw.getText()), Long.parseLong(downbw.getText()));
 		h.addLink(parentName.getText(), Double.parseDouble(upLinkLatency.getText()));
 		System.out.println("Made new dev");
 		stage.close();
 	}
-	public void initialize() {
-		sel = (DeviceSpec)_SpecHandler.getSelected("device");
-		if(sel == null) {
+	
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		sel = (DeviceSpec) _SpecHandler.getSelected("device");
+		if (sel == null) {
 			name.setText("node1");
 			mips.setText("1500");
 			ram.setText("10240");
@@ -87,12 +89,11 @@ public class AddDeviceController extends Controller {
 			idlePower.setText("1.0");
 			return;
 		}
-		
-		sel=(DeviceSpec) sel.pop();
+		sel = (DeviceSpec) sel.pop();
 		name.setText(sel.name);
 		mips.setText(String.valueOf(sel.mips));
 		ram.setText(String.valueOf(sel.ram));
-		upLinkLatency.setText(String.valueOf(sel.ram));
+		for(EdgeSpec e : sel.edgesList) if(e.dst.type.equals("device"))upLinkLatency.setText(String.valueOf(e.latency));
 		upbw.setText(String.valueOf(sel.upbw));
 		downbw.setText(String.valueOf(sel.downbw));
 		nodelvl.setText(String.valueOf(sel.level));
@@ -100,15 +101,15 @@ public class AddDeviceController extends Controller {
 		busyPower.setText(String.valueOf(sel.apower));
 		idlePower.setText(String.valueOf(sel.ipower));
 	}
-	public DeviceSpec getSpec() {return h;}
+	
+	public DeviceSpec getSpec() {
+		return h;
+	}
+	
 	@Override
 	void makeSpec() {
 		// TODO Auto-generated method stub
 		
 	}
-	@Override
-	void setDefaults() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }
