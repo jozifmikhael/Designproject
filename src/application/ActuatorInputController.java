@@ -1,6 +1,5 @@
 package application;
 
-
 import java.io.IOException;
 
 import application._SpecHandler.ActuatSpec;
@@ -31,7 +30,6 @@ import org.fog.test.perfeval.TextParser;
 
 import application._SpecHandler.DeviceSpec;
 
-
 public class ActuatorInputController{
 	_SpecHandler textfile = new _SpecHandler();
 	ActuatSpec a;
@@ -50,7 +48,7 @@ public class ActuatorInputController{
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
-
+		
 		ActuatSpec actuat= (ActuatSpec)_SpecHandler.getSelected("actuat");
 		if(actuat == null) {
 			actuatLatency.setText("6.0");
@@ -67,7 +65,7 @@ public class ActuatorInputController{
 		a = new ActuatSpec(actuatorName.getText().toString(), nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(actuatLatency.getText()));
 		stage.close();
 		ArrayList<String> types = new ArrayList<String>(); types.add("device");
-		DeviceSpec src = (DeviceSpec) _SpecHandler.getLinkableNodes(types, nodeBox.getSelectionModel().getSelectedItem());
+		DeviceSpec src = (DeviceSpec) _SpecHandler.getLinkableNode(types, nodeBox.getSelectionModel().getSelectedItem());
 		if(src != null) src.addLink(actuator_Name, Double.parseDouble(actuatLatency.getText()));
 		stage.close();
 	}

@@ -30,13 +30,12 @@ public class _SpecHandler {
 	public static ArrayList<ActuatSpec> actuatsList = new ArrayList<ActuatSpec>();
 	public static ArrayList<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
 	public static ArrayList<NodeSpec> nodesList = new ArrayList<NodeSpec>();
-	public static ArrayList<EdgeSpec> edgesList = new ArrayList<EdgeSpec>();
+//	public static ArrayList<EdgeSpec> edgesList = new ArrayList<EdgeSpec>();
 	
 	static double R=50;
 	static double zoomFactor=1;
 	static int fontSize = 16;
 	static String font = "monospaced";
-	
 	
 	static GraphicsContext gc=null;
 	
@@ -65,8 +64,10 @@ public class _SpecHandler {
 		return selNode.setSelected();
 	}
 	
-	static boolean editFlag=false;
-	
+	public static void pruneLinks() {
+		for(NodeSpec n: nodesList) n.edgesList=(ArrayList<EdgeSpec>) n.edgesList.stream().filter(e->e.dst!=null).collect(Collectors.toList());
+		for(NodeSpec n: nodesList) n.edgesList=(ArrayList<EdgeSpec>) n.edgesList.stream().filter(e->!e.dst.isTemp).collect(Collectors.toList());
+	}
 	public static NodeSpec getSelected() {
 		for(NodeSpec n: nodesList) if (n.selected) return n;
 		return null;
@@ -75,7 +76,7 @@ public class _SpecHandler {
 		for(NodeSpec n: nodesList) if (n.selected && n.type.equals(_type)) return n;
 		return null;
 	}
-	public static NodeSpec getLinkableNodes(ArrayList<String> types, String _name) {
+	public static NodeSpec getLinkableNode(ArrayList<String> types, String _name) {
 		for(NodeSpec n: nodesList) if (n.name.equals(_name)&&types.contains(n.type)) return n;
 		return null;
 	}
@@ -88,6 +89,7 @@ public class _SpecHandler {
 		String name;
 		String type;
 		boolean selected;
+		boolean isTemp=false;
 		ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
 		
@@ -104,12 +106,22 @@ public class _SpecHandler {
 			this.add();
 		}
 		public NodeSpec(String name, String type) {this(0, 0, name, type);}
-		public NodeSpec(String type, MouseEvent mEvent) {this(mEvent.getX(), mEvent.getY(), "New "+type, type);}
+		public NodeSpec(String type, MouseEvent mEvent) {this(mEvent.getX(), mEvent.getY(), "New "+type, type); this.isTemp=true;}
 		
 		@Override
 		public String toString() {
 			return "x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name=" + name + ", type="
 					+ type + ", selected=" + selected;
+		}
+		public String toStringLinks() {
+			String s = "";
+			if (this.edgesList.size()==0) return s;
+			s+= "\n{";
+			for(int i=1; i<=this.edgesList.size(); i++) {
+				s+=("\n "+i+" - "+this.edgesList.get(i-1).toString());
+			}
+			s+="\n}";
+			return s;
 		}
 		
 		NodeSpec setColor() {
@@ -124,8 +136,7 @@ public class _SpecHandler {
 		}
 		
 		void drawLink() {
-			if (editFlag) edgesList.stream().filter(e->e.dst!=null).collect(Collectors.toList());
-			edgesList.forEach(e->e.draw(gc));
+			this.edgesList.forEach(e->e.draw(gc));
 		}
 		
 		void drawNode() {
@@ -136,11 +147,9 @@ public class _SpecHandler {
 				gc.setStroke(this.selected?Color.BLUE:Color.BLACK);
 				gc.setLineWidth(this.selected?10.0:1.0);
 				gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
-			}else {
-				System.out.println("There's a transp node");
+				gc.setStroke(Color.BLACK); gc.setLineWidth(1.0);
+				gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
 			}
-			gc.setStroke(Color.BLACK); gc.setLineWidth(1.0);
-			gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
 		}
 		
 		NodeSpec setPos(MouseEvent mEvent) {
@@ -154,6 +163,8 @@ public class _SpecHandler {
 		NodeSpec pop() {
 			nodesList.remove(this);
 			assocList.remove(this);
+			this.isTemp=true;
+			pruneLinks();
 			return this;
 		}
 		NodeSpec add() {
@@ -165,7 +176,7 @@ public class _SpecHandler {
 			NodeSpec possiblePrev = getSelected();
 			if (possiblePrev!=null) possiblePrev.selected=false;
 			this.selected = true;
-			System.out.println(this.toString());
+			System.out.println(this.toString()+this.toStringLinks());
 			return this;
 		}
 		
@@ -184,17 +195,15 @@ public class _SpecHandler {
             return linkables;
         }
 		
-        NodeSpec addLink(NodeSpec _dst) {
-            EdgeSpec e = new EdgeSpec(this, _dst, 0);
-            _dst.edgesList.add(e);
+        NodeSpec addLink(NodeSpec dst) {
+        	this.edgesList.add(new EdgeSpec(this, dst, 0));
             return this;
         }
 		
         NodeSpec addLink(String _dst, double UpLinkLatency) {
-            NodeSpec dst = _SpecHandler.getLinkableNodes(linkableDestinations(), _dst);
+            NodeSpec dst = _SpecHandler.getLinkableNode(linkableDestinations(), _dst);
             if (dst==null) return this;
-            EdgeSpec e = new EdgeSpec(this, dst, UpLinkLatency);
-            dst.edgesList.add(e);
+            this.edgesList.add(new EdgeSpec(this, dst, UpLinkLatency));
             return this;
         }
 	}
@@ -336,7 +345,6 @@ public class _SpecHandler {
 			this.uniformMin = uniformMin;
 			this.distType = distType;
 		}
-
 		
 		@Override
 		public String toString() {
@@ -425,12 +433,10 @@ public class _SpecHandler {
 			return obj;	
 		}
 		
-		public EdgeSpec(String src, String dst, String edgeType, double latency, String tupleType,
+		public EdgeSpec(NodeSpec src, NodeSpec dst, String edgeType, double latency, String tupleType,
 				double periodicity, double cpuLength, double newLength, int direction) {
-			for(NodeSpec n : nodesList) {
-				if(n.name.equals(src)) this.src = n;
-				if(n.name.equals(dst)) this.dst = n;
-			}
+			this.src = src;
+			this.dst = dst;
 			this.edgeType = edgeType;
 			this.latency = latency;
 			this.tupleType = tupleType;
@@ -439,7 +445,7 @@ public class _SpecHandler {
 			this.nwLength = newLength;
 			this.direction = direction;
 		}
-		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {this(src.name, dst.name, "0", latency, "null", 0, 0, 0, 0);}
+		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {this(src, dst, "0", latency, "null", 0, 0, 0, 0);}
 		
 		void draw(GraphicsContext gc) {
 			gc.beginPath();
@@ -448,7 +454,7 @@ public class _SpecHandler {
 			gc.stroke();
 		}
 	}
-		
+	
 	public ArrayList<TupleSpec> tempTupleList = new ArrayList<TupleSpec>();
 	public static class TupleSpec{
 		SimpleStringProperty  inTuple;
@@ -511,7 +517,7 @@ public class _SpecHandler {
 		for (ModuleSpec m : modulesList) modulesJSONObj.add(m.toJSON());
 		for (SensorSpec s : sensorsList) sensorsJSONObj.add(s.toJSON());
 		for (ActuatSpec a : actuatsList) actuatsJSONObj.add(a.toJSON());
-		for (EdgeSpec e : edgesList) edgesJSONObj.add(e.toJSON());
+//		for (EdgeSpec e : edgesList) edgesJSONObj.add(e.toJSON());
 
 		JSONObject metaList = new JSONObject();
 		//TODO colors + zoomlv need to be in here as well

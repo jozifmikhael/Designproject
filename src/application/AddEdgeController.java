@@ -8,6 +8,7 @@ import java.util.List;
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.EdgeSpec;
 import application._SpecHandler.ModuleSpec;
+import application._SpecHandler.NodeSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -60,9 +61,14 @@ public class AddEdgeController {
 	@FXML
 	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
+		NodeSpec src = null, dst = null;
+		for(NodeSpec n : _SpecHandler.nodesList) {
+			if(n.name.equals(childChoice.getSelectionModel().getSelectedItem())) src = n;
+			if(n.name.equals(parentChoice.getSelectionModel().getSelectedItem())) dst = n;
+		}
 		v = new EdgeSpec(
-				childChoice.getSelectionModel().getSelectedItem(),
-				parentChoice.getSelectionModel().getSelectedItem(),
+				src,
+				dst,
 				edgeType.getText(),
 				Double.parseDouble(latency.getText()),
 				tupleType.getText(),
