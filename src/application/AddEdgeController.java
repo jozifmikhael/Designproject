@@ -3,7 +3,9 @@ package application;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.EdgeSpec;
@@ -13,12 +15,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class AddEdgeController {
+public class AddEdgeController extends Controller implements Initializable{
 	EdgeSpec v;
 	_SpecHandler textfile = new _SpecHandler();
 	
@@ -41,7 +44,7 @@ public class AddEdgeController {
 	private TextField cpuLength;
 	
 	@FXML
-	private TextField nwLength;
+	private TextField newLength;
 	
 	@FXML
 	private TextField edgeType;
@@ -59,8 +62,8 @@ public class AddEdgeController {
 	private ChoiceBox<String> childChoice;
 	
 	@FXML
-	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
+	void saveSpecHandler(ActionEvent event) throws NumberFormatException, IOException {
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		NodeSpec src = null, dst = null;
 		for(NodeSpec n : _SpecHandler.nodesList) {
 			if(n.name.equals(childChoice.getSelectionModel().getSelectedItem())) src = n;
@@ -70,11 +73,12 @@ public class AddEdgeController {
 				src,
 				dst,
 				edgeType.getText(),
-				Double.parseDouble(latency.getText()),
+//				Double.parseDouble(latency.getText()),
+				1.0,
 				tupleType.getText(),
 				Double.parseDouble(periodicity.getText()),
 				Double.parseDouble(cpuLength.getText()),
-				Double.parseDouble(nwLength.getText()),
+				Double.parseDouble(newLength.getText()),
 				Integer.parseInt(direction.getText()));
 		stage.close();
 	}
@@ -99,5 +103,17 @@ public class AddEdgeController {
 		items.addAll(selectedModulesList);
 		parentChoice.setValue(items.get(0));
 		childChoice.setValue(items.get(1));
+	}
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		EdgeSpec edge = (EdgeSpec) _SpecHandler.getSelected("edge");
+		
+	}
+
+	@Override
+	void makeSpec() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -3,8 +3,10 @@ package application;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.ModuleSpec;
@@ -15,9 +17,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
@@ -29,7 +33,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn.CellEditEvent;
 
 
-public class AddModuleController {
+public class AddModuleController extends Controller implements Initializable{
 	ModuleSpec m;
 	_SpecHandler parser;
 	ObservableList<TupleSpec> data = FXCollections.observableArrayList();
@@ -47,8 +51,8 @@ public class AddModuleController {
 	private TextField ram;
 	
 	@FXML
-	private Button saveModule;
-	
+    private ListView<String> nodeList;
+
 	@FXML
 	private TextField bandwidth;
 	
@@ -83,10 +87,46 @@ public class AddModuleController {
 	private Button addTupleMapping;
 	
 	@FXML
-	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveModule.getScene().getWindow();
+	void saveSpecHandler(ActionEvent event) throws NumberFormatException, IOException {
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		makeSpec();
 		stage.close();
+	}
+	
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		ObservableList<String> items = FXCollections.observableArrayList();
+		_SpecHandler.devicesList.forEach(d->items.add(d.name));
+		nodeBox.setItems(items);
+		ModuleSpec module = (ModuleSpec) _SpecHandler.getSelected("module");
+		if(module == null) {
+			moduleName.setText("client");
+			ram.setText("10");
+			bandwidth.setText("100");
+			size.setText("100");
+			mips.setText("100");
+		} else {
+			moduleName.setText(module.name);
+			ram.setText(String.valueOf(module.ram));
+			bandwidth.setText(String.valueOf(module.bandwidth));
+			size.setText(String.valueOf(module.size));
+			mips.setText(String.valueOf(module.mips));
+			module.tupleMappings.forEach(t->data.add(t));
+		}
+		
+		inTuple.setPromptText("In Tuple");
+		outTuple.setPromptText("Out Tuple");
+		fractionalSensitivity.setPromptText("Sensitivity");
+		
+		inTupleColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, String>("inTuple"));		
+		inTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		outTupleColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, String>("outTuple"));
+		outTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+		sensitivityColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, Double>("sensitivity"));
+		sensitivityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+//		inTupleColumn.setText("test");
+		tupleTable.setItems(data);
+		tupleTable.setEditable(true);
 	}
 	
 	void makeSpec(){
@@ -128,41 +168,7 @@ public class AddModuleController {
                 t.getTablePosition().getRow()).setSensitivity(Double.parseDouble(t.getNewValue()));
     }
 	
-	public void initialize() {
-		ObservableList<String> items = FXCollections.observableArrayList();
-		_SpecHandler.devicesList.forEach(d->items.add(d.name));
-		nodeBox.setItems(items);
-		ModuleSpec module = (ModuleSpec) _SpecHandler.getSelected("module");
-		if(module == null) {
-			moduleName.setText("client");
-			ram.setText("10");
-			bandwidth.setText("100");
-			size.setText("100");
-			mips.setText("100");
-		} else {
-			moduleName.setText(module.name);
-			ram.setText(String.valueOf(module.ram));
-			bandwidth.setText(String.valueOf(module.bandwidth));
-			size.setText(String.valueOf(module.size));
-			mips.setText(String.valueOf(module.mips));
-			module.tupleMappings.forEach(t->data.add(t));
-		}
-		
-		inTuple.setPromptText("In Tuple");
-		outTuple.setPromptText("Out Tuple");
-		fractionalSensitivity.setPromptText("Sensitivity");
-		
-		inTupleColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, String>("inTuple"));		
-		inTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		outTupleColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, String>("outTuple"));
-		outTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		sensitivityColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, Double>("sensitivity"));
-		sensitivityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-//		inTupleColumn.setText("test");
-		tupleTable.setItems(data);
-		tupleTable.setEditable(true);
-		
-		
-	}
 	public ModuleSpec getSpec() {return m;}
+
+	
 }

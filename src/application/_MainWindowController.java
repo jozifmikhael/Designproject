@@ -30,7 +30,8 @@ import org.cloudbus.cloudsim.sdn.overbooking.PeProvisionerOverbooking;
 import org.fog.entities.FogBroker;
 import org.fog.entities.FogDevice;
 import org.fog.entities.FogDeviceCharacteristics;
-import org.fog.placement.Controller;
+import application.Controller;
+//import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.policy.AppModuleAllocationPolicy;
@@ -122,7 +123,7 @@ import org.fog.entities.FogDevice;
 import org.fog.entities.FogDeviceCharacteristics;
 import org.fog.entities.Sensor;
 import org.fog.entities.Tuple;
-import org.fog.placement.Controller;
+//import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.placement.ModulePlacementMapping;
@@ -455,18 +456,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		return newNode;
     }
     
-    NodeSpec setupController(String type, int w, int h) {
+    Spec setupController(String type, int w, int h) {
     	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
 		Scene scene = null;
 		try {
-			scene = new Scene(loader.load(),450,320);
+			scene = new Scene(loader.load(),w,h);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		Stage stage = new Stage();
 		stage.setScene(scene);
-		AddDeviceController controller = loader.getController();
-//		controller.initialize();
+		Controller controller = loader.getController();
 		stage.setTitle("Add "+type+" Node");
 		stage.showAndWait();
 		redrawNodes();
@@ -477,86 +477,38 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 450, 320);}
     
     @FXML
-    ModuleSpec addModule() {
-    	try {
-    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("ModuleInputBox.fxml"));
-    		Scene scene = new Scene(dataFXML.load(),800,800);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		AddModuleController controller = dataFXML.getController();
-    		controller.initialize();
-    		stage.setTitle("Add Module");
-    		stage.showAndWait();
-    		ModuleSpec m = controller.getSpec();
-    		redrawNodes();
-    		return m;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
+    ModuleSpec addModule() {return (ModuleSpec) setupController("Module", 800, 800);}
     
     @FXML
-    SensorSpec addSensor() {
-    	try {
-    		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
-    		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		AddSensorController sensorController = addNewSensorLoader.getController();
-    		sensorController.initialize();
-    		stage.setTitle("Add Sensor");
-    		stage.showAndWait();
-    		SensorSpec s = sensorController.getSpec();
-			redrawNodes();
-    		return s;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
+    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 320);}
     
     @FXML
-    ActuatSpec addActuat() {
-    	try {
-    		FXMLLoader loader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
-    		Scene scene = new Scene(loader.load(),500,500);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		ActuatorInputController actuatorController = loader.getController();
-    		actuatorController.initialize();
-    		stage.setTitle("Add Actuator");
-    		stage.showAndWait();
-    		ActuatSpec a = actuatorController.getSpec();
-			redrawNodes();
-    		return a;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
-    }
+    ActuatSpec addActuat() {return (ActuatSpec) setupController("Actuator", 450, 320);}
 
     @FXML
-    EdgeSpec addEdge() {
-	    try {
-			FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("EdgeInputBox.fxml"));
-			Scene scene = new Scene(dataFXML.load(),414,346);
-			Stage stage = new Stage();
-			stage.setScene(scene);
-			AddEdgeController controller = dataFXML.getController();
-			if(selectedNodesList.isEmpty()) controller.populateList(_SpecHandler.modulesList);
-			else controller.setChoices(selectedNodesList);
-			selectedNodesList.removeAll(selectedNodesList);
-			stage.setTitle("Add App Edge");
-			stage.showAndWait();
-    		EdgeSpec v = controller.getSpec();
-    		redrawNodes();
-    		return v;
-		} catch(Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-    }
+    EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
+
+//    @FXML
+//    EdgeSpec addEdge() {
+//	    try {
+//			FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("EdgeInputBox.fxml"));
+//			Scene scene = new Scene(dataFXML.load(),414,346);
+//			Stage stage = new Stage();
+//			stage.setScene(scene);
+//			AddEdgeController controller = dataFXML.getController();
+//			if(selectedNodesList.isEmpty()) controller.populateList(_SpecHandler.modulesList);
+//			else controller.setChoices(selectedNodesList);
+//			selectedNodesList.removeAll(selectedNodesList);
+//			stage.setTitle("Add App Edge");
+//			stage.showAndWait();
+//    		EdgeSpec v = controller.getSpec();
+//    		redrawNodes();
+//    		return v;
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//    }
     
     @FXML
     void editHandler() {

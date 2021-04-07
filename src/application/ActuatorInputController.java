@@ -24,13 +24,15 @@ import javafx.event.EventHandler;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import org.fog.test.perfeval.TextParser;
 
 import application._SpecHandler.DeviceSpec;
 
-public class ActuatorInputController{
+public class ActuatorInputController extends Controller implements Initializable{
 	_SpecHandler textfile = new _SpecHandler();
 	ActuatSpec a;
 	
@@ -43,8 +45,9 @@ public class ActuatorInputController{
 	private TextField actuatLatency;
 	@FXML
 	private ChoiceBox<String> nodeBox;
-	
-	public void initialize() {
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
@@ -60,8 +63,8 @@ public class ActuatorInputController{
 	}
 	
 	@FXML
-	void saveActuatorHandler(ActionEvent event) {
-		Stage stage = (Stage) saveActuator.getScene().getWindow();
+	void saveSpecHandler(ActionEvent event) {
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		a = new ActuatSpec(actuatorName.getText().toString(), nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(actuatLatency.getText()));
 		stage.close();
 		ArrayList<String> types = new ArrayList<String>(); types.add("device");
@@ -70,4 +73,12 @@ public class ActuatorInputController{
 		stage.close();
 	}
 	public ActuatSpec getSpec() {return a;}
+
+	
+
+	@Override
+	void makeSpec() {
+		// TODO Auto-generated method stub
+		
+	}
 }

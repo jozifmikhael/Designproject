@@ -17,7 +17,7 @@
                   <Text layoutX="22.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tuple Type:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="100.05078125" />
                   <Text layoutX="45.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source:" AnchorPane.leftAnchor="45.0" AnchorPane.topAnchor="20.0" />
                   <TextField fx:id="tupleType" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" text="EEG" AnchorPane.topAnchor="96.0" />
-                  <Button fx:id="saveAppEdge" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveAppEdgeHandler" text="Save App Edge" />
+                  <Button fx:id="saveSpec" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save App Edge" />
                   <TextField fx:id="periodicity" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" text="0.0" AnchorPane.topAnchor="136.0" />
                   <TextField fx:id="cpuLength" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" text="3500.0" />
                   <TextField fx:id="newLength" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" text="500.0" />

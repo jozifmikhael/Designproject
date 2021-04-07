@@ -1,8 +1,10 @@
 package application;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -22,7 +25,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.event.EventHandler;
 import application._SpecHandler.SensorSpec;
 
-public class AddSensorController {
+public class AddSensorController extends Controller implements Initializable{
 	SensorSpec s;
 	_SpecHandler parser;
 	
@@ -73,21 +76,21 @@ public class AddSensorController {
 	
 	@FXML
 	void saveDeterministic(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveDeterministic.getScene().getWindow();
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		saveSensor("Deterministic");
 		stage.close();
 	}
 	
 	@FXML
 	void saveNormal(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveNormal.getScene().getWindow();
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		saveSensor("Normal");
 		stage.close();
 	}
 	
 	@FXML
 	void saveUniform(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveUniform.getScene().getWindow();
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		saveSensor("Uniform");
 		stage.close();
 	}
@@ -129,7 +132,16 @@ public class AddSensorController {
 		s.addLink(nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(sensorLatency.getText()));
 	}
 	
-	public void initialize() {
+	void populateList(List<DeviceSpec> devicesList) {
+		ObservableList<String> items = FXCollections.observableArrayList();
+		for(DeviceSpec d : devicesList) items.add(d.name);
+		nodeBox.setItems(items);
+	}
+  	
+	public SensorSpec getSpec() {return s;}
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
 		nodeBox.setItems(items);
@@ -158,13 +170,12 @@ public class AddSensorController {
 				case "Uniform": accord.setExpandedPane(uniformPane); break;
 			}
 		}
+		
 	}
-	
-	void populateList(List<DeviceSpec> devicesList) {
-		ObservableList<String> items = FXCollections.observableArrayList();
-		for(DeviceSpec d : devicesList) items.add(d.name);
-		nodeBox.setItems(items);
+
+	@Override
+	void makeSpec() {
+		// TODO Auto-generated method stub
+		
 	}
-  	
-	public SensorSpec getSpec() {return s;}
 }

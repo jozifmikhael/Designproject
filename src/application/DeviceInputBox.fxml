@@ -18,7 +18,7 @@
                   <Text layoutX="22.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MIPS:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="58.0" />
                   <TextField fx:id="mips" layoutX="103.0" layoutY="64.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="54.0" />
                   <TextField fx:id="ram" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" AnchorPane.topAnchor="96.0" />
-                  <Button fx:id="saveNode" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveNodeHandler" text="Save Node" />
+                  <Button fx:id="saveSpec" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save Node" />
                   <TextField fx:id="upbw" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" />
                   <TextField fx:id="downbw" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" />
                   <TextField fx:id="nodelvl" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" />

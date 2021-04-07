@@ -76,7 +76,7 @@ public class _SpecHandler {
 		for(NodeSpec n: nodesList) if (n.selected) return n;
 		return null;
 	}
-	public static NodeSpec getSelected(String _type) {
+	public static Spec getSelected(String _type) {
 		for(NodeSpec n: nodesList) {
 			if (n.selected && n.type.equals(_type)) {
 				return n;
@@ -89,7 +89,7 @@ public class _SpecHandler {
 		return null;
 	}
 	
-	public static class NodeSpec {
+	public static class NodeSpec extends Spec{
 		double x;
 		double y;
 		double sz;
@@ -414,7 +414,11 @@ public class _SpecHandler {
 		}
 	}
 
-	public static class EdgeSpec {
+	public static abstract class Spec {
+		
+	}
+	
+	public static class EdgeSpec extends Spec{
 		NodeSpec src;
 		NodeSpec dst;
 		//                      int DEVICE = 0;

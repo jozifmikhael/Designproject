@@ -3,6 +3,7 @@ package application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -10,7 +11,9 @@ import javafx.stage.Stage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import org.fog.test.perfeval.TextParser;
 
@@ -19,7 +22,7 @@ import application._SpecHandler.SensorSpec;
 
 import java.io.IOException;
 
-public class AddDeviceController extends Controller {
+public class AddDeviceController extends Controller implements Initializable{
 	DeviceSpec h;
 	DeviceSpec sel;
 	_SpecHandler textfile = new _SpecHandler();
@@ -32,8 +35,6 @@ public class AddDeviceController extends Controller {
 	private TextField mips;
 	@FXML
 	private TextField ram;
-	@FXML
-	private Button saveNode;
 	@FXML
     private TextField upLinkLatency;
 	@FXML
@@ -52,8 +53,8 @@ public class AddDeviceController extends Controller {
     private TextField transmissionTime;
 	
 	@FXML
-	void saveNodeHandler(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveNode.getScene().getWindow();
+	void saveSpecHandler(ActionEvent event) throws NumberFormatException, IOException {
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		
 		if (name.getText().trim().isEmpty()) {name.setText("default_device");}
 		if (parentName.getText().trim().isEmpty()) {parentName.setText("default_parent");}
@@ -72,7 +73,9 @@ public class AddDeviceController extends Controller {
 		System.out.println("Made new dev");
 		stage.close();
 	}
-	public void initialize() {
+	
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
 		sel = (DeviceSpec)_SpecHandler.getSelected("device");
 		if(sel == null) {
 			name.setText("node1");
@@ -87,7 +90,6 @@ public class AddDeviceController extends Controller {
 			idlePower.setText("1.0");
 			return;
 		}
-		
 		sel=(DeviceSpec) sel.pop();
 		name.setText(sel.name);
 		mips.setText(String.valueOf(sel.mips));
@@ -106,9 +108,5 @@ public class AddDeviceController extends Controller {
 		// TODO Auto-generated method stub
 		
 	}
-	@Override
-	void setDefaults() {
-		// TODO Auto-generated method stub
-		
-	}
+
 }
