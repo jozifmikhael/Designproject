@@ -25,6 +25,7 @@ import javafx.event.EventHandler;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.fog.test.perfeval.TextParser;
 
@@ -39,18 +40,35 @@ public class ActuatorInputController{
 	@FXML
 	private TextField actuatorName;
 	@FXML
-	private TextField parentName;
-	@FXML
 	private Button saveActuator;
+	@FXML
+	private TextField actuatLatency;
+	@FXML
+	private ChoiceBox<String> nodeBox;
 	
-    public void initialize() {
-		saveActuator.setDisable(true);
-    }
+	public void initialize() {
+		ObservableList<String> items = FXCollections.observableArrayList();
+		_SpecHandler.devicesList.forEach(d->items.add(d.name));
+		nodeBox.setItems(items);
+
+		ActuatSpec actuat= (ActuatSpec)_SpecHandler.getSelected("actuat");
+		if(actuat == null) {
+			actuatLatency.setText("6.0");
+			actuatorName.setText("actuator1");
+		}else {
+			actuatLatency.setText(String.valueOf(actuat.UpLinklatency));
+			actuatorName.setText(actuat.name);
+		}
+	}
 	
 	@FXML
 	void saveActuatorHandler(ActionEvent event) {
 		Stage stage = (Stage) saveActuator.getScene().getWindow();
-		a = new ActuatSpec(actuatorName.getText().toString(), parentName.getText().toString());
+		a = new ActuatSpec(actuatorName.getText().toString(), nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(actuatLatency.getText()));
+		stage.close();
+		ArrayList<String> types = new ArrayList<String>(); types.add("device");
+		DeviceSpec src = (DeviceSpec) _SpecHandler.getLinkableNodes(types, nodeBox.getSelectionModel().getSelectedItem());
+		if(src != null) src.addLink(actuator_Name, Double.parseDouble(actuatLatency.getText()));
 		stage.close();
 	}
 	public ActuatSpec getSpec() {return a;}

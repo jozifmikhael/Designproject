@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.ModuleSpec;
 import application._SpecHandler.TupleSpec;
@@ -92,7 +93,7 @@ public class AddModuleController {
 				Integer.parseInt(ram.getText()),
 				Long.parseLong(bandwidth.getText()),
 				Long.parseLong(size.getText()), Integer.parseInt(mips.getText()),
-				new ArrayList<TupleSpec>(tupleMappings));
+				tupleMappings);
 		stage.close();
 	}
 	
@@ -153,8 +154,11 @@ public class AddModuleController {
 		outTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		sensitivityColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, Double>("sensitivity"));
 		sensitivityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+//		inTupleColumn.setText("test");
 		tupleTable.setItems(data);
-		tupleTable.setEditable(true);		
+		tupleTable.setEditable(true);
+		
+		
 	}
 	public ModuleSpec getSpec() {return m;}
 }

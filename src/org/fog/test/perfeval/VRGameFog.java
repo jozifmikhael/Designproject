@@ -58,6 +58,7 @@ import org.fog.utils.FogLinearPowerModel;
 import org.fog.utils.FogUtils;
 import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
+import org.fog.utils.distribution.Distribution;
 import org.fog.utils.distribution.NormalDistribution;	
 import org.fog.utils.distribution.UniformDistribution;
 
@@ -168,19 +169,14 @@ public class VRGameFog {
 		double normalStdDev = (double) sensor.get("normalStdDev");
 		double uniformMax = (double) sensor.get("uniformMax");
 		double uniformMin = (double) sensor.get("uniformMin");
-		
-		if(distribution.equals("Deterministic")) {	
-			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new DeterministicDistribution(deterministicValue)); // inter-transmission time of EEG sensor follows a deterministic distribution	
-			sensors.add(newSensor);
+		Distribution dist;
+		switch(distribution) {
+			case "Deterministic": dist = new DeterministicDistribution(deterministicValue);
+			case "Normal": dist = new NormalDistribution(normalMean, normalStdDev);
+			case "Uniform": dist = new UniformDistribution(uniformMin, uniformMax);
+			default: dist = null;
 		}
-		else if(distribution.equals("Normal")) {
-			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new NormalDistribution(normalMean, normalStdDev)); // inter-transmission time of EEG sensor follows a deterministic distribution	
-			sensors.add(newSensor);
-		}
-		else if(distribution.equals("Uniform")) {
-			Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, new UniformDistribution(uniformMin, uniformMax)); // inter-transmission time of EEG sensor follows a deterministic distribution	
-			sensors.add(newSensor);
-		}	
+		Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, dist);
 	}
 		
 	private static void parseActuatorObject(JSONObject actuator) {	

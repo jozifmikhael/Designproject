@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.fog.test.perfeval.TextParser;
 
@@ -66,7 +67,7 @@ public class AddDeviceController {
 				Long.parseLong(upbw.getText()),
 				Long.parseLong(downbw.getText())
 				);
-		
+		h.addLink(parentName.getText(), Double.parseDouble(upLinkLatency.getText()));
 		stage.close();
 	}
 	public void initialize() {

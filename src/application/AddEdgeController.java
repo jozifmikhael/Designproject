@@ -60,7 +60,7 @@ public class AddEdgeController {
 	@FXML
 	void saveAppEdgeHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveAppEdge.getScene().getWindow();
-		v = textfile.new EdgeSpec(
+		v = new EdgeSpec(
 				childChoice.getSelectionModel().getSelectedItem(),
 				parentChoice.getSelectionModel().getSelectedItem(),
 				edgeType.getText(),

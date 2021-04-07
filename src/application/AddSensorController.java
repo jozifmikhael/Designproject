@@ -125,6 +125,8 @@ public class AddSensorController {
 				Double.parseDouble(max.getText()),
 				Double.parseDouble(min.getText()),
 				distType);
+		
+		s.addLink(nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(sensorLatency.getText()));
 	}
 	
 	public void initialize() {

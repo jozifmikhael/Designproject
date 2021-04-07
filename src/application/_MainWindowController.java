@@ -217,100 +217,177 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	
     }
     
-    
-
-	public int state = 1;
-	@Override
-	public void handle(KeyEvent event) {
-//		System.out.print("_MainWindowController.java: KeyPress ");
-		switch (event.getCode()){
-			case ESCAPE : state=0; break;	 // Select Pointer Tool | Escape Menu Without Saving
-			case DIGIT1 : state=1; break;	 // Select Node Placer
-			case DIGIT2 : state=2; break;	 // Select Module Placer
-			case DIGIT3 : state=3; break;	 // Select Edge Placer
-			case DIGIT4 : state=4; break;    // Select Sensor Placer
-			case DIGIT5 : state=5; break;    // Select Actuator Placer
-			case Z 		: System.out.println("Z"); break;	 // Undo Last Action
-			case E 		: System.out.println("E"); break;	 // Edit Object Selected
-			case F5 	: System.out.println("F5"); break;   // Save File
-			case DELETE : System.out.println("Del"); break;  // Delete Object Selected
-			default : {} // Nothing
-		}
-	}
+	public int KeyboardState = 1;
+	
 	public List<String> selectedModulesList = new ArrayList<String>();
     
-	public _SpecHandler specsHandler;
     public void setupListeners(Stage parentStage, Scene scene) {
-        specsHandler = new _SpecHandler();
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
-    	gc = topoField.getGraphicsContext2D();
-		gc.setTextAlign(TextAlignment.CENTER);
-		gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
-    	scene.setOnKeyPressed(this); // uses handle method
-    }
-    
-    @FXML
-	private void mouseScrollHandler(ScrollEvent event) {
-    	specsHandler.shiftPositionsByZoom(event);
+    	gc=topoField.getGraphicsContext2D();
+    	gc.setTextAlign(TextAlignment.CENTER);
+    	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
+    	_SpecHandler.gc=this.gc;
+    	scene.setOnKeyPressed(this);
     }
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		for (EdgeSpec edge : _SpecHandler.edgesList) edge.draw(gc);
-		for (NodeSpec node : _SpecHandler.nodesList) node.draw(gc);
+		_SpecHandler.nodesList.forEach(n->n.drawLink());
+		_SpecHandler.nodesList.forEach(n->n.drawNode());
+		_SpecHandler.editFlag=false;
 	}
 	
 	private String stateToType() {
-		switch(state) {
+		switch(KeyboardState) {
 			case 1: return "device";
 			case 2: return "module";
 			case 3: return "sensor";
-			case 4: return "actuator";
+			case 4: return "actuat";
+			case 5: return "linker";
 			default: return "error";
 		}
 	}
-    
+	
     boolean mouseL=false;
     boolean mouseR=false;
     boolean mouseM=false;
     NodeSpec draggingNode = null;
     NodeSpec linkSrcNode = null;
     NodeSpec selNode = null;
-    @FXML
-	private void mouseClickHandler(MouseEvent mEvent) {
-        mouseL|=mEvent.isPrimaryButtonDown();
-        mouseR|=mEvent.isSecondaryButtonDown();
-        mouseM|=mEvent.isMiddleButtonDown();
-        
-    	if(mouseL) {
-			selNode = specsHandler.getNode(mEvent);
-			if(state==5) linkSrcNode=selNode;
-			else if(selNode==null) draggingNode = new NodeSpec(stateToType(), mEvent);
-			else if(selNode!=null) draggingNode = selNode;
-    	}
-    	if(mouseM) {
-    		screenPanHandler();
-    	}
+
+	@Override
+	public void handle(KeyEvent event) {
+		InteractionState.trySetKey(event.getCode());
+		switch (event.getCode()){
+			case ESCAPE : KeyboardState=0; InteractionState.trySetKey(event.getCode()); break;	 // Select Pointer Tool | Escape Menu Without Saving
+			case DIGIT1 : KeyboardState=1; InteractionState.trySetKey(event.getCode()); break;	 // Select Node Placer
+			case DIGIT2 : KeyboardState=2; InteractionState.trySetKey(event.getCode()); break;	 // Select Module Placer
+			case DIGIT3 : KeyboardState=3; InteractionState.trySetKey(event.getCode()); break;	 // Select Edge Placer
+			case DIGIT4 : KeyboardState=4; InteractionState.trySetKey(event.getCode()); break;    // Select Sensor Placer
+			case DIGIT5 : KeyboardState=5; InteractionState.trySetKey(event.getCode()); break;    // Select Actuator Placer
+			case C		: System.out.println(event.isControlDown()?"C+Ctrl":"C-"); InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;	 // Copy Selected
+			case V		: System.out.println(event.isControlDown()?"C+Ctrl":"V-"); InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;	 // Copy Selected
+			case Z 		: System.out.println(event.isControlDown()?"C+Ctrl":"Z-"); InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;	 // Undo Last Action
+			case E 		: System.out.println("E"); InteractionState.trySetKey(event.getCode()); break;	 // Edit Object Selected
+			case F5 	: System.out.println("F5"); InteractionState.trySetKey(event.getCode()); break;   // Save File
+			case DELETE : System.out.println("Del"); InteractionState.trySetKey(event.getCode()); break;  // Delete Object Selected
+			default : {} // Nothing
+		}
+		execKeyPressTools();
+	}
+	
+	public static enum InteractionState {
+	    LEFT_CLK, MIDDLE_CLK, RIGHT_CLK, NONE;
+		public static KeyCode setKey = KeyCode.ESCAPE;
+		public static InteractionState lastMouseState = NONE;
+		
+		public static boolean trySetKey(KeyCode _key) {
+			if (lastMouseState!=NONE) setKey=_key;
+			return setKey==_key;
+		}
+		public static boolean trySetKey(KeyCode _key, boolean isModifierDown) {
+			if (!isModifierDown) return isModifierDown;
+			if (lastMouseState!=NONE) setKey=_key;
+			return setKey==_key;
+		}
+		public static KeyCode getSetKey() {
+			return setKey;
+		}
+		public static InteractionState checkMouseBtn(boolean isBtnDown, InteractionState checkState) {
+			if(isBtnDown) {lastMouseState = checkState; return checkState;}
+	    	else if(lastMouseState==checkState) {lastMouseState=NONE; return checkState;}
+	    	else return null;
+		}
+	    public static InteractionState checkMouseState(MouseEvent mEvent){
+	    	if(checkMouseBtn(mEvent.isPrimaryButtonDown(), LEFT_CLK)!=null) return LEFT_CLK;
+	    	if(checkMouseBtn(mEvent.isMiddleButtonDown(), MIDDLE_CLK)!=null) return MIDDLE_CLK;
+	    	if(checkMouseBtn(mEvent.isSecondaryButtonDown(), RIGHT_CLK)!=null) return RIGHT_CLK;
+            return NONE;
+	    }
 	}
     
-    private void screenPanHandler() {
-		// TODO Shift the position of everything
-		
+    @FXML
+	private void mouseClickHandler(MouseEvent mEvent) {
+//        mouseL|=mEvent.isPrimaryButtonDown();
+//        mouseR|=mEvent.isSecondaryButtonDown();
+//        mouseM|=mEvent.isMiddleButtonDown();
+//        
+        switch(InteractionState.checkMouseState(mEvent)) {
+			case LEFT_CLK:
+				switch(InteractionState.getSetKey()) {
+					case ESCAPE : draggingNode=selNode;
+					case DIGIT1 : draggingNode=(selNode==null)?new NodeSpec(stateToType(), mEvent):selNode; break;// Select Device Placer
+					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec(stateToType(), mEvent):selNode; break;// Select Module Placer
+					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec(stateToType(), mEvent):selNode; break;// Select Sensor Placer
+					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec(stateToType(), mEvent):selNode; break;// Select Actuat Placer
+					case DIGIT5 : draggingNode=new NodeSpec(stateToType(), mEvent); if(selNode!=null) selNode.addLink(draggingNode); break;
+					default : {} // Nothing
+				}
+				selNode = _SpecHandler.getNode(mEvent);
+				switch(KeyboardState) {
+					case 1: 
+					case 2: 
+					case 3: 
+					case 4: draggingNode=(selNode==null)?new NodeSpec(stateToType(), mEvent):selNode; break;
+					case 5: {
+						if (selNode==null) return;
+						linkSrcNode = selNode;
+						draggingNode=new NodeSpec(stateToType(), mEvent);
+						linkSrcNode.addLink(draggingNode);
+					}
+					default: System.out.println("Error in keyboard state");
+				}
+			break;
+			
+			case MIDDLE_CLK:
+    			screenPanHandler();
+			break;
+				
+			case RIGHT_CLK:
+				//If we have time, make a little right-click menu show with two options: Edit, Delete
+			break;
+			
+			case NONE:
+			break;
+			
+			default:
+			break;
+        }
 	}
-
+    
 	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
+		switch(InteractionState.checkMouseState(mEvent)) {
+			case LEFT_CLK:
+				draggingNode.pop();
+				selNode = _SpecHandler.getNode(mEvent);
+	    		if (selNode!=null) {
+	    			if(KeyboardState==5) {
+	    				linkSrcNode.addLink(selNode);
+	    				
+	    				redrawNodes();
+	    			}
+	    			draggingNode=null; return;
+	    		}
+	    		if(draggingNode!=null) {draggingNode.pop();}
+				NodeSpec newNode = addNodeType(stateToType());
+				if(newNode!=null) newNode.setSelected().setPos(mEvent);
+			break;
+			case MIDDLE_CLK:
+			break;
+			case NONE:
+			break;
+			case RIGHT_CLK:
+			break;
+			default:
+			break;
+		}
+		
     	if(mouseL) {
     		mouseL=false;
-    		if (selNode!=null) {
-    			selNode.setPos(mEvent);
-    			selNode=null; draggingNode=null; return;
-    		}
-    		if(draggingNode!=null) {draggingNode.pop();}
-			NodeSpec newNode = addNodeType(stateToType());
-			if(newNode!=null) newNode.setSelected().setPos(mEvent);
+    		
     	}
     	redrawNodes();
 //    	
@@ -356,6 +433,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			redrawNodes();
     	}
     }
+	
+    private void screenPanHandler() {
+		// TODO Shift the position of everything
+		
+	}
+        
+    @FXML
+	private void mouseScrollHandler(ScrollEvent event) {
+    	_SpecHandler.shiftPositionsByZoom(event);
+    }
     
 	private void screenSizeChangeHandler() {
     	double w=backPane.getWidth(); double h=backPane.getHeight();
@@ -392,7 +479,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
     	String centralNode = getCentralNode();
-     	specsHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
+//     	specsHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
 	}
 	
 	//TODO Change Parse[X] to be methods of the respective classes
@@ -417,6 +504,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			JSONArray edgesList = (JSONArray) jsonObject.get("edges");	
 		}
 	}
+	
     @FXML
     void showOutput(ActionEvent event) {
         try {
@@ -430,6 +518,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
             e.printStackTrace();
         }
     }
+    
     NodeSpec addNodeType(String _type) {
     	NodeSpec newNode = null;
     	if(_type.equals("device")) newNode = addDevice();
@@ -438,14 +527,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		if(_type.equals("actuat")) newNode = addActuat();
 		return newNode;
     }
+    
     @FXML
     ActuatSpec addActuat() {
     	try {
-    		FXMLLoader addNewActuatorLoader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
-    		Scene scene = new Scene(addNewActuatorLoader.load(),264,133);
+    		FXMLLoader loader = new FXMLLoader(getClass().getResource("ActuatorBox.fxml"));
+    		Scene scene = new Scene(loader.load(),500,500);
     		Stage stage = new Stage();
     		stage.setScene(scene);
-    		ActuatorInputController actuatorController = addNewActuatorLoader.getController();
+    		ActuatorInputController actuatorController = loader.getController();
     		actuatorController.initialize();
     		stage.setTitle("Add Actuator");
     		stage.showAndWait();
@@ -461,11 +551,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     DeviceSpec addDevice() {
     	try {
-    		FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
-    		Scene scene = new Scene(addNewNodeLoader.load(),450,320);
+    		FXMLLoader loader = new FXMLLoader(getClass().getResource("DeviceInputBox.fxml"));
+    		Scene scene = new Scene(loader.load(),450,320);
     		Stage stage = new Stage();
     		stage.setScene(scene);
-    		AddDeviceController controller = addNewNodeLoader.getController();
+    		AddDeviceController controller = loader.getController();
     		controller.initialize();
     		stage.setTitle("Add Device Node");
     		stage.showAndWait();
@@ -479,17 +569,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void editHandler(ActionEvent event) {
+    void editHandler() {
     	NodeSpec selectedNode = _SpecHandler.getSelected().pop();
     	if(selectedNode == null) return;
 		NodeSpec tryEditNode = addNodeType(selectedNode.type);
-		if (tryEditNode == null) selectedNode.add();
-		else tryEditNode.setPos(selectedNode);
+		
+		if (tryEditNode != null) {
+			tryEditNode.setPos(selectedNode);
+			_SpecHandler.editFlag=true;
+		} else selectedNode.add();
 		redrawNodes();
     }
     
     @FXML
-    void deleteHandler(ActionEvent event) {
+    void deleteHandler() {
     	_SpecHandler.getSelected().pop();
 		redrawNodes();
     }

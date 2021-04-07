@@ -16,7 +16,7 @@ import org.fog.entities.FogDevice;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import application._SpecHandler.TupleSpec;
+import application._SpecHandler.DeviceSpec;
 //import application.SetupJSONParser.dispNode;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
@@ -37,13 +37,8 @@ public class _SpecHandler {
 	static int fontSize = 16;
 	static String font = "monospaced";
 	
-	public int canLink(NodeSpec _nodeSrc, NodeSpec _nodeDst) {
-		if (_nodeSrc.type.equals("device")&&_nodeDst.type.equals("device")) return 1;
-		else if (_nodeSrc.type.equals("module")&&_nodeDst.type.equals("module")) return 2;
-		else if (_nodeSrc.type.equals("sensor")&&_nodeDst.type.equals("module")) return 3;
-		else if (_nodeSrc.type.equals("module")&&_nodeDst.type.equals("actuator")) return 4;
-		else return 0;
-	}
+	
+	static GraphicsContext gc=null;
 	
 	static Color deviceColor=Color.RED;
 	static Color moduleColor=Color.CYAN;
@@ -53,7 +48,7 @@ public class _SpecHandler {
 	static List<Color> validColors=Arrays.asList(deviceColor, moduleColor, sensorColor, actuatorColor, transpColor);
 	static Color _errorColor=Color.GREEN;
 	
-	public void shiftPositionsByZoom(ScrollEvent event) {
+	public static void shiftPositionsByZoom(ScrollEvent event) {
     	double minZoom=0.25; double maxZoom=1.5; double zoomStep=0.05;
     	double preZoom=zoomFactor;
     	zoomFactor+=(event.getDeltaY()>0)?zoomStep:-zoomStep;
@@ -63,7 +58,7 @@ public class _SpecHandler {
     	nodesList.forEach((d)->{d.x-=(d.x-event.getX())*2*(1-zoomRatio); d.y-=(d.y-event.getY())*2*(1-zoomRatio);});
     }
 	
-	public NodeSpec getNode(MouseEvent mEvent) {
+	public static NodeSpec getNode(MouseEvent mEvent) {
 		NodeSpec selNode = null;
 		for(NodeSpec n : nodesList) if(Math.pow(Math.pow(n.x-mEvent.getX(),2)+Math.pow(n.y-mEvent.getY(),2),0.5)<=0.5*n.sz*zoomFactor) selNode=n;
 		if (selNode==null) return null;
@@ -81,7 +76,8 @@ public class _SpecHandler {
 		return null;
 	}
 	public static NodeSpec getLinkableNodes(ArrayList<String> types, String _name) {
-		return (NodeSpec) nodesList.stream().filter(n->n.name.equals(_name)).filter(n->types.contains(n.type));
+		for(NodeSpec n: nodesList) if (n.name.equals(_name)&&types.contains(n.type)) return n;
+		return null;
 	}
 	
 	public static class NodeSpec {
@@ -95,10 +91,6 @@ public class _SpecHandler {
 		ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
 		
-		public String getName() {
-			return this.name;
-		}
-
 		public NodeSpec(double x, double y, String name, String type) {
 			this.x = x;
 			this.y = y;
@@ -120,17 +112,23 @@ public class _SpecHandler {
 					+ type + ", selected=" + selected;
 		}
 		
-		private void setColor() {
+		NodeSpec setColor() {
 			if (this.type==null) this.nodeColor=_errorColor;
 			else if(this.type.equals("device")) this.nodeColor=deviceColor;
 			else if(this.type.equals("module")) this.nodeColor=moduleColor;
 			else if(this.type.equals("sensor")) this.nodeColor=sensorColor;
 			else if(this.type.equals("actuat")) this.nodeColor=actuatorColor;
-			else if(this.type.equals("link")) this.nodeColor=transpColor;
+			else if(this.type.equals("linker")) this.nodeColor=transpColor;
 			else this.nodeColor=_errorColor;
+			return this;
 		}
 		
-		void draw(GraphicsContext gc) {
+		void drawLink() {
+			if (editFlag) edgesList.stream().filter(e->e.dst!=null).collect(Collectors.toList());
+			edgesList.forEach(e->e.draw(gc));
+		}
+		
+		void drawNode() {
 			if (validColors.contains(this.nodeColor)) gc.setFill(this.nodeColor);
 			else gc.setFill(_errorColor);
 			gc.fillOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
@@ -138,11 +136,11 @@ public class _SpecHandler {
 				gc.setStroke(this.selected?Color.BLUE:Color.BLACK);
 				gc.setLineWidth(this.selected?10.0:1.0);
 				gc.strokeOval(this.x-0.5*this.sz*zoomFactor, this.y-0.5*this.sz*zoomFactor, this.sz*zoomFactor, this.sz*zoomFactor);
+			}else {
+				System.out.println("There's a transp node");
 			}
 			gc.setStroke(Color.BLACK); gc.setLineWidth(1.0);
 			gc.strokeText(this.name, this.x, this.y+0.4*fontSize);
-			if (editFlag) edgesList.stream().filter(e->e.dst!=null).collect(Collectors.toList());
-			edgesList.forEach(e->e.draw(gc));
 		}
 		
 		NodeSpec setPos(MouseEvent mEvent) {
@@ -153,23 +151,52 @@ public class _SpecHandler {
 			this.x=_node.x; this.y=_node.y;
 			return this;
 		}
-		public NodeSpec pop() {
+		NodeSpec pop() {
 			nodesList.remove(this);
 			assocList.remove(this);
 			return this;
 		}
-		public NodeSpec add() {
+		NodeSpec add() {
 			if(!(nodesList.stream().anyMatch(a->a.name.equals(this.name)))) nodesList.add(this);
 			if(!(assocList.stream().anyMatch(a->a.name.equals(this.name)))) assocList.add(this);
 			return this;
 		}
-		public NodeSpec setSelected() {
+		NodeSpec setSelected() {
 			NodeSpec possiblePrev = getSelected();
 			if (possiblePrev!=null) possiblePrev.selected=false;
 			this.selected = true;
 			System.out.println(this.toString());
 			return this;
 		}
+		
+		ArrayList<String> linkableDestinations() {
+            ArrayList<String> linkables = new ArrayList<String>();
+            if (this.type.equals("device")) linkables.add("device");
+            else if (this.type.equals("module")){
+                linkables.add("module");
+                linkables.add("actuat");
+                linkables.add("device");
+            }
+            else if (this.type.equals("sensor")) {
+                linkables.add("module");
+                linkables.add("device");
+            }
+            return linkables;
+        }
+		
+        NodeSpec addLink(NodeSpec _dst) {
+            EdgeSpec e = new EdgeSpec(this, _dst, 0);
+            _dst.edgesList.add(e);
+            return this;
+        }
+		
+        NodeSpec addLink(String _dst, double UpLinkLatency) {
+            NodeSpec dst = _SpecHandler.getLinkableNodes(linkableDestinations(), _dst);
+            if (dst==null) return this;
+            EdgeSpec e = new EdgeSpec(this, dst, UpLinkLatency);
+            dst.edgesList.add(e);
+            return this;
+        }
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
@@ -334,16 +361,18 @@ public class _SpecHandler {
 	}
 	
 	public static class ActuatSpec extends NodeSpec {
+		public double UpLinklatency;
 		
-		public ActuatSpec(String name, String type) {
-			super(name, "actuat");
-		}
+        public ActuatSpec(String name, String type, double UpLinklatency) {
+            super(name, "actuat");
+            this.UpLinklatency = UpLinklatency;
+        }
 		
 		@Override
 		public String toString() {
 			return "x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",type=" + type;
 		}
-
+		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {	
 			JSONObject obj = new JSONObject();
@@ -354,12 +383,11 @@ public class _SpecHandler {
 				String[] actuatorSplit2 = actuatorSplit[i].split("=");
 				obj.put(actuatorSplit2[0], actuatorSplit2[1]);
 			}
-
 			return obj;	
 		}
 	}
 
-	public class EdgeSpec {
+	public static class EdgeSpec {
 		NodeSpec src;
 		NodeSpec dst;
 		//                      int DEVICE = 0;
@@ -411,6 +439,7 @@ public class _SpecHandler {
 			this.nwLength = newLength;
 			this.direction = direction;
 		}
+		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {this(src.name, dst.name, "0", latency, "null", 0, 0, 0, 0);}
 		
 		void draw(GraphicsContext gc) {
 			gc.beginPath();
@@ -419,25 +448,7 @@ public class _SpecHandler {
 			gc.stroke();
 		}
 	}
-	
-//	void moduleFromJSON(JSONObject obj) {
-//		System.out.println("test");
-//		JSONArray tupleMaps = (JSONArray) obj.get("tupleMaps");
-//		tupleMaps.forEach(n -> tupleFromJSON((JSONObject) n));
-//		ModuleSpec m = new ModuleSpec((String) obj.get("nodeName"), Long.parseUnsignedLong((String) obj.get("size")),
-//				Long.parseUnsignedLong((String) obj.get("bandwidth")),Integer.parseUnsignedInt((String) obj.get("bandwidth")),
-//				Double.parseDouble((String)obj.get("x")), (String) obj.get("name"), Double.parseDouble((String)obj.get("y")), 
-//				Integer.parseUnsignedInt((String) obj.get("MIPS")), new ArrayList<TupleSpec>(tempTupleList));
-//		tempTupleList.clear();
-//	}
-//	
-//	void tupleFromJSON(JSONObject obj) {
-//		TupleSpec t = new TupleSpec((String) obj.get("inTuple"),
-//				(String) obj.get("inTuple"),
-//				(Double) obj.get("sensitivity"));
-//		tempTupleList.add(t);
-//	}
-	
+		
 	public ArrayList<TupleSpec> tempTupleList = new ArrayList<TupleSpec>();
 	public static class TupleSpec{
 		SimpleStringProperty  inTuple;
