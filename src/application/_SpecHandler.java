@@ -476,13 +476,13 @@ public class _SpecHandler {
 	
 	public ArrayList<TupleSpec> tempTupleList = new ArrayList<TupleSpec>();
 	public static class TupleSpec{
-		SimpleStringProperty  inTuple;
-		SimpleStringProperty  outTuple;
+		String  inTuple;
+		String  outTuple;
 		double fractionalSensitivity;
 		
 		@Override
 		public String toString() {
-			return "inTuple=" + inTuple.get() + ",outTuple=" + outTuple.get() + ",fractionalSensitivity=" + fractionalSensitivity;
+			return "inTuple=" + inTuple + ",outTuple=" + outTuple + ",fractionalSensitivity=" + fractionalSensitivity;
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -497,16 +497,16 @@ public class _SpecHandler {
 			return obj;	
 		}
 		public String getInTuple() {
-			return inTuple.get();
+			return inTuple;
 		}
 		public void setInTuple(String inTuple) {
-			this.inTuple.set(inTuple); 
+			this.inTuple =inTuple; 
 		}
 		public String getOutTuple() {
-			return outTuple.get();
+			return outTuple;
 		}
 		public void setOutTuple(String outTuple) {
-			this.outTuple.set(outTuple); 
+			this.outTuple = outTuple; 
 		}
 		public double getSensitivity() {
 			return fractionalSensitivity;
@@ -516,8 +516,8 @@ public class _SpecHandler {
 		}
 		
 		public TupleSpec(String  inTuple, String  outTuple, double fractionalSensitivity) {
-			this.inTuple = new SimpleStringProperty(inTuple);
-			this.outTuple = new SimpleStringProperty(outTuple);
+			this.inTuple = inTuple;
+			this.outTuple = outTuple;
 			this.fractionalSensitivity = fractionalSensitivity;
 		}
 	}

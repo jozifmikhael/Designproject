@@ -8,6 +8,7 @@ import java.util.List;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.ModuleSpec;
+import application._SpecHandler.NodeSpec;
 import application._SpecHandler.TupleSpec;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -33,6 +34,7 @@ public class AddModuleController {
 	ModuleSpec m;
 	_SpecHandler parser;
 	ObservableList<TupleSpec> data = FXCollections.observableArrayList();
+	ObservableList<NodeSpec> nodeData = FXCollections.observableArrayList();
 	
 	@FXML
 	private TextField nodeName;
@@ -79,8 +81,23 @@ public class AddModuleController {
 	@FXML
 	private TableColumn<TupleSpec, Double> sensitivityColumn;
 	
+	@FXML  
+	private TableView<NodeSpec> nodeTable;
+	
+	@FXML
+	private TableColumn<NodeSpec, String> nodeColumn;
+	
 	@FXML
 	private Button addTupleMapping;
+	
+	@FXML
+	private Button addNodeButton;
+	
+	@FXML
+	private Button deleteNodeButton;
+	
+	@FXML
+	private Button deleteButton;
 	
 	@FXML
 	void saveModuleHandler(ActionEvent event) throws NumberFormatException, IOException {
@@ -89,6 +106,23 @@ public class AddModuleController {
 		stage.close();
 	}
 	
+	@FXML
+	void addNodeHandler(ActionEvent event) {
+		String name = nodeBox.getSelectionModel().getSelectedItem();
+		nodeData.add(new NodeSpec(name, ""));
+		nodeTable.refresh();
+	}
+	@FXML
+    void deleteNodeHandler(ActionEvent event) {	
+    }
+	@FXML
+    void addTupleMap(ActionEvent event) {
+		data.add(new TupleSpec(inTuple.getText(),outTuple.getText(),Double.parseDouble(fractionalSensitivity.getText())));
+		inTuple.clear();
+		outTuple.clear();
+		fractionalSensitivity.clear();
+		tupleTable.refresh();
+    }
 	void makeSpec(){
 		ArrayList<TupleSpec> tupleMappings = new ArrayList<TupleSpec>();
 		for(TupleSpec t: data)tupleMappings.add(t);
@@ -101,13 +135,7 @@ public class AddModuleController {
 				tupleMappings);
 	}
 	
-	@FXML
-    void addTupleMap(ActionEvent event) {
-		data.add(new TupleSpec(inTuple.getText(),outTuple.getText(),Double.parseDouble(fractionalSensitivity.getText())));
-		inTuple.clear();
-		outTuple.clear();
-		fractionalSensitivity.clear();
-    }
+	
 	
 	@FXML
     public void inTupleEdit(CellEditEvent<TupleSpec, String> t) {
@@ -123,9 +151,8 @@ public class AddModuleController {
     }
 	
 	@FXML
-    public void sensitivityEdit(CellEditEvent<TupleSpec, String> t) {
-        t.getTableView().getItems().get(
-                t.getTablePosition().getRow()).setSensitivity(Double.parseDouble(t.getNewValue()));
+    public void sensitivityEdit(CellEditEvent<TupleSpec, Double> t) {
+        ((TupleSpec) t.getTableView().getItems().get(t.getTablePosition().getRow())).setSensitivity(Double.valueOf(t.getNewValue()));
     }
 	
 	public void initialize() {
@@ -147,21 +174,43 @@ public class AddModuleController {
 			mips.setText(String.valueOf(module.mips));
 			module.tupleMappings.forEach(t->data.add(t));
 		}
-		
+		//inputelems.foreach(e->{e.setCellValueFactory(new PropertyValueFactory <>(varName)); e.setCellFactory(TextFieldTableCell.forTableColumn(converter));};
 		inTuple.setPromptText("In Tuple");
 		outTuple.setPromptText("Out Tuple");
-		fractionalSensitivity.setPromptText("Sensitivity");
+		fractionalSensitivity.setPromptText("Sensitivity");	
 		
-		inTupleColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, String>("inTuple"));		
+		inTupleColumn.setCellValueFactory(new PropertyValueFactory <>("inTuple"));
 		inTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		outTupleColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, String>("outTuple"));
+		outTupleColumn.setCellValueFactory(new PropertyValueFactory <>("outTuple"));
 		outTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-		sensitivityColumn.setCellValueFactory(new PropertyValueFactory<TupleSpec, Double>("sensitivity"));
+		sensitivityColumn.setCellValueFactory(new PropertyValueFactory <>("sensitivity"));
 		sensitivityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+		nodeColumn.setCellValueFactory(new PropertyValueFactory <>("name"));
+		nodeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 //		inTupleColumn.setText("test");
+		nodeTable.setItems(nodeData);
 		tupleTable.setItems(data);
 		tupleTable.setEditable(true);
+		deleteButton.setOnAction(e -> {
+		    Object selectedItem = tupleTable.getSelectionModel().getSelectedItem();
+		    tupleTable.getItems().remove(selectedItem);
+		});
+		addNodeButton.setOnAction(e -> {
+			String name = nodeBox.getSelectionModel().getSelectedItem();
+			nodeData.add(new NodeSpec(0, 0, name, ""));
+			items.remove(nodeBox.getSelectionModel().getSelectedItem());
+			nodeBox.getSelectionModel().clearSelection();
+			nodeBox.valueProperty().set(null);	
+		});
 		
+		deleteNodeButton.setOnAction(e -> {
+			Object selectedNode = nodeTable.getSelectionModel().getSelectedItem();
+			NodeSpec tempNode = nodeTable.getSelectionModel().getSelectedItem();
+			items.add(tempNode.name);
+			nodeTable.getItems().remove(selectedNode);
+			nodeBox.getSelectionModel().clearSelection();
+			nodeBox.valueProperty().set(null);
+		});
 		
 	}
 	public ModuleSpec getSpec() {return m;}

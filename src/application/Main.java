@@ -15,6 +15,8 @@ import javafx.fxml.FXMLLoader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.fog.test.perfeval.VRGameFog_src;
 
@@ -28,14 +30,18 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			List<String> placementPolicyList = new ArrayList<String>();
+			placementPolicyList.add("Cloudward");
+	    	placementPolicyList.add("Edgeward");
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("_MainWindow.fxml"));
 			BorderPane root = (BorderPane)loader.load();
-			Scene scene = new Scene(root,900,500);
+			Scene scene = new Scene(root,1250,700);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			_MainWindowController controller = (_MainWindowController)loader.getController();
 			controller.setupListeners(primaryStage, scene);
-			
+
 			primaryStage.setScene(scene);
+			controller.populateList(placementPolicyList);	
 			primaryStage.setTitle("Policy Placement Application");
 			primaryStage.show();
 		} catch(Exception e) {

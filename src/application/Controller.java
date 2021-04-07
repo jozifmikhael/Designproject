@@ -12,12 +12,14 @@ public abstract class Controller {
 	ObservableList<?> data = FXCollections.observableArrayList();
 	abstract void initialize();
 	abstract void setDefaults();
-	abstract void makeSpec();
 	
 	@FXML
 	void saveSpecHandler() {
 		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		makeSpec();
 		stage.close();
+	}
+	void makeSpec() {
+		//getAllTextFields.foreach(t->(get(t.name)=t.val));
 	}
 }

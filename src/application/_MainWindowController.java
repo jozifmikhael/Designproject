@@ -52,11 +52,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -204,12 +208,25 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private AnchorPane backPane;
     
+    @FXML
+    private ChoiceBox<String> PolicyChoiceMain;
+    
+    @FXML
+    private Button previewButton;
+    
+    @FXML
+    private TreeTableView<String> tableView;
+    
+    @FXML
+    private TreeTableColumn<String, String> col1;
+    
     ////////////////////////////////////////////////////////////////////////////
     
 //	double R=50;
 	double xCenter=100;
 	double yCenter=100;
-	
+
+	public static String policyType;
     GraphicsContext gc;
     
     @Override
@@ -325,10 +342,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
-					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
-					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
-					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
-					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
+//					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
+//					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
+//					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
+//					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
 					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode); _SpecHandler.pruneLinks(); break;
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
@@ -448,14 +465,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	NodeSpec newNode = null;
     NodeSpec addNodeType(String _type) {
-    	if(_type.equals("device")) newNode = addDevice();
-		if(_type.equals("module")) newNode = addModule();
-		if(_type.equals("sensor")) newNode = addSensor();
-		if(_type.equals("actuat")) newNode = addActuat();
+//    	if(_type.equals("device")) newNode = addDevice();
+//		if(_type.equals("module")) newNode = addModule();
+//		if(_type.equals("sensor")) newNode = addSensor();
+//		if(_type.equals("actuat")) newNode = addActuat();
 		return newNode;
     }
     
-    NodeSpec setupController(String type, int w, int h) {
+    void setupController(String type, int w, int h) throws IOException {
     	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
 		Scene scene = null;
 		try {
@@ -465,17 +482,22 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		}
 		Stage stage = new Stage();
 		stage.setScene(scene);
-		AddDeviceController controller = loader.getController();
+
+		BorderPane root = (BorderPane)loader.load();
+		Controller controller = loader.getController();
+		ObservableList<Node> test=root.getChildren();
+		test.forEach(n->System.out.println(n.toString()));
 //		controller.initialize();
 		stage.setTitle("Add "+type+" Node");
 		stage.showAndWait();
 		redrawNodes();
-		return controller.getSpec();
     }
-
+//
     @FXML
-    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 450, 320);}
-    
+    DeviceSpec addDevice() {
+//    	return (DeviceSpec) setupController("Device", 450, 320);
+    	}
+//    
     @FXML
     ModuleSpec addModule() {
     	try {
@@ -502,6 +524,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		FXMLLoader addNewSensorLoader = new FXMLLoader(getClass().getResource("SensorBox.fxml"));
     		Scene scene = new Scene(addNewSensorLoader.load(),450,400);
     		Stage stage = new Stage();
+    		
     		stage.setScene(scene);
     		AddSensorController sensorController = addNewSensorLoader.getController();
     		sensorController.initialize();
@@ -579,6 +602,23 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void deleteHandler() {
     	_SpecHandler.getSelected().pop();
 		redrawNodes();
+    }
+	
+	void populateList(List<String> str_list) {
+		System.out.println(str_list);
+		ObservableList<String> items = FXCollections.observableArrayList();
+		items.addAll(str_list);
+		System.out.println(items);
+		PolicyChoiceMain.setItems(items);
+ 		PolicyChoiceMain.setValue(items.get(0));
+	}
+    
+    @FXML
+    void savePolicyHandler(ActionEvent event) {
+    	if (PolicyChoiceMain.getSelectionModel().getSelectedItem() == null
+				|| PolicyChoiceMain.getSelectionModel().getSelectedItem().trim().isEmpty()) {			
+			PolicyChoiceMain.setValue("Edgewards");
+		} else policyType = PolicyChoiceMain.getSelectionModel().getSelectedItem().toString();
     }
     
     
