@@ -171,8 +171,8 @@ public class AddModuleController extends Controller implements Initializable{
 		//inputelems.foreach(e->{e.setCellValueFactory(new PropertyValueFactory <>(varName)); e.setCellFactory(TextFieldTableCell.forTableColumn(converter));};
 		inTuple.setPromptText("In Tuple");
 		outTuple.setPromptText("Out Tuple");
-		fractionalSensitivity.setPromptText("Sensitivity");	
-		
+		fractionalSensitivity.setPromptText("Sensitivity"); 
+
 		inTupleColumn.setCellValueFactory(new PropertyValueFactory <>("inTuple"));
 		inTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		outTupleColumn.setCellValueFactory(new PropertyValueFactory <>("outTuple"));

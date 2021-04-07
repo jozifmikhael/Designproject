@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class LinkLatencyInputController {
-	static double LinkLatencyValue = 2.0;
+	double latency = 2.0;
 
     @FXML
     private ResourceBundle resources;
@@ -18,7 +18,7 @@ public class LinkLatencyInputController {
     private URL location;
 
     @FXML
-    private TextField doubleLatency;
+    private TextField UpLinkLatency;
 
     @FXML
     private Button setLinkLatency;
@@ -26,17 +26,15 @@ public class LinkLatencyInputController {
     @FXML
     void saveLinkLatency(ActionEvent event) {
     	Stage stage = (Stage) setLinkLatency.getScene().getWindow();
-    	if (doubleLatency.getText() == null || doubleLatency.getText().trim().isEmpty()) LinkLatencyValue = 1;
-		else LinkLatencyValue = Double.parseDouble(doubleLatency.getText());
-		System.out.println("Link Latency is: " + LinkLatencyValue + " \n");
+    	if (UpLinkLatency.getText().trim().isEmpty())latency = 2.0;
+    	else latency = Double.parseDouble(UpLinkLatency.getText());
     	stage.close();
-
     }
 
     @FXML
     void initialize() {
-        assert doubleLatency != null : "fx:id=\"doubleLatency\" was not injected: check your FXML file 'LinkLatencyInputBox.fxml'.";
-        assert setLinkLatency != null : "fx:id=\"setLinkLatency\" was not injected: check your FXML file 'LinkLatencyInputBox.fxml'.";
-
+    	
     }
+    
+    public double getLatency() {return latency;}
 }

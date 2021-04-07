@@ -363,6 +363,21 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         redrawNodes();
 	}
     
+    private NodeSpec makeReqLink(NodeSpec src, NodeSpec dst) {
+		//check the types of the src and dst and call the full edge controller or the mini one
+    	System.out.println();
+		if(!_SpecHandler.nodesList.contains(src) && !_SpecHandler.nodesList.contains(dst)) return null;
+		if((src.type.equals("device") && dst.type.equals("device")) 
+				||(src.type.equals("sensor") && dst.type.equals("device"))
+				||(src.type.equals("device") && dst.type.equals("actuat"))) {
+			double latency = addDeviceLink();
+			src.addLink(dst.name, latency);
+		}else if(src.type.equals("module") && dst.type.equals("module")) {
+			EdgeSpec e = addEdge();
+		}
+		return src;
+	}
+    
 	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
 		switch(InteractionState.getMouseState(mEvent)) {
@@ -376,7 +391,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
 					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
 					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
-					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode); _SpecHandler.pruneLinks(); break;
+					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:makeReqLink(linkSrcNode,selNode); _SpecHandler.pruneLinks(); break;
+
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
 				}
@@ -394,14 +410,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	redrawNodes();
 	}
 	
-	private EdgeSpec makeReqLink(NodeSpec src, NodeSpec dst) {
-		//check the types of the src and dst and call the full edge controller or the mini one
-		return null;
-	}
-	
-    @FXML
+	@FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
-    	if (!draggingNode.selected) draggingNode.setSelected();
+    	if (draggingNode != null&&!draggingNode.selected) draggingNode.setSelected();
     	if(draggingNode != null) {
     		draggingNode.setPos(mEvent);
 			redrawNodes();
@@ -412,7 +423,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		// TODO Shift the position of everything
 		
 	}
-        
+    
     @FXML
 	private void mouseScrollHandler(ScrollEvent event) {
     	_SpecHandler.shiftPositionsByZoom(event);
@@ -532,7 +543,25 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
     @FXML
     EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
-    
+    @FXML
+    double addDeviceLink() {
+    	try {
+    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+    		Scene scene = new Scene(dataFXML.load(),414,139);
+    		Stage stage = new Stage();
+    		stage.setScene(scene);
+    		LinkLatencyInputController controller = dataFXML.getController();
+    		controller.initialize();
+    		stage.setTitle("Set Latency");
+    		stage.showAndWait();
+    		double latency = controller.getLatency();
+    		redrawNodes();
+    		return latency;
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		return 0.0;
+    	}
+    }
     @FXML
     void editHandler() {
 		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
