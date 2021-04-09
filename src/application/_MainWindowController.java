@@ -247,17 +247,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-    	printDebug("test");
+    	printDebug("Empty initialize function ran");
     }
 	
 	public List<String> selectedNodesList = new ArrayList<String>();
-
-	Map<String, FXMLLoader> loadersList = new HashMap<String, FXMLLoader>();
+	Map<String, URL> loadersList = new HashMap<String, URL>();
 	
     public void setupListeners(Stage parentStage, Scene scene) {
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
+    	
+    	//TODO Do the other menu items like this
+    	addDeviceMenu.setOnAction(e->setupController("device"));
+    	
     	gc=topoField.getGraphicsContext2D();
     	gc.setTextAlign(TextAlignment.CENTER);
     	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
@@ -273,8 +276,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
  		PolicyChoiceMain.setValue(PolicyChoiceMain.getItems().get(0));
  		
  		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
- 				s->loadersList.put(s, new FXMLLoader(getClass().getResource("UI_"+s+".fxml"))));
+ 				s->loadersList.put(s, getClass().getResource("UI_"+s+".fxml")));
+ 		printDebug("setupListeners ran\n");
     }
+    
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
@@ -514,28 +519,55 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		return newNode;
     }
     
+//    Spec setupController(String type, int w, int h) {
+//    	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
+//		Scene scene = null;
+//		try {
+//			scene = new Scene(loader.load(),w,h);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		Stage stage = new Stage();
+//		stage.setScene(scene);
+//		Controller controller = loader.getController();
+//		stage.setTitle("Add "+type+" Node");
+//		stage.showAndWait();
+//		redrawNodes();
+//		return controller.getSpec();
+//    }
+    
     Spec setupController(String type) {
+//    	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
+		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
-			System.out.println(type);
-			Controller controller = loadersList.get(type).getController();
-			Parent newRoot = loadersList.get(type).load();
-			Scene scene = new Scene(newRoot);
+			Scene scene = new Scene(loader.load());
+			Controller controller = loader.getController();
 			Stage stage = new Stage();
-			if(controller==null||newRoot==null||scene==null||stage==null) {
-				System.out.println("Error in resource loading");
-				return null;
-			}
 			stage.setScene(scene);
-			stage.setTitle("Add "+type+" Node");
+			
+			Spec temp = _SpecHandler.defaultDevice;
+			controller.spec=temp;
+			controller.init();
+			
+			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
+			    switch(event.getCode().getCode()) {
+			    	case 116: controller.makeSpec(); break;
+			        default:  {}
+			    }
+			});
+
+			
+			stage.setOnCloseRequest(e -> stage.close());
+			
 			stage.showAndWait();
 			redrawNodes();
-			return controller.getSpec();
+			return temp;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
     }
-
+    
 //    @FXML
 //    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 800, 800);}
 //    @FXML

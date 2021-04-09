@@ -217,7 +217,6 @@ public class AddModuleController extends Controller implements Initializable{
 			nodeBox.getSelectionModel().clearSelection();
 			nodeBox.valueProperty().set(null);
 		});
-		
 	}
 	public ModuleSpec getSpec() {return m;}
 }

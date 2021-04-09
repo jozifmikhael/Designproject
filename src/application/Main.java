@@ -22,27 +22,22 @@ import org.fog.test.perfeval.VRGameFog_src;
 
 public class Main extends Application {
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting...");
+//		System.out.println("Starting...");
 //		new VRGameFog_src("test6.json");
-		launch(args);
+		launch();
 	}
-	
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			List<String> placementPolicyList = new ArrayList<String>();
-			placementPolicyList.add("Cloudward");
-	    	placementPolicyList.add("Edgeward");
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("_MainWindow.fxml"));
-			BorderPane root = (BorderPane)loader.load();
-			Scene scene = new Scene(root,1250,700);
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("UI__MainWindow.fxml"));
+			Scene scene = new Scene(loader.load());
+			
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			_MainWindowController controller = (_MainWindowController)loader.getController();
+			
 			controller.setupListeners(primaryStage, scene);
-
 			primaryStage.setScene(scene);
-			primaryStage.setTitle("Policy Placement Application");
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

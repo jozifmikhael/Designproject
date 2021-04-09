@@ -25,7 +25,7 @@
                   <Canvas fx:id="topoField" height="657.0" layoutX="-1.0" layoutY="1.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="936.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="0.0" />
                   <Pane layoutY="113.0" prefHeight="323.0" prefWidth="123.0" style="-fx-background-color: #e8e8e8;" styleClass="pane">
                      <children>
-                        <Button fx:id="deleteButton1" layoutX="14.0" layoutY="20.0" mnemonicParsing="false" onAction="#deleteHandler" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Node (1)" textFill="WHITE">
+                        <Button layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Node (1)" textFill="WHITE">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
                                  <color>
@@ -44,7 +44,7 @@
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <Button fx:id="editButton1" layoutX="14.0" layoutY="80.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#editHandler" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Module (2)" textFill="WHITE">
+                        <Button fx:id="editButton1" layoutX="14.0" layoutY="80.0" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Module (2)" textFill="WHITE">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
                                  <color>
@@ -63,7 +63,7 @@
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <Button fx:id="previewButton1" layoutX="14.0" layoutY="140.0" mnemonicParsing="false" onAction="#savePolicyHandler" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Sensor (3)" textFill="WHITE">
+                        <Button fx:id="previewButton1" layoutX="14.0" layoutY="140.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Sensor (3)" textFill="WHITE">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
                                  <color>
@@ -79,7 +79,7 @@
                               </DropShadow>
                            </effect>
                         </Button>
-                        <Button fx:id="previewButton11" layoutX="14.0" layoutY="200.0" mnemonicParsing="false" onAction="#savePolicyHandler" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Actuator (4)" textFill="WHITE">
+                        <Button fx:id="previewButton11" layoutX="14.0" layoutY="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Actuator (4)" textFill="WHITE">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
                                  <color>
@@ -95,7 +95,7 @@
                               </DropShadow>
                            </effect>
                         </Button>
-                        <Button fx:id="previewButton111" layoutX="14.0" layoutY="260.0" mnemonicParsing="false" onAction="#savePolicyHandler" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Edge (5)" textFill="WHITE">
+                        <Button fx:id="previewButton111" layoutX="14.0" layoutY="260.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Edge (5)" textFill="WHITE">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
                                  <color>
@@ -146,10 +146,10 @@
                 <Menu mnemonicParsing="false" text="Edit">
                   <items>
                         <MenuItem fx:id="popNodemenu" mnemonicParsing="false" text="Delete" />
-                    <MenuItem fx:id="resetCacheMenu" mnemonicParsing="false" onAction="#resetCache" text="Reset All Devices" />
-                        <MenuItem fx:id="addNodeMenu" mnemonicParsing="false" onAction="#addDevice" text="Add Node" />
-                        <MenuItem fx:id="addModuleMenu" mnemonicParsing="false" onAction="#addModule" text="Add Module" />
-                        <MenuItem fx:id="addEdgeMenu" mnemonicParsing="false" onAction="#addEdge" text="Add Edge" />
+                    <MenuItem fx:id="resetCacheMenu" mnemonicParsing="false" text="Reset All Devices" />
+                        <MenuItem fx:id="addDeviceMenu" mnemonicParsing="false" text="Add Node" />
+                        <MenuItem fx:id="addModuleMenu" mnemonicParsing="false" text="Add Module" />
+                        <MenuItem fx:id="addEdgeMenu" mnemonicParsing="false" text="Add Edge" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -220,7 +220,7 @@
                         </DropShadow>
                      </effect>
                   </ChoiceBox>
-                  <Button fx:id="previewButton" layoutX="565.0" layoutY="29.0" mnemonicParsing="false" onAction="#savePolicyHandler" prefHeight="40.0" prefWidth="110.0" style="-fx-background-color: #e8e8e8;" text="Preview">
+                  <Button fx:id="previewButton" layoutX="565.0" layoutY="29.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" style="-fx-background-color: #e8e8e8;" text="Preview">
                      <effect>
                         <DropShadow offsetX="6.0" offsetY="6.0">
                            <color>

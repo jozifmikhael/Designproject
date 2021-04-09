@@ -183,9 +183,6 @@ public class _SpecHandler {
 			System.out.println("Setter called with : " + _d);
 		}
 		DeviceSpec d;
-		public static DeviceSpec getDefD() {
-			return defaultDevice;
-		}
 	}
 	
 	public static class NodeSpec extends Spec {
