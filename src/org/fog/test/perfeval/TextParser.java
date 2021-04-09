@@ -135,6 +135,42 @@ public class TextParser {
 	//newQuery.ofType("PLAYER_GAME_STATE").ofDst("wherever");
 	
 	public class TupleSpec{
+		public String getTupleType() {
+			return tupleType;
+		}
+		public void setTupleType(String tupleType) {
+			this.tupleType = tupleType;
+		}
+		public String getTupleSrc() {
+			return tupleSrc;
+		}
+		public void setTupleSrc(String tupleSrc) {
+			this.tupleSrc = tupleSrc;
+		}
+		public String getTupleDst() {
+			return tupleDst;
+		}
+		public void setTupleDst(String tupleDst) {
+			this.tupleDst = tupleDst;
+		}
+		public double getTupleNWLatency() {
+			return tupleNWLatency;
+		}
+		public void setTupleNWLatency(double tupleNWLatency) {
+			this.tupleNWLatency = tupleNWLatency;
+		}
+		public double getTupleSentTime() {
+			return tupleSentTime;
+		}
+		public void setTupleSentTime(double tupleSentTime) {
+			this.tupleSentTime = tupleSentTime;
+		}
+		public double getTupleArrivTime() {
+			return tupleArrivTime;
+		}
+		public void setTupleArrivTime(double tupleArrivTime) {
+			this.tupleArrivTime = tupleArrivTime;
+		}
 		@Override
 		public String toString() {
 			return "TupleSpec [tupleType=" + tupleType + ", tupleSrc=" + tupleSrc + ", tupleDst=" + tupleDst
@@ -144,6 +180,8 @@ public class TextParser {
 		String tupleType;
 		String tupleSrc; 
 		String tupleDst;
+		String tupleSrcDev;
+		String tupleDstDev;
 		double tupleNWLatency;
 		double tupleSentTime;
 		double tupleArrivTime;
@@ -167,8 +205,17 @@ public class TextParser {
 			this.tupleNWLatency = arrivalTime-sentTime;
 			globalTuplesList.add(this);
 		}
-		
-		
+		public TupleSpec(String tupleType, String tupleSRC, String tupleDEST, String srcdev, String dstdev, double sentTime, double arrivalTime) {
+			this.tupleType = tupleType;
+			this.tupleSrc = tupleSRC;
+			this.tupleDst = tupleDEST;
+			this.tupleSentTime = sentTime;
+			this.tupleArrivTime = arrivalTime;
+			this.tupleNWLatency = arrivalTime-sentTime;
+			this.tupleSrcDev=srcdev;
+			this.tupleDstDev=dstdev;
+			globalTuplesList.add(this);
+		}
 	}
 	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
 		this.new TupleSpec(tupleType, tupleSRC, tupleDEST, sentTime, arrivalTime);

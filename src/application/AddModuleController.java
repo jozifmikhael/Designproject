@@ -86,6 +86,12 @@ public class AddModuleController extends Controller implements Initializable{
 	@FXML  
 	private TableView<NodeSpec> nodeTable;
 	
+	@FXML  
+	private TableView<NodeSpec> nodeTable1;
+	
+	@FXML
+	private TableColumn<NodeSpec, String> nodeColumn1;
+	
 	@FXML
 	private TableColumn<NodeSpec, String> nodeColumn;
 	
@@ -109,7 +115,9 @@ public class AddModuleController extends Controller implements Initializable{
 	}
 	@FXML
     void deleteNodeHandler(ActionEvent event) {	
-    }
+    
+	}
+	
 	@FXML
     void addTupleMap(ActionEvent event) {
 		data.add(new TupleSpec(inTuple.getText(),outTuple.getText(),Double.parseDouble(fractionalSensitivity.getText())));
@@ -118,6 +126,7 @@ public class AddModuleController extends Controller implements Initializable{
 		fractionalSensitivity.clear();
 		tupleTable.refresh();
     }
+	
 	void makeSpec(){
 		ArrayList<TupleSpec> tupleMappings = new ArrayList<TupleSpec>();
 		for(TupleSpec t: data)tupleMappings.add(t);
@@ -152,6 +161,7 @@ public class AddModuleController extends Controller implements Initializable{
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		ObservableList<String> items = FXCollections.observableArrayList();
 		_SpecHandler.devicesList.forEach(d->items.add(d.name));
+		
 		nodeBox.setItems(items);
 		ModuleSpec module = (ModuleSpec) _SpecHandler.getSelected("module");
 		if(module == null) {

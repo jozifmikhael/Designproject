@@ -3,7 +3,9 @@ package application;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.EdgeSpec;
@@ -13,12 +15,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class AddEdgeController {
+public class AddEdgeController extends Controller implements Initializable{
 	EdgeSpec v;
 	_SpecHandler textfile = new _SpecHandler();
 	
@@ -99,5 +102,17 @@ public class AddEdgeController {
 		items.addAll(selectedModulesList);
 		parentChoice.setValue(items.get(0));
 		childChoice.setValue(items.get(1));
+	}
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	void makeSpec() {
+		// TODO Auto-generated method stub
+		
 	}
 }

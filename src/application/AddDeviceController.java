@@ -1,17 +1,25 @@
 package application;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.text.Format.Field;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -19,6 +27,7 @@ import org.fog.test.perfeval.TextParser;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.EdgeSpec;
+import application._SpecHandler.NodeSpec;
 import application._SpecHandler.SensorSpec;
 
 import java.io.IOException;
@@ -27,79 +36,80 @@ public class AddDeviceController extends Controller implements Initializable {
 	DeviceSpec h;
 	DeviceSpec sel;
 	_SpecHandler textfile = new _SpecHandler();
+	ObservableList<DeviceSpec> nodeData = FXCollections.observableArrayList();
+	ObservableList<NodeSpec> tempData = FXCollections.observableArrayList();
 	
 	@FXML
-	private TextField name;
-	@FXML
-	private TextField parentName;
-	@FXML
-	private TextField mips;
-	@FXML
-	private TextField ram;
-	@FXML
-	private TextField upLinkLatency;
-	@FXML
-	private TextField upbw;
-	@FXML
-	private TextField downbw;
-	@FXML
-	private TextField nodelvl;
-	@FXML
-	private TextField ratePerMIPS;
-	@FXML
-	private TextField busyPower;
-	@FXML
-	private TextField idlePower;
-	@FXML
-	private TextField transmissionTime;
+    private BorderPane bp;
+
+    @FXML
+    private AnchorPane ap;
+
+    @FXML
+    private Button saveSpec;
+
+    @FXML
+    private TableView<?> name;
+
+    @FXML
+    private TableView<?> upbw;
+
+    @FXML
+    private TableView<?> apower;
+
+    @FXML
+    private TableView<?> mips;
+
+    @FXML
+    private TableView<?> downbw;
+
+    @FXML
+    private TableView<?> ipower;
+
+    @FXML
+    private TableView<?> ram;
+
+    @FXML
+    private TableView<?> rate;
+
+    @FXML
+    private TableView<?> latency;
+
+    @FXML
+    private TableView<?> pe;
+
+    @FXML
+    void addNodeHandler(ActionEvent event) {
+    }
 	
 	@FXML
 	void saveSpecHandler(ActionEvent event) throws NumberFormatException, IOException {
 		Stage stage = (Stage) saveSpec.getScene().getWindow();
 		
-		if (name.getText().trim().isEmpty()) {
-			name.setText("default_device");
-		}
-		if (parentName.getText().trim().isEmpty()) {
-			parentName.setText("default_parent");
-		}
-		h = new DeviceSpec(name.getText().toString(), parentName.getText().toString(), 0,
-				Long.parseLong(mips.getText()), Integer.parseInt(ram.getText()), Integer.parseInt(nodelvl.getText()),
-				Double.parseDouble(ratePerMIPS.getText()), Double.parseDouble(idlePower.getText()),
-				Double.parseDouble(busyPower.getText()), Double.parseDouble(upLinkLatency.getText()),
-				Long.parseLong(upbw.getText()), Long.parseLong(downbw.getText()));
-		h.addLink(parentName.getText(), Double.parseDouble(upLinkLatency.getText()));
-		System.out.println("Made new dev");
-		stage.close();
+		System.out.println(_SpecHandler.defaultDevice.toString());
+        ap.getChildren().stream().forEach(selTable->{
+            if(selTable instanceof TableView) {
+                TableColumn selCols = (TableColumn) (((TableView) selTable).getColumns().get(0));
+                ((TableView) selTable).setEditable(true);
+                selCols.setCellValueFactory(new PropertyValueFactory <>(selTable.getId()));
+                selCols.setCellFactory(TextFieldTableCell.forTableColumn());
+            }
+        });
+//        stage.close();
 	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		sel = (DeviceSpec) _SpecHandler.getSelected("device");
-		if (sel == null) {
-			name.setText("node1");
-			mips.setText("1500");
-			ram.setText("10240");
-			upLinkLatency.setText("2.0");
-			upbw.setText("850");
-			downbw.setText("850");
-			nodelvl.setText("1");
-			ratePerMIPS.setText("50.0");
-			busyPower.setText("3.0");
-			idlePower.setText("1.0");
-			return;
-		}
-		sel = (DeviceSpec) sel.pop();
-		name.setText(sel.name);
-		mips.setText(String.valueOf(sel.mips));
-		ram.setText(String.valueOf(sel.ram));
-		for(EdgeSpec e : sel.edgesList) if(e.dst.type.equals("device"))upLinkLatency.setText(String.valueOf(e.latency));
-		upbw.setText(String.valueOf(sel.upbw));
-		downbw.setText(String.valueOf(sel.downbw));
-		nodelvl.setText(String.valueOf(sel.level));
-		ratePerMIPS.setText(String.valueOf(sel.rate));
-		busyPower.setText(String.valueOf(sel.apower));
-		idlePower.setText(String.valueOf(sel.ipower));
+		tempData.add(_SpecHandler.defaultDevice);
+        ap.getChildren().stream().forEach(selTable->{
+            if(selTable instanceof TableView) {
+                ((TableView) selTable).setItems(tempData);
+                TableColumn selCols = (TableColumn) (((TableView) selTable).getColumns().get(0));
+                ((TableView) selTable).setEditable(true);
+                selCols.setCellValueFactory(new PropertyValueFactory <>(selTable.getId()));
+                selCols.setCellFactory(TextFieldTableCell.forTableColumn());
+            }
+        });
 	}
 	
 	public DeviceSpec getSpec() {
@@ -113,3 +123,4 @@ public class AddDeviceController extends Controller implements Initializable {
 	}
 	
 }
+

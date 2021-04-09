@@ -20,6 +20,7 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.scene.control.ChoiceBox;
 import javafx.event.EventHandler;
@@ -75,25 +76,21 @@ public class AddSensorController extends Controller implements Initializable{
 	private TitledPane uniformPane;
 	
 	@FXML
-	void saveDeterministic(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveDeterministic.getScene().getWindow();
-		saveSensor("Deterministic");
+	void saveSpecHandler(ActionEvent event) throws NumberFormatException, IOException {
+		Stage stage = (Stage) saveSpec.getScene().getWindow();
+		
+		if (deterministicPane.isExpanded()) saveSensor("Deterministic"); 
+		else if (normalPane.isExpanded())	saveSensor("Normal");
+		else if (uniformPane.isExpanded())	saveSensor("Uniform");
 		stage.close();
 	}
 	
 	@FXML
-	void saveNormal(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveNormal.getScene().getWindow();
-		saveSensor("Normal");
-		stage.close();
-	}
-	
-	@FXML
-	void saveUniform(ActionEvent event) throws NumberFormatException, IOException {
-		Stage stage = (Stage) saveUniform.getScene().getWindow();
-		saveSensor("Uniform");
-		stage.close();
-	}
+    void checkPane(MouseEvent event) {
+		if ((!deterministicPane.isExpanded()) && (!normalPane.isExpanded()) && (!uniformPane.isExpanded()))
+			saveSpec.setDisable(true);
+		else saveSpec.setDisable(false);
+    }
 	
 	void saveSensor(String distType) {
 		if(distType.equals("Deterministic")) {
@@ -131,6 +128,7 @@ public class AddSensorController extends Controller implements Initializable{
 		
 		s.addLink(nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(sensorLatency.getText()));
 	}
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		ObservableList<String> items = FXCollections.observableArrayList();

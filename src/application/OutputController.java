@@ -2,29 +2,44 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
+import org.fog.test.perfeval.TextParser.TupleSpec;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import application._SpecHandler.NodeSpec;
+//import application._SpecHandler.jank;
+import org.fog.test.perfeval.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.*;
 
-public class OutputController {
+public class OutputController implements Initializable{
 	private static List<Energy> Energylist = new ArrayList<Energy>();
 	private static List<String> nodeList = new ArrayList<String>();
 	private static List<Double> timeNetworkList = new ArrayList<Double>();
@@ -33,13 +48,57 @@ public class OutputController {
 	public List<XYChart.Series> seriesList = new ArrayList<XYChart.Series>();
 	
 	static String sourceFile="output.json";
-	
 	@FXML
-	private StackedAreaChart EnergyConsumption;
-	
-	@FXML
-	private LineChart NetworkUsage;
-	
+    private AnchorPane backPane;
+
+    @FXML
+    private Canvas graphArea;
+
+    @FXML
+    private StackedAreaChart<?, ?> EnergyConsumption;
+
+    @FXML
+    private AnchorPane backPane1;
+
+    @FXML
+    private Canvas graphArea1;
+
+    @FXML
+    private LineChart<?, ?> NetworkUsage;
+
+    @FXML
+    private TableView<TupleSpec> tupleTable;
+
+    @FXML
+    private TableColumn<TupleSpec, String> checkCol;
+    
+    @FXML
+    private TableColumn<TupleSpec, String> sourceDevCol;
+
+    @FXML
+    private TableColumn<TupleSpec, String> sourceModCol;
+
+    @FXML
+    private TableColumn<TupleSpec, String> destDevCol;
+
+    @FXML
+    private TableColumn<TupleSpec, String> destModCol;
+
+    @FXML
+    private TableColumn<TupleSpec, String> typleCol;
+
+    @FXML
+    private TableColumn<TupleSpec, String> timeCol;
+
+    @FXML
+    private ChoiceBox<?> sourceChoiceBox;
+
+    @FXML
+    private ChoiceBox<?> destinationChoiceBox;
+
+    @FXML
+    private Button addButton;
+
 	public static class Energy{
 		String name;
 		private List<Double> timeList = new ArrayList<Double>();
@@ -67,7 +126,7 @@ public class OutputController {
 	}
     
 	@FXML
-    void ParsingEnergy() throws IOException, ParseException {
+    void ParseEnergy() throws IOException, ParseException {
     	JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(sourceFile);
         Object obj = jsonParser.parse(reader);
@@ -76,11 +135,11 @@ public class OutputController {
         nodeArr.forEach(l -> parseNodeData((JSONObject) l));
         JSONArray timeE = (JSONArray) nodeList.get("listEnergy");
         timeE.forEach(l -> parsetimeEData((JSONObject) l));
-        EnergyConsuptionGraph();
+        EnergyConsumptionGraph();
     }
 	
 	@FXML
-    void ParsingNetwork() throws IOException, ParseException {
+    void ParseNetwork() throws IOException, ParseException {
     	JSONParser jsonParser = new JSONParser();
 		FileReader reader = new FileReader(sourceFile);
         Object obj = jsonParser.parse(reader);
@@ -119,6 +178,8 @@ public class OutputController {
 		}
 	}
 	
+	double time_=0;
+	double networkUsage_;
 	private void parseNetworkUsage(JSONObject link){
 		double time = (double) link.get("time");
 		double networkUsage = (double) link.get("networkUsage");
@@ -136,8 +197,7 @@ public class OutputController {
 	}
 	
 	@FXML
-	void EnergyConsuptionGraph() {
-
+	void EnergyConsumptionGraph() {
 		final NumberAxis xAxis = new NumberAxis();
 	    final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Time");
@@ -191,4 +251,62 @@ public class OutputController {
     		e.printStackTrace();
     	}
     }
+    
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		System.out.println("In init");
+		try {
+			ParseEnergy();
+			ParseNetwork();
+			psParseLatency();
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void psParseLatency() {
+		ObservableList<TupleSpec> tempData = FXCollections.observableArrayList();
+//		String tupleType;
+//		String tupleSrc; 
+//		String tupleDst;
+//		double tupleNWLatency;
+//		double tupleSentTime;
+//		double tupleArrivTime;
+//	    checkCol sourceDevCol sourceModCol destDevCol destModCol typleCol timeCol
+		//String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime
+//		PLAYER_GAME_STATE ---> 1.171428573130893
+//		EEG ---> 4.099993792751119
+//		CONCENTRATION ---> 0.12893009140234982
+//		_SENSOR ---> 0.566240448301607
+//		GLOBAL_GAME_STATE ---> 0.04575000214585016
+		TextParser t = new TextParser();
+    	tempData.add(t.new TupleSpec("PLAYER_GAME_STATE ", "Concentration-Calculator", "Connector", "Gateway-0", "Cloud", 0, 0.09056122448938758));
+    	tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor0", "mobile-0", 0, 5.003540903540709));
+    	tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor1", "mobile-1", 0, 5.003540903540709));
+    	tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor2", "mobile-2", 0, 5.003540903540709));
+    	tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor0", "mobile-0", 0, 8.81658119658707));
+    	tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor1", "mobile-1", 0, 8.81658119658707));
+    	tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor2", "mobile-2", 0, 8.81658119658707));
+    	tempData.add(t.new TupleSpec("CONCENTRATION ", "concentration_calculator", "client", "gateway-0", "mobile-0", 0, 0.30730012210177815));
+    	tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-0", 0, 0.2668171658911005));
+    	tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-1", 0, 0.2668171658911005));
+    	tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-2", 0, 0.2668171658911005));
+    	tupleTable.setItems(tempData);
+    	typleCol.setCellValueFactory(new PropertyValueFactory <>("tupleType"));
+    	typleCol.setCellFactory(TextFieldTableCell.forTableColumn());
+//    	timeCol.setCellValueFactory(new PropertyValueFactory <>("arrivalTime"));
+//    	timeCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    	destModCol.setCellValueFactory(new PropertyValueFactory <>("tupleDst"));
+    	destModCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    	sourceModCol.setCellValueFactory(new PropertyValueFactory <>("tupleSrc"));
+    	sourceModCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    	timeCol.setCellValueFactory(new PropertyValueFactory <>("arrivalTime"));
+    	timeCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    	destDevCol.setCellValueFactory(new PropertyValueFactory <>("tupleDest"));
+    	destDevCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    	sourceDevCol.setCellValueFactory(new PropertyValueFactory <>("tupleSRC"));
+    	sourceDevCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    	
+	}
 }

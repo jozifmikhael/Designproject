@@ -77,6 +77,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.EdgeSpec;
+import application._SpecHandler.NodeSpec;
 //import application.SetupJSONParser.dispNode;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
@@ -90,6 +92,7 @@ public class _SpecHandler {
 	public static ArrayList<ActuatSpec> actuatsList = new ArrayList<ActuatSpec>();
 	public static ArrayList<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
 	public static ArrayList<NodeSpec> nodesList = new ArrayList<NodeSpec>();
+	public static NodeSpec defaultDevice = new DeviceSpec("whate", "tt", 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
 	
 	static double R = 50;
 	static double zoomFactor = 1;
@@ -105,6 +108,13 @@ public class _SpecHandler {
 	static Color transpColor = Color.TRANSPARENT;
 	static List<Color> validColors = Arrays.asList(deviceColor, moduleColor, sensorColor, actuatorColor, transpColor);
 	static Color _errorColor = Color.GREEN;
+	
+	public static void shiftPositionsByPan(MouseEvent event) {
+		nodesList.forEach(d -> {
+			d.x -= (d.x - event.getX());
+			d.y -= (d.y - event.getY());
+		});
+	}
 	
 	public static void shiftPositionsByZoom(ScrollEvent event) {
 		double minZoom = 0.25;
@@ -134,6 +144,37 @@ public class _SpecHandler {
 		return selNode.setSelected();
 	}
 	
+	public static EdgeSpec getLink(MouseEvent mEvent) {
+		for (NodeSpec n : nodesList) {
+			for (EdgeSpec l : n.edgesList)
+			if((mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)
+					||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
+					||(mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
+					||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)) {
+				double m = (l.src.y - l.dst.y)/(l.src.x - l.dst.x);
+				if(l.src.x - l.dst.x == 0) {
+					if(Math.abs(mEvent.getX()-l.dst.x) <= 10) System.out.println("selected link");return l.setSelected();
+				}
+				else if(l.src.y - l.dst.y == 0) {
+					if(Math.abs(mEvent.getY()-l.dst.y) <= 10) System.out.println("selected link");return l.setSelected();
+				}
+				else {
+					double bLink = (l.dst.y - (m*l.dst.x));
+					double mTemp = -(1/m);
+					double bTemp = mEvent.getY() - (mTemp * mEvent.getX());
+					double xLine = (bTemp - bLink)/(m - mTemp);
+					double yLine = m * xLine + bLink;
+					double distance = Math.sqrt(Math.pow(xLine - mEvent.getX(), 2) + Math.pow(yLine - mEvent.getY(),2));
+					if(distance <= 10) {
+						System.out.println("selected link");
+						return l.setSelected();					
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	public static void pruneLinks() {
 		for (NodeSpec n : nodesList)
 			n.edgesList = (ArrayList<EdgeSpec>) n.edgesList.stream().filter(e -> e.dst != null)
@@ -144,7 +185,9 @@ public class _SpecHandler {
 	}
 	
 	public static void deselectAll() {
-		nodesList.forEach(n -> n.selected = false);
+		nodesList.forEach(n -> {
+			n.selected = false;
+		});
 	}
 	
 	public static NodeSpec getSelected() {
@@ -171,6 +214,22 @@ public class _SpecHandler {
 	}
 	
 	public static class NodeSpec extends Spec {
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
 		double x;
 		double y;
 		double sz;
@@ -247,7 +306,12 @@ public class _SpecHandler {
 		}
 		
 		void drawLink() {
-			this.edgesList.forEach(e -> e.draw(gc));
+			this.edgesList.forEach(e -> {
+				e.draw(gc);
+				gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
+				gc.setLineWidth(this.selected ? 10.0 : 1.0);
+				System.out.println(e.selected);
+			});
 		}
 		
 		void drawNode() {
@@ -334,10 +398,82 @@ public class _SpecHandler {
 				return this;
 			this.edgesList.add(new EdgeSpec(this, dst, UpLinkLatency));
 			return this;
-		}
+		}		
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
+		public String getPe() {
+			return pe+"";
+		}
+
+		public void setPe(int pe) {
+			this.pe = pe;
+		}
+
+		public String getMips() {
+			return mips+"";
+		}
+
+		public void setMips(long mips) {
+			this.mips = mips;
+		}
+
+		public String getRam() {
+			return ram+"";
+		}
+
+		public void setRam(int ram) {
+			this.ram = ram;
+		}
+
+		public String getRate() {
+			return rate+"";
+		}
+
+		public void setRate(double rate) {
+			this.rate = rate;
+		}
+
+		public String getIpower() {
+			return ipower+"";
+		}
+
+		public void setIpower(double ipower) {
+			this.ipower = ipower;
+		}
+
+		public String getApower() {
+			return apower+"";
+		}
+
+		public void setApower(double apower) {
+			this.apower = apower;
+		}
+
+		public String getLatency() {
+			return latency+"";
+		}
+
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+
+		public String getUpbw() {
+			return upbw+"";
+		}
+
+		public void setUpbw(long upbw) {
+			this.upbw = upbw;
+		}
+
+		public String getDownbw() {
+			return downbw+"";
+		}
+
+		public void setDownbw(long downbw) {
+			this.downbw = downbw;
+		}
+
 		@SuppressWarnings("unchecked")
 		public DeviceSpec(String name, String parent, int pe, long mips, int ram, int level, double rate, double ipower,
 				double apower, double latency, long upbw, long downbw) {
@@ -367,6 +503,47 @@ public class _SpecHandler {
 		long upbw;
 		long downbw;
 		
+		
+		FogDevice addToApp() {	
+			List<Pe> peList = new ArrayList<Pe>();
+			
+			// 3. Create PEs and add these into a list.
+			peList.add(new Pe(0, new PeProvisionerOverbooking(this.mips))); // need to store Pe id and MIPS Rating
+			
+			int hostId = FogUtils.generateEntityId();
+			long storage = 1000000; // host storage
+			int bw = 10000;
+			PowerHost host = new PowerHost(hostId, new RamProvisionerSimple(this.ram), new BwProvisionerOverbooking(bw),
+					storage, peList, new StreamOperatorScheduler(peList),
+					new FogLinearPowerModel(this.apower, this.ipower));
+			List<Host> hostList = new ArrayList<Host>();
+			hostList.add(host);
+			String arch = "x86"; // system architecture
+			String os = "Linux"; // operating system
+			String vmm = "Xen";
+			double time_zone = 10.0; // time zone this resource located
+			double cost = 3.0; // the cost of using processing in this resource
+			double costPerMem = 0.05; // the cost of using memory in this resource
+			double costPerStorage = 0.001; // the cost of using storage in this
+											// resource
+			double costPerBw = 0.0; // the cost of using bw in this resource
+			LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
+			// devices by now
+			FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(arch, os, vmm, host, time_zone,
+					cost, costPerMem, costPerStorage, costPerBw);
+			FogDevice fogdevice = null;
+			try {
+				fogdevice = new FogDevice(this.name, characteristics, new AppModuleAllocationPolicy(hostList),
+						storageList, 10, this.upbw, this.downbw, 0, this.rate);
+				System.out.println(fogdevice.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			fogdevice.setLevel(this.level);
+			return fogdevice;
+		}
+		
 		@Override
 		public String toString() {
 			return "pe=" + pe + ", mips=" + mips + ", ram=" + ram + ", level=" + level + ", rate=" + rate + ", ipower="
@@ -375,46 +552,7 @@ public class _SpecHandler {
 					+ type + ", selected=" + selected;
 		}
 		
-//		private static FogDevice addToApp(this.name, this.mips, this.ram, this.upbw, this.downbw, this.level,
-//				this.rate, this.apower, this.ipower) {
-//			
-//			List<Pe> peList = new ArrayList<Pe>();
-//			
-//			// 3. Create PEs and add these into a list.
-//			peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-//			
-//			int hostId = FogUtils.generateEntityId();
-//			long storage = 1000000; // host storage
-//			int bw = 10000;
-//			PowerHost host = new PowerHost(hostId, new RamProvisionerSimple(ram), new BwProvisionerOverbooking(bw),
-//					storage, peList, new StreamOperatorScheduler(peList),
-//					new FogLinearPowerModel(busyPower, idlePower));
-//			List<Host> hostList = new ArrayList<Host>();
-//			hostList.add(host);
-//			String arch = "x86"; // system architecture
-//			String os = "Linux"; // operating system
-//			String vmm = "Xen";
-//			double time_zone = 10.0; // time zone this resource located
-//			double cost = 3.0; // the cost of using processing in this resource
-//			double costPerMem = 0.05; // the cost of using memory in this resource
-//			double costPerStorage = 0.001; // the cost of using storage in this
-//											// resource
-//			double costPerBw = 0.0; // the cost of using bw in this resource
-//			LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
-//			// devices by now
-//			FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(arch, os, vmm, host, time_zone,
-//					cost, costPerMem, costPerStorage, costPerBw);
-//			FogDevice fogdevice = null;
-//			try {
-//				fogdevice = new FogDevice(nodeName, characteristics, new AppModuleAllocationPolicy(hostList),
-//						storageList, 10, upBw, downBw, 0, ratePerMips);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			
-//			fogdevice.setLevel(level);
-//			return fogdevice;
-//		}
+
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
@@ -603,12 +741,20 @@ public class _SpecHandler {
 //		public static final int DOWN = 2; //I THINK this is dst->src
 //		public static final int ACTUATOR = 3; //I THINK src->actuator
 		int direction = 1;
+		boolean selected = false;
 		
 		@Override
 		public String toString() {
 			return "src=" + src.name + ",dst=" + dst.name + ",edgeType=" + edgeType + ",latency=" + latency
 					+ ",tupleType=" + tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength
 					+ ",nwLength=" + nwLength + ",direction=" + direction;
+		}
+		
+		EdgeSpec setSelected() {
+			deselectAll();
+			this.selected = true;
+//			System.out.println(this.toString()+this.toStringLinks());
+			return this;
 		}
 		
 		@SuppressWarnings("unchecked")

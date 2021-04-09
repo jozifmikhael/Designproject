@@ -257,6 +257,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	_SpecHandler.gc=this.gc;
     	scene.setOnKeyPressed(this);
     }
+    
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
@@ -269,7 +270,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     NodeSpec draggingNode = null;
     NodeSpec linkSrcNode = null;
     NodeSpec selNode = null;
-    
+    EdgeSpec selLink = null;
 	@Override
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
@@ -279,6 +280,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //			case Z 	: System.out.println(event.isControlDown()?"C+Ctrl":"Z-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Undo Last Action
 			default : keySetSuccess=InteractionState.trySetKey(event.getCode());
 		}
+		
 		if(!keySetSuccess) return;
 		switch (InteractionState.getSetKey()){
 			case ESCAPE	: _SpecHandler.deselectAll(); break;
@@ -345,6 +347,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case LEFT_BTN:
 				draggingNode=null;
 				selNode = _SpecHandler.getNode(mEvent);
+				selLink = _SpecHandler.getLink(mEvent);		
 				if (selNode!=null) selNode.setSelected();
 				switch(InteractionState.getSetKey()) {
 					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
@@ -352,10 +355,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec("module", mEvent):selNode; break;// Select Module Placer
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
 					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec("actuat", mEvent):selNode; break;// Select Actuat Placer
-					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(draggingNode);break;
+					case DIGIT5 : 
+						draggingNode=new NodeSpec("linker", mEvent); 
+						linkSrcNode=(selNode==null)?null:selNode.addLink(draggingNode);
+						if (selNode==null) {						
+							selLink.setSelected();
+						}
+						break;
 					default : {} // Nothing
 				} break;
-			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
+			case MIDDLE_BTN: screenPanHandler(mEvent); break; //TODO Screen panning is pretty necessary
 			case RIGHT_BTN: break; //TODO If we have time, make a little right-click menu show with two options: Edit, Delete
 			case NONE: System.out.println("_MainWindowController.java: ClickHandler Error - State NONE"); break;
 			default: System.out.println("_MainWindowController.java: ClickHandler Error - State Default"); break;
@@ -371,12 +380,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				NodeSpec newNode = null;
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selNode = _SpecHandler.getNode(mEvent);
+				selLink =  _SpecHandler.getLink(mEvent);
 				switch(InteractionState.getSetKey()) {
 					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
 					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
 					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
 					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
-					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode); _SpecHandler.pruneLinks(); break;
+					case DIGIT5 : 
+						linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode);
+						_SpecHandler.pruneLinks();
+						if (selNode==null) {						
+							selLink.setSelected();
+						}
+						break;
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
 				}
@@ -408,8 +424,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
 	
-    private void screenPanHandler() {
+    private void screenPanHandler(MouseEvent mEvent) {
 		// TODO Shift the position of everything
+    	_SpecHandler.shiftPositionsByPan(mEvent);	
 		
 	}
         
@@ -525,7 +542,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     ModuleSpec addModule() {return (ModuleSpec) setupController("Module", 800, 800);}
     
     @FXML
-    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 320);}
+    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 500);}
     
     @FXML
     ActuatSpec addActuat() {return (ActuatSpec) setupController("Actuator", 450, 320);}

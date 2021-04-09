@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="339.0" prefWidth="713.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
+<BorderPane prefHeight="420.0" prefWidth="968.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
    <center>
       <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>
@@ -59,6 +59,11 @@
                   <Button fx:id="deleteNodeButton" layoutX="512.0" layoutY="244.0" mnemonicParsing="false" onAction="#deleteNodeHandler" text="Delete Node" />
                   <Text layoutX="549.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Mapping" />
                   <Text layoutX="52.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Module Parameters" />
+                  <TableView fx:id="nodeTable1" layoutX="704.0" layoutY="53.0" prefHeight="183.0" prefWidth="201.0">
+                     <columns>
+                        <TableColumn fx:id="nodeColumn1" prefWidth="200.0" text="Node Name" />
+                     </columns>
+                  </TableView>
                </children>
             </AnchorPane>
          </children>
