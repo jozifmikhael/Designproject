@@ -269,8 +269,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     boolean mouseM=false;
     NodeSpec draggingNode = null;
     NodeSpec linkSrcNode = null;
-    NodeSpec selNode = null;
-    EdgeSpec selLink = null;
+    Spec selObject = null;
 	@Override
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
@@ -346,9 +345,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
-				selNode = _SpecHandler.getNode(mEvent);
-				selLink = _SpecHandler.getLink(mEvent);		
-				if (selNode!=null) selNode.setSelected();
+				selObject = _SpecHandler.getSelectedObject(mEvent);
+				if (selObject !=null) return;		
+				NodeSpec selNode = selObject.getClass().getSimpleName().equals("NodeSpec")?(NodeSpec)selObject:null;
+				EdgeSpec selLink = selObject.getClass().getSimpleName().equals("EdgeSpec")?(EdgeSpec)selObject:null;
 				switch(InteractionState.getSetKey()) {
 					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
 					case DIGIT1 : draggingNode=(selNode==null)?new NodeSpec("device", mEvent):selNode; break;// Select Device Placer
@@ -358,9 +358,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT5 : 
 						draggingNode=new NodeSpec("linker", mEvent); 
 						linkSrcNode=(selNode==null)?null:selNode.addLink(draggingNode);
-						if (selNode==null) {						
-							selLink.setSelected();
-						}
 						break;
 					default : {} // Nothing
 				} break;
@@ -379,8 +376,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //				System.out.println("In Left: KeyState: " + InteractionState.setKey);
 				NodeSpec newNode = null;
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
-				selNode = _SpecHandler.getNode(mEvent);
-				selLink =  _SpecHandler.getLink(mEvent);
+				selObject = _SpecHandler.getSelectedObject(mEvent);
+				if (selObject ==null) return;
+				NodeSpec selNode = selObject.getClass().getSimpleName().equals("NodeSpec")?(NodeSpec)selObject:null;
+				EdgeSpec selLink = selObject.getClass().getSimpleName().equals("EdgeSpec")?(EdgeSpec)selObject:null;
+				
 				switch(InteractionState.getSetKey()) {
 					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
 					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
@@ -389,9 +389,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT5 : 
 						linkSrcNode = (linkSrcNode==null)?null:linkSrcNode.addLink(selNode);
 						_SpecHandler.pruneLinks();
-						if (selNode==null) {						
-							selLink.setSelected();
-						}
 						break;
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing

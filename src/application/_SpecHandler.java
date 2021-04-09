@@ -133,47 +133,78 @@ public class _SpecHandler {
 		});
 	}
 	
-	public static NodeSpec getNode(MouseEvent mEvent) {
+	public static Spec getSelectedObject(MouseEvent mEvent) {
 		NodeSpec selNode = null;
-		for (NodeSpec n : nodesList)
+		for (NodeSpec n : nodesList)	{
 			if (Math.pow(Math.pow(n.x - mEvent.getX(), 2) + Math.pow(n.y - mEvent.getY(), 2), 0.5) <= 0.5 * n.sz
-					* zoomFactor)
+					* zoomFactor) {
 				selNode = n;
-		if (selNode == null)
-			return null;
-		return selNode.setSelected();
-	}
-	
-	public static EdgeSpec getLink(MouseEvent mEvent) {
-		for (NodeSpec n : nodesList) {
-			for (EdgeSpec l : n.edgesList)
-			if((mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)
-					||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
-					||(mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
-					||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)) {
-				double m = (l.src.y - l.dst.y)/(l.src.x - l.dst.x);
-				if(l.src.x - l.dst.x == 0) {
-					if(Math.abs(mEvent.getX()-l.dst.x) <= 10) System.out.println("selected link");return l.setSelected();
-				}
-				else if(l.src.y - l.dst.y == 0) {
-					if(Math.abs(mEvent.getY()-l.dst.y) <= 10) System.out.println("selected link");return l.setSelected();
-				}
-				else {
-					double bLink = (l.dst.y - (m*l.dst.x));
-					double mTemp = -(1/m);
-					double bTemp = mEvent.getY() - (mTemp * mEvent.getX());
-					double xLine = (bTemp - bLink)/(m - mTemp);
-					double yLine = m * xLine + bLink;
-					double distance = Math.sqrt(Math.pow(xLine - mEvent.getX(), 2) + Math.pow(yLine - mEvent.getY(),2));
-					if(distance <= 10) {
-						System.out.println("selected link");
-						return l.setSelected();					
+				break;
+			}			
+			for (EdgeSpec l : n.edgesList) {
+				if((mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)
+						||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
+						||(mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
+						||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)) {
+					double m = (l.src.y - l.dst.y)/(l.src.x - l.dst.x);
+					if(l.src.x - l.dst.x == 0) {
+						if(Math.abs(mEvent.getX()-l.dst.x) <= 10) System.out.println("selected link");return l.setSelected();
+					}
+					else if(l.src.y - l.dst.y == 0) {
+						if(Math.abs(mEvent.getY()-l.dst.y) <= 10) System.out.println("selected link");return l.setSelected();
+					}
+					else {
+						double bLink = (l.dst.y - (m*l.dst.x));
+						double mTemp = -(1/m);
+						double bTemp = mEvent.getY() - (mTemp * mEvent.getX());
+						double xLine = (bTemp - bLink)/(m - mTemp);
+						double yLine = m * xLine + bLink;
+						double distance = Math.sqrt(Math.pow(xLine - mEvent.getX(), 2) + Math.pow(yLine - mEvent.getY(),2));
+						if(distance <= 10) {
+							System.out.println("selected link");
+							return l.setSelected();					
+						}
 					}
 				}
 			}
-		}
-		return null;
+		}		
+		if (selNode == null) {
+			System.out.println("null");
+			return null;
+		}		
+		return selNode.setSelected();
 	}
+	
+//	public static Spec getLink(MouseEvent mEvent) {
+//		for (NodeSpec n : nodesList) {
+//			for (EdgeSpec l : n.edgesList) {
+//			if((mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)
+//					||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
+//					||(mEvent.getX() <= l.dst.x && mEvent.getX() >= l.src.x && mEvent.getY() <= l.src.y && mEvent.getY() >= l.dst.y)
+//					||(mEvent.getX() <= l.src.x && mEvent.getX() >= l.dst.x && mEvent.getY() <= l.dst.y && mEvent.getY() >= l.src.y)) {
+//				double m = (l.src.y - l.dst.y)/(l.src.x - l.dst.x);
+//				if(l.src.x - l.dst.x == 0) {
+//					if(Math.abs(mEvent.getX()-l.dst.x) <= 10) System.out.println("selected link");return l.setSelected();
+//				}
+//				else if(l.src.y - l.dst.y == 0) {
+//					if(Math.abs(mEvent.getY()-l.dst.y) <= 10) System.out.println("selected link");return l.setSelected();
+//				}
+//				else {
+//					double bLink = (l.dst.y - (m*l.dst.x));
+//					double mTemp = -(1/m);
+//					double bTemp = mEvent.getY() - (mTemp * mEvent.getX());
+//					double xLine = (bTemp - bLink)/(m - mTemp);
+//					double yLine = m * xLine + bLink;
+//					double distance = Math.sqrt(Math.pow(xLine - mEvent.getX(), 2) + Math.pow(yLine - mEvent.getY(),2));
+//					if(distance <= 10) {
+//						System.out.println("selected link");
+//						return l.setSelected();					
+//					}
+//				}
+//			}
+//		}
+//		return null;
+//	}
 	
 	public static void pruneLinks() {
 		for (NodeSpec n : nodesList)
@@ -183,7 +214,7 @@ public class _SpecHandler {
 			n.edgesList = (ArrayList<EdgeSpec>) n.edgesList.stream().filter(e -> !e.dst.isTemp)
 					.collect(Collectors.toList());
 	}
-	
+
 	public static void deselectAll() {
 		nodesList.forEach(n -> {
 			n.selected = false;
@@ -308,8 +339,8 @@ public class _SpecHandler {
 		void drawLink() {
 			this.edgesList.forEach(e -> {
 				e.draw(gc);
-				gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
-				gc.setLineWidth(this.selected ? 10.0 : 1.0);
+				gc.setStroke(e.selected ? Color.BLUE : Color.BLACK);
+				gc.setLineWidth(e.selected ? 10.0 : 1.0);
 				System.out.println(e.selected);
 			});
 		}
@@ -748,6 +779,13 @@ public class _SpecHandler {
 			return "src=" + src.name + ",dst=" + dst.name + ",edgeType=" + edgeType + ",latency=" + latency
 					+ ",tupleType=" + tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength
 					+ ",nwLength=" + nwLength + ",direction=" + direction;
+		}
+		
+		void drawLink() {
+			this.draw(gc);
+			gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
+			gc.setLineWidth(this.selected ? 10.0 : 1.0);
+			System.out.println(this.selected);
 		}
 		
 		EdgeSpec setSelected() {
