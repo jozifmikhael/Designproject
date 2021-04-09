@@ -396,8 +396,8 @@ public class _SpecHandler {
 		}
 		
 		int pe;
-		long mips;
-		int ram;
+		public long mips;
+		public int ram;
 		int level;
 		double rate;
 		double ipower;

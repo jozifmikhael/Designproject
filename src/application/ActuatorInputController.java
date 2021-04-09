@@ -56,7 +56,7 @@ public class ActuatorInputController extends Controller implements Initializable
 	
 	@FXML
 	void saveSpecHandler(ActionEvent event) {
-		Stage stage = (Stage) save.getScene().getWindow();
+		Stage stage = (Stage) saveButton.getScene().getWindow();
 		a = new ActuatSpec(actuatorName.getText().toString(), nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(actuatLatency.getText()));
 		stage.close();
 		ArrayList<String> types = new ArrayList<String>(); types.add("device");

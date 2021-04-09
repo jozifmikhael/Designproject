@@ -14,7 +14,7 @@
    <center>
       <AnchorPane prefHeight="605.0" prefWidth="953.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane prefHeight="616.0" prefWidth="838.0" AnchorPane.bottomAnchor="-277.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-125.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="ap" prefHeight="616.0" prefWidth="838.0" AnchorPane.bottomAnchor="-277.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-125.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Text layoutX="504.0" layoutY="309.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Name:" AnchorPane.leftAnchor="504.0" AnchorPane.topAnchor="296.05078125" />
                   <Text layoutX="37.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="RAM:" AnchorPane.leftAnchor="37.0" AnchorPane.topAnchor="100.0" />

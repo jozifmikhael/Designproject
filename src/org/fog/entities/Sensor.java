@@ -30,35 +30,35 @@ public class Sensor extends SimEntity{
 	private int controllerId;
 	private Application app;
 	private double latency;
-	
-	public Sensor(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, 
-			Distribution transmitDistribution, int cpuLength, int nwLength, String tupleType, String destModuleName) {
-		super(name);
-		this.setAppId(appId);
-		this.gatewayDeviceId = gatewayDeviceId;
-		this.geoLocation = geoLocation;
-		this.outputSize = 3;
-		this.setTransmitDistribution(transmitDistribution);
-		setUserId(userId);
-		setDestModuleName(destModuleName);
-		setTupleType(tupleType);
-		setSensorName(sensorName);
-		setLatency(latency);
-	}
-	
-	public Sensor(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, 
-			Distribution transmitDistribution, String tupleType) {
-		super(name);
-		this.setAppId(appId);
-		this.gatewayDeviceId = gatewayDeviceId;
-		this.geoLocation = geoLocation;
-		this.outputSize = 3;
-		this.setTransmitDistribution(transmitDistribution);
-		setUserId(userId);
-		setTupleType(tupleType);
-		setSensorName(sensorName);
-		setLatency(latency);
-	}
+//	
+//	public Sensor(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, 
+//			Distribution transmitDistribution, int cpuLength, int nwLength, String tupleType, String destModuleName) {
+//		super(name);
+//		this.setAppId(appId);
+//		this.gatewayDeviceId = gatewayDeviceId;
+//		this.geoLocation = geoLocation;
+//		this.outputSize = 3;
+//		this.setTransmitDistribution(transmitDistribution);
+//		setUserId(userId);
+//		setDestModuleName(destModuleName);
+//		setTupleType(tupleType);
+//		setSensorName(sensorName);
+//		setLatency(latency);
+//	}
+//	
+//	public Sensor(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, 
+//			Distribution transmitDistribution, String tupleType) {
+//		super(name);
+//		this.setAppId(appId);
+//		this.gatewayDeviceId = gatewayDeviceId;
+//		this.geoLocation = geoLocation;
+//		this.outputSize = 3;
+//		this.setTransmitDistribution(transmitDistribution);
+//		setUserId(userId);
+//		setTupleType(tupleType);
+//		setSensorName(sensorName);
+//		setLatency(latency);
+//	}
 	
 	/**
 	 * This constructor is called from the code that generates PhysicalTopology from JSON
