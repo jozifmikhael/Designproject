@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="339.0" prefWidth="713.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
+<BorderPane prefHeight="547.0" prefWidth="919.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
    <center>
-      <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="605.0" prefWidth="953.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane prefHeight="339.0" prefWidth="938.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane prefHeight="616.0" prefWidth="838.0" AnchorPane.bottomAnchor="-277.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-125.0" AnchorPane.topAnchor="0.0">
                <children>
                   <Text layoutX="504.0" layoutY="309.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Name:" AnchorPane.leftAnchor="504.0" AnchorPane.topAnchor="296.05078125" />
                   <Text layoutX="37.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="RAM:" AnchorPane.leftAnchor="37.0" AnchorPane.topAnchor="100.0" />
@@ -59,6 +59,11 @@
                   <Button fx:id="deleteNodeButton" layoutX="512.0" layoutY="244.0" mnemonicParsing="false" onAction="#deleteNodeHandler" text="Delete Node" />
                   <Text layoutX="549.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Node Mapping" />
                   <Text layoutX="52.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Module Parameters" />
+                  <TableView fx:id="test2Table" layoutX="688.0" layoutY="52.0" prefHeight="200.0" prefWidth="77.0">
+                    <columns>
+                      <TableColumn fx:id="test2Col" prefWidth="75.0" text="C1" />
+                    </columns>
+                  </TableView>
                </children>
             </AnchorPane>
          </children>

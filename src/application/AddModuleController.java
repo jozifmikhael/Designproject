@@ -82,9 +82,15 @@ public class AddModuleController extends Controller implements Initializable{
 	
 	@FXML
 	private TableColumn<TupleSpec, Double> sensitivityColumn;
-	
+
 	@FXML  
 	private TableView<NodeSpec> nodeTable;
+
+	@FXML  
+	private TableView<NodeSpec> test2Table;
+
+	@FXML
+	private TableColumn<NodeSpec, String> test2Col;
 	
 	@FXML
 	private TableColumn<NodeSpec, String> nodeColumn;
@@ -172,7 +178,12 @@ public class AddModuleController extends Controller implements Initializable{
 		inTuple.setPromptText("In Tuple");
 		outTuple.setPromptText("Out Tuple");
 		fractionalSensitivity.setPromptText("Sensitivity"); 
-
+		
+		test2Table.setEditable(true);
+		test2Col.setCellValueFactory(new PropertyValueFactory <>("name"));
+		test2Col.setCellFactory(TextFieldTableCell.forTableColumn());
+		test2Table.setItems(nodeData);
+		
 		inTupleColumn.setCellValueFactory(new PropertyValueFactory <>("inTuple"));
 		inTupleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		outTupleColumn.setCellValueFactory(new PropertyValueFactory <>("outTuple"));
@@ -189,6 +200,7 @@ public class AddModuleController extends Controller implements Initializable{
 		    Object selectedItem = tupleTable.getSelectionModel().getSelectedItem();
 		    tupleTable.getItems().remove(selectedItem);
 		});
+		
 		addNodeButton.setOnAction(e -> {
 			String name = nodeBox.getSelectionModel().getSelectedItem();
 			nodeData.add(new NodeSpec(0, 0, name, ""));

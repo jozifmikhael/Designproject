@@ -105,6 +105,7 @@ public class _SpecHandler {
 	static Color transpColor = Color.TRANSPARENT;
 	static List<Color> validColors = Arrays.asList(deviceColor, moduleColor, sensorColor, actuatorColor, transpColor);
 	static Color _errorColor = Color.GREEN;
+	public static DeviceSpec defaultDevice = new DeviceSpec("whate", "tt", 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
 	
 	public static void shiftPositionsByZoom(ScrollEvent event) {
 		double minZoom = 0.25;
@@ -163,6 +164,10 @@ public class _SpecHandler {
 		return null;
 	}
 	
+	public static ArrayList<NodeSpec> getLinkableNodes(ArrayList<String> types, String _type) {
+		return (ArrayList<NodeSpec>) nodesList.stream().filter(n->types.contains(_type)).collect(Collectors.toList());
+	}
+	
 	public static NodeSpec getLinkableNode(ArrayList<String> types, String _name) {
 		for (NodeSpec n : nodesList)
 			if (n.name.equals(_name) && types.contains(n.type))
@@ -170,12 +175,33 @@ public class _SpecHandler {
 		return null;
 	}
 	
+	public static class jank extends Spec{
+		public String getD() {
+			return d.toString();
+		}
+		public void setD(String _d) {
+			System.out.println("Setter called with : " + _d);
+		}
+		DeviceSpec d;
+		public static DeviceSpec getDefD() {
+			return defaultDevice;
+		}
+	}
+	
 	public static class NodeSpec extends Spec {
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
 		double x;
 		double y;
 		double sz;
 		Color nodeColor;
-		String name;
+		public String name;
 		String type;
 		boolean selected = false;
 		boolean isTemp = false;
@@ -338,6 +364,22 @@ public class _SpecHandler {
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
+		public String getMips() {
+			return mips+"";
+		}
+
+		public void setMips(long mips) {
+			this.mips = mips;
+		}
+
+		public String getRam() {
+			return ram+"";
+		}
+
+		public void setRam(int ram) {
+			this.ram = ram;
+		}
+
 		@SuppressWarnings("unchecked")
 		public DeviceSpec(String name, String parent, int pe, long mips, int ram, int level, double rate, double ipower,
 				double apower, double latency, long upbw, long downbw) {
@@ -375,8 +417,7 @@ public class _SpecHandler {
 					+ type + ", selected=" + selected;
 		}
 		
-//		private static FogDevice addToApp(this.name, this.mips, this.ram, this.upbw, this.downbw, this.level,
-//				this.rate, this.apower, this.ipower) {
+//		private FogDevice addToApp() {
 //			
 //			List<Pe> peList = new ArrayList<Pe>();
 //			
@@ -522,7 +563,7 @@ public class _SpecHandler {
 				dist = null;
 			}
 			for (EdgeSpec edges : this.edgesList)
-				if (edges.edgeType.equals("1"))
+				if (edges.edgeType==1)
 					return new Sensor(this.name, edges.tupleType, userId, appId, dist);
 			return null;
 		}
@@ -559,7 +600,7 @@ public class _SpecHandler {
 		
 		public Actuator addToApp(int userId, String appId, Application application) {
 			for (EdgeSpec edges : this.edgesList) {
-				if (edges.edgeType.equals("1")) {
+				if (edges.edgeType==1) {
 					return new Actuator(this.name, userId, appId, edges.tupleType);
 				}
 			}
@@ -593,7 +634,7 @@ public class _SpecHandler {
 		// public static final int ACTUATOR = 2; // App Edge leads to an actuator
 		// public static final int MODULE = 3; // App Edge is between application
 		// modules
-		String edgeType;
+		int edgeType;
 		double latency;
 		String tupleType;
 		double periodicity;
@@ -624,7 +665,7 @@ public class _SpecHandler {
 			return obj;
 		}
 		
-		public EdgeSpec(NodeSpec src, NodeSpec dst, String edgeType, double latency, String tupleType,
+		public EdgeSpec(NodeSpec src, NodeSpec dst, int edgeType, double latency, String tupleType,
 				double periodicity, double cpuLength, double newLength, int direction) {
 			this.src = src;
 			this.dst = dst;
@@ -638,7 +679,7 @@ public class _SpecHandler {
 		}
 		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {
-			this(src, dst, "0", latency, "null", 0, 0, 0, 0);
+			this(src, dst, 0, latency, "null", 0, 0, 0, 0);
 		}
 		
 		void draw(GraphicsContext gc) {

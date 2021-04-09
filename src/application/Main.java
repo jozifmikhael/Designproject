@@ -27,6 +27,7 @@ public class Main extends Application {
 		launch(args);
 	}
 	
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -41,7 +42,6 @@ public class Main extends Application {
 			controller.setupListeners(primaryStage, scene);
 
 			primaryStage.setScene(scene);
-			controller.populateList(placementPolicyList);	
 			primaryStage.setTitle("Policy Placement Application");
 			primaryStage.show();
 		} catch(Exception e) {

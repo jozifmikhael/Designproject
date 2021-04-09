@@ -22,7 +22,7 @@
          <children>
           <AnchorPane fx:id="backPane" layoutX="-1.0" layoutY="23.0" minHeight="0.0" minWidth="0.0" prefHeight="634.0" prefWidth="934.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Canvas fx:id="topoField" height="657.0" layoutX="-1.0" layoutY="1.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" width="936.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="0.0" />
+                  <Canvas fx:id="topoField" height="657.0" layoutX="-1.0" layoutY="1.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="936.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="0.0" />
                   <Pane layoutY="113.0" prefHeight="323.0" prefWidth="123.0" style="-fx-background-color: #e8e8e8;" styleClass="pane">
                      <children>
                         <Button fx:id="deleteButton1" layoutX="14.0" layoutY="20.0" mnemonicParsing="false" onAction="#deleteHandler" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Node (1)" textFill="WHITE">
@@ -164,7 +164,7 @@
                   </Menu>
               </menus>
             </MenuBar>
-            <Pane layoutX="35.0" layoutY="544.0" prefHeight="99.0" prefWidth="879.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom">
+            <Pane layoutX="35.0" layoutY="544.0" onScroll="#mouseScrollHandler" prefHeight="99.0" prefWidth="879.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom">
                <children>
                   <Button fx:id="deleteButton" layoutX="47.0" layoutY="29.0" mnemonicParsing="false" onAction="#deleteHandler" prefHeight="40.0" prefWidth="110.0" style="-fx-background-color: #e8e8e8;;" text="Delete">
                      <effect>

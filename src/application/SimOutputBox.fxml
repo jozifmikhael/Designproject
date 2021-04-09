@@ -1,48 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.StackedAreaChart?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="600.0" prefWidth="874.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OutputController">
+<BorderPane prefHeight="800.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OutputController">
    <center>
       <AnchorPane prefHeight="500.0" prefWidth="500.0" BorderPane.alignment="CENTER">
          <children>
-            <SplitPane dividerPositions="0.6588628762541806" layoutX="142.0" layoutY="65.0" orientation="VERTICAL" prefHeight="401.0" prefWidth="462.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <items>
-                <AnchorPane fx:id="backPane" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #ffffff;">
-                     <children>
-                        <Canvas fx:id="graphArea" height="389.0" onContextMenuRequested="#EnergyConsuptionGraph" onMouseClicked="#EnergyConsuptionGraph" width="870.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
-                        <StackedAreaChart fx:id="EnergyConsumption" layoutX="4.0" onMouseClicked="#ParsingEnergy" prefHeight="296.0" prefWidth="872.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <xAxis>
-                            <NumberAxis side="BOTTOM" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis side="LEFT" />
-                          </yAxis>
-                        </StackedAreaChart>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane fx:id="backPane1" layoutX="10.0" layoutY="10.0" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #ffffff;">
-                     <children>
-                        <Canvas fx:id="graphArea1" height="193.0" layoutX="-3.0" onContextMenuRequested="#EnergyConsuptionGraph" onMouseClicked="#EnergyConsuptionGraph" width="874.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
-                        <LineChart fx:id="NetworkUsage" layoutX="10.0" layoutY="1.0" onMouseClicked="#ParsingNetwork" prefHeight="296.0" prefWidth="872.0" styleClass="chart-series-line" stylesheets="@linegraphstyle.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <xAxis>
-                              <CategoryAxis side="BOTTOM" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis side="LEFT" />
-                           </yAxis>
-                        </LineChart>
-                     </children>
-                  </AnchorPane>
-              </items>
-            </SplitPane>
+          <AnchorPane fx:id="backPane" layoutX="13.0" layoutY="25.0" minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="737.0" style="-fx-background-color: #ffffff;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="763.0" AnchorPane.topAnchor="25.0">
+               <children>
+                  <Canvas fx:id="graphArea" height="339.0" width="750.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                  <StackedAreaChart fx:id="EnergyConsumption" layoutX="4.0" prefHeight="340.0" prefWidth="742.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="0.0">
+                    <xAxis>
+                      <NumberAxis side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis side="LEFT" />
+                    </yAxis>
+                  </StackedAreaChart>
+               </children>
+            </AnchorPane>
+            <AnchorPane fx:id="backPane1" layoutX="762.0" layoutY="25.0" minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="738.0" style="-fx-background-color: #ffffff;" AnchorPane.leftAnchor="762.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+               <children>
+                  <Canvas fx:id="graphArea1" height="341.0" layoutX="-3.0" width="754.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="1.0" />
+                  <LineChart fx:id="NetworkUsage" layoutX="10.0" layoutY="1.0" prefHeight="340.0" prefWidth="637.0" styleClass="chart-series-line" stylesheets="@linegraphstyle.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <xAxis>
+                        <CategoryAxis side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis side="LEFT" />
+                     </yAxis>
+                  </LineChart>
+               </children>
+            </AnchorPane>
+            <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="229.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Save Energy Consumption Graph" />
+                        <MenuItem mnemonicParsing="false" text="Save Network Usage Graph" />
+                        <MenuItem mnemonicParsing="false" text="Save 3" />
+                        <MenuItem mnemonicParsing="false" text="Save 4" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Delete" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <TableView fx:id="tupleTable" layoutX="14.0" layoutY="379.0" prefHeight="411.0" prefWidth="726.0">
+              <columns>
+                <TableColumn fx:id="checkCol" prefWidth="24.0" text="#" />
+                <TableColumn fx:id="sourceDevCol" prefWidth="99.0" text="Source Device" />
+                  <TableColumn fx:id="sourceModCol" prefWidth="111.0" text="Source Module" />
+                  <TableColumn fx:id="destDevCol" prefWidth="130.0" text="Destination Device" />
+                  <TableColumn fx:id="destModCol" prefWidth="132.0" text="Destination Module" />
+                  <TableColumn fx:id="typleCol" prefWidth="85.0" text="Tuple Type" />
+                  <TableColumn fx:id="timeCol" prefWidth="152.0" text="CPU Execution Delay" />
+              </columns>
+            </TableView>
+            <ChoiceBox fx:id="sourceChoiceBox" layoutX="897.0" layoutY="379.0" prefWidth="150.0" />
+            <ChoiceBox fx:id="destinationChoiceBox" layoutX="1209.0" layoutY="379.0" prefWidth="150.0" />
+            <Button fx:id="addButton" layoutX="1385.0" layoutY="379.0" mnemonicParsing="false" text="+" />
+            <Label layoutX="843.0" layoutY="383.0" text="Source" />
+            <Label layoutX="1131.0" layoutY="383.0" text="Destination" />
+            <AnchorPane layoutX="763.0" layoutY="415.0" prefHeight="385.0" prefWidth="740.0">
+               <children>
+                  <BarChart fx:id="barChart" prefHeight="385.0" prefWidth="723.0">
+                    <xAxis>
+                      <CategoryAxis side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis side="LEFT" />
+                    </yAxis>
+                  </BarChart>
+               </children>
+            </AnchorPane>
          </children>
       </AnchorPane>
    </center>

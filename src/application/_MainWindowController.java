@@ -10,12 +10,14 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -31,6 +33,7 @@ import org.fog.entities.FogBroker;
 import org.fog.entities.FogDevice;
 import org.fog.entities.FogDeviceCharacteristics;
 import application.Controller;
+import application.Main;
 //import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
@@ -53,6 +56,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -137,7 +142,7 @@ import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
 import org.fog.utils.distribution.NormalDistribution;	
 import org.fog.utils.distribution.UniformDistribution;
-
+import static application.scratch.printDebug;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.placement.ModulePlacementMapping;
@@ -242,11 +247,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-    	
+    	printDebug("test");
     }
 	
 	public List<String> selectedNodesList = new ArrayList<String>();
-    
+
+	Map<String, FXMLLoader> loadersList = new HashMap<String, FXMLLoader>();
+	
     public void setupListeners(Stage parentStage, Scene scene) {
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
     	parentStage.widthProperty().addListener(stageSizeListener);
@@ -256,6 +263,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
     	_SpecHandler.gc=this.gc;
     	scene.setOnKeyPressed(this);
+//    	ObservableList<String> items = FXCollections.observableArrayList();
+//    	items.add("Edgewards");
+//    	items.add("Cloud-Only");
+//		PolicyChoiceMain.setItems(items);
+ 		
+ 		Stream.of("Edgewards", "Cloud-Only").forEach(
+ 				s->PolicyChoiceMain.getItems().add(s));
+ 		PolicyChoiceMain.setValue(PolicyChoiceMain.getItems().get(0));
+ 		
+ 		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
+ 				s->loadersList.put(s, new FXMLLoader(getClass().getResource("UI_"+s+".fxml"))));
     }
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
@@ -320,26 +338,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    }
 	}
 	
-	void populateList(List<String> str_list) {
-		System.out.println(str_list);
-		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
-		System.out.println(items);
-		PolicyChoiceMain.setItems(items);
- 		PolicyChoiceMain.setValue(items.get(0));
-	}
-	
 	@FXML
-	void savePolicyHandler(ActionEvent event) {
-		String policyType;
-		if (PolicyChoiceMain.getSelectionModel().getSelectedItem() == null
-				|| PolicyChoiceMain.getSelectionModel().getSelectedItem().trim().isEmpty()) {
-			PolicyChoiceMain.setValue("Edgewards");
-		} else
-			policyType = PolicyChoiceMain.getSelectionModel().getSelectedItem().toString();
-	}
-	
-    @FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
@@ -355,7 +354,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(draggingNode);break;
 					default : {} // Nothing
 				} break;
-			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
+//			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
+			case MIDDLE_BTN: showOutput(); break;
 			case RIGHT_BTN: break; //TODO If we have time, make a little right-click menu show with two options: Edit, Delete
 			case NONE: System.out.println("_MainWindowController.java: ClickHandler Error - State NONE"); break;
 			default: System.out.println("_MainWindowController.java: ClickHandler Error - State Default"); break;
@@ -373,7 +373,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			double latency = addDeviceLink();
 			src.addLink(dst.name, latency);
 		}else if(src.type.equals("module") && dst.type.equals("module")) {
-			EdgeSpec e = addEdge();
+			EdgeSpec e = addEdgeFull();
 		}
 		return src;
 	}
@@ -426,7 +426,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
 	private void mouseScrollHandler(ScrollEvent event) {
+    	System.out.println("in zoom");
     	_SpecHandler.shiftPositionsByZoom(event);
+    	redrawNodes();
     }
     
 	private void screenSizeChangeHandler() {
@@ -490,7 +492,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	}
 	
     @FXML
-    void showOutput(ActionEvent event) {
+    void showOutput() {
         try {
             FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
             Scene scene = new Scene(addNewNodeLoader.load(),900,600);
@@ -512,37 +514,53 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		return newNode;
     }
     
-    Spec setupController(String type, int w, int h) {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
-		Scene scene = null;
+    Spec setupController(String type) {
 		try {
-			scene = new Scene(loader.load(),w,h);
+			System.out.println(type);
+			Controller controller = loadersList.get(type).getController();
+			Parent newRoot = loadersList.get(type).load();
+			Scene scene = new Scene(newRoot);
+			Stage stage = new Stage();
+			if(controller==null||newRoot==null||scene==null||stage==null) {
+				System.out.println("Error in resource loading");
+				return null;
+			}
+			stage.setScene(scene);
+			stage.setTitle("Add "+type+" Node");
+			stage.showAndWait();
+			redrawNodes();
+			return controller.getSpec();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		Controller controller = loader.getController();
-		stage.setTitle("Add "+type+" Node");
-		stage.showAndWait();
-		redrawNodes();
-		return controller.getSpec();
     }
 
-    @FXML
-    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 450, 320);}
+//    @FXML
+//    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 800, 800);}
+//    @FXML
+//    ModuleSpec addModule() {return (ModuleSpec) setupController("Module", 800, 800);}
+//    @FXML
+//    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 320);}
+//    @FXML
+//    ActuatSpec addActuat() {return (ActuatSpec) setupController("Actuator", 450, 320);}
+//    @FXML
+//    EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
     
     @FXML
-    ModuleSpec addModule() {return (ModuleSpec) setupController("Module", 800, 800);}
+    DeviceSpec addDevice() {return (DeviceSpec) setupController("device");}
+    @FXML
+    ModuleSpec addModule() {return (ModuleSpec) setupController("module");}
+    @FXML
+    SensorSpec addSensor() {return (SensorSpec) setupController("sensor");}
+    @FXML
+    ActuatSpec addActuat() {return (ActuatSpec) setupController("actuat");}
+    @FXML
+    EdgeSpec addEdgeFull() {return (EdgeSpec) setupController("edgeFull");}
+    @FXML
+    EdgeSpec addEdgeSimple() {return (EdgeSpec) setupController("edgeSimple");}
     
-    @FXML
-    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 320);}
     
-    @FXML
-    ActuatSpec addActuat() {return (ActuatSpec) setupController("Actuator", 450, 320);}
-
-    @FXML
-    EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
     @FXML
     double addDeviceLink() {
     	try {
@@ -562,6 +580,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     		return 0.0;
     	}
     }
+    
     @FXML
     void editHandler() {
 		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
@@ -604,6 +623,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
+	void savePolicyHandler(ActionEvent event) {
+		String policyType;
+		if (PolicyChoiceMain.getSelectionModel().getSelectedItem() == null
+				|| PolicyChoiceMain.getSelectionModel().getSelectedItem().trim().isEmpty()) {
+			PolicyChoiceMain.setValue("Edgewards");
+		} else
+			policyType = PolicyChoiceMain.getSelectionModel().getSelectedItem().toString();
+	}
+	@FXML
     void confirmPolicy(ActionEvent event) {
     	try {
     		BorderPane root = FXMLLoader.load(getClass().getResource("PolicySelectionBox.fxml"));
@@ -647,6 +675,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	System.out.print("\n TEST Top Node: " + testtopnode);
     }
     
+    //TODO Fix this
     public String getCentralNode() {
     	return "cloud";
     }
@@ -660,8 +689,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         stage.setScene(scene);
         stage.setTitle("Output");
         stage.showAndWait();
-        
     }
+    
     @FXML
     public void createJson(ActionEvent event) {
     	try {

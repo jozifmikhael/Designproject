@@ -1,35 +1,23 @@
 package application;
 
-import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+
 import application._SpecHandler.ActuatSpec;
-import application._SpecHandler.SensorSpec;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.EdgeSpec;
-import application._SpecHandler.ModuleSpec;
 import application._SpecHandler.NodeSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.scene.control.ChoiceBox;
-import javafx.event.EventHandler;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import org.fog.test.perfeval.TextParser;
-import application._SpecHandler.DeviceSpec;
 
 public class ActuatorInputController extends Controller implements Initializable{
 	_SpecHandler textfile = new _SpecHandler();
@@ -44,6 +32,9 @@ public class ActuatorInputController extends Controller implements Initializable
 	private TextField actuatLatency;
 	@FXML
 	private ChoiceBox<String> nodeBox;
+
+	@FXML
+	private TableColumn<ActuatSpec, String> testCol;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -65,7 +56,7 @@ public class ActuatorInputController extends Controller implements Initializable
 	
 	@FXML
 	void saveSpecHandler(ActionEvent event) {
-		Stage stage = (Stage) saveSpec.getScene().getWindow();
+		Stage stage = (Stage) save.getScene().getWindow();
 		a = new ActuatSpec(actuatorName.getText().toString(), nodeBox.getSelectionModel().getSelectedItem(), Double.parseDouble(actuatLatency.getText()));
 		stage.close();
 		ArrayList<String> types = new ArrayList<String>(); types.add("device");
