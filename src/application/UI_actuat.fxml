@@ -11,15 +11,15 @@
    <center>
       <AnchorPane prefHeight="197.0" prefWidth="880.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane prefHeight="206.0" prefWidth="258.0" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="ap" prefHeight="206.0" prefWidth="258.0" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <TextField fx:id="actuatorName" layoutX="140.0" layoutY="36.0" prefHeight="25.0" prefWidth="97.0" AnchorPane.topAnchor="36.0" />
+                  <TextField fx:id="name" layoutX="140.0" layoutY="36.0" prefHeight="25.0" prefWidth="97.0" AnchorPane.topAnchor="36.0" />
                   <Text layoutX="28.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Actuator Name:" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="40.0" />
-                  <Button fx:id="saveSpec" layoutX="95.0" layoutY="187.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save Actuator" />
+                  <Button fx:id="saveButton" layoutX="95.0" layoutY="187.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save Actuator" />
                   <Text layoutX="38.0" layoutY="104.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Node:" />
                   <ChoiceBox fx:id="nodeBox" layoutX="126.0" layoutY="88.0" prefWidth="150.0" />
                   <Text layoutX="28.0" layoutY="149.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latency:" />
-                  <TextField fx:id="actuatLatency" layoutX="127.0" layoutY="141.0" />
+                  <TextField fx:id="UpLinklatency" layoutX="127.0" layoutY="141.0" />
                </children>
             </AnchorPane>
          </children>

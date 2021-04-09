@@ -260,6 +260,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	
     	//TODO Do the other menu items like this
     	addDeviceMenu.setOnAction(e->setupController("device"));
+    	addModuleMenu.setOnAction(e->setupController("module"));
+//    	addSensorMenu.setOnAction(e->setupController("sensor"));
+//    	addActuatorMenu.setOnAction(e->setupController("actuat"));
+    	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
     	
     	gc=topoField.getGraphicsContext2D();
     	gc.setTextAlign(TextAlignment.CENTER);
@@ -286,6 +290,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
 	}
+	
     boolean mouseL=false;
     boolean mouseR=false;
     boolean mouseM=false;
@@ -378,7 +383,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			double latency = addDeviceLink();
 			src.addLink(dst.name, latency);
 		}else if(src.type.equals("module") && dst.type.equals("module")) {
-			EdgeSpec e = addEdgeFull();
+			EdgeSpec e = (EdgeSpec) setupController("edgeFull");
 		}
 		return src;
 	}
@@ -392,10 +397,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
-					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
-					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
-					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
-					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
+					case DIGIT1 : newNode = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
+					case DIGIT2 : newNode = (selNode!=null)?null:(NodeSpec)setupController("module"); break;
+					case DIGIT3 : newNode = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
+					case DIGIT4 : newNode = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
 					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:makeReqLink(linkSrcNode,selNode); _SpecHandler.pruneLinks(); break;
 
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
@@ -512,10 +517,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	NodeSpec newNode = null;
     NodeSpec addNodeType(String _type) {
-    	if(_type.equals("device")) newNode = addDevice();
-		if(_type.equals("module")) newNode = addModule();
-		if(_type.equals("sensor")) newNode = addSensor();
-		if(_type.equals("actuat")) newNode = addActuat();
+    	if(_type.equals("device")) newNode = (NodeSpec)setupController(_type);
+		if(_type.equals("module")) newNode = (NodeSpec)setupController(_type);
+		if(_type.equals("sensor")) newNode = (NodeSpec)setupController(_type);
+		if(_type.equals("actuat")) newNode = (NodeSpec)setupController(_type);
 		return newNode;
     }
     
@@ -579,20 +584,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //    @FXML
 //    EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
     
-    @FXML
-    DeviceSpec addDevice() {return (DeviceSpec) setupController("device");}
-    @FXML
-    ModuleSpec addModule() {return (ModuleSpec) setupController("module");}
-    @FXML
-    SensorSpec addSensor() {return (SensorSpec) setupController("sensor");}
-    @FXML
-    ActuatSpec addActuat() {return (ActuatSpec) setupController("actuat");}
-    @FXML
-    EdgeSpec addEdgeFull() {return (EdgeSpec) setupController("edgeFull");}
-    @FXML
-    EdgeSpec addEdgeSimple() {return (EdgeSpec) setupController("edgeSimple");}
-    
-    
+  
     @FXML
     double addDeviceLink() {
     	try {

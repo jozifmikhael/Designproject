@@ -90,9 +90,13 @@ public abstract class Controller {
 			}while(field == null);
 			field.setAccessible(true); //TODO Do we actually need this? Don't like it
 			switch(field.getType().toString()) {
-				case "long": field.set(targetObject, Long.parseLong(fieldValue.toString())); break;
+//				case "long": field.set(targetObject, Long.parseLong(fieldValue.toString())); break;
+//				case "int": field.set(targetObject, Integer.parseInt(fieldValue.toString())); break;
+//				case "double": field.set(targetObject, Double.parseDouble(fieldValue.toString())); break;
 				default: field.set(targetObject, fieldValue);
 			}
+			
+			
 		} catch (NoSuchFieldException e) {
 			e.printStackTrace();
 			System.out.println("Controller.java : Couldn't find fieldname " + fieldName + " from " + targetObject.getClass());

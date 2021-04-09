@@ -361,6 +361,70 @@ public class _SpecHandler {
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
+		public String getPe() {
+			return pe+"";
+		}
+
+		public void setPe(int pe) {
+			this.pe = pe;
+		}
+
+		public String getLevel() {
+			return level+"";
+		}
+
+		public void setLevel(int level) {
+			this.level = level;
+		}
+
+		public String getRate() {
+			return rate+"";
+		}
+
+		public void setRate(double rate) {
+			this.rate = rate;
+		}
+
+		public String getIpower() {
+			return ipower+"";
+		}
+
+		public void setIpower(double ipower) {
+			this.ipower = ipower;
+		}
+
+		public String getApower() {
+			return apower+"";
+		}
+
+		public void setApower(double apower) {
+			this.apower = apower;
+		}
+
+		public String getLatency() {
+			return latency+"";
+		}
+
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+
+		public String getUpbw() {
+			return upbw+"";
+		}
+
+		public void setUpbw(long upbw) {
+			this.upbw = upbw;
+		}
+
+		public String getDownbw() {
+			return downbw+"";
+		}
+
+		public void setDownbw(long downbw) {
+			this.downbw = downbw;
+		}
+
 		public String getMips() {
 			return mips+"";
 		}
@@ -395,16 +459,16 @@ public class _SpecHandler {
 			this.add();
 		}
 		
-		int pe;
+		public int pe;
 		public long mips;
 		public int ram;
-		int level;
-		double rate;
-		double ipower;
-		double apower;
-		double latency;
-		long upbw;
-		long downbw;
+		public int level;
+		public double rate;
+		public double ipower;
+		public double apower;
+		public double latency;
+		public long upbw;
+		public long downbw;
 		
 		@Override
 		public String toString() {
@@ -471,6 +535,46 @@ public class _SpecHandler {
 	}
 	
 	public static class ModuleSpec extends NodeSpec {
+		public int getRam() {
+			return ram;
+		}
+
+		public void setRam(int ram) {
+			this.ram = ram;
+		}
+
+		public long getBandwidth() {
+			return bandwidth;
+		}
+
+		public void setBandwidth(long bandwidth) {
+			this.bandwidth = bandwidth;
+		}
+
+		public long getSize() {
+			return size;
+		}
+
+		public void setSize(long size) {
+			this.size = size;
+		}
+
+		public int getMips() {
+			return mips;
+		}
+
+		public void setMips(int mips) {
+			this.mips = mips;
+		}
+
+		public ArrayList<TupleSpec> getTupleMappings() {
+			return tupleMappings;
+		}
+
+		public void setTupleMappings(ArrayList<TupleSpec> tupleMappings) {
+			this.tupleMappings = tupleMappings;
+		}
+
 		@Override
 		public String toString() {
 			return "ram=" + ram + ", bandwidth=" + bandwidth + ", size=" + size + ", mips=" + mips + ", x=" + x + ", y="
@@ -524,6 +628,62 @@ public class _SpecHandler {
 	}
 	
 	public static class SensorSpec extends NodeSpec {
+		public double getLatency() {
+			return latency;
+		}
+
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+
+		public double getDeterministicValue() {
+			return deterministicValue;
+		}
+
+		public void setDeterministicValue(double deterministicValue) {
+			this.deterministicValue = deterministicValue;
+		}
+
+		public double getNormalMean() {
+			return normalMean;
+		}
+
+		public void setNormalMean(double normalMean) {
+			this.normalMean = normalMean;
+		}
+
+		public double getNormalStdDev() {
+			return normalStdDev;
+		}
+
+		public void setNormalStdDev(double normalStdDev) {
+			this.normalStdDev = normalStdDev;
+		}
+
+		public double getUniformMax() {
+			return uniformMax;
+		}
+
+		public void setUniformMax(double uniformMax) {
+			this.uniformMax = uniformMax;
+		}
+
+		public double getUniformMin() {
+			return uniformMin;
+		}
+
+		public void setUniformMin(double uniformMin) {
+			this.uniformMin = uniformMin;
+		}
+
+		public String getDistType() {
+			return distType;
+		}
+
+		public void setDistType(String distType) {
+			this.distType = distType;
+		}
+
 		double latency;
 		double deterministicValue;
 		double normalMean;
@@ -588,6 +748,14 @@ public class _SpecHandler {
 	}
 	
 	public static class ActuatSpec extends NodeSpec {
+		public double getUpLinklatency() {
+			return UpLinklatency;
+		}
+
+		public void setUpLinklatency(double upLinklatency) {
+			UpLinklatency = upLinklatency;
+		}
+
 		public double UpLinklatency;
 		
 		public ActuatSpec(String name, String type, double UpLinklatency) {
@@ -624,6 +792,78 @@ public class _SpecHandler {
 	}
 	
 	public static class EdgeSpec extends Spec {
+		public NodeSpec getSrc() {
+			return src;
+		}
+
+		public void setSrc(NodeSpec src) {
+			this.src = src;
+		}
+
+		public NodeSpec getDst() {
+			return dst;
+		}
+
+		public void setDst(NodeSpec dst) {
+			this.dst = dst;
+		}
+
+		public String getEdgeType() {
+			return edgeType+"";
+		}
+
+		public void setEdgeType(int edgeType) {
+			this.edgeType = edgeType;
+		}
+
+		public String getLatency() {
+			return latency+"";
+		}
+
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+
+		public String getTupleType() {
+			return tupleType;
+		}
+
+		public void setTupleType(String tupleType) {
+			this.tupleType = tupleType;
+		}
+
+		public String getPeriodicity() {
+			return periodicity+"";
+		}
+
+		public void setPeriodicity(double periodicity) {
+			this.periodicity = periodicity;
+		}
+
+		public String getCpuLength() {
+			return cpuLength+"";
+		}
+
+		public void setCpuLength(double cpuLength) {
+			this.cpuLength = cpuLength;
+		}
+
+		public String getNwLength() {
+			return nwLength+"";
+		}
+
+		public void setNwLength(double nwLength) {
+			this.nwLength = nwLength;
+		}
+
+		public String getDirection() {
+			return direction+"";
+		}
+
+		public void setDirection(int direction) {
+			this.direction = direction;
+		}
+
 		NodeSpec src;
 		NodeSpec dst;
 		// int DEVICE = 0;
@@ -631,16 +871,16 @@ public class _SpecHandler {
 		// public static final int ACTUATOR = 2; // App Edge leads to an actuator
 		// public static final int MODULE = 3; // App Edge is between application
 		// modules
-		int edgeType;
-		double latency;
-		String tupleType;
-		double periodicity;
-		double cpuLength;
-		double nwLength;
+		public int edgeType;
+		public double latency;
+		public String tupleType;
+		public double periodicity;
+		public double cpuLength;
+		public double nwLength;
 //		public static final int UP = 1; //I THINK this is src->dst
 //		public static final int DOWN = 2; //I THINK this is dst->src
 //		public static final int ACTUATOR = 3; //I THINK src->actuator
-		int direction = 1;
+		public int direction = 1;
 		
 		@Override
 		public String toString() {

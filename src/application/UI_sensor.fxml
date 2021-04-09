@@ -13,17 +13,16 @@
    <center>
       <AnchorPane prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane minHeight="320.0" minWidth="450.0" prefHeight="320.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="ap" minHeight="320.0" minWidth="450.0" prefHeight="320.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Accordion fx:id="accord" layoutY="150.0" prefHeight="252.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <Accordion fx:id="accord" layoutY="150.0" prefHeight="203.0" prefWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <panes>
                       <TitledPane fx:id="deterministicPane" animated="false" prefHeight="215.0" prefWidth="450.0" text="Deterministic Distribution">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
                                     <Text layoutX="40.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Deterministic Value:" />
-                                    <TextField fx:id="DeterministicValue" layoutX="224.0" layoutY="23.0" />
-                                    <Button fx:id="saveSpec" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveDeterministic" text="Save Sensor" />
+                                    <TextField fx:id="deterministicValue" layoutX="224.0" layoutY="23.0" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -32,11 +31,10 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button fx:id="saveSpec" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveNormal" text="Save Sensor" />
                                     <Text layoutX="40.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mean:" />
-                                    <TextField fx:id="mean" layoutX="225.0" layoutY="23.0" />
+                                    <TextField fx:id="normalMean" layoutX="225.0" layoutY="23.0" />
                                     <Text layoutX="40.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Standard Deviation:" />
-                                    <TextField fx:id="stdDev" layoutX="225.0" layoutY="73.0" />
+                                    <TextField fx:id="normalStdDev" layoutX="225.0" layoutY="73.0" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -45,11 +43,10 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button fx:id="saveSpec" layoutX="25.0" layoutY="110.0" mnemonicParsing="false" onAction="#saveUniform" text="Save Sensor" />
-                                    <TextField fx:id="max" layoutX="225.0" layoutY="23.0" />
+                                    <TextField fx:id="uniformMax" layoutX="225.0" layoutY="23.0" />
                                     <Text layoutX="40.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Maximum:" />
                                     <Text layoutX="40.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Minimum:" />
-                                    <TextField fx:id="min" layoutX="225.0" layoutY="73.0" />
+                                    <TextField fx:id="uniformMin" layoutX="225.0" layoutY="73.0" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -59,9 +56,10 @@
                   <Text layoutX="40.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parent Node:" />
                   <ChoiceBox fx:id="nodeBox" layoutX="226.0" layoutY="18.0" prefWidth="150.0" />
                   <Text layoutX="40.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Latency:" />
-                  <TextField fx:id="sensorLatency" layoutX="227.0" layoutY="63.0" text="6.0" />
+                  <TextField fx:id="latency" layoutX="227.0" layoutY="63.0" text="6.0" />
                   <Text layoutX="40.0" layoutY="125.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sensor Name:" />
-                  <TextField fx:id="sensorName" layoutX="227.0" layoutY="108.0" text="sensor1" />
+                  <TextField fx:id="name" layoutX="227.0" layoutY="108.0" text="sensor1" />
+                  <Button fx:id="saveButton" layoutX="49.0" layoutY="155.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save Sensor" />
                </children></AnchorPane>
          </children>
       </AnchorPane>
