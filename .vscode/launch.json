@@ -1,0 +1,591 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "application.Main",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch scratch",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "application.scratch",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch Css2Bin",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "com.sun.javafx.css.parser.Css2Bin",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch FastMath",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.apache.commons.math3.util.FastMath",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample1",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample1",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample2",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample2",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample3",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample3",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample4",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample4",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample5",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample5",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample6",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample6",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample7",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample7",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CloudSimExample8",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.CloudSimExample8",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch NetworkExample1",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.network.NetworkExample1",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch NetworkExample2",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.network.NetworkExample2",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch NetworkExample3",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.network.NetworkExample3",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch NetworkExample4",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.network.NetworkExample4",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch TestExample",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.network.datacenter.TestExample",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch Dvfs",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.Dvfs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrMc",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.IqrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrMmt",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.IqrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrMu",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.IqrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrRs",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.IqrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrMc",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrMmt",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrMu",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrRs",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrMc",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrMmt",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrMu",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrRs",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.LrrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadMc",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.MadMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadMmt",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.MadMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadMu",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.MadMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadRs",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.MadRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch NonPowerAware",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.NonPowerAware",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch PlanetLabRunnerConsole",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.PlanetLabRunnerConsole",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrMc",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.ThrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrMmt",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.ThrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrMu",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.ThrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrRs",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.planetlab.ThrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch Dvfs(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.Dvfs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrMc(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.IqrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrMmt(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.IqrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrMu(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.IqrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch IqrRs(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.IqrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrMc(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrMmt(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrMu(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrRs(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrMc(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrMmt(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrMu(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch LrrRs(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.LrrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadMc(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.MadMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadMmt(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.MadMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadMu(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.MadMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch MadRs(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.MadRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch NonPowerAware(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.NonPowerAware",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrMc(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.ThrMc",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrMmt(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.ThrMmt",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrMu(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.ThrMu",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch ThrRs(1)",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.examples.power.random.ThrRs",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch SDNExample",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.sdn.example.SDNExample",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch PhysicalTopologyGenerator",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.sdn.example.topogenerators.PhysicalTopologyGenerator",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch VMRequestRandomGenerator",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.sdn.example.topogenerators.VMRequestRandomGenerator",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch VirtualTopologyGeneratorVmTypes",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.sdn.example.topogenerators.VirtualTopologyGeneratorVmTypes",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch GraphicSDN",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.sdn.graph.example.GraphicSDN",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch VMRequestGenerator",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.sdn.request.VMRequestGenerator",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch Check",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.cloudbus.cloudsim.util.Check",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch FogGui",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.fog.gui.example.FogGui",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch CleanFromJson",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.fog.test.CleanFromJson",
+            "projectName": "iFogSim_Sim"
+        },
+        {
+            "type": "java",
+            "name": "Launch sim_test_v0",
+            "request": "launch",
+            "vmArgs": "--module-path C:/Users/kumar/eclipse-workspace-f2020/iFogSim_v3/jars/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml",
+            "mainClass": "org.fog.test.perfeval.sim_test_v0",
+            "projectName": "iFogSim_Sim"
+        }
+    ]
+}

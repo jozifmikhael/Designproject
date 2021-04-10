@@ -58,49 +58,51 @@ import org.fog.utils.distribution.UniformDistribution;
 public class VRGameFog {
 	static List<FogDevice> fogDevices = new ArrayList<FogDevice>();
 	static List<Sensor> sensors = new ArrayList<Sensor>();
-	static List<Actuator> actuators = new ArrayList<Actuator>();
-	
-	static String sensorTuple = null;	
-	static String actuatorType = null;
-	
+	static List<Actuator> actuators = new ArrayList<Actuator>();	
 	static int userId;
 	static String appId;
 	
-	static int numOfDepts = 1;
-	static int numOfMobilesPerDept = 1;
-	static double EEG_TRANSMISSION_TIME = 5.1;
-	
-	public VRGameFog() throws Exception {
-
-		System.out.println("Starting VRGame... ");
-		Log.disable();
-		int num_user = 1; // number of cloud users
-		Calendar calendar = Calendar.getInstance();
-		boolean trace_flag = false; // mean trace events
-
-		CloudSim.init(num_user, calendar, trace_flag);
-
-		appId = "vr_game"; // identifier of the application
-		
-		PowerDatacenterBroker broker = new FogBroker("broker");
-        Application application = new Application(appId, broker.getId());
-        userId = broker.getId();
-        ModuleMapping moduleMapping = ModuleMapping.createModuleMapping();
-        
-        _SpecHandler.nodesList.stream().filter(n->n.type.equals("device")).forEach(n->fogDevices.add(((DeviceSpec)n).addToApp()));
-        _SpecHandler.nodesList.stream().filter(n->n.type.equals("sensor")).forEach(n->sensors.add(((SensorSpec)n).addToApp(userId,appId,application)));
-        _SpecHandler.nodesList.stream().filter(n->n.type.equals("actuat")).forEach(n->actuators.add(((ActuatSpec)n).addToApp(userId,appId)));
-        _SpecHandler.nodesList.stream().filter(n->n.type.equals("module")).forEach(n->((ModuleSpec)n).addToApp(application));
-        for(NodeSpec n : _SpecHandler.nodesList) for(EdgeSpec e : n.edgesList) e.addToApp(fogDevices, sensors, actuators, application, moduleMapping);
-		
-		 // initializing a module mapping
+	public void startVRGame(Application application, ModuleMapping moduleMapping, String placementPolicy) {
+		System.out.println("Starting VRGame... ");		
+		// initializing a module mapping
 		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
 //		controller.submitApplication(application, 0,(new ModulePlacementMapping(fogDevices,application, moduleMapping)));
-		controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
-		
+		if(placementPolicy.equals("Edgeward")) controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
+    	else if(placementPolicy.equals("Cloudward")) controller.submitApplication(application, 0,(new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application)));
 		TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 		CloudSim.startSimulation();
 		CloudSim.stopSimulation();
 		Log.printLine("VRGame finished!");
+	}
+	//TODO put back sim params
+	public void createFogSimObjects(boolean startSimulation, String placementPolicy) throws Exception {
+		fogDevices.clear();
+		actuators.clear();
+		sensors.clear();
+		_SpecHandler.placementList.clear();//now in ModulePlacement.java
+		Log.disable();
+		int num_user = 1; // number of cloud users
+		Calendar calendar = Calendar.getInstance();
+		boolean trace_flag = false; // mean trace events
+		CloudSim.init(num_user, calendar, trace_flag);
+		appId = "vr_game"; // identifier of the application
+		PowerDatacenterBroker broker = new FogBroker("broker");
+        Application application = new Application(appId, broker.getId());
+        userId = broker.getId();
+        ModuleMapping moduleMapping = ModuleMapping.createModuleMapping();
+		_SpecHandler.nodesList.stream().filter(n->n.type.equals("device")).forEach(n->fogDevices.add(((DeviceSpec)n).addToApp()));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("sensor")).forEach(n->sensors.add(((SensorSpec)n).addToApp(userId,appId,application)));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("actuat")).forEach(n->actuators.add(((ActuatSpec)n).addToApp(userId,appId)));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("module")).forEach(n->((ModuleSpec)n).addToApp(application));
+        for(NodeSpec n : _SpecHandler.nodesList) for(EdgeSpec e : n.edgesList) e.addToApp(fogDevices, sensors, actuators, application, moduleMapping);
+        if(startSimulation)startVRGame(application, moduleMapping, placementPolicy);
+        else {
+        	if(placementPolicy.equals("Edgeward")) new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping);
+        	else if(placementPolicy.equals("Cloudward")) new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application);
+        }
+	}
+	
+	public VRGameFog(){
+		
 	}
 }

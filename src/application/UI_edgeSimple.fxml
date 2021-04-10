@@ -8,10 +8,10 @@
 
 <BorderPane prefHeight="109.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LinkLatencyInputController">
    <center>
-      <AnchorPane prefHeight="139.0" prefWidth="414.0" BorderPane.alignment="CENTER">
+      <AnchorPane fx:id="ap" prefHeight="139.0" prefWidth="414.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="UpLinkLatency" layoutX="31.0" layoutY="50.0" prefHeight="25.0" prefWidth="225.0" AnchorPane.topAnchor="50.0" />
-            <Button fx:id="setLinkLatency" layoutX="291.0" layoutY="51.0" mnemonicParsing="false" onAction="#saveLinkLatency" text="Set Latency" />
+            <TextField fx:id="latency" layoutX="31.0" layoutY="50.0" prefHeight="25.0" prefWidth="225.0" AnchorPane.topAnchor="50.0" />
+            <Button fx:id="saveButton" layoutX="291.0" layoutY="51.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Set Latency" />
             <Text layoutX="148.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your link latency" />
          </children>
       </AnchorPane>

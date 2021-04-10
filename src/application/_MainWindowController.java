@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
-import application.Controller;
+import application._SubController;
 import application.Main;
 //import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
@@ -271,6 +271,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     NodeSpec draggingNode = null;
     static NodeSpec linkSrcNode = null;
     static NodeSpec selNode = null;
+	VRGameFog vrgame = new VRGameFog();
     
 	@Override
 	public void handle(KeyEvent event) {
@@ -414,7 +415,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
 	private void mouseScrollHandler(ScrollEvent event) {
-    	System.out.println("in zoom");
     	_SpecHandler.shiftPositionsByZoom(event);
     	redrawNodes();
     }
@@ -524,11 +524,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			Scene scene = new Scene(loader.load());
-			Controller controller = loader.getController();
+			_SubController controller = loader.getController();
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			
-			controller.init();
+			controller.init(_SpecHandler.getSelected());
 			
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
@@ -547,41 +547,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			return null;
 		}
     }
-      
-    @FXML
-    double addDeviceLink() {
-    	try {
-    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("Ui_.fxml"));
-    		Scene scene = new Scene(dataFXML.load(),414,139);
-    		Stage stage = new Stage();
-    		stage.setScene(scene);
-    		LinkLatencyInputController controller = dataFXML.getController();
-    		controller.initialize();
-    		stage.setTitle("Set Latency");
-    		stage.showAndWait();
-    		double latency = controller.getLatency();
-    		redrawNodes();
-    		return latency;
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		return 0.0;
-    	}
-    }
-    
+//    
     @FXML
     void editHandler() {
 		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
     	NodeSpec selectedNode = _SpecHandler.getSelected();
     	if(selectedNode == null) return;
-		NodeSpec tryEditNode = addNodeType(selectedNode.type);
-		if (tryEditNode != null) {
-			System.out.println("EditNode " + tryEditNode.toString());
-			System.out.println("SelNode " + selectedNode.toString());
-			tryEditNode=tryEditNode.setPos(selectedNode);
-			System.out.println("SelNode " + selectedNode.toString());
-			System.out.println("Post Edit there are " + _SpecHandler.nodesList.size() + " nodes");
-			_SpecHandler.pruneLinks();
-		}
+    	setupController(selectedNode.type);
+		_SpecHandler.pruneLinks();
 		redrawNodes();
     }
     
@@ -670,13 +643,19 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void startSim(ActionEvent event) throws Exception {
 //    	writeJSON();
-    	VRGameFog vrgame = new VRGameFog();
+		vrgame.createFogSimObjects(true, "Edgeward");
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Output");
         stage.showAndWait();
+    }
+
+	@FXML
+    void startPreview(ActionEvent event) throws Exception {
+    	vrgame.createFogSimObjects(false, "Edgeward");
+    	for(placementObject o : _SpecHandler.placementList)System.out.println("Device: " + o.device + " module " + o.module);
     }
     
     @FXML

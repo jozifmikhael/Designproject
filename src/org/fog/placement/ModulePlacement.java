@@ -8,9 +8,11 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.fog.application.AppModule;
 import org.fog.application.Application;
 import org.fog.entities.FogDevice;
+import application._SpecHandler.placementObject;
 
 public abstract class ModulePlacement {
 	
+	public static ArrayList<placementObject> placementList = new ArrayList<placementObject>();
 	
 	public static int ONLY_CLOUD = 1;
 	public static int EDGEWARDS = 2;
@@ -40,6 +42,7 @@ public abstract class ModulePlacement {
 		return false;
 	}
 	
+	//TODO Refactor this to take a boolean flag at the end
 	protected boolean createModuleInstanceOnDevice(AppModule _module, final FogDevice device){
 		AppModule module = null;
 		if(getModuleToDeviceMap().containsKey(_module.getName()))
@@ -48,6 +51,8 @@ public abstract class ModulePlacement {
 			module = _module;
 			
 		if(canBeCreated(device, module)){
+			placementObject p = new placementObject(device.getName(), module.getName());
+			p.addToPreview();
 			System.out.println("Creating "+module.getName()+" on device "+device.getName());
 			
 			if(!getDeviceToModuleMap().containsKey(device.getId()))
@@ -59,7 +64,7 @@ public abstract class ModulePlacement {
 			getModuleToDeviceMap().get(module.getName()).add(device.getId());
 			return true;
 		} else {
-			System.err.println("Module "+module.getName()+" cannot be created on device "+device.getName());
+			System.err.println("Module " + module.getName() + " cannot be created on device " + device.getName());
 			System.err.println("Terminating");
 			return false;
 		}

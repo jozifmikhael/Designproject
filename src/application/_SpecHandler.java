@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,6 +88,7 @@ public class _SpecHandler {
 	public static ArrayList<ActuatSpec> actuatsList = new ArrayList<ActuatSpec>();
 	public static ArrayList<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
 	public static ArrayList<NodeSpec> nodesList = new ArrayList<NodeSpec>();
+	public static ArrayList<placementObject> placementList = new ArrayList<placementObject>();
 	
 	static double R = 50;
 	static double zoomFactor = 1;
@@ -107,17 +109,29 @@ public class _SpecHandler {
 		double minZoom = 0.25;
 		double maxZoom = 1.5;
 		double zoomStep = 0.05;
+		double scale = 1;
 		double preZoom = zoomFactor;
 		zoomFactor += (event.getDeltaY() > 0) ? zoomStep : -zoomStep;
 		if (zoomFactor < minZoom)
 			zoomFactor = minZoom;
 		if (zoomFactor > maxZoom)
 			zoomFactor = maxZoom;
+
 		double zoomRatio = zoomFactor / preZoom;
-		nodesList.forEach((d) -> {
-			d.x -= (d.x - event.getX()) * 2 * (1 - zoomRatio);
-			d.y -= (d.y - event.getY()) * 2 * (1 - zoomRatio);
-		});
+		gc.translate(preZoom, zoomRatio);
+//		nodesList.forEach((d) -> {
+//			d.x -= (d.x - event.getX()) * 2 * (1 - zoomRatio);
+//			d.y -= (d.y - event.getY()) * 2 * (1 - zoomRatio);
+//		});
+		
+//		scale *= zoomFactor / preZoom;
+//		gc.scale(scale, scale);
+//		gc.m
+//		for(NodeSpec d : nodesList) {
+//			d.sz *= scale;
+//			d.x -= (d.x - event.getX()) * (1 - zoomFactor / preZoom);
+//			d.y -= (d.y - event.getY()) * (1 - zoomFactor / preZoom);
+//		}
 	}
 	
 	public static NodeSpec getNode(MouseEvent mEvent) {
@@ -195,6 +209,11 @@ public class _SpecHandler {
 	}
 	
 	public static class NodeSpec extends Spec {
+		public String testJSON() {
+			String s = "";
+			
+			return s;
+		}
 		public String getName() {
 			return name;
 		}
@@ -962,7 +981,6 @@ public class _SpecHandler {
 		public String inTuple;
 		public String outTuple;
 		public double fractionalSensitivity;
-		
 		@Override
 		public String toString() {
 			return "inTuple=" + inTuple + ",outTuple=" + outTuple + ",fractionalSensitivity="
@@ -1014,6 +1032,20 @@ public class _SpecHandler {
 	
 	public static abstract class Spec {
 		
+	}
+
+	public static class placementObject{
+		public String device;
+		public String module;
+		
+		public placementObject(String device, String module) {
+			this.device = device;
+			this.module = module;
+		}
+		
+		public void addToPreview() {
+			placementList.add(this);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import application._SpecHandler.*;
 
 import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.NodeSpec;
@@ -13,6 +14,7 @@ import application._SpecHandler.TupleSpec;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Accordion;
@@ -58,11 +60,11 @@ import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.LongStringConverter;
 
 
-public abstract class Controller {
+public abstract class _SubController {
 	@FXML
 	public Button saveButton;
 	@FXML
-    private AnchorPane ap;
+    public AnchorPane ap;
 	Spec spec;
 	String thisType;
 
@@ -110,10 +112,11 @@ public abstract class Controller {
 			Field field = getField(targetObject, fieldName);
 			if(field == null) return;
 			switch(field.getType().toString()) {
+				case "string": field.set(targetObject, fieldValue);
 				case "long": field.set(targetObject, Long.parseLong(fieldValue.toString())); break;
-				case "double": field.set(targetObject, Double.parseDouble(fieldValue.toString())); break;
             	case "int": field.set(targetObject, Integer.parseInt(fieldValue.toString())); break;
-				default: field.set(targetObject, fieldValue);
+				case "double": field.set(targetObject, Double.parseDouble(fieldValue.toString())); break;
+				default: printDebug("Unhandled type in setField");
 			}
 		} catch (IllegalAccessException e) {
 			System.out.println("Controller.java : Couldn't set fieldname " + fieldName + " to be accessible");
@@ -126,10 +129,11 @@ public abstract class Controller {
 	public void cellEditHandler(CellEditEvent<Spec, ?> t) {
 //        printDebug("In Table " + t.getTableView().getId() + " : " + t.getOldValue() + " -> " + t.getNewValue()); //t.getNewValue()
         switch(t.getTableColumn().getId()) {
+			case "string": setField(spec, t.getTableColumn().getId(), t.getNewValue());
         	case "double": setField(spec, t.getTableColumn().getId(), Double.valueOf(t.getNewValue().toString())); break;
         	case "long": setField(spec, t.getTableColumn().getId(), Long.valueOf(t.getNewValue().toString())); break;
         	case "int": setField(spec, t.getTableColumn().getId(), Integer.valueOf(t.getNewValue().toString())); break;
-        	default: setField(spec, t.getTableColumn().getId(), t.getNewValue());
+        	default: printDebug("Unhandled type in cellEditHandler");
         }
 		t.getTableView().refresh();
 	}
@@ -155,10 +159,11 @@ public abstract class Controller {
 	            	printDebug(selCol.getId());
 					selCol.setCellValueFactory(new PropertyValueFactory <>(selCol.getId()));
 					switch(getField(spec, selCol.getId()).getType().toString()) {
+						case "string": selCol.setCellFactory(TextFieldTableCell.forTableColumn()); break;
 	                	case "long": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new LongStringConverter())); break;
-						case "double": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter())); break;
 	                	case "int": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); break;
-	                	default: selCol.setCellFactory(TextFieldTableCell.forTableColumn()); break;
+						case "double": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter())); break;
+	                	default: printDebug("Unhandled type in cellFactory");
 	                }
 					selCol.setOnEditCommit(t -> cellEditHandler((CellEditEvent<Spec, ?>)t));
 				}
@@ -176,17 +181,12 @@ public abstract class Controller {
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 } 
-            }else if(selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
+            } else if(selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
         		ObservableList<String> tempNames = FXCollections.observableArrayList();
             	ChoiceBox<String> selBox = (ChoiceBox)selChild;
             	if(selBox.getId().contains("Spec")) {
             		String reqNamesOfType = selBox.getId().split("_")[0];
             		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqNamesOfType)).forEach(n->tempNames.add(n.name));
-//            		ArrayList<String> temp = new ArrayList<String>();
-//            		for(NodeSpec s: _SpecHandler.nodesList) {
-//            			if(s.type.equals("device"))temp.add(s.name);
-//            		}
-////            		tempNames.addAll(temp);
             		selBox.setItems(tempNames);
             		selBox.setValue(tempNames.get(0));
             		selBox.setOnAction((event) -> setField(spec, selBox.getId().split("_")[1], selBox.getSelectionModel().getSelectedItem().toString()));
@@ -196,8 +196,11 @@ public abstract class Controller {
 	}
 	
 	abstract void setSpec();
-	final public void init() {
-		setSpec();
+	abstract void setSpec(Spec s);
+	
+	final public void init(Spec s) {
+		if(s==null) setSpec();
+		else setSpec(s);
 		printDebug(spec.toString());
 		parseChildrenOf(ap);
 	}

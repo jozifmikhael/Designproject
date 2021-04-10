@@ -5,7 +5,7 @@ import application._SpecHandler.DeviceSpec;
 import application._SpecHandler.ModuleSpec;
 import application._SpecHandler.TupleSpec;
 
-public class AddModuleController extends Controller{
+public class AddModuleController extends _SubController{
 	@Override
 	void setSpec() {
 		ArrayList<TupleSpec> t = new ArrayList<TupleSpec>();
