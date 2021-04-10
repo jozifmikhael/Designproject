@@ -1,9 +1,6 @@
 package application;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import org.fog.placement.ModuleMapping;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -105,7 +102,6 @@ public class _SpecHandler {
 	static Color transpColor = Color.TRANSPARENT;
 	static List<Color> validColors = Arrays.asList(deviceColor, moduleColor, sensorColor, actuatorColor, transpColor);
 	static Color _errorColor = Color.GREEN;
-	public static DeviceSpec defaultDevice = new DeviceSpec("whate", "tt", 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
 	
 	public static void shiftPositionsByZoom(ScrollEvent event) {
 		double minZoom = 0.25;
@@ -133,6 +129,11 @@ public class _SpecHandler {
 		if (selNode == null)
 			return null;
 		return selNode.setSelected();
+	}
+	
+	public static NodeSpec getNode(String nodeName) {
+		for(NodeSpec n : nodesList) if(n.name.equals(nodeName)) return n;
+		return null;
 	}
 	
 	public static void pruneLinks() {
@@ -175,14 +176,22 @@ public class _SpecHandler {
 		return null;
 	}
 	
-	public static class jank extends Spec{
-		public String getD() {
-			return d.toString();
-		}
-		public void setD(String _d) {
-			System.out.println("Setter called with : " + _d);
-		}
-		DeviceSpec d;
+	public static ArrayList<String> getLinkableNodes(ArrayList<String> types) {
+		ArrayList<String> list = new ArrayList<String>();
+		for(NodeSpec n : nodesList) if(types.contains(n.type))list.add(n.name);
+        return list;
+    }
+	
+	public static ArrayList<String> linkableDestinations(String type) {//TODO Made just for the edge listeners
+		ArrayList<String> linkables = new ArrayList<String>();
+		if (type.equals("src")) {
+			linkables.add("sensor");
+			linkables.add("module");
+		} else if (type.equals("dst")) {
+			linkables.add("module");
+			linkables.add("actuat");
+		}else if (type.equals("module")) linkables.add("module");
+		return linkables;
 	}
 	
 	public static class NodeSpec extends Spec {
@@ -199,10 +208,10 @@ public class _SpecHandler {
 		double sz;
 		Color nodeColor;
 		public String name;
-		String type;
+		public String type;
 		boolean selected = false;
 		boolean isTemp = false;
-		ArrayList<EdgeSpec> edgesList = null;
+		public ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
 		
 		public NodeSpec(double x, double y, String name, String type) {
@@ -328,9 +337,10 @@ public class _SpecHandler {
 		
 		ArrayList<String> linkableDestinations() {
 			ArrayList<String> linkables = new ArrayList<String>();
-			if (this.type.equals("device"))
+			if (this.type.equals("device")) {
 				linkables.add("device");
-			else if (this.type.equals("module")) {
+				linkables.add("actuat");
+			}else if (this.type.equals("module")) {
 				linkables.add("module");
 				linkables.add("actuat");
 				linkables.add("device");
@@ -346,40 +356,99 @@ public class _SpecHandler {
 			return this;
 		}
 		
-		NodeSpec addLink(NodeSpec dst) {
-			this.edgesList.add(new EdgeSpec(this, dst, 0));
-			return this;
-		}
-		
-		NodeSpec addLink(String _dst, double UpLinkLatency) {
+		NodeSpec deviceModuleLink(String _dst) {
 			NodeSpec dst = _SpecHandler.getLinkableNode(linkableDestinations(), _dst);
-			if (dst == null)
-				return this;
-			this.edgesList.add(new EdgeSpec(this, dst, UpLinkLatency));
+			if (dst == null)return this;
+			this.edgesList.add(new EdgeSpec(this, dst));
 			return this;
 		}
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
-		public String getMips() {
-			return mips+"";
+
+		public int getPe() {
+			return pe;
+		}
+
+		public void setPe(int pe) {
+			this.pe = pe;
+		}
+
+		public long getMips() {
+			return mips;
 		}
 
 		public void setMips(long mips) {
 			this.mips = mips;
 		}
 
-		public String getRam() {
-			return ram+"";
+		public int getRam() {
+			return ram;
 		}
 
 		public void setRam(int ram) {
 			this.ram = ram;
 		}
 
+		public int getLevel() {
+			return level;
+		}
+
+		public void setLevel(int level) {
+			this.level = level;
+		}
+
+		public double getRate() {
+			return rate;
+		}
+
+		public void setRate(double rate) {
+			this.rate = rate;
+		}
+
+		public double getIpower() {
+			return ipower;
+		}
+
+		public void setIpower(double ipower) {
+			this.ipower = ipower;
+		}
+
+		public double getApower() {
+			return apower;
+		}
+
+		public void setApower(double apower) {
+			this.apower = apower;
+		}
+
+		public double getLatency() {
+			return latency;
+		}
+
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+
+		public long getUpbw() {
+			return upbw;
+		}
+
+		public void setUpbw(long upbw) {
+			this.upbw = upbw;
+		}
+
+		public long getDownbw() {
+			return downbw;
+		}
+
+		public void setDownbw(long downbw) {
+			this.downbw = downbw;
+		}
+
 		@SuppressWarnings("unchecked")
-		public DeviceSpec(String name, String parent, int pe, long mips, int ram, int level, double rate, double ipower,
-				double apower, double latency, long upbw, long downbw) {
+		public DeviceSpec(String name, int pe, long mips, int ram, int level, double rate, double ipower, double apower,
+				double latency, long upbw, long downbw) {
 			super(name, "device");
 			this.pe = pe;
 			this.mips = mips;
@@ -395,16 +464,16 @@ public class _SpecHandler {
 			this.add();
 		}
 		
-		int pe;
+		public int pe;
 		public long mips;
 		public int ram;
-		int level;
-		double rate;
-		double ipower;
-		double apower;
-		double latency;
-		long upbw;
-		long downbw;
+		public int level;
+		public double rate;
+		public double ipower;
+		public double apower;
+		public double latency;
+		public long upbw;
+		public long downbw;
 		
 		@Override
 		public String toString() {
@@ -414,45 +483,44 @@ public class _SpecHandler {
 					+ type + ", selected=" + selected;
 		}
 		
-//		private FogDevice addToApp() {
-//			
-//			List<Pe> peList = new ArrayList<Pe>();
-//			
-//			// 3. Create PEs and add these into a list.
-//			peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-//			
-//			int hostId = FogUtils.generateEntityId();
-//			long storage = 1000000; // host storage
-//			int bw = 10000;
-//			PowerHost host = new PowerHost(hostId, new RamProvisionerSimple(ram), new BwProvisionerOverbooking(bw),
-//					storage, peList, new StreamOperatorScheduler(peList),
-//					new FogLinearPowerModel(busyPower, idlePower));
-//			List<Host> hostList = new ArrayList<Host>();
-//			hostList.add(host);
-//			String arch = "x86"; // system architecture
-//			String os = "Linux"; // operating system
-//			String vmm = "Xen";
-//			double time_zone = 10.0; // time zone this resource located
-//			double cost = 3.0; // the cost of using processing in this resource
-//			double costPerMem = 0.05; // the cost of using memory in this resource
-//			double costPerStorage = 0.001; // the cost of using storage in this
-//											// resource
-//			double costPerBw = 0.0; // the cost of using bw in this resource
-//			LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
-//			// devices by now
-//			FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(arch, os, vmm, host, time_zone,
-//					cost, costPerMem, costPerStorage, costPerBw);
-//			FogDevice fogdevice = null;
-//			try {
-//				fogdevice = new FogDevice(nodeName, characteristics, new AppModuleAllocationPolicy(hostList),
-//						storageList, 10, upBw, downBw, 0, ratePerMips);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			
-//			fogdevice.setLevel(level);
-//			return fogdevice;
-//		}
+		public FogDevice addToApp() {
+			List<Pe> peList = new ArrayList<Pe>();
+			
+			// 3. Create PEs and add these into a list.
+			peList.add(new Pe(0, new PeProvisionerOverbooking(this.mips))); // need to store Pe id and MIPS Rating
+			
+			int hostId = FogUtils.generateEntityId();
+			long storage = 1000000; // host storage
+			int bw = 10000;
+			PowerHost host = new PowerHost(hostId, new RamProvisionerSimple(this.ram), new BwProvisionerOverbooking(bw),
+					storage, peList, new StreamOperatorScheduler(peList),
+					new FogLinearPowerModel(this.apower, this.ipower));
+			List<Host> hostList = new ArrayList<Host>();
+			hostList.add(host);
+			String arch = "x86"; // system architecture
+			String os = "Linux"; // operating system
+			String vmm = "Xen";
+			double time_zone = 10.0; // time zone this resource located
+			double cost = 3.0; // the cost of using processing in this resource
+			double costPerMem = 0.05; // the cost of using memory in this resource
+			double costPerStorage = 0.001; // the cost of using storage in this
+											// resource
+			double costPerBw = 0.0; // the cost of using bw in this resource
+			LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
+			// devices by now
+			FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(arch, os, vmm, host, time_zone,
+					cost, costPerMem, costPerStorage, costPerBw);
+			FogDevice fogdevice = null;
+			try {
+				fogdevice = new FogDevice(this.name, characteristics, new AppModuleAllocationPolicy(hostList),
+						storageList, 10, this.upbw, this.downbw, 0, this.rate);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			fogdevice.setLevel(this.level);
+			return fogdevice;
+		}
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
@@ -470,18 +538,59 @@ public class _SpecHandler {
 		
 	}
 	
-	public static class ModuleSpec extends NodeSpec {
+	public static class ModuleSpec extends NodeSpec {	
+		
+		public int getRam() {
+			return ram;
+		}
+
+		public void setRam(int ram) {
+			this.ram = ram;
+		}
+
+		public long getBandwidth() {
+			return bandwidth;
+		}
+
+		public void setBandwidth(long bandwidth) {
+			this.bandwidth = bandwidth;
+		}
+
+		public long getSize() {
+			return size;
+		}
+
+		public void setSize(long size) {
+			this.size = size;
+		}
+
+		public int getMips() {
+			return mips;
+		}
+
+		public void setMips(int mips) {
+			this.mips = mips;
+		}
+
+		public ArrayList<TupleSpec> getTupleMappings() {
+			return tupleMappings;
+		}
+
+		public void setTupleMappings(ArrayList<TupleSpec> tupleMappings) {
+			this.tupleMappings = tupleMappings;
+		}
+
 		@Override
 		public String toString() {
 			return "ram=" + ram + ", bandwidth=" + bandwidth + ", size=" + size + ", mips=" + mips + ", x=" + x + ", y="
 					+ y + ", name=" + name;
 		}
 		
-		int ram;
-		long bandwidth;
-		long size;
-		int mips;
-		ArrayList<TupleSpec> tupleMappings;
+		public int ram;
+		public long bandwidth;
+		public long size;
+		public int mips;
+		public ArrayList<TupleSpec> tupleMappings;
 		
 		public ModuleSpec(String name, String nodeName, int ram, long bandwidth, long size, int mips,
 				ArrayList<TupleSpec> _tupleMappings) {
@@ -493,16 +602,12 @@ public class _SpecHandler {
 			this.add();
 		}
 		
-		public AppModule addToApp(int userId, String appId, Application application) {
-			String vmm = "Xen";
-			AppModule module = new AppModule(FogUtils.generateEntityId(), this.name, appId, userId, this.mips, this.ram,
-					this.bandwidth, this.size, vmm, new TupleScheduler(this.mips, 1),
-					new HashMap<Pair<String, String>, SelectivityModel>());
+		public Application addToApp(Application application) {
 			application.addAppModule(this.name, this.ram, this.mips, this.size, this.bandwidth);
 			for (TupleSpec tupleMaps : this.tupleMappings)
 				application.addTupleMapping(this.name, tupleMaps.getInTuple(), tupleMaps.getOutTuple(),
 						new FractionalSelectivity(tupleMaps.getSensitivity()));
-			return module;
+			return application;
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -524,6 +629,62 @@ public class _SpecHandler {
 	}
 	
 	public static class SensorSpec extends NodeSpec {
+		public double getLatency() {
+			return latency;
+		}
+		
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+		
+		public double getDeterministicValue() {
+			return deterministicValue;
+		}
+		
+		public void setDeterministicValue(double deterministicValue) {
+			this.deterministicValue = deterministicValue;
+		}
+		
+		public double getNormalMean() {
+			return normalMean;
+		}
+		
+		public void setNormalMean(double normalMean) {
+			this.normalMean = normalMean;
+		}
+		
+		public double getNormalStdDev() {
+			return normalStdDev;
+		}
+		
+		public void setNormalStdDev(double normalStdDev) {
+			this.normalStdDev = normalStdDev;
+		}
+		
+		public double getUniformMax() {
+			return uniformMax;
+		}
+		
+		public void setUniformMax(double uniformMax) {
+			this.uniformMax = uniformMax;
+		}
+		
+		public double getUniformMin() {
+			return uniformMin;
+		}
+		
+		public void setUniformMin(double uniformMin) {
+			this.uniformMin = uniformMin;
+		}
+		
+		public String getDistType() {
+			return distType;
+		}
+		
+		public void setDistType(String distType) {
+			this.distType = distType;
+		}
+		
 		double latency;
 		double deterministicValue;
 		double normalMean;
@@ -548,21 +709,18 @@ public class _SpecHandler {
 			Distribution dist;
 			switch (this.distType){
 				case "Deterministic":
-				dist = new DeterministicDistribution(deterministicValue);
+				dist = new DeterministicDistribution(this.deterministicValue);
 				break;
 				case "Normal":
-				dist = new NormalDistribution(normalMean, normalStdDev);
+				dist = new NormalDistribution(this.normalMean, this.normalStdDev);
 				break;
 				case "Uniform":
-				dist = new UniformDistribution(uniformMin, uniformMax);
+				dist = new UniformDistribution(this.uniformMin, this.uniformMax);
 				break;
 				default:
 				dist = null;
 			}
-			for (EdgeSpec edges : this.edgesList)
-				if (edges.edgeType==1)
-					return new Sensor(this.name, edges.tupleType, userId, appId, dist);
-			return null;
+			return new Sensor(this.name, this.name, userId, appId, dist);
 		}
 		
 		@Override
@@ -588,6 +746,14 @@ public class _SpecHandler {
 	}
 	
 	public static class ActuatSpec extends NodeSpec {
+		public double getUpLinklatency() {
+			return UpLinklatency;
+		}
+		
+		public void setUpLinklatency(double upLinklatency) {
+			UpLinklatency = upLinklatency;
+		}
+		
 		public double UpLinklatency;
 		
 		public ActuatSpec(String name, String type, double UpLinklatency) {
@@ -595,13 +761,8 @@ public class _SpecHandler {
 			this.UpLinklatency = UpLinklatency;
 		}
 		
-		public Actuator addToApp(int userId, String appId, Application application) {
-			for (EdgeSpec edges : this.edgesList) {
-				if (edges.edgeType==1) {
-					return new Actuator(this.name, userId, appId, edges.tupleType);
-				}
-			}
-			return null;
+		public Actuator addToApp(int userId, String appId) {
+			return new Actuator(this.name, userId, appId, this.name);
 		}
 		
 		@Override
@@ -624,6 +785,78 @@ public class _SpecHandler {
 	}
 	
 	public static class EdgeSpec extends Spec {
+		public NodeSpec getSrc() {
+			return src;
+		}
+		
+		public void setSrc(NodeSpec src) {
+			this.src = src;
+		}
+		
+		public NodeSpec getDst() {
+			return dst;
+		}
+		
+		public void setDst(NodeSpec dst) {
+			this.dst = dst;
+		}
+		
+		public String getEdgeType() {
+			return edgeType+"";
+		}
+		
+		public void setEdgeType(int edgeType) {
+			this.edgeType = edgeType;
+		}
+		
+		public String getLatency() {
+			return latency+"";
+		}
+		
+		public void setLatency(double latency) {
+			this.latency = latency;
+		}
+		
+		public String getTupleType() {
+			return tupleType;
+		}
+		
+		public void setTupleType(String tupleType) {
+			this.tupleType = tupleType;
+		}
+		
+		public String getPeriodicity() {
+			return periodicity+"";
+		}
+		
+		public void setPeriodicity(double periodicity) {
+			this.periodicity = periodicity;
+		}
+		
+		public String getCpuLength() {
+			return cpuLength+"";
+		}
+		
+		public void setCpuLength(double cpuLength) {
+			this.cpuLength = cpuLength;
+		}
+		
+		public String getNwLength() {
+			return nwLength+"";
+		}
+		
+		public void setNwLength(double nwLength) {
+			this.nwLength = nwLength;
+		}
+		
+		public String getDirection() {
+			return direction+"";
+		}
+		
+		public void setDirection(int direction) {
+			this.direction = direction;
+		}
+		
 		NodeSpec src;
 		NodeSpec dst;
 		// int DEVICE = 0;
@@ -631,16 +864,16 @@ public class _SpecHandler {
 		// public static final int ACTUATOR = 2; // App Edge leads to an actuator
 		// public static final int MODULE = 3; // App Edge is between application
 		// modules
-		int edgeType;
-		double latency;
-		String tupleType;
-		double periodicity;
-		double cpuLength;
-		double nwLength;
+		public int edgeType;
+		public double latency;
+		public String tupleType;
+		public double periodicity;
+		public double cpuLength;
+		public double nwLength;
 //		public static final int UP = 1; //I THINK this is src->dst
 //		public static final int DOWN = 2; //I THINK this is dst->src
 //		public static final int ACTUATOR = 3; //I THINK src->actuator
-		int direction = 1;
+		public int direction = 1;
 		
 		@Override
 		public String toString() {
@@ -673,6 +906,44 @@ public class _SpecHandler {
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
 			this.direction = direction;
+}
+		
+		public EdgeSpec(NodeSpec src, NodeSpec dst) {
+			this(src, dst, -1, 0, "null", 0, 0, 0, 0);
+		}
+		
+		public Application addToApp(List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators, Application application, ModuleMapping moduleMapping) {
+			if (this.edgeType == 0){
+				FogDevice srcDev =null;
+			    FogDevice dstDev =null;
+			    Sensor srcSen = null;
+			    Actuator dstAct = null;
+			    for(FogDevice f : fogDevices) {
+			        if (f.getName().equals(this.src.name)) srcDev=f;
+			        if (f.getName().equals(this.dst.name)) dstDev=f;
+			    }
+			    if(srcDev!=null && dstDev !=null) {
+			        srcDev.setUplinkLatency(this.latency);
+			        srcDev.setParentId(dstDev.getId());
+			    }else {
+			    	for(Sensor s: sensors)if(s.getName().equals(this.src.name))srcSen = s;
+			    	for(Actuator a: actuators)if(a.getName().equals(this.dst.name))dstAct = a;
+			    	if(srcSen != null) {
+			    		srcSen.setGatewayDeviceId(dstDev.getId());
+			    		srcSen.setLatency(this.latency);
+			    	}else if(dstAct != null) {
+			    		dstAct.setGatewayDeviceId(srcDev.getId());
+			    		dstAct.setLatency(this.latency);
+			    	}
+			    }
+			    return null;
+			}else if(this.edgeType == -1) {
+				moduleMapping.addModuleToDevice(this.src.name, this.dst.name);
+				return null;
+			}else {
+				application.addAppEdge(this.src.name, this.dst.name, this.periodicity, this.cpuLength, this.nwLength, this.tupleType, this.direction, this.edgeType);
+			}			
+			return application;
 		}
 		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {
@@ -687,14 +958,14 @@ public class _SpecHandler {
 		}
 	}
 		
-	public static class TupleSpec {
-		SimpleStringProperty inTuple;
-		SimpleStringProperty outTuple;
-		double fractionalSensitivity;
+	public static class TupleSpec extends Spec {
+		public String inTuple;
+		public String outTuple;
+		public double fractionalSensitivity;
 		
 		@Override
 		public String toString() {
-			return "inTuple=" + inTuple.get() + ",outTuple=" + outTuple.get() + ",fractionalSensitivity="
+			return "inTuple=" + inTuple + ",outTuple=" + outTuple + ",fractionalSensitivity="
 					+ fractionalSensitivity;
 		}
 		
@@ -711,19 +982,19 @@ public class _SpecHandler {
 		}
 		
 		public String getInTuple() {
-			return inTuple.get();
+			return inTuple;
 		}
 		
 		public void setInTuple(String inTuple) {
-			this.inTuple.set(inTuple);
+			this.inTuple = inTuple;
 		}
 		
 		public String getOutTuple() {
-			return outTuple.get();
+			return outTuple;
 		}
 		
 		public void setOutTuple(String outTuple) {
-			this.outTuple.set(outTuple);
+			this.outTuple = outTuple;
 		}
 		
 		public double getSensitivity() {
@@ -735,8 +1006,8 @@ public class _SpecHandler {
 		}
 		
 		public TupleSpec(String inTuple, String outTuple, double fractionalSensitivity) {
-			this.inTuple = new SimpleStringProperty(inTuple);
-			this.outTuple = new SimpleStringProperty(outTuple);
+			this.inTuple = inTuple;
+			this.outTuple = outTuple;
 			this.fractionalSensitivity = fractionalSensitivity;
 		}
 	}

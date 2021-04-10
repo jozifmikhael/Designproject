@@ -7,31 +7,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
-import org.cloudbus.cloudsim.power.PowerHost;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
-import org.cloudbus.cloudsim.sdn.overbooking.BwProvisionerOverbooking;
-import org.cloudbus.cloudsim.sdn.overbooking.PeProvisionerOverbooking;
-import org.fog.entities.FogBroker;
-import org.fog.entities.FogDevice;
-import org.fog.entities.FogDeviceCharacteristics;
 import application.Controller;
 import application.Main;
 //import org.fog.placement.Controller;
@@ -51,13 +32,8 @@ import org.json.simple.parser.ParseException;
 
 import application._SpecHandler.*;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -72,7 +48,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import javafx.scene.canvas.*;
 import javafx.beans.value.ChangeListener;
 import javafx.application.Application;
@@ -260,6 +235,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	
     	//TODO Do the other menu items like this
     	addDeviceMenu.setOnAction(e->setupController("device"));
+    	addModuleMenu.setOnAction(e->setupController("module"));
+//    	addSensorMenu.setOnAction(e->setupController("sensor"));
+//    	addActuatorMenu.setOnAction(e->setupController("actuat"));
+    	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
     	
     	gc=topoField.getGraphicsContext2D();
     	gc.setTextAlign(TextAlignment.CENTER);
@@ -290,8 +269,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     boolean mouseR=false;
     boolean mouseM=false;
     NodeSpec draggingNode = null;
-    NodeSpec linkSrcNode = null;
-    NodeSpec selNode = null;
+    static NodeSpec linkSrcNode = null;
+    static NodeSpec selNode = null;
     
 	@Override
 	public void handle(KeyEvent event) {
@@ -356,7 +335,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec("module", mEvent):selNode; break;// Select Module Placer
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
 					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec("actuat", mEvent):selNode; break;// Select Actuat Placer
-					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(draggingNode);break;
+					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(new EdgeSpec(selNode, draggingNode, 0));break;
 					default : {} // Nothing
 				} break;
 //			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
@@ -375,11 +354,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		if((src.type.equals("device") && dst.type.equals("device")) 
 				||(src.type.equals("sensor") && dst.type.equals("device"))
 				||(src.type.equals("device") && dst.type.equals("actuat"))) {
-			double latency = addDeviceLink();
-			src.addLink(dst.name, latency);
-		}else if(src.type.equals("module") && dst.type.equals("module")) {
-			EdgeSpec e = addEdgeFull();
+			EdgeSpec e = (EdgeSpec)setupController("edgeSimple");
+			if(e != null) src.addLink(e);
+		}else if((src.type.equals("module") && dst.type.equals("module")) 
+				||(src.type.equals("sensor") && dst.type.equals("module"))
+				||(src.type.equals("module") && dst.type.equals("actuat"))) {
+			EdgeSpec e = (EdgeSpec) setupController("edgeFull");
+			if(e != null) src.addLink(e);
 		}
+		else if(src.type.equals("module") && dst.type.equals("device")) src.deviceModuleLink(dst.name);
 		return src;
 	}
     
@@ -392,10 +375,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
-					case DIGIT1 : newNode = (selNode!=null)?null:addDevice(); break;
-					case DIGIT2 : newNode = (selNode!=null)?null:addModule(); break;
-					case DIGIT3 : newNode = (selNode!=null)?null:addSensor(); break;
-					case DIGIT4 : newNode = (selNode!=null)?null:addActuat(); break;
+					case DIGIT1 : newNode = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
+					case DIGIT2 : newNode = (selNode!=null)?null:(NodeSpec)setupController("module"); break;
+					case DIGIT3 : newNode = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
+					case DIGIT4 : newNode = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
 					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:makeReqLink(linkSrcNode,selNode); _SpecHandler.pruneLinks(); break;
 
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
@@ -512,10 +495,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	NodeSpec newNode = null;
     NodeSpec addNodeType(String _type) {
-    	if(_type.equals("device")) newNode = addDevice();
-		if(_type.equals("module")) newNode = addModule();
-		if(_type.equals("sensor")) newNode = addSensor();
-		if(_type.equals("actuat")) newNode = addActuat();
+    	if(_type.equals("device")) newNode = (NodeSpec)setupController(_type);
+		if(_type.equals("module")) newNode = (NodeSpec)setupController(_type);
+		if(_type.equals("sensor")) newNode = (NodeSpec)setupController(_type);
+		if(_type.equals("actuat")) newNode = (NodeSpec)setupController(_type);
 		return newNode;
     }
     
@@ -545,8 +528,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			
-			Spec temp = _SpecHandler.defaultDevice;
-			controller.spec=temp;
 			controller.init();
 			
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
@@ -556,47 +537,21 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			    }
 			});
 
-			
 			stage.setOnCloseRequest(e -> stage.close());
 			
 			stage.showAndWait();
 			redrawNodes();
-			return temp;
+			return controller.spec;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
     }
-    
-//    @FXML
-//    DeviceSpec addDevice() {return (DeviceSpec) setupController("Device", 800, 800);}
-//    @FXML
-//    ModuleSpec addModule() {return (ModuleSpec) setupController("Module", 800, 800);}
-//    @FXML
-//    SensorSpec addSensor() {return (SensorSpec) setupController("Sensor", 450, 320);}
-//    @FXML
-//    ActuatSpec addActuat() {return (ActuatSpec) setupController("Actuator", 450, 320);}
-//    @FXML
-//    EdgeSpec addEdge() {return (EdgeSpec) setupController("Edge", 450, 320);}
-    
-    @FXML
-    DeviceSpec addDevice() {return (DeviceSpec) setupController("device");}
-    @FXML
-    ModuleSpec addModule() {return (ModuleSpec) setupController("module");}
-    @FXML
-    SensorSpec addSensor() {return (SensorSpec) setupController("sensor");}
-    @FXML
-    ActuatSpec addActuat() {return (ActuatSpec) setupController("actuat");}
-    @FXML
-    EdgeSpec addEdgeFull() {return (EdgeSpec) setupController("edgeFull");}
-    @FXML
-    EdgeSpec addEdgeSimple() {return (EdgeSpec) setupController("edgeSimple");}
-    
-    
+      
     @FXML
     double addDeviceLink() {
     	try {
-    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("LinkLatencyInputBox.fxml"));
+    		FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("Ui_.fxml"));
     		Scene scene = new Scene(dataFXML.load(),414,139);
     		Stage stage = new Stage();
     		stage.setScene(scene);
@@ -715,6 +670,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void startSim(ActionEvent event) throws Exception {
 //    	writeJSON();
+    	VRGameFog vrgame = new VRGameFog();
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();

@@ -2,20 +2,10 @@ package org.fog.test.perfeval;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.io.BufferedWriter;
-// Added by us
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
-//import java.io.FileNotFoundException;
-//import java.io.IOException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import application._SpecHandler.*;
+import application._SpecHandler;
 
 //import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
@@ -58,7 +48,6 @@ import org.fog.utils.FogLinearPowerModel;
 import org.fog.utils.FogUtils;
 import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.DeterministicDistribution;
-import org.fog.utils.distribution.Distribution;
 import org.fog.utils.distribution.NormalDistribution;	
 import org.fog.utils.distribution.UniformDistribution;
 
@@ -77,7 +66,11 @@ public class VRGameFog {
 	static int userId;
 	static String appId;
 	
-	public VRGameFog(String jsonFile) throws Exception {
+	static int numOfDepts = 1;
+	static int numOfMobilesPerDept = 1;
+	static double EEG_TRANSMISSION_TIME = 5.1;
+	
+	public VRGameFog() throws Exception {
 
 		System.out.println("Starting VRGame... ");
 		Log.disable();
@@ -90,233 +83,24 @@ public class VRGameFog {
 		appId = "vr_game"; // identifier of the application
 		
 		PowerDatacenterBroker broker = new FogBroker("broker");
-		userId = broker.getId();
-//			cloud = createFogDevice("cloud", 44800, 40000, 100, 10000, 0, 0.01, 16*103, 16*83.25); // creates the fog device Cloud at the apex of the hierarchy with level=0
-//			cloud.setParentId(-1);
-//			proxy = createFogDevice("proxy-server", 2800, 4000, 10000, 10000, 1, 0.0, 107.339, 83.4333); // creates the fog device Proxy Server (level=1)
-//			proxy.setParentId(cloud.getId()); // setting Cloud as parent of the Proxy Server
-//			//proxy.setUplinkLatency(100); // latency of connection from Proxy Server to the Cloud is 100 ms
-//			
-//			fogDevices.add(cloud);
-//			fogDevices.add(proxy);
-		
-		Application application = new Application(appId, broker.getId());
-		application.setUserId(broker.getId());
-		
-		System.out.println("Starting parsing...");
-		JSONParser jsonParser = new JSONParser();
-		FileReader reader = new FileReader(jsonFile);
-        Object obj = jsonParser.parse(reader);
-        JSONObject jsonObject = (JSONObject) obj;
-
-        JSONObject metaArr = (JSONObject) jsonObject.get("meta");
-        String simPolicy = (String) metaArr.get("policy");
-        long granularity = (long) metaArr.get("granularity");
-        long time = (long) metaArr.get("time");
-        Config.RESOURCE_MANAGE_INTERVAL = (int) granularity;
-        Config.RESOURCE_MGMT_INTERVAL = (double) granularity;
-        Config.MAX_SIMULATION_TIME = (int) time;
-        Config.TOP_NODE = (String) metaArr.get("central");
+        Application application = new Application(appId, broker.getId());
+        userId = broker.getId();
+        ModuleMapping moduleMapping = ModuleMapping.createModuleMapping();
         
-        System.out.println("Finished meta");
-        
-        JSONArray modArr = (JSONArray) jsonObject.get("modules");	
-        modArr.forEach(n -> parseModuleObject((JSONObject) n, application));
-        JSONArray edgeArr = (JSONArray) jsonObject.get("edges");
-        edgeArr.forEach(n -> parseEdgeObject((JSONObject) n, application));
-    	JSONArray nodeArr = (JSONArray) jsonObject.get("nodes");
-		nodeArr.forEach(n -> parseNodeObject( (JSONObject)n));
-		JSONArray sensorArr = (JSONArray) jsonObject.get("sensors");
-		sensorArr.forEach(l -> parseSensorObject((JSONObject) l));
-		JSONArray actuatorArr = (JSONArray) jsonObject.get("actuators");
-		actuatorArr.forEach(l -> parseActuatorObject((JSONObject) l));
-        JSONArray linkArr = (JSONArray) jsonObject.get("links");
-        linkArr.forEach(l -> parseLinkObject((JSONObject) l));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("device")).forEach(n->fogDevices.add(((DeviceSpec)n).addToApp()));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("sensor")).forEach(n->sensors.add(((SensorSpec)n).addToApp(userId,appId,application)));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("actuat")).forEach(n->actuators.add(((ActuatSpec)n).addToApp(userId,appId)));
+        _SpecHandler.nodesList.stream().filter(n->n.type.equals("module")).forEach(n->((ModuleSpec)n).addToApp(application));
+        for(NodeSpec n : _SpecHandler.nodesList) for(EdgeSpec e : n.edgesList) e.addToApp(fogDevices, sensors, actuators, application, moduleMapping);
 		
-		ModuleMapping moduleMapping = ModuleMapping.createModuleMapping(); // initializing a module mapping
-		moduleMapping.addModuleToDevice("connector", "cloud");
+		 // initializing a module mapping
 		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
+//		controller.submitApplication(application, 0,(new ModulePlacementMapping(fogDevices,application, moduleMapping)));
 		controller.submitApplication(application, 0,(new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping)));
 		
 		TimeKeeper.getInstance().setSimulationStartTime(Calendar.getInstance().getTimeInMillis());
 		CloudSim.startSimulation();
 		CloudSim.stopSimulation();
 		Log.printLine("VRGame finished!");
-	}
-	
-	private static void parseNodeObject(JSONObject node) {
-        double nodeBusyPower = (double) node.get("apower");
-        int nodeLevel = Integer.parseUnsignedInt(node.get("level").toString());
-        double nodeRatePerMips = (double) node.get("rate");
-        double nodeIdlePower = (double) node.get("ipower");
-        String nodeID = (String) node.get("name");
-        long nodeDownBw = Long.parseUnsignedLong(node.get("down_bw").toString());
-        long nodeUpBw = Long.parseUnsignedLong(node.get("up_bw").toString());
-        long nodeMips = Long.parseUnsignedLong(node.get("mips").toString());
-//        double transmissionTime = (double) node.get("transmission_time");
-        int nodeRam = Integer.parseUnsignedInt(node.get("ram").toString());
-        
-        FogDevice mobile = createFogDevice(nodeID, nodeMips, nodeRam, nodeUpBw, nodeDownBw, nodeLevel, nodeRatePerMips, nodeBusyPower, nodeIdlePower);
-		
-		fogDevices.add(mobile);
-    }
-	
-	private static void parseSensorObject(JSONObject sensor) {	
-		String sensorName = (String) sensor.get("sensorName");
-		String distribution = (String) sensor.get("distribution");
-		double deterministicValue = (double) sensor.get("deterministicValue");
-		double normalMean = (double) sensor.get("normalMean");
-		double normalStdDev = (double) sensor.get("normalStdDev");
-		double uniformMax = (double) sensor.get("uniformMax");
-		double uniformMin = (double) sensor.get("uniformMin");
-		Distribution dist;
-		switch(distribution) {
-			case "Deterministic": dist = new DeterministicDistribution(deterministicValue);
-			case "Normal": dist = new NormalDistribution(normalMean, normalStdDev);
-			case "Uniform": dist = new UniformDistribution(uniformMin, uniformMax);
-			default: dist = null;
-		}
-		Sensor newSensor = new Sensor(sensorName, sensorTuple, userId, appId, dist);
-	}
-		
-	private static void parseActuatorObject(JSONObject actuator) {	
-		String actuatorName = (String) actuator.get("Actuator Name");
-		Actuator display = new Actuator(actuatorName, userId, appId, actuatorType);
-		actuators.add(display);
-	}
-	
-	private static void parseLinkObject(JSONObject link) {
-		double latency = (double) (link.get("latency"));
-		String srcID = (String) link.get("srcID");
-		String dstID = (String) link.get("dstID");
-		FogDevice src = null;
-		FogDevice dst = null;
-		Sensor sensorSrc = null;
-		Actuator actuatorSrc = null;
-
-		for(FogDevice device : fogDevices) {
-			if (device.getName().equals(srcID)) src=device;
-			if (device.getName().equals(dstID)) dst=device;
-		}
-		for(Sensor sensor : sensors) {	
-			if (sensor.getName().equals(srcID)) sensorSrc=sensor;	
-		}	
-			
-		for(Actuator actuator : actuators) {	
-			if (actuator.getName().equals(srcID)) actuatorSrc = actuator;	
-		}
-		if(!(src==null || dst==null)) {
-			src.setParentId(dst.getId());
-			src.setUplinkLatency(latency);
-		}else if(!(sensorSrc==null || dst==null)) {	
-			sensorSrc.setGatewayDeviceId(dst.getId());	
-			sensorSrc.setLatency(latency);	
-		}else if(!(actuatorSrc==null || dst==null)) {	
-			actuatorSrc.setGatewayDeviceId(dst.getId());	
-			actuatorSrc.setLatency(latency);
-		}else System.out.println("Error src/dst not found");
-	}
-	
-	private static void parseModuleObject(JSONObject module, Application application) {
-		String name = (String) module.get("name");
-		int ram = Integer.parseUnsignedInt(module.get("ram").toString());
-		int mips = Integer.parseUnsignedInt(module.get("mips").toString());
-		long size = Long.parseUnsignedLong(module.get("size").toString());
-		long bw = Long.parseUnsignedLong(module.get("bandwidth").toString());
-		
-		application.addAppModule(name, ram, mips, size, bw);
-		
-		JSONArray tuplemap = (JSONArray) module.get("TupleMaps");
-		tuplemap.forEach(n -> parseTupleMapping((JSONObject) n, application, name));
-	}
-	private static void parseEdgeObject(JSONObject edges, Application application) {
-		String src = (String) edges.get("src");
-		String dest = (String) edges.get("dest");
-		double periodicity = (double) edges.get("periodicity");
-		double tupleCpuLength = (double) edges.get("tupleCpuLength");
-		double tupleNwLength = (double) edges.get("tupleNwLength");
-		String tupleType = (String) edges.get("tupleType");
-		int direction = Integer.parseUnsignedInt(edges.get("direction").toString());
-		int edgeType = Integer.parseUnsignedInt(edges.get("edgeType").toString());
-		
-		if(edgeType == 1) {
-			sensorTuple = tupleType;
-		}
-		else if(edgeType == 2) {
-			actuatorType = dest;
-		}
-		application.addAppEdge(src, dest, periodicity, tupleCpuLength, tupleNwLength, tupleType, direction, edgeType);
-	}
-	private static void parseTupleMapping(JSONObject tuplemaps, Application application, String name) {
-		String inTuple = (String) tuplemaps.get("inTuple");
-		String outTuple = (String) tuplemaps.get("outTuple");
-		double fractionalSensitivity = (double) tuplemaps.get("fractionalSensitivity");
-		application.addTupleMapping(name, inTuple, outTuple, new FractionalSelectivity(fractionalSensitivity));
-	}
-	
-	/**
-	 * Creates a vanilla fog device
-	 * @param nodeName name of the device to be used in simulation
-	 * @param mips MIPS
-	 * @param ram RAM
-	 * @param upBw uplink bandwidth
-	 * @param downBw downlink bandwidth
-	 * @param level hierarchy level of the device
-	 * @param ratePerMips cost rate per MIPS used
-	 * @param busyPower
-	 * @param idlePower
-	 * @return
-	 */
-	private static FogDevice createFogDevice(String nodeName, long mips,
-			int ram, long upBw, long downBw, int level, double ratePerMips, double busyPower, double idlePower) {
-		
-		List<Pe> peList = new ArrayList<Pe>();
-		
-		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerOverbooking(mips))); // need to store Pe id and MIPS Rating
-		
-		int hostId = FogUtils.generateEntityId();
-		long storage = 1000000; // host storage
-		int bw = 10000;
-
-		PowerHost host = new PowerHost(
-				hostId,
-				new RamProvisionerSimple(ram),
-				new BwProvisionerOverbooking(bw),
-				storage,
-				peList,
-				new StreamOperatorScheduler(peList),
-				new FogLinearPowerModel(busyPower, idlePower)
-			);
-
-		List<Host> hostList = new ArrayList<Host>();
-		hostList.add(host);
-
-		String arch = "x86"; // system architecture
-		String os = "Linux"; // operating system
-		String vmm = "Xen";
-		double time_zone = 10.0; // time zone this resource located
-		double cost = 3.0; // the cost of using processing in this resource
-		double costPerMem = 0.05; // the cost of using memory in this resource
-		double costPerStorage = 0.001; // the cost of using storage in this
-										// resource
-		double costPerBw = 0.0; // the cost of using bw in this resource
-		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
-													// devices by now
-
-		FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(
-				arch, os, vmm, host, time_zone, cost, costPerMem,
-				costPerStorage, costPerBw);
-
-		FogDevice fogdevice = null;
-		try {
-			fogdevice = new FogDevice(nodeName, characteristics, 
-					new AppModuleAllocationPolicy(hostList), storageList, 10, upBw, downBw, 0, ratePerMips);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		fogdevice.setLevel(level);
-		return fogdevice;
 	}
 }

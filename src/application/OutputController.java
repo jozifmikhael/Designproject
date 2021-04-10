@@ -11,7 +11,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import application._SpecHandler.NodeSpec;
-import application._SpecHandler.jank;
 import org.fog.test.perfeval.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;

@@ -74,7 +74,7 @@ public class Sensor extends SimEntity{
 		this.setAppId(appId);
 		this.setTransmitDistribution(transmitDistribution);
 		setTupleType(tupleType);
-		setSensorName(tupleType);
+		setSensorName(name);
 		setUserId(userId);
 	}
 	
