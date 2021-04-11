@@ -88,7 +88,6 @@ public class _SpecHandler {
 	public static ArrayList<ActuatSpec> actuatsList = new ArrayList<ActuatSpec>();
 	public static ArrayList<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
 	public static ArrayList<NodeSpec> nodesList = new ArrayList<NodeSpec>();
-	public static ArrayList<placementObject> placementList = new ArrayList<placementObject>();
 	
 	static double R = 50;
 	static double zoomFactor = 1;

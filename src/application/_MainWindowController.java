@@ -655,7 +655,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	@FXML
     void startPreview(ActionEvent event) throws Exception {
     	vrgame.createFogSimObjects(false, "Edgeward");
-    	for(placementObject o : _SpecHandler.placementList)System.out.println("Device: " + o.device + " module " + o.module);
+    	// for(placementObject o : _SpecHandler.placementList)System.out.println("Device: " + o.device + " module " + o.module);//placementList moved to ModulePlacement.java
     }
     
     @FXML
