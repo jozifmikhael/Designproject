@@ -79,7 +79,7 @@ public class VRGameFog {
 		fogDevices.clear();
 		actuators.clear();
 		sensors.clear();
-		_SpecHandler.placementList.clear();//now in ModulePlacement.java
+//		_SpecHandler.placementList.clear();//now in ModulePlacement.java
 		Log.disable();
 		int num_user = 1; // number of cloud users
 		Calendar calendar = Calendar.getInstance();

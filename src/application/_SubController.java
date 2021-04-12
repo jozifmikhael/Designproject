@@ -112,11 +112,11 @@ public abstract class _SubController {
 			Field field = getField(targetObject, fieldName);
 			if(field == null) return;
 			switch(field.getType().toString()) {
-				case "string": field.set(targetObject, fieldValue);
+				case "class java.lang.String": field.set(targetObject, fieldValue); break;
 				case "long": field.set(targetObject, Long.parseLong(fieldValue.toString())); break;
             	case "int": field.set(targetObject, Integer.parseInt(fieldValue.toString())); break;
 				case "double": field.set(targetObject, Double.parseDouble(fieldValue.toString())); break;
-				default: printDebug("Unhandled type in setField");
+				default: printDebug("Unhandled type " + field.getType().toString() + " in setField for : " + fieldName);
 			}
 		} catch (IllegalAccessException e) {
 			System.out.println("Controller.java : Couldn't set fieldname " + fieldName + " to be accessible");
@@ -126,15 +126,11 @@ public abstract class _SubController {
 			System.out.println("Controller.java : Couldn't set fieldname " + fieldName + " = " + fieldValue.toString());
 		}
 	}
-	public void cellEditHandler(CellEditEvent<Spec, ?> t) {
-//        printDebug("In Table " + t.getTableView().getId() + " : " + t.getOldValue() + " -> " + t.getNewValue()); //t.getNewValue()
-        switch(t.getTableColumn().getId()) {
-			case "string": setField(spec, t.getTableColumn().getId(), t.getNewValue());
-        	case "double": setField(spec, t.getTableColumn().getId(), Double.valueOf(t.getNewValue().toString())); break;
-        	case "long": setField(spec, t.getTableColumn().getId(), Long.valueOf(t.getNewValue().toString())); break;
-        	case "int": setField(spec, t.getTableColumn().getId(), Integer.valueOf(t.getNewValue().toString())); break;
-        	default: printDebug("Unhandled type in cellEditHandler");
-        }
+	public void cellEditHandler(CellEditEvent<?, ?> t) {
+        printDebug("In Table " + t.getTableView().getId() + " : " + t.getOldValue() + " -> " + t.getNewValue()); //t.getNewValue()
+		String colID=t.getTableColumn().getId();
+		printDebug(colID);
+		setField(t.getTableView().getItems().get(t.getTablePosition().getRow()), colID, t.getNewValue());
 		t.getTableView().refresh();
 	}
 	
@@ -145,31 +141,34 @@ public abstract class _SubController {
 		for(int i=0; i<((Parent) cRoot).getChildrenUnmodifiable().size(); i++) {
 			Node selChild = ((Parent) cRoot).getChildrenUnmodifiable().get(i);
 			
-			if(containers.contains(selChild.getClass().getSimpleName().toString())){
+			if (containers.contains(selChild.getClass().getSimpleName().toString())) {
 				printDebug("Checking children of : " + selChild.getClass().getSimpleName().toString());
 				parseChildrenOf(selChild);
-			}else if(selChild.getClass().getSimpleName().toString().equals("TableView")) {
+			} 
+			else if (selChild.getClass().getSimpleName().toString().equals("TableView")) {
 				TableView selTable = (TableView)selChild;
-				selTable.setItems(tempData);
+//				selTable.setItems(tempData);
 				selTable.setEditable(true);
 				int nCol = selTable.getColumns().size();
 				for(int j = 0; j<nCol; j++) {
-					printDebug(selTable.getId());
+					printDebug("Table ID " + selTable.getId());
 					TableColumn selCol = (TableColumn) (selTable.getColumns().get(j));
-	            	printDebug(selCol.getId());
+	            	printDebug("Col ID " + selCol.getId());
 					selCol.setCellValueFactory(new PropertyValueFactory <>(selCol.getId()));
-					switch(getField(spec, selCol.getId()).getType().toString()) {
-						case "string": selCol.setCellFactory(TextFieldTableCell.forTableColumn()); break;
+					switch(getField(selTable.getItems().get(0), selCol.getId()).getType().toString()) {
+						case "class java.lang.String": selCol.setCellFactory(TextFieldTableCell.forTableColumn()); break;
 	                	case "long": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new LongStringConverter())); break;
 	                	case "int": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter())); break;
 						case "double": selCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter())); break;
 	                	default: printDebug("Unhandled type in cellFactory");
 	                }
-					selCol.setOnEditCommit(t -> cellEditHandler((CellEditEvent<Spec, ?>)t));
+					selCol.setOnEditCommit(t -> cellEditHandler((CellEditEvent<?, ?>)t));
 				}
-            }else if(selChild.getClass().getSimpleName().toString().equals("TextField")) {
-            	printDebug("Found a textField with ID " + selChild.getId());
+			}
+			else if (selChild.getClass().getSimpleName().toString().equals("TextField")) {
+				printDebug("Found a textField with ID " + selChild.getId());
             	TextField selTextField = (TextField)selChild;
+            	if(selTextField.getId().contains("Spec")) continue;
             	selTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             		printDebug(selTextField.getId() + " -> " + newValue);
             	    setField(spec, selTextField.getId(), newValue);
@@ -181,9 +180,9 @@ public abstract class _SubController {
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 } 
-            } else if(selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
+			} else if (selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
         		ObservableList<String> tempNames = FXCollections.observableArrayList();
-            	ChoiceBox<String> selBox = (ChoiceBox)selChild;
+            	ChoiceBox<String> selBox = (ChoiceBox) selChild;
             	if(selBox.getId().contains("Spec")) {
             		String reqNamesOfType = selBox.getId().split("_")[0];
             		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqNamesOfType)).forEach(n->tempNames.add(n.name));
@@ -195,13 +194,19 @@ public abstract class _SubController {
 		}
 	}
 	
-	abstract void setSpec();
-	abstract void setSpec(Spec s);
-	
-	final public void init(Spec s) {
-		if(s==null) setSpec();
-		else setSpec(s);
+	void extendedInit() {
+		//Does nothing here
+		//Extend this method in children controllers to add in extra functionality if needed
+		//Populate non-standard lists/tables, etc.
+	}
+	abstract void initDefaultObject();
+	final public Spec init(Spec s) {
+		if(s==null) initDefaultObject();
+		else spec=s;
+		extendedInit();
 		printDebug(spec.toString());
 		parseChildrenOf(ap);
+		printDebug("Returned");
+		return spec;
 	}
 }

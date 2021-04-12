@@ -213,8 +213,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private TreeTableColumn<String, String> col1;
     
     ////////////////////////////////////////////////////////////////////////////
-    
-//	double R=50;
+    // TODO Tidy up the todo list
+	// TODO Actually implement/deal with errors caught by try-catches instead of just suppressing
+    // double R=50;
 	double xCenter=100;
 	double yCenter=100;
 	
@@ -528,15 +529,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			
-			controller.init(_SpecHandler.getSelected());
+			Spec specPtr = controller.init(_SpecHandler.getSelected());
 			
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
-			    	case 116: controller.makeSpec(); break;
-			        default:  {}
+			    	case 27: break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
+			    	case 116: printDebug(specPtr.toString()); break;
+			        default:  {printDebug(event.getCode().getCode()+"");}
 			    }
 			});
-
+			
 			stage.setOnCloseRequest(e -> stage.close());
 			
 			stage.showAndWait();

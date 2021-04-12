@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 public class LinkLatencyInputController extends _SubController{
 
 	@Override
-	void setSpec() {
+	void initDefaultObject() {
 		// TODO Auto-generated method stub
         spec = new _SpecHandler.EdgeSpec(_MainWindowController.selNode, _MainWindowController.linkSrcNode);
 	}

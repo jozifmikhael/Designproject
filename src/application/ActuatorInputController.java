@@ -5,7 +5,7 @@ import application._SpecHandler.DeviceSpec;
 
 public class ActuatorInputController extends _SubController{
 	 @Override
-    void setSpec() {
+    void initDefaultObject() {
         spec = new ActuatSpec("node"+_SpecHandler.nodesList.size(), thisType, 0);
     }
 }

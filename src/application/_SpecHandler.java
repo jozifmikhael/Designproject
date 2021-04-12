@@ -447,7 +447,8 @@ public class _SpecHandler {
 		public void setLatency(double latency) {
 			this.latency = latency;
 		}
-
+		//TODO Only have the one box for upbw/downbw
+		//just assign equiv in the background?
 		public long getUpbw() {
 			return upbw;
 		}
@@ -624,7 +625,7 @@ public class _SpecHandler {
 			application.addAppModule(this.name, this.ram, this.mips, this.size, this.bandwidth);
 			for (TupleSpec tupleMaps : this.tupleMappings)
 				application.addTupleMapping(this.name, tupleMaps.getInTuple(), tupleMaps.getOutTuple(),
-						new FractionalSelectivity(tupleMaps.getSensitivity()));
+						new FractionalSelectivity(tupleMaps.getFractionalSensitivity()));
 			return application;
 		}
 		
@@ -977,6 +978,30 @@ public class _SpecHandler {
 	}
 		
 	public static class TupleSpec extends Spec {
+		public String getInTuple() {
+			return inTuple;
+		}
+
+		public void setInTuple(String inTuple) {
+			this.inTuple = inTuple;
+		}
+
+		public String getOutTuple() {
+			return outTuple;
+		}
+
+		public void setOutTuple(String outTuple) {
+			this.outTuple = outTuple;
+		}
+
+		public double getFractionalSensitivity() {
+			return fractionalSensitivity;
+		}
+
+		public void setFractionalSensitivity(double fractionalSensitivity) {
+			this.fractionalSensitivity = fractionalSensitivity;
+		}
+
 		public String inTuple;
 		public String outTuple;
 		public double fractionalSensitivity;
@@ -996,30 +1021,6 @@ public class _SpecHandler {
 				obj.put(tupleSplit2[0], tupleSplit2[1]);
 			}
 			return obj;
-		}
-		
-		public String getInTuple() {
-			return inTuple;
-		}
-		
-		public void setInTuple(String inTuple) {
-			this.inTuple = inTuple;
-		}
-		
-		public String getOutTuple() {
-			return outTuple;
-		}
-		
-		public void setOutTuple(String outTuple) {
-			this.outTuple = outTuple;
-		}
-		
-		public double getSensitivity() {
-			return fractionalSensitivity;
-		}
-		
-		public void setSensitivity(double sensitivity) {
-			this.fractionalSensitivity = sensitivity;
 		}
 		
 		public TupleSpec(String inTuple, String outTuple, double fractionalSensitivity) {
@@ -1043,10 +1044,11 @@ public class _SpecHandler {
 		}
 		
 		public void addToPreview() {
-			placementList.add(this);
+			//TODO Preview
+//			placementList.add(this);
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public void writeJSON(String jsonFileName, int simGranularity, int simTotLength, String placementPolicy,
 			String topLvNode) {
