@@ -38,10 +38,11 @@ public class AddModuleController extends _SubController{
         spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>());
 	}
 	void extendedInit() {
+		tupleData.add(new TupleSpec("-", "-", 0.0));
 		tupleData.addAll(((ModuleSpec)this.spec).tupleMappings);
-		tupleData.add(new TupleSpec("test", "test", 0.0));
 		TupleSpec.setItems(tupleData);
 	}
+	
 	@FXML
     void addTupleMap() {
 		TupleSpec t = new TupleSpec(inTuple_TupleSpec.getText(),outTuple_TupleSpec.getText(),Double.parseDouble(fractionalSensitivity_TupleSpec.getText()));
@@ -51,6 +52,6 @@ public class AddModuleController extends _SubController{
 		outTuple_TupleSpec.clear();
 		fractionalSensitivity_TupleSpec.clear();
 		TupleSpec.refresh();
-		printDebug("tupleMappings Size : "+((ModuleSpec)this.spec).tupleMappings.size());
+//		printDebug("tupleMappings Size : "+((ModuleSpec)this.spec).tupleMappings.size());
     }
 }

@@ -194,12 +194,12 @@ public abstract class _SubController {
 		}
 	}
 	
+	abstract void initDefaultObject();
 	void extendedInit() {
 		//Does nothing here
 		//Extend this method in children controllers to add in extra functionality if needed
 		//Populate non-standard lists/tables, etc.
 	}
-	abstract void initDefaultObject();
 	final public Spec init(Spec s) {
 		if(s==null) initDefaultObject();
 		else spec=s;

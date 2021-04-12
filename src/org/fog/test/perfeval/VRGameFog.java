@@ -6,15 +6,9 @@ import java.util.List;
 
 import application._SpecHandler.*;
 import application._SpecHandler;
-
-//import org.json.simple.parser.ParseException;
 import org.cloudbus.cloudsim.Vm;
-//import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-//import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.Cloudlet;
 //import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-//import java.text.DecimalFormat;
-
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Pe;
@@ -62,7 +56,7 @@ public class VRGameFog {
 	static int userId;
 	static String appId;
 	
-	public void startVRGame(Application application, ModuleMapping moduleMapping, String placementPolicy) {
+	public void startVRGame(Application application, ModuleMapping moduleMapping, String placementPolicy, int granularityMetric, int simulationTime) {
 		System.out.println("Starting VRGame... ");		
 		// initializing a module mapping
 		Controller controller = new Controller("master-controller", fogDevices, sensors, actuators);
@@ -75,11 +69,11 @@ public class VRGameFog {
 		Log.printLine("VRGame finished!");
 	}
 	//TODO put back sim params
-	public void createFogSimObjects(boolean startSimulation, String placementPolicy) throws Exception {
+	public void createFogSimObjects(boolean startSimulation, String placementPolicy, int granularityMetric, int simulationTime) throws Exception {
 		fogDevices.clear();
 		actuators.clear();
 		sensors.clear();
-//		_SpecHandler.placementList.clear();//now in ModulePlacement.java
+		ModulePlacement.placementList.clear();
 		Log.disable();
 		int num_user = 1; // number of cloud users
 		Calendar calendar = Calendar.getInstance();
@@ -95,7 +89,7 @@ public class VRGameFog {
         _SpecHandler.nodesList.stream().filter(n->n.type.equals("actuat")).forEach(n->actuators.add(((ActuatSpec)n).addToApp(userId,appId)));
         _SpecHandler.nodesList.stream().filter(n->n.type.equals("module")).forEach(n->((ModuleSpec)n).addToApp(application));
         for(NodeSpec n : _SpecHandler.nodesList) for(EdgeSpec e : n.edgesList) e.addToApp(fogDevices, sensors, actuators, application, moduleMapping);
-        if(startSimulation)startVRGame(application, moduleMapping, placementPolicy);
+        if(startSimulation)startVRGame(application, moduleMapping, placementPolicy, granularityMetric, simulationTime);
         else {
         	if(placementPolicy.equals("Edgeward")) new ModulePlacementEdgewards(fogDevices, sensors, actuators, application, moduleMapping);
         	else if(placementPolicy.equals("Cloudward")) new ModulePlacementOnlyCloud(fogDevices, sensors, actuators, application);

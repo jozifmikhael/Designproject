@@ -57,7 +57,6 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -272,6 +271,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     NodeSpec draggingNode = null;
     static NodeSpec linkSrcNode = null;
     static NodeSpec selNode = null;
+	static EdgeSpec selEdge = null;
 	VRGameFog vrgame = new VRGameFog();
     
 	@Override
@@ -329,8 +329,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
+				selEdge = _SpecHandler.getEdge(mEvent);
 				selNode = _SpecHandler.getNode(mEvent);
 				if (selNode!=null) selNode.setSelected();
+				else if(selEdge!=null) selEdge.setSelected();
 				switch(InteractionState.getSetKey()) {
 					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
 					case DIGIT1 : draggingNode=(selNode==null)?new NodeSpec("device", mEvent):selNode; break;// Select Device Placer
@@ -375,6 +377,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //				System.out.println("In Left: KeyState: " + InteractionState.setKey);
 				NodeSpec newNode = null;
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
+				selEdge = _SpecHandler.getEdge(mEvent);
 				selNode = _SpecHandler.getNode(mEvent);
 				switch(InteractionState.getSetKey()) {
 					case DIGIT1 : newNode = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
@@ -553,7 +556,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void editHandler() {
 		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
-    	NodeSpec selectedNode = _SpecHandler.getSelected();
+    	NodeSpec selectedNode = (NodeSpec)_SpecHandler.getSelected();
     	if(selectedNode == null) return;
     	setupController(selectedNode.type);
 		_SpecHandler.pruneLinks();
@@ -645,7 +648,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     void startSim(ActionEvent event) throws Exception {
 //    	writeJSON();
-		vrgame.createFogSimObjects(true, "Edgeward");
+		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
         Stage stage = new Stage();
@@ -656,7 +659,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	@FXML
     void startPreview(ActionEvent event) throws Exception {
-    	vrgame.createFogSimObjects(false, "Edgeward");
+    	vrgame.createFogSimObjects(false, "Edgeward", 10, 10000);
     	// for(placementObject o : _SpecHandler.placementList)System.out.println("Device: " + o.device + " module " + o.module);//placementList moved to ModulePlacement.java
     }
     

@@ -1,13 +1,13 @@
 package application;
 
 import org.fog.placement.ModuleMapping;
+import org.fog.placement.ModulePlacement;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,10 +73,6 @@ import org.fog.utils.FogLinearPowerModel;
 import org.fog.utils.FogUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-import application._SpecHandler.DeviceSpec;
-//import application.SetupJSONParser.dispNode;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -143,6 +139,32 @@ public class _SpecHandler {
 			return null;
 		return selNode.setSelected();
 	}
+
+	public static EdgeSpec getEdge(MouseEvent mEvent) {
+		for(NodeSpec n : _SpecHandler.nodesList) {
+			for(EdgeSpec e : n.edgesList) {
+				if(e.dst == null || e.src == null) continue;
+				if((mEvent.getX() <= e.dst.x && mEvent.getX() >= e.src.x && mEvent.getY() <= e.dst.y && mEvent.getY() >= e.src.y)
+						||(mEvent.getX() <= e.src.x && mEvent.getX() >= e.dst.x && mEvent.getY() <= e.src.y && mEvent.getY() >= e.dst.y)
+						||(mEvent.getX() <= e.dst.x && mEvent.getX() >= e.src.x && mEvent.getY() <= e.src.y && mEvent.getY() >= e.dst.y)
+						||(mEvent.getX() <= e.src.x && mEvent.getX() >= e.dst.x && mEvent.getY() <= e.dst.y && mEvent.getY() >= e.src.y)) {
+					double m = (e.src.y - e.dst.y)/(e.src.x - e.dst.x);
+					if(e.src.x - e.dst.x == 0 && Math.abs(mEvent.getX() - e.dst.x) <= 10) return (EdgeSpec) e.setSelected();
+					else if(e.src.y - e.dst.y == 0 && Math.abs(mEvent.getY() - e.dst.y) <= 10) return (EdgeSpec) e.setSelected();
+					else {
+						double bLink = (e.dst.y - (m*e.dst.x));
+						double mTemp = -(1/m);
+						double bTemp = mEvent.getY() - (mTemp * mEvent.getX());
+						double xLine = (bTemp - bLink)/(m - mTemp);
+						double yLine = m * xLine + bLink;
+						double distance = Math.sqrt(Math.pow(xLine - mEvent.getX(), 2) + Math.pow(yLine - mEvent.getY(),2));
+						if(distance <= 10) return (EdgeSpec) e.setSelected();
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 	public static NodeSpec getNode(String nodeName) {
 		for(NodeSpec n : nodesList) if(n.name.equals(nodeName)) return n;
@@ -159,13 +181,19 @@ public class _SpecHandler {
 	}
 	
 	public static void deselectAll() {
-		nodesList.forEach(n -> n.selected = false);
+		for(NodeSpec n : nodesList) {
+			n.selected = false;
+			for(EdgeSpec e: n.edgesList) e.selected = false;
+		}
 	}
 	
-	public static NodeSpec getSelected() {
-		for (NodeSpec n : nodesList)
-			if (n.selected)
-				return n;
+	public static Spec getSelected() {
+		for (NodeSpec n : nodesList) {
+			if (n.selected) return n;
+			for(EdgeSpec e : n.edgesList) {
+				if(e.selected) return e;
+			}
+		}
 		return null;
 	}
 	
@@ -227,7 +255,6 @@ public class _SpecHandler {
 		Color nodeColor;
 		public String name;
 		public String type;
-		boolean selected = false;
 		boolean isTemp = false;
 		public ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
@@ -346,13 +373,6 @@ public class _SpecHandler {
 			return this;
 		}
 		
-		NodeSpec setSelected() {
-			deselectAll();
-			this.selected = true;
-//			System.out.println(this.toString()+this.toStringLinks());
-			return this;
-		}
-		
 		ArrayList<String> linkableDestinations() {
 			ArrayList<String> linkables = new ArrayList<String>();
 			if (this.type.equals("device")) {
@@ -370,6 +390,7 @@ public class _SpecHandler {
 		}
 		
 		NodeSpec addLink(EdgeSpec e) {
+			for(EdgeSpec edge : this.edgesList) if(e.dst.equals(edge.dst)) return this;
 			this.edgesList.add(e);
 			return this;
 		}
@@ -930,6 +951,11 @@ public class _SpecHandler {
 		public EdgeSpec(NodeSpec src, NodeSpec dst) {
 			this(src, dst, -1, 0, "null", 0, 0, 0, 0);
 		}
+
+			
+		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {
+			this(src, dst, 0, latency, "null", 0, 0, 0, 0);
+		}
 		
 		public Application addToApp(List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators, Application application, ModuleMapping moduleMapping) {
 			if (this.edgeType == 0){
@@ -965,15 +991,15 @@ public class _SpecHandler {
 			return application;
 		}
 		
-		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {
-			this(src, dst, 0, latency, "null", 0, 0, 0, 0);
-		}
-		
 		void draw(GraphicsContext gc) {
 			gc.beginPath();
+			gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
+			gc.setLineWidth(this.selected ? 10.0 : 1.0);
 			gc.moveTo(this.src.x, this.src.y);
 			gc.lineTo(this.dst.x, this.dst.y);
 			gc.stroke();
+			gc.setStroke(Color.BLACK);
+			gc.setLineWidth(1.0);
 		}
 	}
 		
@@ -1031,7 +1057,14 @@ public class _SpecHandler {
 	}
 	
 	public static abstract class Spec {
-		
+		boolean selected = false;
+
+		NodeSpec setSelected() {
+			deselectAll();
+			this.selected = true;
+//			System.out.println(this.toString()+this.toStringLinks());
+			return this;
+		}
 	}
 
 	public static class placementObject{
@@ -1045,7 +1078,7 @@ public class _SpecHandler {
 		
 		public void addToPreview() {
 			//TODO Preview
-//			placementList.add(this);
+			ModulePlacement.placementList.add(this);
 		}
 	}
 	
