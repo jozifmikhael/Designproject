@@ -435,7 +435,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	@FXML
     void newJSON(ActionEvent event) throws IOException {
 		FXMLLoader root = new FXMLLoader(getClass().getResource("SaveFileBox.fxml"));
-		Scene scene = new Scene(root.load(),414,139);
+		Scene scene = new Scene(root.load(),500,221);
 		Stage stage = new Stage();
 		stage.setScene(scene);
 		stage.setTitle("Save File");
@@ -483,7 +483,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void showOutput() {
         try {
             FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-            Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+            Scene scene = new Scene(addNewNodeLoader.load(),1555,837);
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.setTitle("Output");
@@ -641,11 +641,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         	placementPolicyList.add("Lowest Power Usage");
         	
         	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("setSimParamsBox.fxml"));
-			Scene scene = new Scene(dataFXML.load(),414,210);
+			Scene scene = new Scene(dataFXML.load(),500,265);
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			setParamsController controller = dataFXML.getController();
-			controller.populateList(placementPolicyList);
+//			controller.populateList(placementPolicyList);
      		stage.setTitle("Setting Parameters");    		
      		stage.showAndWait();
     	} catch(Exception e) {
@@ -672,7 +672,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //    	writeJSON();
     	VRGameFog vrgame = new VRGameFog();
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+        Scene scene = new Scene(addNewNodeLoader.load(),1555,837);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Output");

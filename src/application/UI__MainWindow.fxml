@@ -16,7 +16,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="657.0" prefWidth="1241.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application._MainWindowController">
+<BorderPane prefHeight="658.0" prefWidth="1236.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application._MainWindowController">
    <center>
       <AnchorPane prefHeight="657.0" prefWidth="1045.0" BorderPane.alignment="CENTER">
          <children>
@@ -125,7 +125,7 @@
                       <TreeTableColumn fx:id="col1" prefWidth="309.0" text="Preview of Placements" />
                     </columns>
                      <effect>
-                        <InnerShadow offsetX="6.0" offsetY="6.0">
+                        <InnerShadow offsetX="6.0" offsetY="3.0">
                            <color>
                               <Color red="0.8500000238418579" green="0.8393750190734863" blue="0.8075000047683716" opacity="0.8700000047683716" />
                            </color>
@@ -243,7 +243,7 @@
                      <effect>
                         <DropShadow offsetX="6.0" offsetY="6.0">
                            <color>
-                              <Color red="0.8600000143051147" green="0.8445199728012085" blue="0.8083999752998352" opacity="0.886956512928009" />
+                              <Color red="0.8588235378265381" green="0.843137264251709" blue="0.8078431487083435" opacity="0.8899999856948853" />
                            </color>
                            <input>
                               <DropShadow offsetX="-6.0" offsetY="-6.0">

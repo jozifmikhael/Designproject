@@ -48,20 +48,20 @@ public class setParamsController {
 		if (GranValue.getText() == null || GranValue.getText().trim().isEmpty()) granularityMetric = 10;
 		else granularityMetric = Integer.parseInt(GranValue.getText());
 		System.out.println("Simulation granularity will be: " + granularityMetric + " \n");
-		
-		if (PolicyChoice.getSelectionModel().getSelectedItem() == null
-				|| PolicyChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {			
-			PolicyChoice.setValue("Edgewards");
-		} else policyType = PolicyChoice.getSelectionModel().getSelectedItem().toString();
+//		
+//		if (PolicyChoice.getSelectionModel().getSelectedItem() == null
+//				|| PolicyChoice.getSelectionModel().getSelectedItem().trim().isEmpty()) {			
+//			PolicyChoice.setValue("Edgewards");
+//		} else policyType = PolicyChoice.getSelectionModel().getSelectedItem().toString();
     	stage.close();
     }
         
-    void populateList(List<String> str_list) {
-		ObservableList<String> items = FXCollections.observableArrayList();
-		items.addAll(str_list);
-		PolicyChoice.setItems(items);	
-		PolicyChoice.setValue(items.get(0));
-	}
+//    void populateList(List<String> str_list) {
+//		ObservableList<String> items = FXCollections.observableArrayList();
+//		items.addAll(str_list);
+//		PolicyChoice.setItems(items);	
+//		PolicyChoice.setValue(items.get(0));
+//	}
     
     @FXML
     void initialize() {

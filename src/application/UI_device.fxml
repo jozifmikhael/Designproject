@@ -1,53 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="380.0" prefWidth="523.0" stylesheets="@application2.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddDeviceController">
+<BorderPane prefHeight="432.0" prefWidth="612.0" style="-fx-background-color: #f5f5f5;" stylesheets="@application2.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddDeviceController">
    <center>
       <AnchorPane fx:id="ap" prefHeight="369.0" prefWidth="462.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane fx:id="ap" layoutX="-9.0" layoutY="64.0" prefHeight="369.0" prefWidth="509.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="ap" layoutX="-9.0" layoutY="64.0" prefHeight="430.0" prefWidth="612.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Pane layoutX="64.0" layoutY="130.0" prefHeight="377.0" prefWidth="523.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <Pane layoutX="32.0" layoutY="113.0" prefHeight="287.0" prefWidth="544.0" styleClass="pane" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="36.0" AnchorPane.topAnchor="113.0">
                      <children>
-                        <Label layoutX="44.0" layoutY="112.0" prefHeight="33.0" prefWidth="205.0" text="  Name" />
-                        <Label layoutX="273.0" layoutY="276.0" prefHeight="33.0" prefWidth="205.0" text="  Uplink Latency" />
-                        <Label layoutX="273.0" layoutY="236.0" prefHeight="33.0" prefWidth="205.0" text="  Idle Power" />
-                        <Label layoutX="273.0" layoutY="196.0" prefHeight="33.0" prefWidth="205.0" text="  Busy Power" />
-                        <Label layoutX="273.0" layoutY="156.0" prefHeight="33.0" prefWidth="205.0" text="  Rate per MIPS" />
-                        <Label layoutX="44.0" layoutY="312.0" prefHeight="33.0" prefWidth="205.0" text="  Level" />
-                        <Label layoutX="44.0" layoutY="272.0" prefHeight="33.0" prefWidth="205.0" text="  Down Bandwidth" />
-                        <Label layoutX="44.0" layoutY="232.0" prefHeight="33.0" prefWidth="205.0" text="  Up Bandwidth" />
-                        <Label layoutX="44.0" layoutY="192.0" prefHeight="33.0" prefWidth="205.0" text="  RAM" />
-                        <Label layoutX="44.0" layoutY="152.0" prefHeight="33.0" prefWidth="205.0" text="  MIPS" />
-                        <Label layoutX="273.0" layoutY="116.0" prefHeight="33.0" prefWidth="205.0" text="  Pe" />
-                        <TextField fx:id="name" layoutX="163.0" layoutY="116.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="mips" layoutX="164.0" layoutY="156.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="ram" layoutX="164.0" layoutY="196.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="upbw" layoutX="164.0" layoutY="236.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="downbw" layoutX="164.0" layoutY="276.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="level" layoutX="164.0" layoutY="316.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="pe" layoutX="393.0" layoutY="120.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="rate" layoutX="393.0" layoutY="160.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="apower" layoutX="393.0" layoutY="200.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="ipower" layoutX="393.0" layoutY="240.0" prefHeight="25.0" prefWidth="80.0" />
-                        <TextField fx:id="latency" layoutX="393.0" layoutY="280.0" prefHeight="25.0" prefWidth="80.0" />
+                        <TextField fx:id="name" layoutX="141.0" layoutY="30.0" prefHeight="25.0" prefWidth="110.0" />
+                        <ChoiceBox fx:id="parent" layoutX="395.0" layoutY="30.0" prefHeight="25.0" prefWidth="110.0" styleClass="deviceParentcbwidth" />
+                        <TextField fx:id="mips" layoutX="141.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="ram" layoutX="141.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="upbw" layoutX="141.0" layoutY="150.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="downbw" layoutX="141.0" layoutY="190.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="level" layoutX="141.0" layoutY="230.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="pe" layoutX="395.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="rate" layoutX="395.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="apower" layoutX="395.0" layoutY="150.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="ipower" layoutX="395.0" layoutY="190.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="latency" layoutX="395.0" layoutY="230.0" prefHeight="25.0" prefWidth="110.0" />
+                        <Label layoutX="28.0" layoutY="35.0" text="Name">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="28.0" layoutY="75.0" text="MIPS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="28.0" layoutY="115.0" text="RAM">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="28.0" layoutY="155.0" text="Up Bandwidth">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="28.0" layoutY="195.0" text="Down Bandwidth">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="28.0" layoutY="235.0" text="Level">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="290.0" layoutY="75.0" text="Pe">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                         <Label layoutX="290.0" layoutY="115.0" text="Rate per MIPS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="290.0" layoutY="155.0" text="Busy Power">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="290.0" layoutY="195.0" text="Idle Power">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="290.0" layoutY="235.0" text="Uplink Latency">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="290.0" layoutY="35.0" text="Parent">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
                      </children>
+                     <effect>
+                        <InnerShadow offsetX="6.0" offsetY="6.0">
+                           <color>
+                              <Color red="0.8100000023841858" green="0.7905600070953369" blue="0.7613999843597412" opacity="0.917391300201416" />
+                           </color>
+                        </InnerShadow>
+                     </effect>
                   </Pane>
-                  <Label alignment="CENTER" layoutX="45.0" layoutY="25.0" prefHeight="58.0" prefWidth="207.0" text="Node Parameters" textAlignment="CENTER">
+                  <Label alignment="CENTER" layoutX="32.0" layoutY="31.0" prefHeight="52.0" prefWidth="291.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 10;" text="Node Parameters" textAlignment="CENTER">
                      <font>
                         <Font size="18.0" />
                      </font>
                   </Label>
-                  <Button fx:id="saveButton" defaultButton="true" layoutX="270.0" layoutY="25.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="58.0" prefWidth="205.0" text="Save Node">
+                  <Button fx:id="saveButton" defaultButton="true" layoutX="347.0" layoutY="31.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="226.0" text="Save Node">
                      <effect>
                         <DropShadow offsetX="6.0" offsetY="6.0">
                            <color>
