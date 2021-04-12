@@ -389,7 +389,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
 				}
-				if (newNode!=null) newNode.setSelected().setPos(mEvent);
+				if (newNode!=null) ((NodeSpec)newNode.setSelected()).setPos(mEvent);
 			break;
 			case MIDDLE_BTN:
 			break;
@@ -565,7 +565,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void deleteHandler() {
-    	_SpecHandler.getSelected().pop();
+    	((NodeSpec)_SpecHandler.getSelected()).pop();
 		redrawNodes();
     }
     

@@ -137,7 +137,7 @@ public class _SpecHandler {
 				selNode = n;
 		if (selNode == null)
 			return null;
-		return selNode.setSelected();
+		return (NodeSpec) selNode.setSelected();
 	}
 
 	public static EdgeSpec getEdge(MouseEvent mEvent) {
@@ -1059,7 +1059,7 @@ public class _SpecHandler {
 	public static abstract class Spec {
 		boolean selected = false;
 
-		NodeSpec setSelected() {
+		Spec setSelected() {
 			deselectAll();
 			this.selected = true;
 //			System.out.println(this.toString()+this.toStringLinks());
