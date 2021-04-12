@@ -9,12 +9,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import static application.scratch.printDebug;
 
-public class LinkLatencyInputController extends _SubController{
+public class AddEdgeSimpleController extends _SubController{
 
 	@Override
 	void initDefaultObject() {
 		// TODO Auto-generated method stub
-        spec = new _SpecHandler.EdgeSpec(_MainWindowController.selNode, _MainWindowController.linkSrcNode);
+		printDebug("In AddEdgeSimpleController");
+        spec = new EdgeSpec(_MainWindowController.selNode, _MainWindowController.linkSrcNode);
 	}
 }

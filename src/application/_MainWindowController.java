@@ -234,12 +234,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	parentStage.heightProperty().addListener(stageSizeListener);
     	
     	//TODO Do the other menu items like this
-    	addDeviceMenu.setOnAction(e->setupController("device"));
-    	addModuleMenu.setOnAction(e->setupController("module"));
-//    	addSensorMenu.setOnAction(e->setupController("sensor"));
-//    	addActuatorMenu.setOnAction(e->setupController("actuat"));
-    	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
-    	
+//    	addDeviceMenu.setOnAction(e->setupController("device"));
+//    	addModuleMenu.setOnAction(e->setupController("module"));
+////    	addSensorMenu.setOnAction(e->setupController("sensor"));
+////    	addActuatorMenu.setOnAction(e->setupController("actuat"));
+//    	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
+//    	
     	gc=topoField.getGraphicsContext2D();
     	gc.setTextAlign(TextAlignment.CENTER);
     	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
@@ -354,10 +354,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private NodeSpec makeReqLink(NodeSpec src, NodeSpec dst) {
 		//check the types of the src and dst and call the full edge controller or the mini one
     	System.out.println();
+    	if(src==null || dst==null) return null;
 		if(!_SpecHandler.nodesList.contains(src) && !_SpecHandler.nodesList.contains(dst)) return null;
 		if((src.type.equals("device") && dst.type.equals("device")) 
 				||(src.type.equals("sensor") && dst.type.equals("device"))
 				||(src.type.equals("device") && dst.type.equals("actuat"))) {
+			printDebug("Setting up controller with edgeSimple");
 			EdgeSpec e = (EdgeSpec)setupController("edgeSimple");
 			if(e != null) src.addLink(e);
 		}else if((src.type.equals("module") && dst.type.equals("module")) 
@@ -375,7 +377,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 //				System.out.println("In Left: KeyState: " + InteractionState.setKey);
-				NodeSpec newNode = null;
+				Spec newNode = null;
 				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
 				selEdge = _SpecHandler.getEdge(mEvent);
 				selNode = _SpecHandler.getNode(mEvent);
@@ -497,12 +499,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
 
-	NodeSpec newNode = null;
-    NodeSpec addNodeType(String _type) {
-    	if(_type.equals("device")) newNode = (NodeSpec)setupController(_type);
-		if(_type.equals("module")) newNode = (NodeSpec)setupController(_type);
-		if(_type.equals("sensor")) newNode = (NodeSpec)setupController(_type);
-		if(_type.equals("actuat")) newNode = (NodeSpec)setupController(_type);
+	Spec newNode = null;
+    Spec addNodeType(String _type) {
+    	if(_type.equals("device")) newNode = (Spec)setupController(_type);
+		if(_type.equals("module")) newNode = (Spec)setupController(_type);
+		if(_type.equals("sensor")) newNode = (Spec)setupController(_type);
+		if(_type.equals("actuat")) newNode = (Spec)setupController(_type);
 		return newNode;
     }
     
@@ -524,7 +526,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //    }
     
     Spec setupController(String type) {
-//    	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
+    	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			Scene scene = new Scene(loader.load());
@@ -532,11 +534,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			
-			Spec specPtr = controller.init(_SpecHandler.getSelected());
+			Spec prevState=null;
+			if (_SpecHandler.getSelected() != null)
+				prevState = _SpecHandler.getSelected().type.equals(type) ? DeviceSpec.fromJSON(((DeviceSpec)_SpecHandler.getSelected()).toJSON()) : null;
+			
+			Spec specPtr = controller.init(prevState);
 			
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
-			    	case 27: break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
+			    	case 27: controller.recover(); stage.close(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
 			    	case 116: printDebug(specPtr.toString()); break;
 			        default:  {printDebug(event.getCode().getCode()+"");}
 			    }
@@ -552,11 +558,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			return null;
 		}
     }
-//    
+    
     @FXML
     void editHandler() {
 		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
-    	NodeSpec selectedNode = (NodeSpec)_SpecHandler.getSelected();
+    	Spec selectedNode = (Spec)_SpecHandler.getSelected();
     	if(selectedNode == null) return;
     	setupController(selectedNode.type);
 		_SpecHandler.pruneLinks();
@@ -568,7 +574,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	((NodeSpec)_SpecHandler.getSelected()).pop();
 		redrawNodes();
     }
-    
     
     @FXML
     void exitApp(ActionEvent event) {
@@ -596,6 +601,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		} else
 			policyType = PolicyChoiceMain.getSelectionModel().getSelectedItem().toString();
 	}
+    
 	@FXML
     void confirmPolicy(ActionEvent event) {
     	try {
@@ -642,6 +648,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     //TODO Fix this
     public String getCentralNode() {
+//    	for(NodeSpec nodes)
     	return "cloud";
     }
     

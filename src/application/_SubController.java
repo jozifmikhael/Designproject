@@ -66,6 +66,7 @@ public abstract class _SubController {
 	@FXML
     public AnchorPane ap;
 	Spec spec;
+	Spec specPrev;
 	String thisType;
 
 	ObservableList<Spec> tempData = FXCollections.observableArrayList();
@@ -200,13 +201,24 @@ public abstract class _SubController {
 		//Extend this method in children controllers to add in extra functionality if needed
 		//Populate non-standard lists/tables, etc.
 	}
+	final public void recover() {
+		printDebug("Recovering...");
+		printDebug("SpecC:"+spec.toString());
+		printDebug("SpecP:"+specPrev.toString());
+		((DeviceSpec)spec).pop();
+		if(specPrev!=null) ((DeviceSpec)specPrev).add();
+		spec=specPrev;
+	}
 	final public Spec init(Spec s) {
-		if(s==null) initDefaultObject();
-		else spec=s;
+		if(s!=null) {
+			spec=s;
+			specPrev=DeviceSpec.fromJSON(((DeviceSpec)s).toJSON());
+		}else initDefaultObject();
 		extendedInit();
 		printDebug(spec.toString());
 		parseChildrenOf(ap);
 		printDebug("Returned");
+		printDebug(spec.toString());
 		return spec;
 	}
 }

@@ -53,6 +53,7 @@ import org.fog.utils.distribution.UniformDistribution;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import application._SpecHandler.TupleSpec;
+import static application.scratch.printDebug;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
@@ -130,7 +131,7 @@ public class _SpecHandler {
 	}
 	
 	public static NodeSpec getNode(MouseEvent mEvent) {
-		NodeSpec selNode = null;
+		Spec selNode = null;
 		for (NodeSpec n : nodesList)
 			if (Math.pow(Math.pow(n.x - mEvent.getX(), 2) + Math.pow(n.y - mEvent.getY(), 2), 0.5) <= 0.5 * n.sz
 					* zoomFactor)
@@ -166,7 +167,7 @@ public class _SpecHandler {
 		return null;
 	}
 	
-	public static NodeSpec getNode(String nodeName) {
+	public static Spec getNode(String nodeName) {
 		for(NodeSpec n : nodesList) if(n.name.equals(nodeName)) return n;
 		return null;
 	}
@@ -198,7 +199,7 @@ public class _SpecHandler {
 	}
 	
 	public static Spec getSelected(String _type) {
-		for (NodeSpec n : nodesList) {
+		for (Spec n : nodesList) {
 			if (n.selected && n.type.equals(_type)) {
 				return n;
 			}
@@ -235,12 +236,18 @@ public class _SpecHandler {
 		return linkables;
 	}
 	
-	public static class NodeSpec extends Spec {
-		public String testJSON() {
-			String s = "";
-			
-			return s;
+	public static abstract class Spec {
+		boolean selected = false;
+		public String type;
+		
+		Spec setSelected() {
+			deselectAll();
+			this.selected = true;
+			return this;
 		}
+	}
+	
+	public static class NodeSpec extends Spec {
 		public String getName() {
 			return name;
 		}
@@ -254,10 +261,10 @@ public class _SpecHandler {
 		double sz;
 		Color nodeColor;
 		public String name;
-		public String type;
 		boolean isTemp = false;
 		public ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
+		ArrayList<String> test;
 		
 		public NodeSpec(double x, double y, String name, String type) {
 			this.x = x;
@@ -305,7 +312,7 @@ public class _SpecHandler {
 			return s;
 		}
 		
-		NodeSpec setColor() {
+		Spec setColor() {
 			if (this.type == null)
 				this.nodeColor = _errorColor;
 			else if (this.type.equals("device"))
@@ -345,13 +352,13 @@ public class _SpecHandler {
 			}
 		}
 		
-		NodeSpec setPos(MouseEvent mEvent) {
+		Spec setPos(MouseEvent mEvent) {
 			this.x = mEvent.getX();
 			this.y = mEvent.getY();
 			return this;
 		}
 		
-		NodeSpec setPos(NodeSpec _node) {
+		Spec setPos(NodeSpec _node) {
 			this.x = _node.x;
 			this.y = _node.y;
 			return this;
@@ -365,7 +372,7 @@ public class _SpecHandler {
 			return this;
 		}
 		
-		NodeSpec add() {
+		Spec add() {
 			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
 				nodesList.add(this);
 			if (!(assocList.stream().anyMatch(a -> a.name.equals(this.name))))
@@ -395,7 +402,7 @@ public class _SpecHandler {
 			return this;
 		}
 		
-		NodeSpec deviceModuleLink(String _dst) {
+		Spec deviceModuleLink(String _dst) {
 			NodeSpec dst = _SpecHandler.getLinkableNode(linkableDestinations(), _dst);
 			if (dst == null)return this;
 			this.edgesList.add(new EdgeSpec(this, dst));
@@ -404,6 +411,102 @@ public class _SpecHandler {
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
+
+		@SuppressWarnings("unchecked")
+		public DeviceSpec(String name, int pe, long mips, int ram, int level, double rate, double ipower, double apower,
+				double latency, long upbw, long downbw) {
+			super(name, "device");
+			this.pe = pe;
+			this.mips = mips;
+			this.ram = ram;
+			this.level = level;
+			this.rate = rate;
+			this.ipower = ipower;
+			this.apower = apower;
+			this.latency = latency;
+			this.upbw = upbw;
+			this.downbw = downbw;
+			this.assocList = (ArrayList<NodeSpec>) ((ArrayList<?>) devicesList);
+			this.test = new ArrayList<String>();
+			this.setSelected();
+			this.add();
+		}
+		
+		@Override
+        public String toString() {
+            return "selected="+ selected +",pe=" + pe + ",mips=" + mips + ",ram=" + ram + ",level=" + level + ",rate=" + rate
+                    + ",ipower=" + ipower + ",apower=" + apower + ",upbw=" + upbw + ",downbw=" + downbw + ",x=" + x
+                    + ",y=" + y + ",name=" + name;
+        }
+		static DeviceSpec fromJSON(JSONObject obj) {
+            DeviceSpec d = new DeviceSpec((String) obj.get("name"), 
+                    Integer.parseInt((String)obj.get("pe")),
+                    Long.parseLong((String)obj.get("mips")),
+                    Integer.parseInt((String)obj.get("ram")),
+                    Integer.parseInt((String)obj.get("level")),
+                    Double.parseDouble((String)obj.get("rate")),
+                    Double.parseDouble((String)obj.get("ipower")),
+                    Double.parseDouble((String)obj.get("apower")), 
+                    0.0, 
+                    Long.parseLong((String)obj.get("upbw")), 
+                    Long.parseLong((String)obj.get("downbw")));
+		            d.x = Double.parseDouble((String)obj.get("x"));
+		            d.y = Double.parseDouble((String)obj.get("y"));
+            return d;
+        }
+		
+		public FogDevice addToApp() {
+			List<Pe> peList = new ArrayList<Pe>();
+			
+			// 3. Create PEs and add these into a list.
+			peList.add(new Pe(0, new PeProvisionerOverbooking(this.mips))); // need to store Pe id and MIPS Rating
+			
+			int hostId = FogUtils.generateEntityId();
+			long storage = 1000000; // host storage
+			int bw = 10000;
+			PowerHost host = new PowerHost(hostId, new RamProvisionerSimple(this.ram), new BwProvisionerOverbooking(bw),
+					storage, peList, new StreamOperatorScheduler(peList),
+					new FogLinearPowerModel(this.apower, this.ipower));
+			List<Host> hostList = new ArrayList<Host>();
+			hostList.add(host);
+			String arch = "x86"; // system architecture
+			String os = "Linux"; // operating system
+			String vmm = "Xen";
+			double time_zone = 10.0; // time zone this resource located
+			double cost = 3.0; // the cost of using processing in this resource
+			double costPerMem = 0.05; // the cost of using memory in this resource
+			double costPerStorage = 0.001; // the cost of using storage in this
+											// resource
+			double costPerBw = 0.0; // the cost of using bw in this resource
+			LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
+			// devices by now
+			FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(arch, os, vmm, host, time_zone,
+					cost, costPerMem, costPerStorage, costPerBw);
+			FogDevice fogdevice = null;
+			try {
+				fogdevice = new FogDevice(this.name, characteristics, new AppModuleAllocationPolicy(hostList),
+						storageList, 10, this.upbw, this.downbw, 0, this.rate);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			fogdevice.setLevel(this.level);
+			return fogdevice;
+		}
+
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			JSONObject obj = new JSONObject();
+			String deviceString = this.toString();
+			String[] deviceSplit = deviceString.split(",");
+			
+			for (int i = 0; i < deviceSplit.length; i++) {
+				String[] deviceSplit2 = deviceSplit[i].split("=");
+				obj.put(deviceSplit2[0], deviceSplit2[1]);
+			}
+			
+			return obj;
+		}
 
 		public int getPe() {
 			return pe;
@@ -486,24 +589,6 @@ public class _SpecHandler {
 			this.downbw = downbw;
 		}
 
-		@SuppressWarnings("unchecked")
-		public DeviceSpec(String name, int pe, long mips, int ram, int level, double rate, double ipower, double apower,
-				double latency, long upbw, long downbw) {
-			super(name, "device");
-			this.pe = pe;
-			this.mips = mips;
-			this.ram = ram;
-			this.level = level;
-			this.rate = rate;
-			this.ipower = ipower;
-			this.apower = apower;
-			this.latency = latency;
-			this.upbw = upbw;
-			this.downbw = downbw;
-			this.assocList = (ArrayList<NodeSpec>) ((ArrayList<?>) devicesList);
-			this.add();
-		}
-		
 		public int pe;
 		public long mips;
 		public int ram;
@@ -514,67 +599,6 @@ public class _SpecHandler {
 		public double latency;
 		public long upbw;
 		public long downbw;
-		
-		@Override
-		public String toString() {
-			return "pe=" + pe + ", mips=" + mips + ", ram=" + ram + ", level=" + level + ", rate=" + rate + ", ipower="
-					+ ipower + ", apower=" + apower + ", latency=" + latency + ", upbw=" + upbw + ", downbw=" + downbw
-					+ ", x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name=" + name + ", type="
-					+ type + ", selected=" + selected;
-		}
-		
-		public FogDevice addToApp() {
-			List<Pe> peList = new ArrayList<Pe>();
-			
-			// 3. Create PEs and add these into a list.
-			peList.add(new Pe(0, new PeProvisionerOverbooking(this.mips))); // need to store Pe id and MIPS Rating
-			
-			int hostId = FogUtils.generateEntityId();
-			long storage = 1000000; // host storage
-			int bw = 10000;
-			PowerHost host = new PowerHost(hostId, new RamProvisionerSimple(this.ram), new BwProvisionerOverbooking(bw),
-					storage, peList, new StreamOperatorScheduler(peList),
-					new FogLinearPowerModel(this.apower, this.ipower));
-			List<Host> hostList = new ArrayList<Host>();
-			hostList.add(host);
-			String arch = "x86"; // system architecture
-			String os = "Linux"; // operating system
-			String vmm = "Xen";
-			double time_zone = 10.0; // time zone this resource located
-			double cost = 3.0; // the cost of using processing in this resource
-			double costPerMem = 0.05; // the cost of using memory in this resource
-			double costPerStorage = 0.001; // the cost of using storage in this
-											// resource
-			double costPerBw = 0.0; // the cost of using bw in this resource
-			LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
-			// devices by now
-			FogDeviceCharacteristics characteristics = new FogDeviceCharacteristics(arch, os, vmm, host, time_zone,
-					cost, costPerMem, costPerStorage, costPerBw);
-			FogDevice fogdevice = null;
-			try {
-				fogdevice = new FogDevice(this.name, characteristics, new AppModuleAllocationPolicy(hostList),
-						storageList, 10, this.upbw, this.downbw, 0, this.rate);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			fogdevice.setLevel(this.level);
-			return fogdevice;
-		}
-		
-		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			JSONObject obj = new JSONObject();
-			String deviceString = this.toString();
-			String[] deviceSplit = deviceString.split(",");
-			
-			for (int i = 0; i < deviceSplit.length; i++) {
-				String[] deviceSplit2 = deviceSplit[i].split("=");
-				obj.put(deviceSplit2[0], deviceSplit2[1]);
-			}
-			
-			return obj;
-		}
 		
 	}
 	
@@ -825,7 +849,7 @@ public class _SpecHandler {
 	}
 	
 	public static class EdgeSpec extends Spec {
-		public NodeSpec getSrc() {
+		public Spec getSrc() {
 			return src;
 		}
 		
@@ -833,7 +857,7 @@ public class _SpecHandler {
 			this.src = src;
 		}
 		
-		public NodeSpec getDst() {
+		public Spec getDst() {
 			return dst;
 		}
 		
@@ -1056,17 +1080,6 @@ public class _SpecHandler {
 		}
 	}
 	
-	public static abstract class Spec {
-		boolean selected = false;
-
-		Spec setSelected() {
-			deselectAll();
-			this.selected = true;
-//			System.out.println(this.toString()+this.toStringLinks());
-			return this;
-		}
-	}
-
 	public static class placementObject{
 		public String device;
 		public String module;
