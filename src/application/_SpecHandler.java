@@ -250,7 +250,7 @@ public class _SpecHandler {
 		return linkables;
 	}
 	
-	public static abstract class Spec {
+	public static class Spec {
 		public boolean selected = false;
 		public String type;
 		protected boolean isTemp = false;
@@ -305,69 +305,101 @@ public class _SpecHandler {
 //		            d.y = Double.parseDouble((String)obj.get("y"));
 //		    return d;
 //		}
+		public void testSerDe() {
+			Spec temp = new Spec(this.toJSON_reflections());
+			printDebug(temp.toJSON_reflections().toString());
+		}
+		public Spec() {}
+		public Spec(JSONObject obj) {
+            Field[] cFields = this.getClass().getFields();
+            for (int i = 0; i < cFields.length; i++) {
+                Field f = cFields[i];
+                String cVal = (String) obj.get(f.getName());
+                try {
+                    switch(f.getType().toString()) {
+                        case "int":     f.set(this, Integer    .parseInt     (cVal)); break;
+                        case "double":     f.set(this, Double    .parseDouble (cVal)); break;
+                        case "long":     f.set(this, Long    .parseLong     (cVal)); break;
+                        case "boolean": f.set(this, Boolean .parseBoolean(cVal)); break;
+                        case "class java.lang.String": f.set(this, cVal); break;
+                        case "class java.util.ArrayList" :{
+                            if (f.getGenericType() instanceof ParameterizedType) {
+                                Type[] params = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+                                printDebug("Found ArrayList of types "+params[0].getTypeName());
+                                obj.keySet().forEach(o->printDebug(o+":"+obj.get(o)));
+                                printDebug("-Finished ArrayList");
+                            } else printDebug("Error, ArrayList found but is not instanceof ParameterizedType");
 
+                            break;
+                        }
+                    }
+                }catch (IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON_reflections() {
 			JSONObject obj = new JSONObject();
 			Field[] cFields = this.getClass().getFields();
-			
-			for (int i = 0; i < cFields.length; i++) {
-				try {
-					printDebug();
-					obj.put(cFields[i].getName(), cFields[i].get(this).toString());
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			printDebug("JSON Obj.toString()" + obj.toString());
-			printDebug("JSON Obj.toJSONString()" + obj.toJSONString());
-			fromJSON_reflections(obj);
-			return obj;
-		}
-		
-		void fromJSON_reflections(JSONObject obj) {
-			Field[] cFields = this.getClass().getFields();
 			for (int i = 0; i < cFields.length; i++) {
 				Field f = cFields[i];
-				String cVal = (String) obj.get(f.getName());
 				try {
-//					printDebug(f.getType().toString());
-					switch(f.getType().toString()) {
-						case "int": 	f.set(this, Integer	.parseInt	 (cVal)); break;
-						case "double": 	f.set(this, Double	.parseDouble (cVal)); break;
-						case "long": 	f.set(this, Long	.parseLong	 (cVal)); break;
-						case "boolean": f.set(this, Boolean .parseBoolean(cVal)); break;
-						case "class java.lang.String": f.set(this, cVal); break;
-						case "class java.util.ArrayList" :{
-					        if (f.getGenericType() instanceof ParameterizedType) {
-					        	Type[] params = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
-				        		printDebug("Found ArrayList of types "+params[0].getTypeName());
-				        		obj.keySet().forEach(o->printDebug(o+":"+obj.get(o)));
-				        		printDebug("-Finished ArrayList");
-//					        	if(params.length==1) {
-//					        		printDebug(params[0].getTypeName());
-//					        		JSONArray jaObj=(JSONArray)obj.get(f.getName());
-////					        		jaObj.forEach(o->printDebug(o);
-//					        	}else printDebug("Error, ArrayList found but has too many params to handle");
-					        } else printDebug("Error, ArrayList found but is not instanceof ParameterizedType");
-//							printDebug(f.getType().getComponentType());
-//							printDebug("Vals in JSON are");
-//							JSONArray jaObj=(JSONArray)obj.get(f.getName());
-//							jaObj.forEach(o->printDebug(o.toString()));
-//							((ArrayList)f.get(this)).add(cFields);
-//							f.set(this, obj.get(f.getName()));
-//							printDebug("Set arraylist");
-							break;
-						}
-						default: printDebug("Unknown type encountered by fromJSON Parser: '" + f.getType().toString() + "' val in JSON "+cVal);
-					}
+					if (f.getGenericType() instanceof ParameterizedType) {
+						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
+						JSONArray newSet = null;
+						arrRef.forEach(a->newSet.add(((Spec)a).toJSON_reflections()));
+						obj.put(f.getName(), newSet);
+					}else obj.put(f.getName(), f.get(this).toString());
 				} catch (IllegalArgumentException | IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+			return obj;
 		}
+//		void fromJSON_reflections(JSONObject obj) {
+//			Field[] cFields = this.getClass().getFields();
+//			for (int i = 0; i < cFields.length; i++) {
+//				Field f = cFields[i];
+//				String cVal = (String) obj.get(f.getName());
+//				try {
+////					printDebug(f.getType().toString());
+//					switch(f.getType().toString()) {
+//						case "int": 	f.set(this, Integer	.parseInt	 (cVal)); break;
+//						case "double": 	f.set(this, Double	.parseDouble (cVal)); break;
+//						case "long": 	f.set(this, Long	.parseLong	 (cVal)); break;
+//						case "boolean": f.set(this, Boolean .parseBoolean(cVal)); break;
+//						case "class java.lang.String": f.set(this, cVal); break;
+//						case "class java.util.ArrayList" :{
+//					        if (f.getGenericType() instanceof ParameterizedType) {
+//					        	Type[] params = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+//				        		printDebug("Found ArrayList of types "+params[0].getTypeName());
+//				        		obj.keySet().forEach(o->printDebug(o+":"+obj.get(o)));
+//				        		printDebug("-Finished ArrayList");
+////					        	if(params.length==1) {
+////					        		printDebug(params[0].getTypeName());
+////					        		JSONArray jaObj=(JSONArray)obj.get(f.getName());
+//////					        		jaObj.forEach(o->printDebug(o);
+////					        	}else printDebug("Error, ArrayList found but has too many params to handle");
+//					        } else printDebug("Error, ArrayList found but is not instanceof ParameterizedType");
+////							printDebug(f.getType().getComponentType());
+////							printDebug("Vals in JSON are");
+////							JSONArray jaObj=(JSONArray)obj.get(f.getName());
+////							jaObj.forEach(o->printDebug(o.toString()));
+////							((ArrayList)f.get(this)).add(cFields);
+////							f.set(this, obj.get(f.getName()));
+////							printDebug("Set arraylist");
+//							break;
+//						}
+//						default: printDebug("Unknown type encountered by fromJSON Parser: '" + f.getType().toString() + "' val in JSON "+cVal);
+//					}
+//				} catch (IllegalArgumentException | IllegalAccessException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 	}
 	
 	public static class NodeSpec extends Spec {
