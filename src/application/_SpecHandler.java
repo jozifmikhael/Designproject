@@ -5,6 +5,8 @@ import org.fog.placement.ModulePlacement;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -262,6 +264,49 @@ public class _SpecHandler {
 			this.selected = true;
 			return this;
 		}
+
+		public Spec() {
+		}
+
+		public Spec(JSONObject obj) {
+			Field[] cFields = this.getClass().getFields();
+			for (int i = 0; i < cFields.length; i++) {
+				Field f = cFields[i];
+				try {
+					switch (f.getType().toString()) {
+					case "int":
+						f.set(this, Integer.parseInt((String) obj.get(f.getName())));
+						break;
+					case "double":
+						f.set(this, Double.parseDouble((String) obj.get(f.getName())));
+						break;
+					case "long":
+						f.set(this, Long.parseLong((String) obj.get(f.getName())));
+						break;
+					case "boolean":
+						f.set(this, Boolean.parseBoolean((String) obj.get(f.getName())));
+						break;
+					case "class java.lang.String":
+						f.set(this, (String) obj.get(f.getName()));
+						break;
+					case "class java.util.ArrayList": {
+						if (f.getGenericType() instanceof ParameterizedType) {
+							Type[] params = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+							printDebug("Found ArrayList of types " + params[0].getTypeName());
+							obj.keySet().forEach(o -> printDebug(o + ":" + obj.get(o)));
+							printDebug("-Finished ArrayList");
+						} else
+							printDebug("Error, ArrayList found but is not instanceof ParameterizedType");
+
+						break;
+					}
+					}
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 		
 		public void fieldsTest(){
 //			Field[] cFields = this.getClass().getFields();
@@ -320,7 +365,13 @@ public class _SpecHandler {
 		ArrayList<NodeSpec> assocList = nodesList;
 		public ArrayList<String> test;
 		
+		public NodeSpec(JSONObject a) {
+			super(a);
+		}
+		
+		
 		public NodeSpec(double x, double y, String name, String type) {
+			
 			this.x = x;
 			this.y = y;
 			this.sz = R + R;
@@ -498,6 +549,8 @@ public class _SpecHandler {
 			this.setSelected();
 			this.add();
 		}
+		
+		public DeviceSpec(JSONObject a) {super(a);}
 		
 		@Override
         public String toString() {
@@ -1156,6 +1209,7 @@ public class _SpecHandler {
 	
 	public static void loadJSON(File file) {
 		System.out.println("Loaded Json: " + file.getName());
+		
 	}
 	
 	@SuppressWarnings("unchecked")
