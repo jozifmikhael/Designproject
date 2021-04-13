@@ -5,11 +5,15 @@ import org.fog.placement.ModulePlacement;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.io.BufferedReader;
 import java.io.File;
@@ -109,12 +113,12 @@ public class _SpecHandler {
         double myy=2+event.getDeltaY()/40;
         double tx=0;
         double ty=0;
-
+        
         System.out.println("["+mxx+" "+mxy+" "+tx+" ");
         System.out.println(" "+myx+" "+myy+" "+ty+"]");
         Affine afft = new Affine(mxx, mxy, tx,
                                  myx, myy, ty);
-
+        
         double deltaX=event.getScreenX()*.001*event.getDeltaY()/40;
         double deltaY=event.getScreenY()*.001*event.getDeltaY()/40;
         
@@ -129,6 +133,8 @@ public class _SpecHandler {
         printDebug("New Inp");
         gc.getCanvas().getTransforms().forEach(t->printDebug(t.toString()));
         printDebug("L->S"+gc.getCanvas().getLocalToSceneTransform().toString());
+		printDebug(gc.getCanvas().getId());
+		// gc.getCanvas().setmax
         gc.getCanvas().setWidth(10000);
         gc.getCanvas().setHeight(10000);
         printDebug(gc.getCanvas().layoutXProperty()+"");
@@ -257,22 +263,49 @@ public class _SpecHandler {
 		
 		public void fieldsTest(){
 //			Field[] cFields = this.getClass().getFields();
-//			printDebug("Object of type '" + this.getClass().descriptorString() + "' has Fields ");
-//			// getDeclaredFields() gets all fields from _just the class_ of the calling object, i.e. when a NodeSpec calls .fieldsTest()
-//			// getFields() gets all fields that the calling object can access including from up the chain but _are also public_
-//			// See my _SubController for a way to get all fields calling object can access regardless of access modifier
+//			printDebug("Object of type '" + this.getClass().descriptorString() + "' has the fields:");
+			// getDeclaredFields() gets all fields from _just the class_ of the calling object, i.e. when a NodeSpec calls .fieldsTest()
+			// getFields() gets all fields that the calling object can access including from up the chain but _are also public_
+			// See my _SubController for a way to get all fields calling object can access regardless of access modifier
+			
+			//cFields[i].getGenericType() -> 'int'/'double'/'long', ''
 //			for(int i=0; i<cFields.length; i++) {
 //				try {
-//					printDebug(cFields[i].getType()+" "+cFields[i].getName()+" = "+cFields[i].get(this).toString());
-//				} catch (IllegalArgumentException | IllegalAccessException e) {
+//					Field f = cFields[i];
+//					switch(f.getType().getTypeParameters().length) {
+//						case 0: printDebug(f.getName()+ " = "+f.get(this).toString()); break; //Simple var type
+//						case 1: printDebug(f.getName()+ " = "+f.get(this).toString()); break; //Single layer list
+//						default: printDebug("Found too many type params"); //Multi layered stuff, don't need to deal with this atm
+//					}
+//				} catch (IllegalArgumentException e) {
 //					e.printStackTrace();
 //					printDebug("Couldn't handle field#"+i+" : "+cFields[i].getType()+" "+cFields[i].getName());
+//				} catch (IllegalAccessException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
 //				}
 //			}
 //			printDebug(" - End of found fields from Spec");
 			toJSON_reflections();
 		}
 		
+//		static DeviceSpec fromJSON(JSONObject obj) {
+//		    DeviceSpec d = new DeviceSpec((String) obj.get("name"), 
+//		            Integer.parseInt((String)obj.get("pe")),
+//		            Long.parseLong((String)obj.get("mips")),
+//		            Integer.parseInt((String)obj.get("ram")),
+//		            Integer.parseInt((String)obj.get("level")),
+//		            Double.parseDouble((String)obj.get("rate")),
+//		            Double.parseDouble((String)obj.get("ipower")),
+//		            Double.parseDouble((String)obj.get("apower")), 
+//		            0.0, 
+//		            Long.parseLong((String)obj.get("upbw")), 
+//		            Long.parseLong((String)obj.get("downbw")));
+//		            d.x = Double.parseDouble((String)obj.get("x"));
+//		            d.y = Double.parseDouble((String)obj.get("y"));
+//		    return d;
+//		}
+
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON_reflections() {
 			JSONObject obj = new JSONObject();
@@ -289,20 +322,55 @@ public class _SpecHandler {
 			}
 			printDebug("JSON Obj.toString()" + obj.toString());
 			printDebug("JSON Obj.toJSONString()" + obj.toJSONString());
-			
+			fromJSON_reflections(obj);
 			return obj;
+		}
+		
+		void fromJSON_reflections(JSONObject obj) {
+			Field[] cFields = this.getClass().getFields();
+			for (int i = 0; i < cFields.length; i++) {
+				Field f = cFields[i];
+				String cVal = (String) obj.get(f.getName());
+				try {
+//					printDebug(f.getType().toString());
+					switch(f.getType().toString()) {
+						case "int": 	f.set(this, Integer	.parseInt	 (cVal)); break;
+						case "double": 	f.set(this, Double	.parseDouble (cVal)); break;
+						case "long": 	f.set(this, Long	.parseLong	 (cVal)); break;
+						case "boolean": f.set(this, Boolean .parseBoolean(cVal)); break;
+						case "class java.lang.String": f.set(this, cVal); break;
+						case "class java.util.ArrayList" :{
+					        if (f.getGenericType() instanceof ParameterizedType) {
+					        	Type[] params = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
+				        		printDebug("Found ArrayList of types "+params[0].getTypeName());
+				        		obj.keySet().forEach(o->printDebug(o+":"+obj.get(o)));
+				        		printDebug("-Finished ArrayList");
+//					        	if(params.length==1) {
+//					        		printDebug(params[0].getTypeName());
+//					        		JSONArray jaObj=(JSONArray)obj.get(f.getName());
+////					        		jaObj.forEach(o->printDebug(o);
+//					        	}else printDebug("Error, ArrayList found but has too many params to handle");
+					        } else printDebug("Error, ArrayList found but is not instanceof ParameterizedType");
+//							printDebug(f.getType().getComponentType());
+//							printDebug("Vals in JSON are");
+//							JSONArray jaObj=(JSONArray)obj.get(f.getName());
+//							jaObj.forEach(o->printDebug(o.toString()));
+//							((ArrayList)f.get(this)).add(cFields);
+//							f.set(this, obj.get(f.getName()));
+//							printDebug("Set arraylist");
+							break;
+						}
+						default: printDebug("Unknown type encountered by fromJSON Parser: '" + f.getType().toString() + "' val in JSON "+cVal);
+					}
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
 	public static class NodeSpec extends Spec {
-		public String getName() {
-			return name;
-		}
-		
-		public void setName(String name) {
-			this.name = name;
-		}
-		
 		public double x;
 		public double y;
 		double sz;
@@ -312,6 +380,13 @@ public class _SpecHandler {
 		ArrayList<NodeSpec> assocList = nodesList;
 		public ArrayList<String> test;
 		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
 		public NodeSpec(double x, double y, String name, String type) {
 			this.x = x;
 			this.y = y;
@@ -472,7 +547,7 @@ public class _SpecHandler {
 		public DeviceSpec(String name, int pe, long mips, int ram, int level, double rate, double ipower, double apower,
 				double latency, long upbw, long downbw) {
 			super(name, "device");
-			this.pe = pe;
+			this.pe = 151;
 			this.mips = mips;
 			this.ram = ram;
 			this.level = level;
@@ -484,6 +559,7 @@ public class _SpecHandler {
 			this.downbw = downbw;
 			this.assocList = (ArrayList<NodeSpec>) ((ArrayList<?>) devicesList);
 			this.test = new ArrayList<String>();
+			this.test.add(new String());
 			this.test.add("simple val");
 			this.test.add("A Value!");
 			this.test.add(5+"");
@@ -497,23 +573,6 @@ public class _SpecHandler {
                     + ",ipower=" + ipower + ",apower=" + apower + ",upbw=" + upbw + ",downbw=" + downbw + ",x=" + x
                     + ",y=" + y + ",name=" + name;
         }
-		static DeviceSpec fromJSON(JSONObject obj) {
-            DeviceSpec d = new DeviceSpec((String) obj.get("name"), 
-                    Integer.parseInt((String)obj.get("pe")),
-                    Long.parseLong((String)obj.get("mips")),
-                    Integer.parseInt((String)obj.get("ram")),
-                    Integer.parseInt((String)obj.get("level")),
-                    Double.parseDouble((String)obj.get("rate")),
-                    Double.parseDouble((String)obj.get("ipower")),
-                    Double.parseDouble((String)obj.get("apower")), 
-                    0.0, 
-                    Long.parseLong((String)obj.get("upbw")), 
-                    Long.parseLong((String)obj.get("downbw")));
-		            d.x = Double.parseDouble((String)obj.get("x"));
-		            d.y = Double.parseDouble((String)obj.get("y"));
-            return d;
-        }
-		
 		public FogDevice addToApp() {
 			List<Pe> peList = new ArrayList<Pe>();
 			
@@ -551,6 +610,23 @@ public class _SpecHandler {
 			
 			fogdevice.setLevel(this.level);
 			return fogdevice;
+		}
+
+		static DeviceSpec fromJSON(JSONObject obj) {
+		    DeviceSpec d = new DeviceSpec((String) obj.get("name"), 
+		            Integer.parseInt((String)obj.get("pe")),
+		            Long.parseLong((String)obj.get("mips")),
+		            Integer.parseInt((String)obj.get("ram")),
+		            Integer.parseInt((String)obj.get("level")),
+		            Double.parseDouble((String)obj.get("rate")),
+		            Double.parseDouble((String)obj.get("ipower")),
+		            Double.parseDouble((String)obj.get("apower")), 
+		            0.0, 
+		            Long.parseLong((String)obj.get("upbw")), 
+		            Long.parseLong((String)obj.get("downbw")));
+		            d.x = Double.parseDouble((String)obj.get("x"));
+		            d.y = Double.parseDouble((String)obj.get("y"));
+		    return d;
 		}
 
 		@SuppressWarnings("unchecked")

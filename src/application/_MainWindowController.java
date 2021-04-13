@@ -229,7 +229,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	Map<String, URL> loadersList = new HashMap<String, URL>();
 	
     public void setupListeners(Stage parentStage, Scene scene) {
-    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
+    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler(parentStage);
     	parentStage.widthProperty().addListener(stageSizeListener);
     	parentStage.heightProperty().addListener(stageSizeListener);
     	
@@ -425,12 +425,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	redrawNodes();
     }
     
-	private void screenSizeChangeHandler() {
-//    	double w=backPane.getWidth(); double h=backPane.getHeight();
-//		xCenter=0.5*w; yCenter=0.5*h;
-//		topoField.setWidth(w); topoField.setHeight(h);
-//    	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
-		redrawNodes();
+	private void screenSizeChangeHandler(Stage parentStage) {
+		topoField.widthProperty().bind(parentStage.widthProperty());
+		topoField.heightProperty().bind(parentStage.heightProperty());
+		double w = topoField.getWidth(); double h = topoField.getHeight();
+		xCenter=0.5*w; yCenter=0.5*h;
+    	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
     }
     
     String selectedJSON="test9.json";
