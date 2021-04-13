@@ -485,20 +485,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	@FXML
 	void loadJson(ActionEvent event) throws FileNotFoundException, IOException, ParseException {
 		Stage stage = new Stage();
-		// TODO FileChooser?
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Open JSON File");
 		chooser.setInitialDirectory(new File("saves"));
-		File selectedDirectory = chooser.showOpenDialog(stage);
-		if (selectedDirectory != null) {
-			System.out.println("Loaded Json: " + selectedDirectory.getName());
-			JSONObject jsonObject = (JSONObject) new JSONParser().parse(new FileReader(selectedDirectory.getName()));
-			JSONArray devicesList = (JSONArray) jsonObject.get("nodes");
-			JSONArray actuatsList = (JSONArray) jsonObject.get("actuats");
-			JSONArray modulesList = (JSONArray) jsonObject.get("modules");
-			JSONArray sensorsList = (JSONArray) jsonObject.get("sensors");
-			JSONArray edgesList = (JSONArray) jsonObject.get("edges");
-		}
+		File selectedFile = chooser.showOpenDialog(stage);
+		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
 	}
 	
     @FXML

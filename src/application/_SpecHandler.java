@@ -1154,6 +1154,10 @@ public class _SpecHandler {
 		}
 	}
 	
+	public static void loadJSON(File file) {
+		System.out.println("Loaded Json: " + file.getName());
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static void writeJSON(String jsonFileName, int simGranularity, int simTotLength, String placementPolicy,
 			String topLvNode) {
