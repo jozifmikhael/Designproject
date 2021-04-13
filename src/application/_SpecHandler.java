@@ -78,6 +78,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.*;
 
 public class _SpecHandler {
 	public static ArrayList<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
@@ -102,33 +103,40 @@ public class _SpecHandler {
 	static Color _errorColor = Color.GREEN;
 	
 	public static void shiftPositionsByZoom(ScrollEvent event) {
-		double minZoom = 0.25;
-		double maxZoom = 1.5;
-		double zoomStep = 0.05;
-		double scale = 1;
-		double preZoom = zoomFactor;
-		zoomFactor += (event.getDeltaY() > 0) ? zoomStep : -zoomStep;
-		if (zoomFactor < minZoom)
-			zoomFactor = minZoom;
-		if (zoomFactor > maxZoom)
-			zoomFactor = maxZoom;
+        double mxx=2+event.getDeltaY()/40;
+        double mxy=0;
+        double myx=0;
+        double myy=2+event.getDeltaY()/40;
+        double tx=0;
+        double ty=0;
 
-		double zoomRatio = zoomFactor / preZoom;
-		gc.translate(preZoom, zoomRatio);
-//		nodesList.forEach((d) -> {
-//			d.x -= (d.x - event.getX()) * 2 * (1 - zoomRatio);
-//			d.y -= (d.y - event.getY()) * 2 * (1 - zoomRatio);
-//		});
-		
-//		scale *= zoomFactor / preZoom;
-//		gc.scale(scale, scale);
-//		gc.m
-//		for(NodeSpec d : nodesList) {
-//			d.sz *= scale;
-//			d.x -= (d.x - event.getX()) * (1 - zoomFactor / preZoom);
-//			d.y -= (d.y - event.getY()) * (1 - zoomFactor / preZoom);
-//		}
-	}
+        System.out.println("["+mxx+" "+mxy+" "+tx+" ");
+        System.out.println(" "+myx+" "+myy+" "+ty+"]");
+        Affine afft = new Affine(mxx, mxy, tx,
+                                 myx, myy, ty);
+
+        double deltaX=event.getScreenX()*.001*event.getDeltaY()/40;
+        double deltaY=event.getScreenY()*.001*event.getDeltaY()/40;
+        
+//        gc.getCanvas().getTransforms().add(new Translate(deltaY,deltaX)); // Needs to jump to mouse
+//        gc.getCanvas().getTransforms().add(new Scale(1,1)); // Needs to jump to mouse
+//        gc.getCanvas().getTransforms().add(new Translate(-deltaY/1.1,-deltaX/1.1)); // Needs to jump to mouse
+
+        Transform initDel=new Translate(deltaY,deltaX);
+        Transform pivScal=new Scale(1+0.1*event.getDeltaY()/40,1+0.1*event.getDeltaY()/40,event.getSceneX(),event.getSceneY());
+//        Transform[] tList = {};
+        gc.getCanvas().getTransforms().add(pivScal);
+        printDebug("New Inp");
+        gc.getCanvas().getTransforms().forEach(t->printDebug(t.toString()));
+        printDebug("L->S"+gc.getCanvas().getLocalToSceneTransform().toString());
+        gc.getCanvas().setWidth(10000);
+        gc.getCanvas().setHeight(10000);
+        printDebug(gc.getCanvas().layoutXProperty()+"");
+        printDebug(gc.getCanvas().layoutYProperty()+"");
+//        printDebug(gc.getTransform().toString());
+//        gc.getTransform().appendScale(50, 50);
+//        printDebug(gc.getTransform().toString());
+    }
 	
 	public static NodeSpec getNode(MouseEvent mEvent) {
 		Spec selNode = null;
@@ -237,7 +245,7 @@ public class _SpecHandler {
 	}
 	
 	public static abstract class Spec {
-		boolean selected = false;
+		public boolean selected = false;
 		public String type;
 		
 		Spec setSelected() {
@@ -245,9 +253,26 @@ public class _SpecHandler {
 			this.selected = true;
 			return this;
 		}
+		
+		public void fieldsTest(){
+			Field[] cFields = this.getClass().getFields();
+			printDebug("Object of type '" + this.getClass().descriptorString() + "' has Fields ");
+			// getDeclaredFields() gets all fields from _just the class_ of the calling object, i.e. when a NodeSpec calls .fieldsTest()
+			// getFields() gets all fields that the calling object can access including from up the chain but _are also public_
+			// See my _SubController for a way to get all fields calling object can access regardless of access modifier
+			for(int i=0; i<cFields.length; i++) {
+				try {
+					printDebug(cFields[i].getType()+" "+cFields[i].getName()+" = "+cFields[i].get(this).toString());
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+					printDebug("Couldn't handle field#"+i+" : "+cFields[i].getType()+" "+cFields[i].getName());
+				}
+			}
+			printDebug(" - End of found fields from Spec");
+		}
 	}
 	
-	public static class NodeSpec extends Spec {
+	public static abstract class NodeSpec extends Spec {
 		public String getName() {
 			return name;
 		}
@@ -256,15 +281,15 @@ public class _SpecHandler {
 			this.name = name;
 		}
 		
-		double x;
-		double y;
+		public double x;
+		public double y;
 		double sz;
 		Color nodeColor;
 		public String name;
 		boolean isTemp = false;
 		public ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
-		ArrayList<String> test;
+		public ArrayList<String> test;
 		
 		public NodeSpec(double x, double y, String name, String type) {
 			this.x = x;
@@ -411,7 +436,17 @@ public class _SpecHandler {
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
-
+		public int pe;
+		public long mips;
+		public int ram;
+		public int level;
+		public double rate;
+		public double ipower;
+		public double apower;
+		public double latency;
+		public long upbw;
+		public long downbw;
+		
 		@SuppressWarnings("unchecked")
 		public DeviceSpec(String name, int pe, long mips, int ram, int level, double rate, double ipower, double apower,
 				double latency, long upbw, long downbw) {
@@ -428,6 +463,8 @@ public class _SpecHandler {
 			this.downbw = downbw;
 			this.assocList = (ArrayList<NodeSpec>) ((ArrayList<?>) devicesList);
 			this.test = new ArrayList<String>();
+			this.test.add("simple val");
+			this.test.add("A Value!");
 			this.setSelected();
 			this.add();
 		}
@@ -588,21 +625,14 @@ public class _SpecHandler {
 		public void setDownbw(long downbw) {
 			this.downbw = downbw;
 		}
-
-		public int pe;
-		public long mips;
-		public int ram;
-		public int level;
-		public double rate;
-		public double ipower;
-		public double apower;
-		public double latency;
-		public long upbw;
-		public long downbw;
-		
 	}
 	
-	public static class ModuleSpec extends NodeSpec {	
+	public static class ModuleSpec extends NodeSpec {
+		public int ram;
+		public long bandwidth;
+		public long size;
+		public int mips;
+		public ArrayList<TupleSpec> tupleMappings;
 		
 		public int getRam() {
 			return ram;
@@ -649,12 +679,6 @@ public class _SpecHandler {
 			return "ram=" + ram + ", bandwidth=" + bandwidth + ", size=" + size + ", mips=" + mips + ", x=" + x + ", y="
 					+ y + ", name=" + name;
 		}
-		
-		public int ram;
-		public long bandwidth;
-		public long size;
-		public int mips;
-		public ArrayList<TupleSpec> tupleMappings;
 		
 		public ModuleSpec(String name, String nodeName, int ram, long bandwidth, long size, int mips,
 				ArrayList<TupleSpec> _tupleMappings) {

@@ -426,10 +426,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
 	private void screenSizeChangeHandler() {
-    	double w=backPane.getWidth(); double h=backPane.getHeight();
-		xCenter=0.5*w; yCenter=0.5*h;
-		topoField.setWidth(w); topoField.setHeight(h);
-    	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
+//    	double w=backPane.getWidth(); double h=backPane.getHeight();
+//		xCenter=0.5*w; yCenter=0.5*h;
+//		topoField.setWidth(w); topoField.setHeight(h);
+//    	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
 		redrawNodes();
     }
     
@@ -543,7 +543,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
 			    	case 27: controller.recover(); stage.close(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
-			    	case 116: printDebug(specPtr.toString()); break;
+			    	case 116: specPtr.fieldsTest(); break;
 			        default:  {printDebug(event.getCode().getCode()+"");}
 			    }
 			});

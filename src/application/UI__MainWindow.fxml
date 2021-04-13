@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -10,20 +11,19 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.effect.InnerShadow?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="657.0" prefWidth="1241.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application._MainWindowController">
-   <center>
-      <AnchorPane prefHeight="657.0" prefWidth="1045.0" BorderPane.alignment="CENTER">
+   <left>
+      <Group BorderPane.alignment="CENTER">
          <children>
-          <AnchorPane fx:id="backPane" layoutX="-1.0" layoutY="23.0" minHeight="0.0" minWidth="0.0" prefHeight="634.0" prefWidth="934.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Group>
                <children>
-                  <Canvas fx:id="topoField" height="657.0" layoutX="-1.0" layoutY="1.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="936.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="0.0" />
-                  <Pane layoutY="113.0" prefHeight="323.0" prefWidth="123.0" style="-fx-background-color: #e8e8e8;" styleClass="pane">
+                  <Canvas fx:id="topoField" height="657.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="1227.0" />
+                  <Pane prefHeight="323.0" prefWidth="123.0" style="-fx-background-color: #e8e8e8;" styleClass="pane">
                      <children>
                         <Button layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" style="-fx-background-color: #ffa200;" text="Node (1)" textFill="WHITE">
                            <effect>
@@ -120,7 +120,7 @@
                         </InnerShadow>
                      </effect>
                   </Pane>
-                  <TreeTableView fx:id="tableView" layoutX="936.0" layoutY="45.0" prefHeight="602.0" prefWidth="285.0">
+                  <TreeTableView fx:id="tableView" prefHeight="602.0" prefWidth="285.0">
                     <columns>
                       <TreeTableColumn fx:id="col1" prefWidth="309.0" text="Preview of Placements" />
                     </columns>
@@ -133,8 +133,8 @@
                      </effect>
                   </TreeTableView>
                </children>
-            </AnchorPane>
-            <MenuBar layoutX="332.0" layoutY="7.0" prefHeight="25.0" prefWidth="931.0" style="-fx-background-color: #ffa200;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            </Group>
+            <MenuBar prefHeight="25.0" prefWidth="931.0" style="-fx-background-color: #ffa200;">
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
@@ -164,7 +164,7 @@
                   </Menu>
               </menus>
             </MenuBar>
-            <Pane layoutX="35.0" layoutY="544.0" onScroll="#mouseScrollHandler" prefHeight="99.0" prefWidth="879.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom">
+            <Pane onScroll="#mouseScrollHandler" prefHeight="99.0" prefWidth="879.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom">
                <children>
                   <Button fx:id="deleteButton" layoutX="47.0" layoutY="29.0" mnemonicParsing="false" onAction="#deleteHandler" prefHeight="40.0" prefWidth="110.0" style="-fx-background-color: #e8e8e8;;" text="Delete">
                      <effect>
@@ -268,6 +268,6 @@
                </effect>
             </Pane>
          </children>
-      </AnchorPane>
-   </center>
+      </Group>
+   </left>
 </BorderPane>
