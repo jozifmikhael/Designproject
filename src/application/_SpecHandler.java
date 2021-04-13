@@ -247,6 +247,7 @@ public class _SpecHandler {
 	public static abstract class Spec {
 		public boolean selected = false;
 		public String type;
+		protected boolean isTemp = false;
 		
 		Spec setSelected() {
 			deselectAll();
@@ -272,7 +273,7 @@ public class _SpecHandler {
 		}
 	}
 	
-	public static abstract class NodeSpec extends Spec {
+	public static class NodeSpec extends Spec {
 		public String getName() {
 			return name;
 		}
@@ -286,7 +287,6 @@ public class _SpecHandler {
 		double sz;
 		Color nodeColor;
 		public String name;
-		boolean isTemp = false;
 		public ArrayList<EdgeSpec> edgesList = null;
 		ArrayList<NodeSpec> assocList = nodesList;
 		public ArrayList<String> test;

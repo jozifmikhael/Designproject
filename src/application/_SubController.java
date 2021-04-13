@@ -204,9 +204,11 @@ public abstract class _SubController {
 	final public void recover() {
 		printDebug("Recovering...");
 		printDebug("SpecC:"+spec.toString());
-		printDebug("SpecP:"+specPrev.toString());
 		((DeviceSpec)spec).pop();
-		if(specPrev!=null) ((DeviceSpec)specPrev).add();
+		if(specPrev!=null && !specPrev.isTemp) {
+			((DeviceSpec)specPrev).add();
+			printDebug("SpecP:"+specPrev.toString());
+		}
 		spec=specPrev;
 	}
 	final public Spec init(Spec s) {
