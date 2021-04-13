@@ -54,7 +54,6 @@ import org.fog.utils.distribution.NormalDistribution;
 import org.fog.utils.distribution.UniformDistribution;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import application._SpecHandler.TupleSpec;
 import static application.scratch.printDebug;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Pe;
@@ -88,11 +87,6 @@ import javafx.scene.transform.*;
 public class _SpecHandler {
 	@FXML
 	AnchorPane backPane;
-	
-	public static ArrayList<DeviceSpec> devicesList = new ArrayList<DeviceSpec>();
-	public static ArrayList<ModuleSpec> modulesList = new ArrayList<ModuleSpec>();
-	public static ArrayList<ActuatSpec> actuatsList = new ArrayList<ActuatSpec>();
-	public static ArrayList<SensorSpec> sensorsList = new ArrayList<SensorSpec>();
 	public static ArrayList<NodeSpec> nodesList = new ArrayList<NodeSpec>();
 	static double R = 50;
 	static double zoomFactor = 1;
@@ -264,10 +258,11 @@ public class _SpecHandler {
 			this.selected = true;
 			return this;
 		}
-
-		public Spec() {
-		}
-
+		
+		abstract Spec pop();
+		abstract Spec add();
+		public Spec() {}
+		
 		public Spec(JSONObject obj) {
 			Field[] cFields = this.getClass().getFields();
 			for (int i = 0; i < cFields.length; i++) {
@@ -362,7 +357,6 @@ public class _SpecHandler {
 		Color nodeColor;
 		public String name;
 		public ArrayList<EdgeSpec> edgesList = null;
-		ArrayList<NodeSpec> assocList = nodesList;
 		public ArrayList<String> test;
 		
 		public NodeSpec(JSONObject a) {
@@ -471,7 +465,6 @@ public class _SpecHandler {
 		
 		NodeSpec pop() {
 			nodesList.remove(this);
-			assocList.remove(this);
 			this.isTemp = true;
 			pruneLinks();
 			return this;
@@ -480,8 +473,6 @@ public class _SpecHandler {
 		Spec add() {
 			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
 				nodesList.add(this);
-			if (!(assocList.stream().anyMatch(a -> a.name.equals(this.name))))
-				assocList.add(this);
 			return this;
 		}
 		
@@ -510,7 +501,7 @@ public class _SpecHandler {
 		Spec deviceModuleLink(String _dst) {
 			NodeSpec dst = _SpecHandler.getLinkableNode(linkableDestinations(), _dst);
 			if (dst == null)return this;
-			this.edgesList.add(new EdgeSpec(this, dst));
+			this.edgesList.add(new EdgeSpec(this, dst, "edgeSimple"));
 			return this;
 		}
 	}
@@ -541,7 +532,6 @@ public class _SpecHandler {
 			this.latency = latency;
 			this.upbw = upbw;
 			this.downbw = downbw;
-			this.assocList = (ArrayList<NodeSpec>) ((ArrayList<?>) devicesList);
 			this.test = new ArrayList<String>();
 			this.test.add("simple val");
 			this.test.add("A Value!");
@@ -612,20 +602,6 @@ public class _SpecHandler {
 			
 			fogdevice.setLevel(this.level);
 			return fogdevice;
-		}
-
-		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			JSONObject obj = new JSONObject();
-			String deviceString = this.toString();
-			String[] deviceSplit = deviceString.split(",");
-			
-			for (int i = 0; i < deviceSplit.length; i++) {
-				String[] deviceSplit2 = deviceSplit[i].split("=");
-				obj.put(deviceSplit2[0], deviceSplit2[1]);
-			}
-			
-			return obj;
 		}
 
 		public int getPe() {
@@ -717,6 +693,7 @@ public class _SpecHandler {
 		public int mips;
 		public ArrayList<TupleSpec> tupleMappings;
 		
+		public ModuleSpec(JSONObject a) {super(a);}
 		public int getRam() {
 			return ram;
 		}
@@ -857,13 +834,13 @@ public class _SpecHandler {
 		}
 		
 		double latency;
-		double deterministicValue;
-		double normalMean;
-		double normalStdDev;
-		double uniformMax;
-		double uniformMin;
-		String distType;
-		
+		public double deterministicValue;
+		public double normalMean;
+		public double normalStdDev;
+		public double uniformMax;
+		public double uniformMin;
+		public String distType;
+		public SensorSpec(JSONObject a) {super(a);}
 		public SensorSpec(String name, String parent, double latency, double deterministicValue, double normalMean,
 				double normalStdDev, double uniformMax, double uniformMin, String distType) {
 			super(name, "sensor");
@@ -901,19 +878,19 @@ public class _SpecHandler {
 					+ ", distType=" + distType;
 		}
 		
-		@SuppressWarnings("unchecked")
-		JSONObject toJSON() {
-			JSONObject obj = new JSONObject();
-			String sensorString = this.toString();
-			String[] sensorSplit = sensorString.split(",");
-			
-			for (int i = 0; i < sensorSplit.length; i++) {
-				String[] sensorSplit2 = sensorSplit[i].split("=");
-				obj.put(sensorSplit2[0], sensorSplit2[1]);
-			}
-			
-			return obj;
-		}
+//		@SuppressWarnings("unchecked")
+//		JSONObject toJSON() {
+//			JSONObject obj = new JSONObject();
+//			String sensorString = this.toString();
+//			String[] sensorSplit = sensorString.split(",");
+//			
+//			for (int i = 0; i < sensorSplit.length; i++) {
+//				String[] sensorSplit2 = sensorSplit[i].split("=");
+//				obj.put(sensorSplit2[0], sensorSplit2[1]);
+//			}
+//			
+//			return obj;
+//		}
 	}
 	
 	public static class ActuatSpec extends NodeSpec {
@@ -925,7 +902,7 @@ public class _SpecHandler {
 			UpLinklatency = upLinklatency;
 		}
 		
-		public double UpLinklatency;
+		double UpLinklatency;
 		
 		public ActuatSpec(String name, String type, double UpLinklatency) {
 			super(name, "actuat");
@@ -935,7 +912,7 @@ public class _SpecHandler {
 		public Actuator addToApp(int userId, String appId) {
 			return new Actuator(this.name, userId, appId, this.name);
 		}
-		
+		public ActuatSpec(JSONObject a) {super(a);}
 		@Override
 		public String toString() {
 			return "x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",type=" + type;
@@ -956,6 +933,23 @@ public class _SpecHandler {
 	}
 	
 	public static class EdgeSpec extends Spec {
+
+		public String getSrcName() {
+			return srcName;
+		}
+
+		public void setSrcName(String srcName) {
+			this.srcName = srcName;
+		}
+
+		public String getDstName() {
+			return dstName;
+		}
+
+		public void setDstName(String dstName) {
+			this.dstName = dstName;
+		}
+
 		public Spec getSrc() {
 			return src;
 		}
@@ -1028,8 +1022,11 @@ public class _SpecHandler {
 			this.direction = direction;
 		}
 		
+		public EdgeSpec(JSONObject a) {super(a);}
 		NodeSpec src;
 		NodeSpec dst;
+		public String srcName;
+		public String dstName;
 		// int DEVICE = 0;
 		// public static final int SENSOR = 1; // App Edge originates from a sensor
 		// public static final int ACTUATOR = 2; // App Edge leads to an actuator
@@ -1067,9 +1064,11 @@ public class _SpecHandler {
 //		}
 		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, int edgeType, double latency, String tupleType,
-				double periodicity, double cpuLength, double newLength, int direction) {
+				double periodicity, double cpuLength, double newLength, int direction, String type) {
 			this.src = src;
 			this.dst = dst;
+			this.dstName = dst.name;
+			this.srcName = src.name;
 			this.edgeType = edgeType;
 			this.latency = latency;
 			this.tupleType = tupleType;
@@ -1077,15 +1076,16 @@ public class _SpecHandler {
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
 			this.direction = direction;
+			this.type = type;
 }
 		
-		public EdgeSpec(NodeSpec src, NodeSpec dst) {
-			this(src, dst, -1, 0, "null", 0, 0, 0, 0);
+		public EdgeSpec(NodeSpec src, NodeSpec dst, String type) {
+			this(src, dst, -1, 0, "null", 0, 0, 0, 0, type);
 		}
 
 			
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {
-			this(src, dst, 0, latency, "null", 0, 0, 0, 0);
+			this(src, dst, 0, latency, "null", 0, 0, 0, 0, "edgeSimple");
 		}
 		
 		public Application addToApp(List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators, Application application, ModuleMapping moduleMapping) {
@@ -1132,6 +1132,22 @@ public class _SpecHandler {
 			gc.setStroke(Color.BLACK);
 			gc.setLineWidth(1.0);
 		}
+
+		@Override
+		Spec pop() {
+			this.src.edgesList.remove(this);
+			return this;
+		}
+
+		@Override
+		Spec add() {
+			for(NodeSpec n : nodesList) {
+				if(n.name.equals(this.srcName))this.src = n;
+				if(n.name.equals(this.dstName))this.dst = n;
+			}
+			this.src.edgesList.add(this);
+			return null;
+		}
 	}
 		
 	public static class TupleSpec extends Spec {
@@ -1141,6 +1157,14 @@ public class _SpecHandler {
 
 		public void setInTuple(String inTuple) {
 			this.inTuple = inTuple;
+		}
+
+		public String getHostModuleName() {
+			return hostModuleName;
+		}
+
+		public void setHostModuleName(String hostModuleName) {
+			this.hostModuleName = hostModuleName;
 		}
 
 		public String getOutTuple() {
@@ -1158,10 +1182,13 @@ public class _SpecHandler {
 		public void setFractionalSensitivity(double fractionalSensitivity) {
 			this.fractionalSensitivity = fractionalSensitivity;
 		}
-
+		public TupleSpec(JSONObject a) {super(a);}
 		public String inTuple;
 		public String outTuple;
 		public double fractionalSensitivity;
+		public String hostModuleName;
+		ModuleSpec hostModule;
+
 		@Override
 		public String toString() {
 			return "inTuple=" + inTuple + ",outTuple=" + outTuple + ",fractionalSensitivity="
@@ -1180,10 +1207,26 @@ public class _SpecHandler {
 //			return obj;
 //		}
 		
-		public TupleSpec(String inTuple, String outTuple, double fractionalSensitivity) {
+		public TupleSpec(String inTuple, String outTuple, double fractionalSensitivity, ModuleSpec hostModule) {
+			this.hostModule = hostModule;
+			this.hostModuleName = hostModule.name;
 			this.inTuple = inTuple;
 			this.outTuple = outTuple;
 			this.fractionalSensitivity = fractionalSensitivity;
+		}
+		ModuleSpec parentModule;
+		@Override
+		Spec pop() {
+			this.parentModule.tupleMappings.remove(this);
+			return this;
+		}
+
+		@Override
+		Spec add() {
+			for(NodeSpec n : nodesList){
+
+			}
+			return null;
 		}
 	}
 	
@@ -1221,14 +1264,22 @@ public class _SpecHandler {
 		JSONArray sensorsJSONObj = new JSONArray();
 		JSONArray actuatsJSONObj = new JSONArray();
 		JSONArray edgesJSONObj = new JSONArray();
-		
-		devicesList.forEach(d->devicesJSONObj.add(d.toJSON_reflections()));
-        modulesList.forEach(m->modulesJSONObj.add(m.toJSON_reflections()));
-        sensorsList.forEach(s->sensorsJSONObj.add(s.toJSON_reflections()));
-        actuatsList.forEach(a->actuatsJSONObj.add(a.toJSON_reflections()));
-        for(NodeSpec n : nodesList) for(EdgeSpec e: n.edgesList) edgesJSONObj.add(e.toJSON_reflections());
-//		for (EdgeSpec e : edgesList) edgesJSONObj.add(e.toJSON());
-			
+
+		for(NodeSpec n: nodesList) {
+			switch(n.type) {
+				case "device": devicesJSONObj.add(n.toJSON_reflections()); break;
+				case "module": modulesJSONObj.add(n.toJSON_reflections()); break;
+				case "sensor": sensorsJSONObj.add(n.toJSON_reflections()); break;
+				case "actuat": actuatsJSONObj.add(n.toJSON_reflections()); break;
+			}
+		}
+//		
+//		devicesList.forEach(d->devicesJSONObj.add(d.toJSON_reflections()));
+//        modulesList.forEach(m->modulesJSONObj.add(m.toJSON_reflections()));
+//        sensorsList.forEach(s->sensorsJSONObj.add(s.toJSON_reflections()));
+//        actuatsList.forEach(a->actuatsJSONObj.add(a.toJSON_reflections()));
+        // for(NodeSpec n : nodesList) for(EdgeSpec e: n.edgesList) edgesJSONObj.add(e.toJSON_reflections());
+        
 		JSONObject metaList = new JSONObject();
 		// TODO colors + zoomlv need to be in here as well
 		metaList.put("simGranularity", simGranularity);

@@ -17,6 +17,6 @@ public class AddEdgeSimpleController extends _SubController{
 	void initDefaultObject() {
 		// TODO Auto-generated method stub
 		printDebug("In AddEdgeSimpleController");
-        spec = new EdgeSpec(_MainWindowController.selNode, _MainWindowController.linkSrcNode);
+        spec = new EdgeSpec(_MainWindowController.selNode, _MainWindowController.linkSrcNode, "edgeSimple");
 	}
 }

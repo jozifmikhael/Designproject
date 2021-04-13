@@ -204,9 +204,9 @@ public abstract class _SubController {
 	final public void recover() {
 		printDebug("Recovering...");
 		printDebug("SpecC:"+spec.toString());
-		((DeviceSpec)spec).pop();
+		spec.pop();
 		if(specPrev!=null && !specPrev.isTemp) {
-			((DeviceSpec)specPrev).add();
+			specPrev.add();
 			printDebug("SpecP:"+specPrev.toString());
 		}
 		spec=specPrev;
@@ -214,7 +214,7 @@ public abstract class _SubController {
 	final public Spec init(Spec s) {
 		if(s!=null) {
 			spec=s;
-			specPrev=DeviceSpec.fromJSON(((DeviceSpec)s).toJSON());
+			specPrev=DeviceSpec.fromJSON(s.toJSON_reflections());
 		}else initDefaultObject();
 		extendedInit();
 		parseChildrenOf(ap);

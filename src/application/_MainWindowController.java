@@ -543,7 +543,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			
 			Spec prevState=null;
 			if (_SpecHandler.getSelected() != null)
-				prevState = _SpecHandler.getSelected().type.equals(type) ? DeviceSpec.fromJSON(((DeviceSpec)_SpecHandler.getSelected()).toJSON()) : null;
+				prevState = _SpecHandler.getSelected().type.equals(type) ? _SpecHandler.getSelected() : null;
 			
 			Spec specPtr = controller.init(prevState);
 			
