@@ -317,10 +317,10 @@ public class _SpecHandler {
                 String cVal = (String) obj.get(f.getName());
                 try {
                     switch(f.getType().toString()) {
-                        case "int":     f.set(this, Integer    .parseInt     (cVal)); break;
-                        case "double":     f.set(this, Double    .parseDouble (cVal)); break;
-                        case "long":     f.set(this, Long    .parseLong     (cVal)); break;
-                        case "boolean": f.set(this, Boolean .parseBoolean(cVal)); break;
+                    	case "boolean": f.set(this, Boolean.parseBoolean(cVal)); break;
+                    	case "double":	f.set(this, Double .parseDouble (cVal)); break;
+                        case "long":    f.set(this, Long   .parseLong   (cVal)); break;
+                        case "int":     f.set(this, Integer.parseInt    (cVal)); break;
                         case "class java.lang.String": f.set(this, cVal); break;
                         case "class java.util.ArrayList" :{
                             if (f.getGenericType() instanceof ParameterizedType) {
@@ -349,7 +349,9 @@ public class _SpecHandler {
 					if (f.getGenericType() instanceof ParameterizedType) {
 						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
 						JSONArray newSet = null;
-						arrRef.forEach(a->newSet.add(((Spec)a).toJSON_reflections()));
+						if(f.getGenericType().toString().contains("_SpecHandler$")) {
+							arrRef.forEach(a->newSet.add(((Spec)a).toJSON_reflections()));
+						}else arrRef.forEach(a->newSet.add(a+""));
 						obj.put(f.getName(), newSet);
 					}else obj.put(f.getName(), f.get(this).toString());
 				} catch (IllegalArgumentException | IllegalAccessException e) {
