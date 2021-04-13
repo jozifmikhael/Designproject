@@ -17,6 +17,7 @@ import application._SubController;
 import application.Main;
 //import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
+import org.fog.placement.ModulePlacement;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.policy.AppModuleAllocationPolicy;
 import org.fog.scheduler.StreamOperatorScheduler;
@@ -39,6 +40,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -133,6 +135,7 @@ import org.fog.utils.distribution.UniformDistribution;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeView;
 
 public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{	
 	@FXML
@@ -200,16 +203,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private AnchorPane backPane;
+
     @FXML
     private ChoiceBox<String> PolicyChoiceMain;
+
     @FXML
     private Button previewButton;
     
-   
     @FXML
-    private TreeTableView<String> tableView;
-    @FXML
-    private TreeTableColumn<String, String> col1;
+    private TreeView<String> treeView;
     
     ////////////////////////////////////////////////////////////////////////////
     // TODO Tidy up the todo list
@@ -262,6 +264,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
+		
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
 	}
@@ -439,6 +442,22 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     int simGranu = 10;
     
 	@FXML
+	    void startSim(ActionEvent event) throws Exception {
+	    	String policy = setParamsController.policyType;
+	    	int time = setParamsController.simulationTime;
+	    	int granularity = setParamsController.granularityMetric;
+	    	String centralNode = getCentralNode();
+	    	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
+	//		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
+	//     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
+	//        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+	//        Stage stage = new Stage();
+	//        stage.setScene(scene);
+	//        stage.setTitle("Output");
+	//        stage.showAndWait();
+	    }
+
+	@FXML
     void newJSON(ActionEvent event) throws IOException {
 		FXMLLoader root = new FXMLLoader(getClass().getResource("SaveFileBox.fxml"));
 		Scene scene = new Scene(root.load(),414,139);
@@ -456,11 +475,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		//TODO change this so that the meta-specs are actually inside the SetupJSONParser
 		//and we only set from here on change
 		//So ideally just JSONHandler.writeJSON();
-		String policy = setParamsController.policyType;
-    	int time = setParamsController.simulationTime;
-    	int granularity = setParamsController.granularityMetric;
-    	String centralNode = getCentralNode();
-//     	specsHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
+		
+//     	
 	}
 	
 	//TODO Change Parse[X] to be methods of the respective classes
@@ -543,7 +559,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
 			    	case 27: controller.recover(); stage.close(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
-			    	case 116: specPtr.testSerDe(); break;
+			    	case 116: printDebug("ss"); break;
 			        default:  {printDebug(event.getCode().getCode()+"");}
 			    }
 			});
@@ -653,21 +669,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void startSim(ActionEvent event) throws Exception {
-//    	writeJSON();
-		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
-     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.setTitle("Output");
-        stage.showAndWait();
-    }
-
-	@FXML
     void startPreview(ActionEvent event) throws Exception {
     	vrgame.createFogSimObjects(false, "Edgeward", 10, 10000);
-    	// for(placementObject o : _SpecHandler.placementList)System.out.println("Device: " + o.device + " module " + o.module);//placementList moved to ModulePlacement.java
+    	TreeItem<String> devices = new TreeItem<>("Devices");
+		for(placementObject o : ModulePlacement.placementList) {
+    		TreeItem<String> parent1 = new TreeItem<>(o.device);
+    		for(String m : o.module) {
+    			TreeItem<String> item = new TreeItem<>(m);
+    			parent1.getChildren().add(item);
+    		}
+//    		TreeParentList.add(parent1);
+    		devices.getChildren().add(parent1);
+    	}
+		treeView.setRoot(devices);
+    	devices.setExpanded(true);
     }
     
     @FXML

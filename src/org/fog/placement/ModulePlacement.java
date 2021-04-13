@@ -51,9 +51,12 @@ public abstract class ModulePlacement {
 			module = _module;
 			
 		if(canBeCreated(device, module)){
-			placementObject p = new placementObject(device.getName(), module.getName());
-			p.addToPreview();
-			System.out.println("Creating "+module.getName()+" on device "+device.getName());
+			placementObject p = placementObject.getDevice(device.getName());
+			if(p==null) {
+				p = new placementObject(device.getName(), module.getName());
+				p.addToPreview();
+			}
+			else p.module.add(module.getName());
 			
 			if(!getDeviceToModuleMap().containsKey(device.getId()))
 				getDeviceToModuleMap().put(device.getId(), new ArrayList<AppModule>());
