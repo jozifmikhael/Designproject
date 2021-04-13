@@ -108,7 +108,7 @@ public abstract class _SubController {
 	}
 	
 	final public static void setField(Object targetObject, String fieldName, Object fieldValue) {
-		printDebug(fieldName + " -> "+ fieldValue);
+//		printDebug(fieldName + " -> "+ fieldValue);
 		try {
 			Field field = getField(targetObject, fieldName);
 			if(field == null) return;
@@ -143,9 +143,9 @@ public abstract class _SubController {
 			Node selChild = ((Parent) cRoot).getChildrenUnmodifiable().get(i);
 			
 			if (containers.contains(selChild.getClass().getSimpleName().toString())) {
-				printDebug("Checking children of : " + selChild.getClass().getSimpleName().toString());
+//				printDebug("Checking children of : " + selChild.getClass().getSimpleName().toString());
 				parseChildrenOf(selChild);
-			} 
+			}
 			else if (selChild.getClass().getSimpleName().toString().equals("TableView")) {
 				TableView selTable = (TableView)selChild;
 //				selTable.setItems(tempData);
@@ -167,11 +167,11 @@ public abstract class _SubController {
 				}
 			}
 			else if (selChild.getClass().getSimpleName().toString().equals("TextField")) {
-				printDebug("Found a textField with ID " + selChild.getId());
+//				printDebug("Found a textField with ID " + selChild.getId());
             	TextField selTextField = (TextField)selChild;
             	if(selTextField.getId().contains("Spec")) continue;
             	selTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            		printDebug(selTextField.getId() + " -> " + newValue);
+//            		printDebug(selTextField.getId() + " -> " + newValue);
             	    setField(spec, selTextField.getId(), newValue);
             	});
             	try {
@@ -180,7 +180,7 @@ public abstract class _SubController {
                     selTextField.setText(getField(spec, selTextField.getId()).get(spec).toString());
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
-                } 
+                }
 			} else if (selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
         		ObservableList<String> tempNames = FXCollections.observableArrayList();
             	ChoiceBox<String> selBox = (ChoiceBox) selChild;
@@ -217,10 +217,7 @@ public abstract class _SubController {
 			specPrev=DeviceSpec.fromJSON(((DeviceSpec)s).toJSON());
 		}else initDefaultObject();
 		extendedInit();
-		printDebug(spec.toString());
 		parseChildrenOf(ap);
-		printDebug("Returned");
-		printDebug(spec.toString());
 		return spec;
 	}
 }

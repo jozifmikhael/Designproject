@@ -256,20 +256,41 @@ public class _SpecHandler {
 		}
 		
 		public void fieldsTest(){
+//			Field[] cFields = this.getClass().getFields();
+//			printDebug("Object of type '" + this.getClass().descriptorString() + "' has Fields ");
+//			// getDeclaredFields() gets all fields from _just the class_ of the calling object, i.e. when a NodeSpec calls .fieldsTest()
+//			// getFields() gets all fields that the calling object can access including from up the chain but _are also public_
+//			// See my _SubController for a way to get all fields calling object can access regardless of access modifier
+//			for(int i=0; i<cFields.length; i++) {
+//				try {
+//					printDebug(cFields[i].getType()+" "+cFields[i].getName()+" = "+cFields[i].get(this).toString());
+//				} catch (IllegalArgumentException | IllegalAccessException e) {
+//					e.printStackTrace();
+//					printDebug("Couldn't handle field#"+i+" : "+cFields[i].getType()+" "+cFields[i].getName());
+//				}
+//			}
+//			printDebug(" - End of found fields from Spec");
+			toJSON_reflections();
+		}
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON_reflections() {
+			JSONObject obj = new JSONObject();
 			Field[] cFields = this.getClass().getFields();
-			printDebug("Object of type '" + this.getClass().descriptorString() + "' has Fields ");
-			// getDeclaredFields() gets all fields from _just the class_ of the calling object, i.e. when a NodeSpec calls .fieldsTest()
-			// getFields() gets all fields that the calling object can access including from up the chain but _are also public_
-			// See my _SubController for a way to get all fields calling object can access regardless of access modifier
-			for(int i=0; i<cFields.length; i++) {
+			
+			for (int i = 0; i < cFields.length; i++) {
 				try {
-					printDebug(cFields[i].getType()+" "+cFields[i].getName()+" = "+cFields[i].get(this).toString());
+					printDebug();
+					obj.put(cFields[i].getName(), cFields[i].get(this).toString());
 				} catch (IllegalArgumentException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
-					printDebug("Couldn't handle field#"+i+" : "+cFields[i].getType()+" "+cFields[i].getName());
 				}
 			}
-			printDebug(" - End of found fields from Spec");
+			printDebug("JSON Obj.toString()" + obj.toString());
+			printDebug("JSON Obj.toJSONString()" + obj.toJSONString());
+			
+			return obj;
 		}
 	}
 	
@@ -465,6 +486,7 @@ public class _SpecHandler {
 			this.test = new ArrayList<String>();
 			this.test.add("simple val");
 			this.test.add("A Value!");
+			this.test.add(5+"");
 			this.setSelected();
 			this.add();
 		}

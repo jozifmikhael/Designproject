@@ -23,8 +23,8 @@ public class scratch {
 //		System.out.println(testobj.getClass());
 //	}
 //	
-	public static void printDebug(String msg){
+	public static void printDebug(Object...msgs){
 		StackTraceElement callerSE = Thread.currentThread().getStackTrace()[2];
-		System.out.println("("+ callerSE.getFileName() + ":" + callerSE.getLineNumber() + ") : " + msg);
+		for(Object msg : msgs) System.out.println("("+ callerSE.getFileName() + ":" + callerSE.getLineNumber() + ") : " + msg+"");
 	}
 }

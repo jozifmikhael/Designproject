@@ -19,12 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fog.test.perfeval.VRGameFog_src;
+import static application.scratch.printDebug;
 
 public class Main extends Application {
 	public static void main(String[] args) throws Exception {
 //		System.out.println("Starting...");
 //		new VRGameFog_src("test6.json");
 		launch();
+		printDebug("Reached line after launch()");
+		System.exit(0);
 	}
 	
 	@Override
