@@ -487,7 +487,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
     
-    static Spec setupController(String type) {
+    Spec setupController(String type) {
     	printDebug("Starting setupController with type " + type + ", '" + loadersList.get(type).toString()+"'");
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {

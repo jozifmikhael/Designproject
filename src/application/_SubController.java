@@ -194,7 +194,8 @@ public abstract class _SubController {
 		if(s!=null) {
 			spec=s;
 			specPrev=DeviceSpec.fromJSON(s.toJSON());
-		}else initDefaultObjects();
+		}
+		initDefaultObjects();
 		parseChildrenOf(ap);
 		return spec;
 	}
