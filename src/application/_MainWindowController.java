@@ -221,54 +221,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
     GraphicsContext gc;
     
-    @Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-    	printDebug("Empty initialize function ran");
-    }
-	
-	public List<String> selectedNodesList = new ArrayList<String>();
-	static Map<String, URL> loadersList = new HashMap<String, URL>();
-	
-    public void setupListeners(Stage parentStage, Scene scene) {
-    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler(parentStage);
-    	parentStage.widthProperty().addListener(stageSizeListener);
-    	parentStage.heightProperty().addListener(stageSizeListener);
-    	
-    	//TODO Do the other menu items like this
-//    	addDeviceMenu.setOnAction(e->setupController("device"));
-//    	addModuleMenu.setOnAction(e->setupController("module"));
-////    	addSensorMenu.setOnAction(e->setupController("sensor"));
-////    	addActuatorMenu.setOnAction(e->setupController("actuat"));
-//    	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
-//    	
-    	gc=topoField.getGraphicsContext2D();
-    	gc.setTextAlign(TextAlignment.CENTER);
-    	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
-    	_SpecHandler.gc=this.gc;
-    	scene.setOnKeyPressed(this);
-//    	ObservableList<String> items = FXCollections.observableArrayList();
-//    	items.add("Edgewards");
-//    	items.add("Cloud-Only");
-//		PolicyChoiceMain.setItems(items);
- 		
- 		Stream.of("Edgewards", "Cloud-Only").forEach(
- 				s->PolicyChoiceMain.getItems().add(s));
- 		PolicyChoiceMain.setValue(PolicyChoiceMain.getItems().get(0));
- 		
- 		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
- 				s->loadersList.put(s, getClass().getResource("UI_"+s+".fxml")));
- 		printDebug("setupListeners ran\n");
- 		printDebug("Getting controller for device... " + loadersList.get("device").getPath());
-    }
-    
-	private void redrawNodes() {
-		gc.setFill(Color.WHITE);
-		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		
-		_SpecHandler.nodesList.forEach(n->n.drawLink());
-		_SpecHandler.nodesList.forEach(n->n.drawNode());
-	}
-    boolean mouseL=false;
+    public List<String> selectedNodesList = new ArrayList<String>();
+	boolean mouseL=false;
     boolean mouseR=false;
     boolean mouseM=false;
     NodeSpec draggingNode = null;
@@ -277,6 +231,49 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	static EdgeSpec selEdge = null;
 	VRGameFog vrgame = new VRGameFog();
     
+	static Map<String, URL> loadersList = new HashMap<String, URL>();
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		printDebug("Empty initialize function ran");
+	}
+	
+	public void setupListeners(Stage parentStage, Scene scene) {
+	    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler(parentStage);
+	    	parentStage.widthProperty().addListener(stageSizeListener);
+	    	parentStage.heightProperty().addListener(stageSizeListener);
+	    	
+	    	//TODO Do the other menu items like this
+//	      	addDeviceMenu.setOnAction(e->setupController("device"));
+//	     	addModuleMenu.setOnAction(e->setupController("module"));
+//	      	addSensorMenu.setOnAction(e->setupController("sensor"));
+//	     	addActuatorMenu.setOnAction(e->setupController("actuat"));
+//	     	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
+	    	
+	    	gc=topoField.getGraphicsContext2D();
+	    	gc.setTextAlign(TextAlignment.CENTER);
+	    	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
+	    	_SpecHandler.gc=this.gc;
+	    	
+	    	scene.setOnKeyPressed(this);
+	 		
+	 		Stream.of("Edgewards", "Cloud-Only").forEach(
+	 				s->PolicyChoiceMain.getItems().add(s));
+	 		PolicyChoiceMain.setValue(PolicyChoiceMain.getItems().get(0));
+	 		
+	 		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
+	 				s->loadersList.put(s, getClass().getResource("UI_"+s+".fxml")));
+	 		printDebug("setupListeners ran\n");
+	    }
+
+	private void redrawNodes() {
+		gc.setFill(Color.WHITE);
+		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
+		
+		_SpecHandler.nodesList.forEach(n->n.drawLink());
+		_SpecHandler.nodesList.forEach(n->n.drawNode());
+	}
+
 	@Override
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
@@ -364,7 +361,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
 		switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
-//				System.out.println("In Left: KeyState: " + InteractionState.setKey);
 				if(draggingNode!=null && draggingNode.isTemp) draggingNode.pop();
 				draggingNode=null;
 				Spec newSimObject = null;
@@ -496,11 +492,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
-			_SubController controller = loader.getController();
-			if(controller==null) {
-				printDebug("Controller null");
-				return null;
-			}
+			_SubController controller = (_SubController)loader.getController();
 			Scene scene = new Scene(loader.load());
 			Stage stage = new Stage();
 			stage.setScene(scene);

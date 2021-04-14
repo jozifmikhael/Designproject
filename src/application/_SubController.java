@@ -67,27 +67,7 @@ public abstract class _SubController {
 	Spec spec;
 	Spec specPrev;
 	String thisType;
-
-	ObservableList<Spec> tempData = FXCollections.observableArrayList();
 	
-	//getAllTextFields.foreach(t->(get(t.name)=t.val));
-	void makeSpec() {
-		printDebug(spec.toString());
-		for(int i=0; i<ap.getChildren().size(); i++) {
-			Node selTable = ap.getChildren().get(i);
-			if(selTable instanceof TableView) {
-                TableColumn selCols = (TableColumn) (((TableView) selTable).getColumns().get(0));
-            }
-		}
-	}
-	
-	@FXML
-	Spec saveSpecHandler() {
-		ap.getChildren().stream().forEach(c->printDebug(c.getId()));
-		((Stage) saveButton.getScene().getWindow()).close();
-		printDebug(this.spec.toString());
-		return this.spec;
-	}
 	
 	final public static Field getField(Object targetObject, String fieldName) {
 //		Field[] cFields = targetObject.getClass().getDeclaredFields();
@@ -191,11 +171,14 @@ public abstract class _SubController {
 		}
 	}
 	
-	abstract void initDefaultObject();
-	void extendedInit() {
-		//Does nothing here
-		//Extend this method in children controllers to add in extra functionality if needed
-		//Populate non-standard lists/tables, etc.
+	abstract void initDefaultObjects();
+	
+	@FXML
+	Spec saveSpecHandler() {
+		ap.getChildren().stream().forEach(c->printDebug(c.getId()));
+		((Stage) saveButton.getScene().getWindow()).close();
+		printDebug(this.spec.toString());
+		return this.spec;
 	}
 	final public void recover() {
 		printDebug("Recovering...");
@@ -211,8 +194,7 @@ public abstract class _SubController {
 		if(s!=null) {
 			spec=s;
 			specPrev=DeviceSpec.fromJSON(s.toJSON());
-		}else initDefaultObject();
-		extendedInit();
+		}else initDefaultObjects();
 		parseChildrenOf(ap);
 		return spec;
 	}

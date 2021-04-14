@@ -36,7 +36,7 @@ public class Main extends Application {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("UI__MainWindow.fxml"));
 			Scene scene = new Scene(loader.load());
 			
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+//			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			_MainWindowController controller = (_MainWindowController)loader.getController();
 			
 			controller.setupListeners(primaryStage, scene);

@@ -1,11 +1,10 @@
 package application;
 
 import application._SpecHandler.ActuatSpec;
-import application._SpecHandler.DeviceSpec;
 
-public class ActuatorInputController extends _SubController{
+public class AddActuatController extends _SubController{
 	 @Override
-    void initDefaultObject() {
+    void initDefaultObjects() {
         spec = new ActuatSpec("node"+_SpecHandler.nodesList.size(), thisType, 0);
     }
 }
