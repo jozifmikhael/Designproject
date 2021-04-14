@@ -33,7 +33,7 @@ public class AddModuleController extends _SubController{
 		tupleData.addAll(((ModuleSpec)this.spec).tupleMappings);
 		TupleSpec.setItems(tupleData);
 		nodeData.add(new EdgeSpec());
-		nodeData.addAll(((ModuleSpec)this.spec).moduleMappings);
+		nodeData.addAll(((ModuleSpec)this.spec).edgesList);
 		NodeSpec.setItems(nodeData);
 		printDebug("Leaving mod extended init");
 	}
