@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,6 +55,9 @@ import org.fog.utils.distribution.NormalDistribution;
 import org.fog.utils.distribution.UniformDistribution;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import application._SpecHandler.EdgeSpec;
+
 import static application.scratch.printDebug;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Pe;
@@ -102,6 +106,20 @@ public class _SpecHandler {
 	static Color transpColor = Color.TRANSPARENT;
 	static List<Color> validColors = Arrays.asList(deviceColor, moduleColor, sensorColor, actuatorColor, transpColor);
 	static Color _errorColor = Color.GREEN;
+	
+	static Map<String, Integer> allowableLinks= new HashMap<String, Integer>(){{
+		put("devicedevice", 0);
+		put("sensordevice", 0);
+		put("deviceactuat", 0);
+		put("modulemodule", 3);
+		put("sensormodule", 1);
+		put("moduleactuat", 2);
+		put("moduledevice", -1);
+		put("devicelinker", -2);
+		put("sensorlinker", -2);
+		put("modulelinker", -2);
+		put("actuatlinker", -2);
+	}};
 	
 	public static void shiftPositionsByZoom(ScrollEvent event) {
         double mxx=2+event.getDeltaY()/40;
@@ -343,6 +361,14 @@ public class _SpecHandler {
 	}
 	
 	public static class NodeSpec extends Spec {
+		public ArrayList<EdgeSpec> getEdgesList() {
+			return edgesList;
+		}
+
+		public void setEdgesList(ArrayList<EdgeSpec> edgesList) {
+			this.edgesList = edgesList;
+		}
+
 		public String getName() {
 			return name;
 		}
@@ -357,7 +383,6 @@ public class _SpecHandler {
 		Color nodeColor;
 		public String name;
 		public ArrayList<EdgeSpec> edgesList = null;
-		public ArrayList<String> test;
 		
 		public NodeSpec(JSONObject a) {
 			super(a);
@@ -501,7 +526,7 @@ public class _SpecHandler {
 		Spec deviceModuleLink(String _dst) {
 			NodeSpec dst = _SpecHandler.getLinkableNode(linkableDestinations(), _dst);
 			if (dst == null)return this;
-			this.edgesList.add(new EdgeSpec(this, dst, "edgeSimple"));
+			this.edgesList.add(new EdgeSpec(this, dst, 0, "edgeSimple"));
 			return this;
 		}
 	}
@@ -532,10 +557,6 @@ public class _SpecHandler {
 			this.latency = latency;
 			this.upbw = upbw;
 			this.downbw = downbw;
-			this.test = new ArrayList<String>();
-			this.test.add("simple val");
-			this.test.add("A Value!");
-			this.test.add(5+"");
 			this.setSelected();
 			this.add();
 		}
@@ -1045,11 +1066,11 @@ public class _SpecHandler {
 		
 		@Override
 		public String toString() {
-			return "src=" + src.name + ",dst=" + dst.name + ",edgeType=" + edgeType + ",latency=" + latency
+			return "srcName=" + srcName + ",dstName=" + dstName + ",edgeType=" + edgeType + ",latency=" + latency
 					+ ",tupleType=" + tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength
 					+ ",nwLength=" + nwLength + ",direction=" + direction;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 //		JSONObject toJSON() {
 //			JSONObject obj = new JSONObject();
@@ -1063,13 +1084,13 @@ public class _SpecHandler {
 //			return obj;
 //		}
 		
-		public EdgeSpec(NodeSpec src, NodeSpec dst, int edgeType, double latency, String tupleType,
-				double periodicity, double cpuLength, double newLength, int direction, String type) {
+		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String tupleType, double periodicity,
+				double cpuLength, double newLength, int direction, String type) {
+			System.out.println(src.type + " "+ dst.type);
 			this.src = src;
 			this.dst = dst;
 			this.dstName = dst.name;
 			this.srcName = src.name;
-			this.edgeType = edgeType;
 			this.latency = latency;
 			this.tupleType = tupleType;
 			this.periodicity = periodicity;
@@ -1077,15 +1098,36 @@ public class _SpecHandler {
 			this.nwLength = newLength;
 			this.direction = direction;
 			this.type = type;
-}
+			this.edgeType=allowableLinks.get(src.type+dst.type);
+		}
 		
-		public EdgeSpec(NodeSpec src, NodeSpec dst, String type) {
-			this(src, dst, -1, 0, "null", 0, 0, 0, 0, type);
+		public EdgeSpec(NodeSpec src, NodeSpec dst) {
+			if(src==null || dst==null) return;
+			if(!_SpecHandler.nodesList.contains(src) && !_SpecHandler.nodesList.contains(dst)) return;
+			if(!_SpecHandler.allowableLinks.containsKey(src.type+dst.type))return;
+			int i = _SpecHandler.allowableLinks.get(src.type+dst.type);
+			EdgeSpec e = null;
+			switch(i) {
+				case 0:
+					e = (EdgeSpec)_MainWindowController.setupController("edgeSimple");
+					if(e != null) src.addLink(e);
+					break;
+				case -1:
+					src.deviceModuleLink(dst.name);
+					break;
+				case -2:
+					break;
+				default:
+					e = (EdgeSpec)_MainWindowController.setupController("edgeFull");
+					if(e != null) src.addLink(e);
+					break;
+			}
 		}
 
-			
-		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency) {
-			this(src, dst, 0, latency, "null", 0, 0, 0, 0, "edgeSimple");
+		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String type) {
+			this(src, dst, latency, "null", 0, 0, 0, 0, type);
+			this.dstName = dst.name;
+			this.srcName = src.name;
 		}
 		
 		public Application addToApp(List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators, Application application, ModuleMapping moduleMapping) {
@@ -1252,7 +1294,6 @@ public class _SpecHandler {
 	
 	public static void loadJSON(File file) {
 		System.out.println("Loaded Json: " + file.getName());
-		
 	}
 	
 	@SuppressWarnings("unchecked")

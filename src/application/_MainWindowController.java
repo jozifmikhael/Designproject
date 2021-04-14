@@ -228,7 +228,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
 	
 	public List<String> selectedNodesList = new ArrayList<String>();
-	Map<String, URL> loadersList = new HashMap<String, URL>();
+	static Map<String, URL> loadersList = new HashMap<String, URL>();
 	
     public void setupListeners(Stage parentStage, Scene scene) {
     	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler(parentStage);
@@ -342,7 +342,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec("module", mEvent):selNode; break;// Select Module Placer
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
 					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec("actuat", mEvent):selNode; break;// Select Actuat Placer
-					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(new EdgeSpec(selNode, draggingNode, 0));break;
+					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(new EdgeSpec(selNode, draggingNode, 0, "edgeSimple"));break;
 					default : {} // Nothing
 				} break;
 //			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
@@ -352,27 +352,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			default: System.out.println("_MainWindowController.java: ClickHandler Error - State Default"); break;
         }
         redrawNodes();
-	}
-    
-    private NodeSpec makeReqLink(NodeSpec src, NodeSpec dst) {
-		//check the types of the src and dst and call the full edge controller or the mini one
-    	System.out.println();
-    	if(src==null || dst==null) return null;
-		if(!_SpecHandler.nodesList.contains(src) && !_SpecHandler.nodesList.contains(dst)) return null;
-		if((src.type.equals("device") && dst.type.equals("device")) 
-				||(src.type.equals("sensor") && dst.type.equals("device"))
-				||(src.type.equals("device") && dst.type.equals("actuat"))) {
-			printDebug("Setting up controller with edgeSimple");
-			EdgeSpec e = (EdgeSpec)setupController("edgeSimple");
-			if(e != null) src.addLink(e);
-		}else if((src.type.equals("module") && dst.type.equals("module")) 
-				||(src.type.equals("sensor") && dst.type.equals("module"))
-				||(src.type.equals("module") && dst.type.equals("actuat"))) {
-			EdgeSpec e = (EdgeSpec) setupController("edgeFull");
-			if(e != null) src.addLink(e);
-		}
-		else if(src.type.equals("module") && dst.type.equals("device")) src.deviceModuleLink(dst.name);
-		return src;
 	}
     
 	@FXML
@@ -389,7 +368,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT2 : newNode = (selNode!=null)?null:(NodeSpec)setupController("module"); break;
 					case DIGIT3 : newNode = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
 					case DIGIT4 : newNode = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
-					case DIGIT5 : linkSrcNode = (linkSrcNode==null)?null:makeReqLink(linkSrcNode,selNode); _SpecHandler.pruneLinks(); break;
+					case DIGIT5 : if(linkSrcNode!=null) {
+						new EdgeSpec(selNode,linkSrcNode); _SpecHandler.pruneLinks();
+					} break;
 
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
@@ -532,7 +513,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //		return controller.getSpec();
 //    }
     
-    Spec setupController(String type) {
+    static Spec setupController(String type) {
     	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
@@ -556,9 +537,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			});
 			
 			stage.setOnCloseRequest(e -> stage.close());
-			
 			stage.showAndWait();
-			redrawNodes();
 			return controller.spec;
 		} catch (IOException e) {
 			e.printStackTrace();
