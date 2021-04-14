@@ -221,7 +221,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
     GraphicsContext gc;
     
-    public List<String> selectedNodesList = new ArrayList<String>();
 	boolean mouseL=false;
     boolean mouseR=false;
     boolean mouseM=false;
@@ -489,7 +488,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     static Spec setupController(String type) {
-    	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
+    	printDebug("Starting setupController with type " + type + ", '" + loadersList.get(type).toString()+"'");
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			_SubController controller = (_SubController)loader.getController();
