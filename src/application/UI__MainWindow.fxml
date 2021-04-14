@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.effect.DropShadow?>
@@ -19,13 +20,21 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="658.0" prefWidth="1224.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application._MainWindowController">
+<BorderPane prefHeight="658.0" prefWidth="1224.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application._MainWindowController">
    <center>
       <AnchorPane prefHeight="657.0" prefWidth="1045.0" BorderPane.alignment="CENTER">
          <children>
           <AnchorPane fx:id="backPane" layoutX="-1.0" layoutY="23.0" minHeight="0.0" minWidth="0.0" prefHeight="634.0" prefWidth="934.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Canvas fx:id="topoField" height="657.0" layoutX="-1.0" layoutY="1.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="922.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="302.0" AnchorPane.topAnchor="0.0" />
+                  <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="658.0" prefWidth="1224.0">
+                    <content>
+                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0">
+                           <children>
+                              <Canvas fx:id="topoField" height="10000.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="10000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
                   <AnchorPane layoutX="21.0" layoutY="540.0" prefHeight="99.0" prefWidth="879.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom" AnchorPane.bottomAnchor="19.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="324.0">
                      <children>
                         <Button fx:id="deleteButton" layoutX="41.0" layoutY="30.0" mnemonicParsing="false" onAction="#deleteHandler" prefHeight="40.0" prefWidth="110.0" style="-fx-background-color: #e8e8e8;;" styleClass="buttonGrey" text="Delete">
@@ -116,7 +125,7 @@
                   </AnchorPane>
                   <AnchorPane layoutX="922.0" layoutY="43.0" prefHeight="596.0" prefWidth="276.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom" AnchorPane.bottomAnchor="19.0" AnchorPane.rightAnchor="26.0">
                      <children>
-                        <TreeView fx:id="col1" layoutX="7.0" layoutY="36.0" prefHeight="540.0" prefWidth="267.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="35.0" />
+                        <TreeView layoutX="7.0" layoutY="36.0" prefHeight="540.0" prefWidth="267.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="35.0" />
                      </children>
                      <effect>
                         <InnerShadow offsetX="6.0" offsetY="6.0">
@@ -126,7 +135,7 @@
                         </InnerShadow>
                      </effect>
                   </AnchorPane>
-                  <AnchorPane layoutX="922.0" layoutY="42.0" prefHeight="37.0" prefWidth="276.0" styleClass="treeviewtoplabel" AnchorPane.bottomAnchor="579.0">
+                  <AnchorPane layoutX="922.0" layoutY="42.0" prefHeight="37.0" prefWidth="276.0" styleClass="treeviewtoplabel" AnchorPane.bottomAnchor="579.0" AnchorPane.rightAnchor="26.0">
                      <children>
                         <Label layoutX="53.0" layoutY="6.0" prefHeight="25.0" style="-fx-text-fill: white;" styleClass="outline" text="Preview of Placements" textAlignment="CENTER" textFill="#ffa200">
                            <font>

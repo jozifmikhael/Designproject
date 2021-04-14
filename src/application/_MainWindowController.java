@@ -38,6 +38,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
@@ -203,6 +204,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private AnchorPane backPane;
 
+	@FXML
+    private AnchorPane frontPane;
+    
+    @FXML
+    private ScrollPane scrollPane;
+
     @FXML
     private ChoiceBox<String> PolicyChoiceMain;
 
@@ -234,13 +241,21 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		printDebug("Empty initialize function ran");
+		scrollPane.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if (event.getDeltaY() > 0)
+                    screenSizeChangeHandler();
+                event.consume();
+            }
+        });
+		printDebug("initialize function ran");
 	}
 	
 	public void setupListeners(Stage parentStage, Scene scene) {
-	    	ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler(parentStage);
-	    	parentStage.widthProperty().addListener(stageSizeListener);
-	    	parentStage.heightProperty().addListener(stageSizeListener);
+			ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
+    		frontPane.widthProperty().addListener(stageSizeListener);
+    		frontPane.heightProperty().addListener(stageSizeListener);
 	    	
 	    	//TODO Do the other menu items like this
 //	      	addDeviceMenu.setOnAction(e->setupController("device"));
@@ -266,9 +281,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    }
 
 	private void redrawNodes() {
+		printDebug("In redraw");
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		
+//		
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
 	}
@@ -409,12 +425,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	redrawNodes();
     }
     
-	private void screenSizeChangeHandler(Stage parentStage) {
-		topoField.widthProperty().bind(parentStage.widthProperty());
-		topoField.heightProperty().bind(parentStage.heightProperty());
+	private void screenSizeChangeHandler() {
+		topoField.widthProperty().bind(frontPane.widthProperty());
+		topoField.heightProperty().bind(frontPane.heightProperty());
 		double w = topoField.getWidth(); double h = topoField.getHeight();
 		xCenter=0.5*w; yCenter=0.5*h;
     	gc.setFill(Color.WHITE); gc.fillRect(0, 0, w, h);
+		redrawNodes();	
     }
     
     String selectedJSON="test9.json";
@@ -491,10 +508,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	printDebug("Starting setupController with type " + type + ", '" + loadersList.get(type).toString()+"'");
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
-			_SubController controller = (_SubController)loader.getController();
 			Scene scene = new Scene(loader.load());
 			Stage stage = new Stage();
 			stage.setScene(scene);
+			_SubController controller = (_SubController)loader.getController();
 			controller.init(_SpecHandler.getSelected());
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
@@ -515,7 +532,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void editHandler() {
-		System.out.println("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
+		printDebug("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
     	Spec selectedNode = (Spec)_SpecHandler.getSelected();
     	if(selectedNode == null) return;
     	setupController(selectedNode.type);

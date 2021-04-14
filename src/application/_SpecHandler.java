@@ -111,43 +111,33 @@ public class _SpecHandler {
 	static Color _errorColor = Color.RED;
 		
 	public static void shiftPositionsByZoom(ScrollEvent event) {
-        double mxx=2+event.getDeltaY()/40;
-        double mxy=0;
-        double myx=0;
-        double myy=2+event.getDeltaY()/40;
-        double tx=0;
-        double ty=0;
+		double minZoom = 0.25;
+		double maxZoom = 1.5;
+		double zoomStep = 0.05;
+		double scale = 1;
+		double preZoom = zoomFactor;
+		zoomFactor += (event.getDeltaY() > 0) ? zoomStep : -zoomStep;
+		if (zoomFactor < minZoom)
+			zoomFactor = minZoom;
+		if (zoomFactor > maxZoom)
+			zoomFactor = maxZoom;
 
-        System.out.println("["+mxx+" "+mxy+" "+tx+" ");
-        System.out.println(" "+myx+" "+myy+" "+ty+"]");
-        Affine afft = new Affine(mxx, mxy, tx,
-                                 myx, myy, ty);
-
-        double deltaX=event.getScreenX()*.001*event.getDeltaY()/40;
-        double deltaY=event.getScreenY()*.001*event.getDeltaY()/40;
-        
-//        gc.getCanvas().getTransforms().add(new Translate(deltaY,deltaX)); // Needs to jump to mouse
-//        gc.getCanvas().getTransforms().add(new Scale(1,1)); // Needs to jump to mouse
-//        gc.getCanvas().getTransforms().add(new Translate(-deltaY/1.1,-deltaX/1.1)); // Needs to jump to mouse
-
-        Transform initDel=new Translate(deltaY,deltaX);
-        Transform pivScal=new Scale(1+0.1*event.getDeltaY()/40,1+0.1*event.getDeltaY()/40,event.getSceneX(),event.getSceneY());
-//        Transform[] tList = {};
-        gc.getCanvas().getTransforms().add(pivScal);
-        printDebug("New Inp");
-        gc.getCanvas().getTransforms().forEach(t->printDebug(t.toString()));
-        printDebug("L->S"+gc.getCanvas().getLocalToSceneTransform().toString());
-		printDebug(gc.getCanvas().getId());
-		// gc.getCanvas().setmax
+		double zoomRatio = zoomFactor / preZoom;
+//		gc.translate(preZoom, zoomRatio);
+//		nodesList.forEach((d) -> {
+//			d.x -= (d.x - event.getX()) * 2 * (1 - zoomRatio);
+//			d.y -= (d.y - event.getY()) * 2 * (1 - zoomRatio);
+//		});
 		
-        gc.getCanvas().setWidth(10000);
-        gc.getCanvas().setHeight(10000);
-        printDebug(gc.getCanvas().layoutXProperty()+"");
-        printDebug(gc.getCanvas().layoutYProperty()+"");
-//        printDebug(gc.getTransform().toString());
-//        gc.getTransform().appendScale(50, 50);
-//        printDebug(gc.getTransform().toString());
-    }
+//		scale *= zoomFactor / preZoom;
+//		gc.scale(scale, scale);
+//		gc.m
+//		for(NodeSpec d : nodesList) {
+//			d.sz *= scale;
+//			d.x -= (d.x - event.getX()) * (1 - zoomFactor / preZoom);
+//			d.y -= (d.y - event.getY()) * (1 - zoomFactor / preZoom);
+//		}
+	}
 	
 	public static NodeSpec getNode(MouseEvent mEvent) {
 		Spec selNode = null;
@@ -403,10 +393,10 @@ public class _SpecHandler {
 		}
 		
 		void drawNode() {
-			DropShadow ds1 = new DropShadow();
-	        ds1.setOffsetY(3.0f);
-	        ds1.setOffsetX(3.0f);
-	        ds1.setColor(Color.LIGHTGREY);//web("#dbd7ce", 0.92));
+//			DropShadow ds1 = new DropShadow();
+//	        ds1.setOffsetY(3.0f);
+//	        ds1.setOffsetX(3.0f);
+//	        ds1.setColor(Color.LIGHTGREY);//web("#dbd7ce", 0.92));
 			if (validColors.contains(this.nodeColor))
 				gc.setFill(this.nodeColor);
 			else
@@ -416,12 +406,12 @@ public class _SpecHandler {
 			if (nodeColor != transpColor) {
 				gc.setStroke(Color.BLACK);
 				gc.setLineWidth(1.0);
-				gc.strokeText(this.name, this.x, this.y + 0.4 * fontSize);				
-				gc.setEffect(ds1);
+				gc.strokeText(this.name, this.x, this.y + 0.4 * fontSize);
 				gc.setStroke(this.selected ? Color.web("#3297FD", 1) : Color.BLACK);
 				gc.setLineWidth(this.selected ? 3.0 : 3.0);
 				gc.strokeOval(this.x - 0.5 * this.sz * zoomFactor, this.y - 0.5 * this.sz * zoomFactor,
-						this.sz * zoomFactor, this.sz * zoomFactor);			
+						this.sz * zoomFactor, this.sz * zoomFactor);
+//				gc.setEffect(ds1);
 			}
 		}
 		
@@ -886,7 +876,42 @@ public class _SpecHandler {
 			gc.stroke();
 			gc.setStroke(Color.BLACK);
 			gc.setLineWidth(1.0);
+			gc.setFill(Color.BLACK);
+			
+			double distancex = this.dst.x - this.src.x;
+			double distancey = this.dst.y - this.src.y;
+			double distance = Math.sqrt(distancex*distancex+distancey*distancey);
+			double rotation = -Math.atan2(distancex, distancey);
+		    rotation = Math.toRadians(Math.toDegrees(rotation) + 270);
+			double m = (this.dst.y - this.src.y)/(this.dst.x - this.src.x);
+			
+			double X = Math.round((float)(this.dst.x+Math.cos(rotation)*this.dst.sz/2));
+			double Y = Math.round((float)(this.dst.y+Math.sin(rotation)*this.dst.sz/2));
+			
+			double [] xpoints = {X, X+8, X-8};
+			double [] ypoints = {Y, Y+8, Y+8};
+
+	        gc.save();
+		//rotate(gc,rotate*60-120,X,Y);//? 
+	        if (rotation >= 6.05 && rotation < 6.43) rotate(gc,270,X,Y);	
+	        else if(rotation >=5.54 && rotation <6.05) rotate(gc,240,X,Y);
+	        else if(rotation >=4.97 && rotation <5.54) rotate(gc,210,X,Y);
+	        else if(rotation >=4.32 && rotation <4.97) rotate(gc,180,X,Y);
+	        else if(rotation >=3.686 && rotation <4.32) rotate(gc,150,X,Y);
+	        else if(rotation >=3.45 && rotation <3.686) rotate(gc,120,X,Y);
+	        else if(rotation >=2.97 && rotation <3.45) rotate(gc,90,X,Y);
+	        else if(rotation >=2.30 && rotation <2.97) rotate(gc,60,X,Y);
+	        else if(rotation >=2.00 && rotation <2.30) rotate(gc,30,X,Y);
+	        else if(rotation >=6.43 && rotation <7.023) rotate(gc,300,X,Y);
+	        else if(rotation >=7.023 && rotation <7.473) rotate(gc,330,X,Y);
+	        gc.fillPolygon(xpoints, ypoints, 3);
+			gc.restore();
 		}
+		
+		private void rotate(GraphicsContext gc, double angle, double px, double py) {
+	        Rotate r = new Rotate(angle, px, py);
+	        gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+	    }
 
 		public Application addToApp(List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators, Application application, ModuleMapping moduleMapping) {
 			if (this.edgeType == 0){
@@ -1043,7 +1068,7 @@ public class _SpecHandler {
 		@Override
 		Spec add() {
 			for(NodeSpec n : nodesList){
-		
+				
 			}
 			return null;
 		}

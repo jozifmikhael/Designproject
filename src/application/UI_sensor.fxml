@@ -14,7 +14,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="400.0" prefHeight="519.0" prefWidth="500.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddSensorController">
+<BorderPane minHeight="400.0" prefHeight="519.0" prefWidth="500.0" style="-fx-background-color: #f5f5f5;" stylesheets="@application2.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddSensorController">
    <center>
       <AnchorPane fx:id="ap" prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>

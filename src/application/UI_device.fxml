@@ -11,7 +11,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="393.0" prefWidth="612.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddModuleController">
+<BorderPane prefHeight="393.0" prefWidth="612.0" style="-fx-background-color: #f5f5f5;" stylesheets="@application2.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddDeviceController">
    <center>
       <AnchorPane fx:id="ap" prefHeight="369.0" prefWidth="462.0" BorderPane.alignment="CENTER">
          <children>
