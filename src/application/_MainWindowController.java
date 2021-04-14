@@ -310,10 +310,11 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
 		switch (event.getCode()){
-			case S	: System.out.println(event.isControlDown()?"S+Ctrl":"No ctrl-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
-			case O	: System.out.println(event.isControlDown()?"O+Ctrl":"No ctrl-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
-			case C	: System.out.println(event.isControlDown()?"C+Ctrl":"C-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Copy Selected
-//			case V	: System.out.println(event.isControlDown()?"C+Ctrl":"V-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Copy Selected
+			case S	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+			case O	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+			case E	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+			case C	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+//			case V	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
 //			case Z 	: System.out.println(event.isControlDown()?"C+Ctrl":"Z-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Undo Last Action
 			default : keySetSuccess=InteractionState.trySetKey(event.getCode());
 		}
@@ -324,7 +325,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case DELETE : System.out.println("Unimplemented delete tool"); break; // Copy Selected
 			case S		: flushFile(); break;
 			case O		: loadJSON(); break;
-			case E		: System.out.println("Unimplemented edit tool"); break; // Copy Selected
+			case E		: editHandler(); break; // Edit Selected
 			case C		: System.out.println("Unimplemented copy tool"); break; // Copy Selected
 			case V		: System.out.println("Unimplemented paste tool"); break; // Paste Selected
 			case Z		: System.out.println("Unimplemented undo tool"); break; // Undo Last
@@ -547,7 +548,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			        default:  {printDebug(event.getCode().getCode()+"");}
 			    }
 			});
-			
 			stage.setOnCloseRequest(e -> {
 				printDebug("close request found");
 				stage.close();
@@ -561,8 +561,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
+    void copyHandler() {
+    	
+    }
+    
+    @FXML
     void editHandler() {
-		printDebug("Pre Edit there are " + _SpecHandler.nodesList.size() + " nodes");
     	Spec selectedNode = (Spec)_SpecHandler.getSelected();
     	if(selectedNode == null) return;
     	setupController(selectedNode.type);
@@ -572,7 +576,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void deleteHandler() {
-    	((NodeSpec)_SpecHandler.getSelected()).pop();
+    	_SpecHandler.getSelected().pop();
 		redrawNodes();
     }
     

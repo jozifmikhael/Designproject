@@ -35,6 +35,17 @@
   -fx-background-color: #e0e0e0;  
 }
 
+.context-menu {
+ // -fx-font-family: monospace;
+ // -fx-font-fill: orange;
+}
+
+.menu-item .label {
+  //-fx-font-family: "Courier New";
+  -fx-font-fill: orange;
+}
+
+
 .button {
   -fx-background-radius: 15px ,15px, 15px, 15px;
   /*-fx-font-size: 14px;*/

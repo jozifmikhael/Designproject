@@ -11,6 +11,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.effect.InnerShadow?>
@@ -26,11 +27,11 @@
          <children>
           <AnchorPane fx:id="backPane" layoutX="-1.0" layoutY="23.0" minHeight="0.0" minWidth="0.0" prefHeight="634.0" prefWidth="934.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="658.0" prefWidth="1224.0">
+                  <ScrollPane pannable="true" prefHeight="658.0" prefWidth="1224.0">
                     <content>
-                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="2000.0" prefWidth="2000.0">
+                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0" styleClass="menuFont">
                            <children>
-                              <Canvas fx:id="topoField" height="2000.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" onScrollFinished="#mouseScrollHandler" onScrollStarted="#mouseScrollHandler" onZoom="#mouseScrollHandler" onZoomFinished="#mouseScrollHandler" onZoomStarted="#mouseScrollHandler" width="2000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
+                              <Canvas fx:id="topoField" height="657.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="1224.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
                            </children>
                         </AnchorPane>
                     </content>
@@ -150,94 +151,103 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="207.0" style="-fx-background-color: transparent;">
                                  <children>
-                                    <Pane fx:id="toolPanel" layoutX="89.0" layoutY="-98.0" prefHeight="323.0" prefWidth="125.0" rotate="90.0" style="-fx-background-color: #e8e8e8;" styleClass="pane" AnchorPane.leftAnchor="89.0">
+                                    <Pane fx:id="toolPanel" layoutX="108.6" layoutY="-98.0" prefHeight="331.0" prefWidth="125.0" rotate="90.0" style="-fx-background-color: #e8e8e8;" styleClass="pane" AnchorPane.leftAnchor="89.0">
                                        <children>
-                                          <Button fx:id="tool1" layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Node (1)" textFill="WHITE">
-                                             <effect>
-                                                <DropShadow offsetX="6.0" offsetY="6.0">
-                                                   <color>
-                                                      <Color red="0.7544000148773193" green="0.7631466388702393" blue="0.8199999928474426" opacity="0.8913043737411499" />
-                                                   </color>
-                                                   <input>
-                                                      <DropShadow offsetX="-6.0" offsetY="-6.0">
-                                                         <color>
-                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8913043737411499" />
-                                                         </color>
-                                                      </DropShadow>
-                                                   </input>
-                                                </DropShadow>
-                                             </effect>
+                                          <ToggleButton fx:id="tool1" layoutX="11.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Node (1)">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
-                                          </Button>
-                                          <Button fx:id="tool2" layoutX="14.0" layoutY="80.0" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Module (2)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
-                                                      <Color red="0.7695000171661377" green="0.7775999903678894" blue="0.8100000023841858" opacity="0.886956512928009" />
+                                                      <Color red="0.745199978351593" green="0.7570800185203552" blue="0.8100000023841858" opacity="0.8899999856948853" />
                                                    </color>
                                                    <input>
                                                       <DropShadow offsetX="-6.0" offsetY="-6.0">
                                                          <color>
-                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8913043737411499" />
+                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8899999856948853" />
                                                          </color>
                                                       </DropShadow>
                                                    </input>
                                                 </DropShadow>
                                              </effect>
+                                          </ToggleButton>
+                                          <ToggleButton fx:id="tool2" layoutX="11.0" layoutY="80.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Module (2)">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
-                                          </Button>
-                                          <Button fx:id="tool3" layoutX="14.0" layoutY="140.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Sensor (3)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
-                                                      <Color red="0.8159999847412109" green="0.8210999965667725" blue="0.8500000238418579" opacity="0.8913043737411499" />
+                                                      <Color red="0.745199978351593" green="0.7570800185203552" blue="0.8100000023841858" opacity="0.8899999856948853" />
                                                    </color>
                                                    <input>
                                                       <DropShadow offsetX="-6.0" offsetY="-6.0">
                                                          <color>
-                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8913043737411499" />
+                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8899999856948853" />
                                                          </color>
                                                       </DropShadow>
                                                    </input>
                                                 </DropShadow>
                                              </effect>
-                                          </Button>
-                                          <Button fx:id="tool4" layoutX="14.0" layoutY="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Actuat (4)" textFill="WHITE">
+                                          </ToggleButton>
+                                          <ToggleButton fx:id="tool3" layoutX="11.0" layoutY="140.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Sensor (3)">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
-                                                      <Color red="0.8159999847412109" green="0.8210999965667725" blue="0.8500000238418579" opacity="0.8913043737411499" />
+                                                      <Color red="0.745199978351593" green="0.7570800185203552" blue="0.8100000023841858" opacity="0.8899999856948853" />
                                                    </color>
                                                    <input>
                                                       <DropShadow offsetX="-6.0" offsetY="-6.0">
                                                          <color>
-                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8913043737411499" />
+                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8899999856948853" />
                                                          </color>
                                                       </DropShadow>
                                                    </input>
                                                 </DropShadow>
                                              </effect>
-                                          </Button>
-                                          <Button fx:id="tool5" layoutX="14.0" layoutY="260.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Edge (5)" textFill="WHITE">
+                                          </ToggleButton>
+                                          <ToggleButton fx:id="tool4" layoutX="11.0" layoutY="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Actuator (4)">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
-                                                      <Color red="0.8159999847412109" green="0.8210999965667725" blue="0.8500000238418579" opacity="0.8913043737411499" />
+                                                      <Color red="0.745199978351593" green="0.7570800185203552" blue="0.8100000023841858" opacity="0.8899999856948853" />
                                                    </color>
                                                    <input>
                                                       <DropShadow offsetX="-6.0" offsetY="-6.0">
                                                          <color>
-                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8913043737411499" />
+                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8899999856948853" />
                                                          </color>
                                                       </DropShadow>
                                                    </input>
                                                 </DropShadow>
                                              </effect>
-                                          </Button>
+                                          </ToggleButton>
+                                          <ToggleButton fx:id="tool5" layoutX="11.0" layoutY="260.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Edge (5)">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <effect>
+                                                <DropShadow offsetX="6.0" offsetY="6.0">
+                                                   <color>
+                                                      <Color red="0.745199978351593" green="0.7570800185203552" blue="0.8100000023841858" opacity="0.8899999856948853" />
+                                                   </color>
+                                                   <input>
+                                                      <DropShadow offsetX="-6.0" offsetY="-6.0">
+                                                         <color>
+                                                            <Color red="1.0" green="1.0" blue="1.0" opacity="0.8899999856948853" />
+                                                         </color>
+                                                      </DropShadow>
+                                                   </input>
+                                                </DropShadow>
+                                             </effect>
+                                          </ToggleButton>
                                        </children>
                                        <effect>
                                           <InnerShadow offsetX="6.0" offsetY="6.0">
@@ -259,23 +269,20 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
-                        <MenuItem fx:id="newJSONMenu" mnemonicParsing="false" onAction="#newJSON" text="Create New" />
-                        <MenuItem fx:id="loadJSON" mnemonicParsing="false" onAction="#loadJSON" text="Load Previous" />
+                        <MenuItem fx:id="newJSONMenu" mnemonicParsing="false" onAction="#newJSON" text="Save        (Ctrl + S)" />
+                        <MenuItem fx:id="loadJSON" mnemonicParsing="false" onAction="#loadJson" text="Open      (Ctrl + O)" />
+                    <MenuItem mnemonicParsing="false" text="Clear" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                   <items>
-                        <MenuItem fx:id="popNodemenu" mnemonicParsing="false" text="Delete" />
-                    <MenuItem fx:id="resetCacheMenu" mnemonicParsing="false" text="Reset All Devices" />
-                        <MenuItem fx:id="addDeviceMenu" mnemonicParsing="false" text="Add Node" />
-                        <MenuItem fx:id="addModuleMenu" mnemonicParsing="false" text="Add Module" />
-                        <MenuItem fx:id="addEdgeMenu" mnemonicParsing="false" text="Add Edge" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem fx:id="popNodemenu1" mnemonicParsing="false" text="Edit                    (Ctrl + E)" />
+                        <MenuItem fx:id="popNodemenu" mnemonicParsing="false" text="Delete                       (Del)" />
+                        <MenuItem fx:id="addDeviceMenu" mnemonicParsing="false" text="Place Node                   (1)" />
+                        <MenuItem fx:id="addModuleMenu" mnemonicParsing="false" text="Place Module               (2)" />
+                        <MenuItem fx:id="addModuleMenu1" mnemonicParsing="false" text="Place Sensor                 (3)" />
+                        <MenuItem fx:id="addEdgeMenu" mnemonicParsing="false" text="Place Actuator              (4)" />
+                        <MenuItem fx:id="addEdgeMenu1" mnemonicParsing="false" text="Place Edge                    (5)" />
                   </items>
                 </Menu>
                   <Menu mnemonicParsing="false" text="Policy">
@@ -283,6 +290,11 @@
                         <MenuItem fx:id="SetSimParams" mnemonicParsing="false" onAction="#setParams" text="Set Simulation Parameters" />
                     </items>
                   </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
               </menus>
             </MenuBar>
          </children>
