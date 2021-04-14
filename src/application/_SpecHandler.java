@@ -237,9 +237,9 @@ public class _SpecHandler {
 		return null;
 	}
 	public static abstract class Spec {
+		protected boolean isTemp = false;
 		public boolean selected = false;
 		public String type;
-		protected boolean isTemp = false;
 		
 		Spec setSelected() {
 			deselectAll();
@@ -399,18 +399,6 @@ public class _SpecHandler {
 					+ type + ", selected=" + selected;
 		}
 		
-		public String toStringLinks() {
-			String s = "";
-			if (this.edgesList.size() == 0)
-				return s;
-			s += "\n{";
-			for (int i = 1; i <= this.edgesList.size(); i++) {
-				s += ("\n " + i + " - " + this.edgesList.get(i - 1).toString());
-			}
-			s += "\n}";
-			return s;
-		}
-		
 		Spec setColor() {
 			if (this.type == null)
 				this.nodeColor = _errorColor;
@@ -484,10 +472,12 @@ public class _SpecHandler {
 //			return linkables;
 //		}
 //		
-		NodeSpec addLink(EdgeSpec e) {
-			for(EdgeSpec edge : this.edgesList) if(e.dst.equals(edge.dst)) return this;
+		EdgeSpec newLinkTo(NodeSpec newDst) {
+			if(newDst==null) return null;
+			for(EdgeSpec edge : this.edgesList) if(edge.dst.equals(newDst)) return null;
+			EdgeSpec e = new EdgeSpec(this, newDst);
 			this.edgesList.add(e);
-			return this;
+			return e;
 		}
 		// Initialize this like every other edge, by calling the constructor
 //		Spec deviceModuleLink(String _dst) {
@@ -892,54 +882,44 @@ public class _SpecHandler {
 		public double nwLength;
 		public int direction = 1;
 		static Map<String, Integer> allowableLinks = new HashMap<String, Integer>(){{
-			put("devicedevice", 0);
-			put("sensordevice", 0);
-			put("deviceactuat", 0);
-			put("modulemodule", 3);
+			put("devicedevice", -1);
+			put("sensordevice", -1);
+			put("deviceactuat", -1);
+			put("moduledevice", 0);
 			put("sensormodule", 1);
 			put("moduleactuat", 2);
-			put("moduledevice", -1);
+			put("modulemodule", 3);
 		}};
 
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String tupleType, double periodicity,
 				double cpuLength, double newLength, int direction, String type) {
 			this.src = src;
 			this.dst = dst;
+			this.edgeType = allowableLinks.getOrDefault(src.type+dst.type, -2);
+			this.type = this.edgeType>0?"edgeFull":"edgeSimple";
+			if(this.src.type.equals("linker")) this.direction=2;
+			if(this.dst.type.equals("actuat")) this.direction=2;
 			this.dstName = dst.name;
 			this.srcName = src.name;
+			
 			this.latency = latency;
 			this.tupleType = tupleType;
 			this.periodicity = periodicity;
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
-			this.direction = direction;
-			this.type = type;
-			this.edgeType=allowableLinks.get(src.type+dst.type);
-		}
-
-		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String type) {
-			this(src, dst, latency, "null", 0, 0, 0, 0, type);
-			this.dstName = dst.name;
-			this.srcName = src.name;
 		}
 		
 		public EdgeSpec(NodeSpec src, NodeSpec dst) {
-			if(src==null || dst==null) return;
-			if(!_SpecHandler.nodesList.contains(src) && !_SpecHandler.nodesList.contains(dst)) return;
-			if(!allowableLinks.containsKey(src.type+dst.type)) return;
-			EdgeSpec e = null;
-			switch(allowableLinks.get(src.type+dst.type)) {
-				case -2: break;
-				case -1: e = (EdgeSpec)_MainWindowController.setupController("edgeSimple"); break;
-				case 0: e = (EdgeSpec)_MainWindowController.setupController("edgeSimple"); break;
-				case 1: e = (EdgeSpec)_MainWindowController.setupController("edgeFull"); break;
-				case 2: e = (EdgeSpec)_MainWindowController.setupController("edgeFull"); break;
-				case 3: e = (EdgeSpec)_MainWindowController.setupController("edgeFull"); break;
-			}
+			this(src, dst, 0, "", 0, 0, 0, 1, "");
 		}
-
+				
 		public EdgeSpec(JSONObject a) {super(a);}
-
+		
+		public EdgeSpec() {
+			this.srcName="-";
+			this.dstName="-";
+		}
+		
 		@Override
 		Spec add() {
 			for(NodeSpec n : nodesList) {

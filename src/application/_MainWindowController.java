@@ -258,6 +258,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
  		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
  				s->loadersList.put(s, getClass().getResource("UI_"+s+".fxml")));
  		printDebug("setupListeners ran\n");
+ 		printDebug("Getting controller for device... " + loadersList.get("device").getPath());
     }
     
 	private void redrawNodes() {
@@ -343,10 +344,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
 					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec("actuat", mEvent):selNode; break;// Select Actuat Placer
 					case DIGIT5 : {
-						draggingNode=new NodeSpec("linker", mEvent);
 						if(selNode==null) return;
 						linkSrcNode=selNode;
-						linkSrcNode=(selNode==null)?null:selNode.addLink(new EdgeSpec(selNode, draggingNode, 0, "edgeSimple"));
+						draggingNode=new NodeSpec("linker", mEvent);
+						draggingNode.newLinkTo(linkSrcNode);
 					} break;
 					default : {} // Nothing
 				} break;
@@ -364,23 +365,22 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 //				System.out.println("In Left: KeyState: " + InteractionState.setKey);
-				Spec newNode = null;
-				draggingNode=(draggingNode!=null && draggingNode.isTemp)?draggingNode.pop():null;
-				selEdge = _SpecHandler.getEdge(mEvent);
-				selNode = _SpecHandler.getNode(mEvent);
+				if(draggingNode!=null && draggingNode.isTemp) draggingNode.pop();
+				draggingNode=null;
+				Spec newSimObject = null;
 				switch(InteractionState.getSetKey()) {
-					case DIGIT1 : newNode = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
-					case DIGIT2 : newNode = (selNode!=null)?null:(NodeSpec)setupController("module"); break;
-					case DIGIT3 : newNode = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
-					case DIGIT4 : newNode = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
-					case DIGIT5 : if(linkSrcNode!=null) {
-						new EdgeSpec(linkSrcNode,selNode); _SpecHandler.pruneLinks(); //repushing?
+					case DIGIT1 : newSimObject = (NodeSpec)setupController("device"); break;
+					case DIGIT2 : newSimObject = (NodeSpec)setupController("module"); break;
+					case DIGIT3 : newSimObject = (NodeSpec)setupController("sensor"); break;
+					case DIGIT4 : newSimObject = (NodeSpec)setupController("actuat"); break;
+					case DIGIT5 : {
+						selNode = _SpecHandler.getNode(mEvent);			
+						if(selNode==null || linkSrcNode==null) break;
+						setupController(linkSrcNode.newLinkTo(selNode).type);
 					} break;
-
-//					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
 					default : {} // Nothing
 				}
-				if (newNode!=null) ((NodeSpec)newNode.setSelected()).setPos(mEvent);
+				if (newSimObject!=null) ((NodeSpec)newSimObject.setSelected()).setPos(mEvent);
 			break;
 			case MIDDLE_BTN:
 			break;
@@ -491,38 +491,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
             e.printStackTrace();
         }
     }
-
-	Spec newNode = null;
-    Spec addNodeType(String _type) {
-    	if(_type.equals("device")) newNode = (Spec)setupController(_type);
-		if(_type.equals("module")) newNode = (Spec)setupController(_type);
-		if(_type.equals("sensor")) newNode = (Spec)setupController(_type);
-		if(_type.equals("actuat")) newNode = (Spec)setupController(_type);
-		return newNode;
-    }
-    
-//    Spec setupController(String type, int w, int h) {
-//    	FXMLLoader loader = new FXMLLoader(getClass().getResource(type+"InputBox.fxml"));
-//		Scene scene = null;
-//		try {
-//			scene = new Scene(loader.load(),w,h);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		Stage stage = new Stage();
-//		stage.setScene(scene);
-//		Controller controller = loader.getController();
-//		stage.setTitle("Add "+type+" Node");
-//		stage.showAndWait();
-//		redrawNodes();
-//		return controller.getSpec();
-//    }
     
     static Spec setupController(String type) {
     	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			_SubController controller = loader.getController();
+			if(controller==null) printDebug("controller null");
 			Scene scene = new Scene(loader.load());
 			Stage stage = new Stage();
 			stage.setScene(scene);
