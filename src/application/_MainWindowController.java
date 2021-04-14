@@ -374,7 +374,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT3 : newNode = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
 					case DIGIT4 : newNode = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
 					case DIGIT5 : if(linkSrcNode!=null) {
-						new EdgeSpec(linkSrcNode,selNode); _SpecHandler.pruneLinks();
+						new EdgeSpec(linkSrcNode,selNode); _SpecHandler.pruneLinks(); //repushing?
 					} break;
 
 //					case DIGIT5 : makeReqLink(linkSrcNode, selNode); _SpecHandler.pruneLinks(); break;
