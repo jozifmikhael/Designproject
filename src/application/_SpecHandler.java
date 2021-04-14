@@ -289,15 +289,9 @@ public class _SpecHandler {
 				}
 			}
 		}
-
-		
-		public void fieldsTest(){
-			
-			toJSON_reflections();
-		}
 		
 		@SuppressWarnings("unchecked")
-		JSONObject toJSON_reflections() {
+		JSONObject toJSON() {
 			JSONObject obj = new JSONObject();
 			Field[] cFields = this.getClass().getFields();
 			
@@ -309,7 +303,7 @@ public class _SpecHandler {
 						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
 						JSONArray newSet = new JSONArray();
 						if(f.getGenericType().toString().contains("_SpecHandler$")) {
-							arrRef.forEach(a->newSet.add(((Spec)a).toJSON_reflections()));
+							arrRef.forEach(a->newSet.add(((Spec)a).toJSON()));
 						}else arrRef.forEach(a->newSet.add(a+""));
 						obj.put(f.getName(), newSet);
 					}else obj.put(cFields[i].getName(), cFields[i].get(this).toString());
@@ -455,23 +449,7 @@ public class _SpecHandler {
 			this.y = _node.y;
 			return this;
 		}
-//		This is a map in the edge spec, whys this here still?
-//		ArrayList<String> linkableDestinations() {
-//			ArrayList<String> linkables = new ArrayList<String>();
-//			if (this.type.equals("device")) {
-//				linkables.add("device");
-//				linkables.add("actuat");
-//			}else if (this.type.equals("module")) {
-//				linkables.add("module");
-//				linkables.add("actuat");
-//				linkables.add("device");
-//			} else if (this.type.equals("sensor")) {
-//				linkables.add("module");
-//				linkables.add("device");
-//			}
-//			return linkables;
-//		}
-//		
+		
 		EdgeSpec newLinkTo(NodeSpec newDst) {
 			if(newDst==null) return null;
 			for(EdgeSpec edge : this.edgesList) if(edge.dst.equals(newDst)) return null;
@@ -479,13 +457,6 @@ public class _SpecHandler {
 			this.edgesList.add(e);
 			return e;
 		}
-		// Initialize this like every other edge, by calling the constructor
-//		Spec deviceModuleLink(String _dst) {
-//			NodeSpec dst = _SpecHandler.getLinkableNode(linkableDestinations(), _dst);
-//			if (dst == null)return this;
-//			this.edgesList.add(new EdgeSpec(this, dst, 0, "edgeSimple"));
-//			return this;
-//		}
 	}
 	
 	public static class DeviceSpec extends NodeSpec {
@@ -1181,18 +1152,12 @@ public class _SpecHandler {
 
 		for(NodeSpec n: nodesList) {
 			switch(n.type) {
-				case "device": devicesJSONObj.add(n.toJSON_reflections()); break;
-				case "module": modulesJSONObj.add(n.toJSON_reflections()); break;
-				case "sensor": sensorsJSONObj.add(n.toJSON_reflections()); break;
-				case "actuat": actuatsJSONObj.add(n.toJSON_reflections()); break;
+				case "device": devicesJSONObj.add(n.toJSON()); break;
+				case "module": modulesJSONObj.add(n.toJSON()); break;
+				case "sensor": sensorsJSONObj.add(n.toJSON()); break;
+				case "actuat": actuatsJSONObj.add(n.toJSON()); break;
 			}
 		}
-//		
-//		devicesList.forEach(d->devicesJSONObj.add(d.toJSON_reflections()));
-//        modulesList.forEach(m->modulesJSONObj.add(m.toJSON_reflections()));
-//        sensorsList.forEach(s->sensorsJSONObj.add(s.toJSON_reflections()));
-//        actuatsList.forEach(a->actuatsJSONObj.add(a.toJSON_reflections()));
-        // for(NodeSpec n : nodesList) for(EdgeSpec e: n.edgesList) edgesJSONObj.add(e.toJSON_reflections());
         
 		JSONObject metaList = new JSONObject();
 		// TODO colors + zoomlv need to be in here as well

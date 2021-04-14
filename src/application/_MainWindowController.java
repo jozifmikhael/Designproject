@@ -497,21 +497,18 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			_SubController controller = loader.getController();
-			if(controller==null) printDebug("controller null");
+			if(controller==null) {
+				printDebug("Controller null");
+				return null;
+			}
 			Scene scene = new Scene(loader.load());
 			Stage stage = new Stage();
 			stage.setScene(scene);
-			
-			Spec prevState=null;
-			if (_SpecHandler.getSelected() != null)
-				prevState = _SpecHandler.getSelected().type.equals(type) ? _SpecHandler.getSelected() : null;
-			
-			Spec specPtr = controller.init(prevState);
-			
+			controller.init(_SpecHandler.getSelected());
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
 			    	case 27: controller.recover(); stage.close(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
-			    	case 116: printDebug("ss"); break;
+			    	case 116: printDebug(controller.spec.toJSON()); break;
 			        default:  {printDebug(event.getCode().getCode()+"");}
 			    }
 			});

@@ -59,7 +59,6 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.LongStringConverter;
 
-
 public abstract class _SubController {
 	@FXML
 	public Button saveButton;
@@ -211,7 +210,7 @@ public abstract class _SubController {
 	final public Spec init(Spec s) {
 		if(s!=null) {
 			spec=s;
-			specPrev=DeviceSpec.fromJSON(s.toJSON_reflections());
+			specPrev=DeviceSpec.fromJSON(s.toJSON());
 		}else initDefaultObject();
 		extendedInit();
 		parseChildrenOf(ap);

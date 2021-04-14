@@ -6,6 +6,9 @@ import static application.scratch.printDebug;
 
 
 public class AddDeviceController extends _SubController{
+	public AddDeviceController(){
+		printDebug("In const");
+	}
 	@Override
 	void initDefaultObject() {
 //		printDebug("In device controller");
