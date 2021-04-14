@@ -345,9 +345,17 @@ public class _SpecHandler {
 			Field[] cFields = this.getClass().getFields();
 			
 			for (int i = 0; i < cFields.length; i++) {
+				Field f = cFields[i];
 				try {
 					printDebug();
-					obj.put(cFields[i].getName(), cFields[i].get(this).toString());
+					if (f.getGenericType() instanceof ParameterizedType) {
+						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
+						JSONArray newSet = new JSONArray();
+						if(f.getGenericType().toString().contains("_SpecHandler$")) {
+							arrRef.forEach(a->newSet.add(((Spec)a).toJSON_reflections()));
+						}else arrRef.forEach(a->newSet.add(a+""));
+						obj.put(f.getName(), newSet);
+					}else obj.put(cFields[i].getName(), cFields[i].get(this).toString());
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1086,7 +1094,6 @@ public class _SpecHandler {
 		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String tupleType, double periodicity,
 				double cpuLength, double newLength, int direction, String type) {
-			System.out.println(src.type + " "+ dst.type);
 			this.src = src;
 			this.dst = dst;
 			this.dstName = dst.name;
