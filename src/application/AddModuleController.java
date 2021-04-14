@@ -27,8 +27,7 @@ public class AddModuleController extends _SubController{
 	TableView NodeSpec;
 	@Override
 	void initDefaultObjects() {
-        spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>(), new ArrayList<EdgeSpec>());
-        printDebug("In mod extended init");
+		if(this.spec==null) spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>(), new ArrayList<EdgeSpec>());
 		tupleData.add(new TupleSpec("-", "-", 0.0, (ModuleSpec) spec));
 //		tupleData.addAll(((ModuleSpec)this.spec).tupleMappings);
 		TupleSpec.setItems(tupleData);
