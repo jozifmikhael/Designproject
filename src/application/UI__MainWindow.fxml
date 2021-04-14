@@ -27,7 +27,7 @@
          <children>
           <AnchorPane fx:id="backPane" layoutX="-1.0" layoutY="23.0" minHeight="0.0" minWidth="0.0" prefHeight="634.0" prefWidth="934.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ScrollPane pannable="true" prefHeight="658.0" prefWidth="1224.0">
+                  <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="658.0" prefWidth="1224.0">
                     <content>
                       <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0" styleClass="menuFont">
                            <children>
@@ -270,7 +270,7 @@
                 <Menu mnemonicParsing="false" text="File">
                   <items>
                         <MenuItem fx:id="newJSONMenu" mnemonicParsing="false" onAction="#newJSON" text="Save        (Ctrl + S)" />
-                        <MenuItem fx:id="loadJSON" mnemonicParsing="false" onAction="#loadJson" text="Open      (Ctrl + O)" />
+                        <MenuItem fx:id="loadJSON" mnemonicParsing="false" onAction="#loadJSON" text="Open      (Ctrl + O)" />
                     <MenuItem mnemonicParsing="false" text="Clear" />
                   </items>
                 </Menu>

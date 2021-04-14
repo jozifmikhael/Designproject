@@ -40,6 +40,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -216,15 +217,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     @FXML
     private Button previewButton;
     @FXML
-    private Button tool1;
+    private ToggleButton tool1;
     @FXML
-    private Button tool2;
+    private ToggleButton tool2;
     @FXML
-    private Button tool3;
+    private ToggleButton tool3;
     @FXML
-    private Button tool4;
+    private ToggleButton tool4;
     @FXML
-    private Button tool5;
+    private ToggleButton tool5;
     
     @FXML
     private TreeView<String> treeView;
