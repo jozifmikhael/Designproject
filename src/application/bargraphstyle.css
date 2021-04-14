@@ -1,0 +1,9 @@
+.data0.chart-bar { -fx-bar-fill: #66ff99 }
+.data1.chart-bar { -fx-bar-fill: #3399ff }
+.data2.chart-bar { -fx-bar-fill: #ffff66 }
+.data3.chart-bar { -fx-bar-fill: #ff9966 }
+.data4.chart-bar { -fx-bar-fill: #66ccff }
+
+.axis {
+	-fx-minor-tick-length: 0;
+}

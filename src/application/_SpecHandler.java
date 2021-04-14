@@ -57,9 +57,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import application._SpecHandler.EdgeSpec;
-
 import static application.scratch.printDebug;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Pe;
@@ -841,7 +838,7 @@ public class _SpecHandler {
 		}
 		
 		public EdgeSpec(NodeSpec src, NodeSpec dst) {
-			this(src, dst, 0, "", 0, 0, 0, 1, "");
+			this(src, dst, 2.0, "", 0, 0, 0, 1, "");
 		}
 				
 		public EdgeSpec(JSONObject a) {super(a);}
@@ -871,8 +868,8 @@ public class _SpecHandler {
 			gc.beginPath();
 			gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
 			gc.setLineWidth(this.selected ? 10.0 : 1.0);
-			gc.moveTo(this.src.x, this.src.y);
-			gc.lineTo(this.dst.x, this.dst.y);
+
+//			double drawSrcX = this.direction==1?dst.x:
 			gc.stroke();
 			gc.setStroke(Color.BLACK);
 			gc.setLineWidth(1.0);
@@ -914,7 +911,7 @@ public class _SpecHandler {
 	    }
 
 		public Application addToApp(List<FogDevice> fogDevices, List<Sensor> sensors, List<Actuator> actuators, Application application, ModuleMapping moduleMapping) {
-			if (this.edgeType == 0){
+			if (this.edgeType == -1){
 				FogDevice srcDev =null;
 			    FogDevice dstDev =null;
 			    Sensor srcSen = null;
@@ -938,7 +935,7 @@ public class _SpecHandler {
 			    	}
 			    }
 			    return null;
-			}else if(this.edgeType == -1) {
+			}else if(this.edgeType == 0) {
 				moduleMapping.addModuleToDevice(this.src.name, this.dst.name);
 				return null;
 			}else {

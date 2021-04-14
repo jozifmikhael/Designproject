@@ -160,11 +160,12 @@ public abstract class _SubController {
         		ObservableList<String> tempNames = FXCollections.observableArrayList();
             	ChoiceBox<String> selBox = (ChoiceBox) selChild;
             	if(selBox.getId().contains("Spec")) {
-            		String reqNamesOfType = selBox.getId().split("_")[0];
+            		String reqNamesOfType = selBox.getId().split("_")[0].replace("Spec","");
             		printDebug(reqNamesOfType);
             		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqNamesOfType)).forEach(n->tempNames.add(n.name));
+            		printDebug(tempNames.toString());
             		selBox.setItems(tempNames);
-            		selBox.setValue(tempNames.get(0));
+            		if(tempNames.size()>-1) selBox.setValue(tempNames.get(0));
             		selBox.setOnAction((event) -> setField(spec, selBox.getId().split("_")[1], selBox.getSelectionModel().getSelectedItem().toString()));
             	}
             }
@@ -197,6 +198,7 @@ public abstract class _SubController {
 		}
 		initDefaultObjects();
 		parseChildrenOf(ap);
+		printDebug("Finished parsing");
 		return spec;
 	}
 }

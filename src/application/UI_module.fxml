@@ -125,7 +125,7 @@
                               </DropShadow>
                            </effect>
                         </Button>
-                        <ChoiceBox fx:id="NodeSpec_name" layoutX="123.0" layoutY="215.0" prefHeight="25.0" prefWidth="150.0" styleClass="moduleNodeNamecbwidth" />
+                        <ChoiceBox fx:id="deviceSpec_name" layoutX="123.0" layoutY="215.0" prefHeight="25.0" prefWidth="150.0" styleClass="moduleNodeNamecbwidth" />
                         <Label layoutX="44.0" layoutY="219.0" text="Node Name">
                            <font>
                               <Font size="14.0" />

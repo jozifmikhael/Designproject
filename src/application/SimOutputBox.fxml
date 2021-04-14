@@ -1,175 +1,173 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.chart.BarChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.chart.StackedAreaChart?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.effect.InnerShadow?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.text.Font?>
-
-<BorderPane prefHeight="837.0" prefWidth="1555.0" stylesheets="@application3.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OutputController">
-   <center>
-      <AnchorPane prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
-         <children>
-            <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="229.0" style="-fx-background-color: #ffa200;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Save Energy Consumption Graph" />
-                        <MenuItem mnemonicParsing="false" text="Save Network Usage Graph" />
-                        <MenuItem mnemonicParsing="false" text="Save 3" />
-                        <MenuItem mnemonicParsing="false" text="Save 4" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
-          <AnchorPane fx:id="backPane" layoutX="24.0" layoutY="48.0" minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="737.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 20;">
-               <children>
-                  <Canvas fx:id="graphArea" height="339.0" width="750.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
-                  <StackedAreaChart fx:id="EnergyConsumption" layoutX="4.0" layoutY="8.0" prefHeight="320.0" prefWidth="715.0" style="-fx-background-radius: 100;" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="8.0">
-                    <xAxis>
-                      <NumberAxis side="BOTTOM" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" />
-                    </yAxis>
-                  </StackedAreaChart>
-               </children>
-               <effect>
-                  <InnerShadow offsetX="6.0" offsetY="6.0">
-                     <color>
-                        <Color red="0.8117647171020508" green="0.7921568751335144" blue="0.7607843279838562" opacity="0.9200000166893005" />
-                     </color>
-                  </InnerShadow>
-               </effect>
-            </AnchorPane>
-            <AnchorPane fx:id="backPane1" layoutX="787.0" layoutY="48.0" minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="738.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 20;">
-               <children>
-                  <Canvas fx:id="graphArea1" height="341.0" layoutX="-3.0" width="754.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="1.0" />
-                  <LineChart fx:id="NetworkUsage" layoutX="10.0" layoutY="8.0" prefHeight="332.0" prefWidth="729.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="8.0">
-                     <xAxis>
-                        <CategoryAxis side="BOTTOM" />
-                     </xAxis>
-                     <yAxis>
-                        <NumberAxis side="LEFT" />
-                     </yAxis>
-                  </LineChart>
-               </children>
-               <effect>
-                  <InnerShadow offsetX="6.0" offsetY="6.0">
-                     <color>
-                        <Color red="0.8117647171020508" green="0.7921568751335144" blue="0.7607843279838562" opacity="0.9200000166893005" />
-                     </color>
-                  </InnerShadow>
-               </effect>
-            </AnchorPane>
-            <AnchorPane layoutX="24.0" layoutY="410.0" prefHeight="401.0" prefWidth="740.0" style="-fx-background-radius: 20; -fx-background-color: #e8e8e8;">
-               <children>
-                  <TableView fx:id="tupleTable" layoutX="19.0" layoutY="18.0" prefHeight="368.0" prefWidth="703.0">
-                    <columns>
-                      <TableColumn fx:id="checkCol" prefWidth="24.0" text="#" />
-                      <TableColumn fx:id="sourceDevCol" prefWidth="89.0" text="Source Device" />
-                        <TableColumn fx:id="sourceModCol" prefWidth="104.0" text="Source Module" />
-                        <TableColumn fx:id="destDevCol" prefWidth="120.0" text="Destination Device" />
-                        <TableColumn fx:id="destModCol" prefWidth="138.0" text="Destination Module" />
-                        <TableColumn fx:id="typleCol" prefWidth="82.0" text="Tuple Type" />
-                        <TableColumn fx:id="timeCol" prefWidth="143.5" text="CPU Execution Delay" />
-                    </columns>
-                  </TableView>
-               </children>
-               <effect>
-                  <InnerShadow offsetX="6.0" offsetY="6.0">
-                     <color>
-                        <Color red="0.8100000023841858" green="0.7905600070953369" blue="0.7613999843597412" opacity="0.9217391014099121" />
-                     </color>
-                  </InnerShadow>
-               </effect>
-            </AnchorPane>
-            <AnchorPane layoutX="789.0" layoutY="410.0" prefHeight="403.0" prefWidth="741.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 20;">
-               <children>
-                  <Canvas fx:id="graphArea2" height="313.0" layoutY="71.0" width="741.0" />
-                  <Pane layoutX="58.0" layoutY="14.0" prefHeight="53.0" prefWidth="626.0" style="-fx-background-radius: 20; -fx-background-color: #d7d7d7;">
-                     <children>
-                        <ChoiceBox fx:id="sourceChoiceBox" layoutX="77.0" layoutY="11.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 15;">
-                           <effect>
-                              <DropShadow offsetX="6.0" offsetY="6.0">
-                                 <color>
-                                    <Color red="0.7372549176216125" green="0.7058823704719543" blue="0.6666666865348816" opacity="0.8899999856948853" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </ChoiceBox>
-                        <ChoiceBox fx:id="destinationChoiceBox" layoutX="351.0" layoutY="11.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 15;">
-                           <effect>
-                              <DropShadow offsetX="6.0" offsetY="6.0">
-                                 <color>
-                                    <Color red="0.7300000190734863" green="0.7004349827766418" blue="0.6643000245094299" opacity="0.8899999856948853" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </ChoiceBox>
-                        <Button fx:id="addButton" layoutX="546.0" layoutY="12.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" style="-fx-background-radius: 15; -fx-background-color: #ffa200;" text="+" textFill="WHITE">
-                           <effect>
-                              <DropShadow offsetX="6.0" offsetY="6.0">
-                                 <color>
-                                    <Color red="0.7300000190734863" green="0.7004349827766418" blue="0.6643000245094299" opacity="0.8913043737411499" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Button>
-                        <Label layoutX="14.0" layoutY="12.0" text="Source:">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="255.0" layoutY="12.0" text="Destination:">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </Pane>
-                  <BarChart fx:id="barChart" layoutX="7.0" layoutY="101.0" prefHeight="291.0" prefWidth="721.0">
-                    <xAxis>
-                      <CategoryAxis side="BOTTOM" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis side="LEFT" />
-                    </yAxis>
-                  </BarChart>
-               </children>
-               <effect>
-                  <InnerShadow offsetX="6.0" offsetY="6.0">
-                     <color>
-                        <Color red="0.8117647171020508" green="0.7921568751335144" blue="0.7607843279838562" opacity="0.9200000166893005" />
-                     </color>
-                  </InnerShadow>
-               </effect>
-            </AnchorPane>
-         </children>
-      </AnchorPane>
-   </center>
-</BorderPane>
+<?xml version="1.0" encoding="UTF-8"?>	
+<?import javafx.scene.canvas.Canvas?>	
+<?import javafx.scene.chart.BarChart?>	
+<?import javafx.scene.chart.CategoryAxis?>	
+<?import javafx.scene.chart.LineChart?>	
+<?import javafx.scene.chart.NumberAxis?>	
+<?import javafx.scene.chart.StackedAreaChart?>	
+<?import javafx.scene.control.Button?>	
+<?import javafx.scene.control.ChoiceBox?>	
+<?import javafx.scene.control.Label?>	
+<?import javafx.scene.control.Menu?>	
+<?import javafx.scene.control.MenuBar?>	
+<?import javafx.scene.control.MenuItem?>	
+<?import javafx.scene.control.TableColumn?>	
+<?import javafx.scene.control.TableView?>	
+<?import javafx.scene.effect.DropShadow?>	
+<?import javafx.scene.effect.InnerShadow?>	
+<?import javafx.scene.layout.AnchorPane?>	
+<?import javafx.scene.layout.BorderPane?>	
+<?import javafx.scene.layout.Pane?>	
+<?import javafx.scene.paint.Color?>	
+<?import javafx.scene.text.Font?>	
+<BorderPane prefHeight="837.0" prefWidth="1555.0" stylesheets="@application3.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.OutputController">	
+   <center>	
+      <AnchorPane prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">	
+         <children>	
+            <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="229.0" style="-fx-background-color: #ffa200;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">	
+              <menus>	
+                <Menu mnemonicParsing="false" text="File">	
+                  <items>	
+                    <MenuItem fx:id="saveEnergy" mnemonicParsing="false" onAction="#saveEnergyHandler" text="Save Energy Consumption Graph" />	
+                        <MenuItem fx:id="saveNetwork" mnemonicParsing="false" onAction="#saveNetworkHandler" text="Save Network Usage Graph" />	
+                        <MenuItem fx:id="saveTuple" mnemonicParsing="false" onAction="#saveTupleHandler" text="Save Tuple Delay" />	
+                        <MenuItem mnemonicParsing="false" text="Save 4" />	
+                  </items>	
+                </Menu>	
+                <Menu mnemonicParsing="false" text="Help">	
+                  <items>	
+                    <MenuItem mnemonicParsing="false" text="Delete" />	
+                  </items>	
+                </Menu>	
+              </menus>	
+            </MenuBar>	
+          <AnchorPane fx:id="backPane" layoutX="24.0" layoutY="48.0" minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="737.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 20;">	
+               <children>	
+                  <Canvas fx:id="graphArea" height="339.0" width="750.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />	
+                  <StackedAreaChart fx:id="EnergyConsumption" layoutX="4.0" layoutY="8.0" prefHeight="320.0" prefWidth="715.0" style="-fx-background-radius: 100;" stylesheets="@areagraphstyle.css" verticalGridLinesVisible="false" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="8.0">	
+                    <xAxis>	
+                      <NumberAxis side="BOTTOM" />	
+                    </xAxis>	
+                    <yAxis>	
+                      <NumberAxis side="LEFT" />	
+                    </yAxis>	
+                  </StackedAreaChart>	
+               </children>	
+               <effect>	
+                  <InnerShadow offsetX="6.0" offsetY="6.0">	
+                     <color>	
+                        <Color red="0.8117647171020508" green="0.7921568751335144" blue="0.7607843279838562" opacity="0.9200000166893005" />	
+                     </color>	
+                  </InnerShadow>	
+               </effect>	
+            </AnchorPane>	
+            <AnchorPane fx:id="backPane1" layoutX="787.0" layoutY="48.0" minHeight="0.0" minWidth="0.0" prefHeight="340.0" prefWidth="738.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 20;">	
+               <children>	
+                  <Canvas fx:id="graphArea1" height="341.0" layoutX="-3.0" width="754.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="-1.0" AnchorPane.topAnchor="1.0" />	
+                  <LineChart fx:id="NetworkUsage" layoutX="10.0" layoutY="8.0" prefHeight="332.0" prefWidth="729.0" stylesheets="@linegraphstyle.css" verticalGridLinesVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="8.0">	
+                     <xAxis>	
+                        <CategoryAxis side="BOTTOM" />	
+                     </xAxis>	
+                     <yAxis>	
+                        <NumberAxis side="LEFT" />	
+                     </yAxis>	
+                  </LineChart>	
+               </children>	
+               <effect>	
+                  <InnerShadow offsetX="6.0" offsetY="6.0">	
+                     <color>	
+                        <Color red="0.8117647171020508" green="0.7921568751335144" blue="0.7607843279838562" opacity="0.9200000166893005" />	
+                     </color>	
+                  </InnerShadow>	
+               </effect>	
+            </AnchorPane>	
+            <AnchorPane layoutX="24.0" layoutY="410.0" prefHeight="401.0" prefWidth="740.0" style="-fx-background-radius: 20; -fx-background-color: #e8e8e8;">	
+               <children>	
+                  <TableView fx:id="tupleTable" layoutX="19.0" layoutY="18.0" prefHeight="368.0" prefWidth="703.0">	
+                    <columns>	
+                      <TableColumn fx:id="checkCol" prefWidth="24.0" text="#" />	
+                      <TableColumn fx:id="sourceDevCol" prefWidth="89.0" text="Source Device" />	
+                        <TableColumn fx:id="sourceModCol" prefWidth="104.0" text="Source Module" />	
+                        <TableColumn fx:id="destDevCol" prefWidth="120.0" text="Destination Device" />	
+                        <TableColumn fx:id="destModCol" prefWidth="138.0" text="Destination Module" />	
+                        <TableColumn fx:id="typleCol" prefWidth="82.0" text="Tuple Type" />	
+                        <TableColumn fx:id="timeCol" prefWidth="143.5" text="CPU Execution Delay" />	
+                    </columns>	
+                  </TableView>	
+               </children>	
+               <effect>	
+                  <InnerShadow offsetX="6.0" offsetY="6.0">	
+                     <color>	
+                        <Color red="0.8100000023841858" green="0.7905600070953369" blue="0.7613999843597412" opacity="0.9217391014099121" />	
+                     </color>	
+                  </InnerShadow>	
+               </effect>	
+            </AnchorPane>	
+            <AnchorPane layoutX="789.0" layoutY="410.0" prefHeight="403.0" prefWidth="741.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 20;">	
+               <children>	
+                  <Canvas fx:id="graphArea2" height="313.0" layoutY="71.0" width="741.0" />	
+                  <Pane layoutX="58.0" layoutY="14.0" prefHeight="53.0" prefWidth="626.0" style="-fx-background-radius: 20; -fx-background-color: #d7d7d7;">	
+                     <children>	
+                        <ChoiceBox fx:id="sourceChoiceBox" layoutX="77.0" layoutY="11.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 15;">	
+                           <effect>	
+                              <DropShadow offsetX="6.0" offsetY="6.0">	
+                                 <color>	
+                                    <Color red="0.7372549176216125" green="0.7058823704719543" blue="0.6666666865348816" opacity="0.8899999856948853" />	
+                                 </color>	
+                              </DropShadow>	
+                           </effect>	
+                        </ChoiceBox>	
+                        <ChoiceBox fx:id="destinationChoiceBox" layoutX="351.0" layoutY="11.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 15;">	
+                           <effect>	
+                              <DropShadow offsetX="6.0" offsetY="6.0">	
+                                 <color>	
+                                    <Color red="0.7300000190734863" green="0.7004349827766418" blue="0.6643000245094299" opacity="0.8899999856948853" />	
+                                 </color>	
+                              </DropShadow>	
+                           </effect>	
+                        </ChoiceBox>	
+                        <Button fx:id="addButton" layoutX="546.0" layoutY="12.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="58.0" style="-fx-background-radius: 15; -fx-background-color: #ffa200;" text="+" textFill="WHITE">	
+                           <effect>	
+                              <DropShadow offsetX="6.0" offsetY="6.0">	
+                                 <color>	
+                                    <Color red="0.7300000190734863" green="0.7004349827766418" blue="0.6643000245094299" opacity="0.8913043737411499" />	
+                                 </color>	
+                              </DropShadow>	
+                           </effect>	
+                           <font>	
+                              <Font name="System Bold" size="12.0" />	
+                           </font>	
+                        </Button>	
+                        <Label layoutX="14.0" layoutY="12.0" text="Source:">	
+                           <font>	
+                              <Font size="16.0" />	
+                           </font>	
+                        </Label>	
+                        <Label layoutX="255.0" layoutY="12.0" text="Destination:">	
+                           <font>	
+                              <Font size="16.0" />	
+                           </font>	
+                        </Label>	
+                     </children>	
+                  </Pane>	
+                  <BarChart fx:id="barChart" barGap="0.0" categoryGap="1.0" layoutX="7.0" layoutY="101.0" prefHeight="291.0" prefWidth="721.0" styleClass="chart-series-bar" stylesheets="@bargraphstyle.css" verticalGridLinesVisible="false">	
+                    <xAxis>	
+                      <CategoryAxis side="BOTTOM" />	
+                    </xAxis>	
+                    <yAxis>	
+                      <NumberAxis side="LEFT" />	
+                    </yAxis>	
+                  </BarChart>	
+               </children>	
+               <effect>	
+                  <InnerShadow offsetX="6.0" offsetY="6.0">	
+                     <color>	
+                        <Color red="0.8117647171020508" green="0.7921568751335144" blue="0.7607843279838562" opacity="0.9200000166893005" />	
+                     </color>	
+                  </InnerShadow>	
+               </effect>	
+            </AnchorPane>	
+         </children>	
+      </AnchorPane>	
+   </center>	
+</BorderPane>	

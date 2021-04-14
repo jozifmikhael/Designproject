@@ -241,14 +241,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		scrollPane.setOnScroll(new EventHandler<ScrollEvent>() {
-            @Override
-            public void handle(ScrollEvent event) {
-                if (event.getDeltaY() > 0)
-                    screenSizeChangeHandler();
-                event.consume();
-            }
-        });
+		scrollPane.setPannable(false);
+//		scrollPane.setOnScroll(new EventHandler<ScrollEvent>() {
+//            @Override
+//            public void handle(ScrollEvent event) {
+//                if (event.getDeltaY() > 0)
+//                    screenSizeChangeHandler();
+//                event.consume();
+//            }
+//        });
 		printDebug("initialize function ran");
 	}
 	
@@ -440,20 +441,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     int simGranu = 10;
     
 	@FXML
-	    void startSim(ActionEvent event) throws Exception {
-	    	String policy = setParamsController.policyType;
-	    	int time = setParamsController.simulationTime;
-	    	int granularity = setParamsController.granularityMetric;
-	    	String centralNode = getCentralNode();
-	    	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
-	//		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
-	//     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-	//        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
-	//        Stage stage = new Stage();
-	//        stage.setScene(scene);
-	//        stage.setTitle("Output");
-	//        stage.showAndWait();
-	    }
+    void startSim(ActionEvent event) throws Exception {
+    	String policy = setParamsController.policyType;
+    	int time = setParamsController.simulationTime;
+    	int granularity = setParamsController.granularityMetric;
+    	String centralNode = getCentralNode();
+    	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
+//		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
+//     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
+//        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+//        Stage stage = new Stage();
+//        stage.setScene(scene);
+//        stage.setTitle("Output");
+//        stage.showAndWait();
+    }
 
 	@FXML
     void newJSON(ActionEvent event) throws IOException {
