@@ -68,7 +68,6 @@ public abstract class _SubController {
 	Spec specPrev;
 	String thisType;
 	
-	
 	final public static Field getField(Object targetObject, String fieldName) {
 //		Field[] cFields = targetObject.getClass().getDeclaredFields();
 //        for(int i=0; i<cFields.length; i++) printDebug(cFields[i].getGenericType().toString() + " " + cFields[i].getName());
@@ -163,9 +162,8 @@ public abstract class _SubController {
             		String reqNamesOfType = selBox.getId().split("_")[0].replace("Spec","");
             		printDebug(reqNamesOfType);
             		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqNamesOfType)).forEach(n->tempNames.add(n.name));
-            		printDebug(tempNames.toString());
             		selBox.setItems(tempNames);
-            		if(tempNames.size()>-1) selBox.setValue(tempNames.get(0));
+            		if(tempNames.size()>0) selBox.setValue(tempNames.get(0));
             		selBox.setOnAction((event) -> setField(spec, selBox.getId().split("_")[1], selBox.getSelectionModel().getSelectedItem().toString()));
             	}
             }

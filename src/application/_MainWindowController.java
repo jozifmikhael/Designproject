@@ -387,10 +387,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				draggingNode=null;
 				Spec newSimObject = null;
 				switch(InteractionState.getSetKey()) {
-					case DIGIT1 : newSimObject = (NodeSpec)setupController("device"); break;
-					case DIGIT2 : newSimObject = (NodeSpec)setupController("module"); break;
-					case DIGIT3 : newSimObject = (NodeSpec)setupController("sensor"); break;
-					case DIGIT4 : newSimObject = (NodeSpec)setupController("actuat"); break;
+					case DIGIT1 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
+					case DIGIT2 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("module"); break;
+					case DIGIT3 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
+					case DIGIT4 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
 					case DIGIT5 : {
 						selNode = _SpecHandler.getNode(mEvent);			
 						if(selNode==null || linkSrcNode==null) break;

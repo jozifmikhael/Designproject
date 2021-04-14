@@ -277,6 +277,7 @@ public class _SpecHandler {
 					if (f.getGenericType() instanceof ParameterizedType) {
 						printDebug(f.getName());
 						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
+						if(arrRef == null) continue;
 						JSONArray newSet = new JSONArray();
 						if(f.getGenericType().toString().contains("_SpecHandler$")) {
 							arrRef.forEach(a->newSet.add(((Spec)a).toJSON()));
