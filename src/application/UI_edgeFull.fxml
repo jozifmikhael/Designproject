@@ -2,34 +2,83 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="316.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddEdgeController">
+<BorderPane prefHeight="311.0" prefWidth="612.0" style="-fx-background-color: #f5f5f5;" stylesheets="@application2.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddEdgeController">
    <center>
       <AnchorPane fx:id="ap" prefHeight="220.0" prefWidth="273.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane fx:id="ap" prefHeight="346.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane fx:id="ap" prefHeight="347.0" prefWidth="612.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Text layoutX="20.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Destination:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="58.0" />
-                  <Text layoutX="22.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tuple Type:" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="100.05078125" />
-                  <Text layoutX="45.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Source:" AnchorPane.leftAnchor="45.0" AnchorPane.topAnchor="20.0" />
-                  <TextField fx:id="tupleType" layoutX="103.0" layoutY="98.0" prefHeight="25.0" prefWidth="99.0" text="EEG" AnchorPane.topAnchor="96.0" />
-                  <Button fx:id="saveButton" defaultButton="true" layoutX="16.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Save App Edge" />
-                  <TextField fx:id="periodicity" layoutX="103.0" layoutY="139.0" prefHeight="25.0" prefWidth="98.0" text="0.0" AnchorPane.topAnchor="136.0" />
-                  <TextField fx:id="cpuLength" layoutX="103.0" layoutY="175.0" prefHeight="25.0" prefWidth="97.0" text="3500.0" />
-                  <TextField fx:id="nwLength" layoutX="103.0" layoutY="210.0" prefHeight="25.0" prefWidth="96.0" text="500.0" />
-                  <TextField fx:id="edgeType" layoutX="281.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" text="1" />
-                  <Text layoutX="31.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Period:" AnchorPane.topAnchor="140.0" />
-                  <Text layoutX="16.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CPU Length:" />
-                  <Text layoutX="8.0" layoutY="227.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Network Length:" />
-                  <Text layoutX="207.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edge Type:" />
-                  <TextField fx:id="direction" layoutX="281.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" text="1" />
-                  <Text layoutX="207.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Direction:" />
-                  <ChoiceBox fx:id="parentChoice" layoutX="103.0" layoutY="54.0" prefHeight="25.0" prefWidth="99.0" />
-                  <ChoiceBox fx:id="childChoice" layoutX="103.0" layoutY="16.0" prefHeight="25.0" prefWidth="99.0" />
+                  <Button fx:id="saveButton" defaultButton="true" layoutX="347.0" layoutY="31.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="226.0" text="Save App Edge">
+                     <effect>
+                        <DropShadow offsetX="6.0" offsetY="6.0">
+                           <color>
+                              <Color red="0.8500000238418579" green="0.8344166874885559" blue="0.8075000047683716" opacity="0.886956512928009" />
+                           </color>
+                           <input>
+                              <DropShadow offsetX="-6.0" offsetY="-6.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </DropShadow>
+                           </input>
+                        </DropShadow>
+                     </effect></Button>
+                  <Label alignment="CENTER" layoutX="32.0" layoutY="31.0" prefHeight="52.0" prefWidth="291.0" style="-fx-background-color: #e8e8e8; -fx-background-radius: 10;" text="Edge Parameters" textAlignment="CENTER">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Pane layoutX="34.0" layoutY="110.0" prefHeight="168.0" prefWidth="544.0" styleClass="pane">
+                     <children>
+                        <ChoiceBox fx:id="NodeSpec_name_1" layoutX="136.0" layoutY="30.0" prefHeight="25.0" prefWidth="110.0" styleClass="edgeFullSrcDestcbwidth" />
+                        <ChoiceBox fx:id="NodeSpec_name_2" layoutX="395.0" layoutY="30.0" prefHeight="25.0" prefWidth="110.0" styleClass="edgeFullSrcDestcbwidth" />
+                        <TextField fx:id="tupleType" layoutX="136.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" text="EEG" />
+                        <TextField fx:id="periodicity" layoutX="137.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" text="0.0" />
+                        <TextField fx:id="cpuLength" layoutX="395.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" text="3500.0" />
+                        <TextField fx:id="nwLength" layoutX="395.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" text="500.0" />
+                        <Label layoutX="28.0" layoutY="35.0" text="Source">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Label layoutX="290.0" layoutY="35.0" text="Destination">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Label layoutX="28.0" layoutY="75.0" text="Tuple Type">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Label layoutX="28.0" layoutY="115.0" text="Period">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Label layoutX="290.0" layoutY="75.0" text="CPU Length">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Label layoutX="290.0" layoutY="115.0" text="Network Length">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                     </children>
+                     <effect>
+                        <InnerShadow offsetX="6.0" offsetY="6.0">
+                           <color>
+                              <Color red="0.8100000023841858" green="0.7905600070953369" blue="0.7613999843597412" opacity="0.9200000166893005" />
+                           </color>
+                        </InnerShadow>
+                     </effect>
+                  </Pane>
                </children>
             </AnchorPane>
          </children>

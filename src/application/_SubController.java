@@ -108,7 +108,6 @@ public abstract class _SubController {
 	}
 	
 	final public static void setField(Object targetObject, String fieldName, Object fieldValue) {
-//		printDebug(fieldName + " -> "+ fieldValue);
 		try {
 			Field field = getField(targetObject, fieldName);
 			if(field == null) return;
@@ -142,10 +141,7 @@ public abstract class _SubController {
 		for(int i=0; i<((Parent) cRoot).getChildrenUnmodifiable().size(); i++) {
 			Node selChild = ((Parent) cRoot).getChildrenUnmodifiable().get(i);
 			
-			if (containers.contains(selChild.getClass().getSimpleName().toString())) {
-//				printDebug("Checking children of : " + selChild.getClass().getSimpleName().toString());
-				parseChildrenOf(selChild);
-			}
+			if (containers.contains(selChild.getClass().getSimpleName().toString())) parseChildrenOf(selChild);
 			else if (selChild.getClass().getSimpleName().toString().equals("TableView")) {
 				TableView selTable = (TableView)selChild;
 //				selTable.setItems(tempData);
@@ -186,6 +182,7 @@ public abstract class _SubController {
             	ChoiceBox<String> selBox = (ChoiceBox) selChild;
             	if(selBox.getId().contains("Spec")) {
             		String reqNamesOfType = selBox.getId().split("_")[0];
+            		printDebug(reqNamesOfType);
             		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqNamesOfType)).forEach(n->tempNames.add(n.name));
             		selBox.setItems(tempNames);
             		selBox.setValue(tempNames.get(0));

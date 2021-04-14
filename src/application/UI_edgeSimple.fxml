@@ -1,18 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="109.0" prefWidth="414.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddEdgeSimpleController">
+<BorderPane prefHeight="221.0" prefWidth="500.0" style="-fx-background-color: #f5f5f5;" stylesheets="@application2.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LinkLatencyInputController">
    <center>
       <AnchorPane fx:id="ap" prefHeight="139.0" prefWidth="414.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="latency" layoutX="31.0" layoutY="50.0" prefHeight="25.0" prefWidth="225.0" AnchorPane.topAnchor="50.0" />
-            <Button fx:id="saveButton" layoutX="291.0" layoutY="51.0" mnemonicParsing="false" onAction="#saveSpecHandler" text="Set Latency" />
-            <Text layoutX="148.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your link latency" />
+            <Button fx:id="saveButton" layoutX="289.0" layoutY="28.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Set Latency">
+               <effect>
+                  <DropShadow offsetX="6.0" offsetY="6.0">
+                     <color>
+                        <Color red="0.8500000238418579" green="0.8344166874885559" blue="0.8075000047683716" opacity="0.8899999856948853" />
+                     </color>
+                     <input>
+                        <DropShadow offsetX="-6.0" offsetY="-6.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </DropShadow>
+                     </input>
+                  </DropShadow>
+               </effect>
+            </Button>
+            <Label layoutX="29.0" layoutY="28.0" prefHeight="52.0" prefWidth="238.0" style="-fx-background-radius: 10; -fx-background-color: #e8e8e8;" text="              Edge Parameters" textAlignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Pane layoutX="29.0" layoutY="107.0" prefHeight="86.0" prefWidth="442.0" styleClass="pane">
+               <children>
+                  <TextField fx:id="latency" layoutX="183.0" layoutY="33.0" prefHeight="25.0" prefWidth="225.0" />
+                  <Label layoutX="40.0" layoutY="36.0" text="Link Latency">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+               <effect>
+                  <InnerShadow offsetX="6.0" offsetY="6.0">
+                     <color>
+                        <Color red="0.8100000023841858" green="0.7905600070953369" blue="0.7613999843597412" opacity="0.9200000166893005" />
+                     </color>
+                  </InnerShadow>
+               </effect>
+            </Pane>
          </children>
       </AnchorPane>
    </center>

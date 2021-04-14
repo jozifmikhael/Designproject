@@ -4,6 +4,7 @@ import static application.scratch.printDebug;
 
 import java.util.ArrayList;
 import application._SpecHandler.DeviceSpec;
+import application._SpecHandler.EdgeSpec;
 import application._SpecHandler.ModuleSpec;
 import application._SpecHandler.NodeSpec;
 import application._SpecHandler.Spec;
@@ -24,7 +25,7 @@ import javafx.util.converter.LongStringConverter;
 
 public class AddModuleController extends _SubController{
 	ObservableList<TupleSpec> tupleData = FXCollections.observableArrayList();
-	ObservableList<NodeSpec> nodeData = FXCollections.observableArrayList();
+	ObservableList<EdgeSpec> nodeData = FXCollections.observableArrayList();
 	@FXML
 	TextField inTuple_TupleSpec;
 	@FXML
@@ -33,14 +34,21 @@ public class AddModuleController extends _SubController{
 	TextField fractionalSensitivity_TupleSpec;
 	@FXML
 	TableView TupleSpec;
+	@FXML
+	TableView NodeSpec;
 	@Override
 	void initDefaultObject() {
-        spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>());
+        spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>(), new ArrayList<EdgeSpec>());
 	}
 	void extendedInit() {
+		printDebug("In mod extended init");
 		tupleData.add(new TupleSpec("-", "-", 0.0, (ModuleSpec) spec));
 		tupleData.addAll(((ModuleSpec)this.spec).tupleMappings);
 		TupleSpec.setItems(tupleData);
+		nodeData.add(new EdgeSpec());
+		nodeData.addAll(((ModuleSpec)this.spec).moduleMappings);
+		NodeSpec.setItems(nodeData);
+		printDebug("Leaving mod extended init");
 	}
 	
 	@FXML

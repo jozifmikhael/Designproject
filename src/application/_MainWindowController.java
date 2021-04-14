@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import application._SubController;
 import application.Main;
-//import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacement;
 import org.fog.placement.ModulePlacementEdgewards;
@@ -329,6 +328,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	@FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
+		_SpecHandler.deselectAll();
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
@@ -342,7 +342,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec("module", mEvent):selNode; break;// Select Module Placer
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
 					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec("actuat", mEvent):selNode; break;// Select Actuat Placer
-					case DIGIT5 : draggingNode=new NodeSpec("linker", mEvent); linkSrcNode=(selNode==null)?null:selNode.addLink(new EdgeSpec(selNode, draggingNode, 0, "edgeSimple"));break;
+					case DIGIT5 : {
+						draggingNode=new NodeSpec("linker", mEvent);
+						if(selNode==null) return;
+						linkSrcNode=selNode;
+						linkSrcNode=(selNode==null)?null:selNode.addLink(new EdgeSpec(selNode, draggingNode, 0, "edgeSimple"));
+					} break;
 					default : {} // Nothing
 				} break;
 //			case MIDDLE_BTN: screenPanHandler(); break; //TODO Screen panning is pretty necessary
@@ -517,8 +522,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	printDebug("Starting setupController with type " + type + ", file " + loadersList.get(type).toString());
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
-			Scene scene = new Scene(loader.load());
 			_SubController controller = loader.getController();
+			Scene scene = new Scene(loader.load());
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			
