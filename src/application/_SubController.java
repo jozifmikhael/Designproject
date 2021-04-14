@@ -199,4 +199,9 @@ public abstract class _SubController {
 		printDebug("Finished parsing");
 		return spec;
 	}
+
+	public Spec getSpec() {
+		this.specPrev=null;
+		return spec;
+	}
 }

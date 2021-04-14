@@ -871,42 +871,59 @@ public class _SpecHandler {
 			gc.beginPath();
 			gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
 			gc.setLineWidth(this.selected ? 10.0 : 1.0);
-			double drawSrcX = this.direction==1?dst.x:src.x;
-			double drawDstX = this.direction==1?src.x:dst.x;
-			double drawSrcY = this.direction==1?dst.y:src.y;
-			double drawDstY = this.direction==1?src.y:dst.y;
-			gc.moveTo(drawSrcX, drawSrcY);
-            gc.lineTo(drawDstX, drawDstY);
+			gc.moveTo(this.dst.x, this.dst.y);
+			gc.lineTo(this.src.x, this.src.y);
 			gc.stroke();
 			gc.setStroke(Color.BLACK);
 			gc.setLineWidth(1.0);
 			gc.setFill(Color.BLACK);
 			
-			double distancex = drawSrcX - drawDstX;
-			double distancey = drawSrcY - drawDstY;
-			double rotation = Math.toDegrees(-Math.atan2(distancex, distancey)+(3*Math.PI/4));
-			double m = (drawSrcY - drawDstY)/(drawSrcX - drawDstX);
-			double X = Math.round((float)(drawSrcX+Math.cos(rotation)*this.dst.sz/2));
-			double Y = Math.round((float)(drawSrcY+Math.sin(rotation)*this.dst.sz/2));
-			
-			double [] xpoints = {X, X+8, X-8};
-			double [] ypoints = {Y, Y+8, Y+8};
+			double distancex = this.src.x - this.dst.x;
+			double distancey = this.src.y - this.dst.y;
+			double rotation = -Math.atan2(distancex, distancey);
+			double oldRotation = rotation;
+		    rotation = Math.toRadians(Math.toDegrees(rotation) + 90);
+			double X = Math.round((float)(this.dst.x+Math.cos(rotation)*this.dst.sz/2));
+			double Y = Math.round((float)(this.dst.y+Math.sin(rotation)*this.dst.sz/2));
 
-	        gc.save();
-	        
-	        if (rotation >= 6.05 && rotation < 6.43) rotate(gc,270,X,Y);	
-	        else if(rotation >=5.54 && rotation <6.05) rotate(gc,240,X,Y);
-	        else if(rotation >=4.97 && rotation <5.54) rotate(gc,210,X,Y);
-	        else if(rotation >=4.32 && rotation <4.97) rotate(gc,180,X,Y);
-	        else if(rotation >=3.686 && rotation <4.32) rotate(gc,150,X,Y);
-	        else if(rotation >=3.45 && rotation <3.686) rotate(gc,120,X,Y);
-	        else if(rotation >=2.97 && rotation <3.45) rotate(gc,90,X,Y);
-	        else if(rotation >=2.30 && rotation <2.97) rotate(gc,60,X,Y);
-	        else if(rotation >=2.00 && rotation <2.30) rotate(gc,30,X,Y);
-	        else if(rotation >=6.43 && rotation <7.023) rotate(gc,300,X,Y);
-	        else if(rotation >=7.023 && rotation <7.473) rotate(gc,330,X,Y);
-	        gc.fillPolygon(xpoints, ypoints, 3);
-			gc.restore();
+			if (this.src.isTemp) {
+				double [] xpoints = {this.src.x, this.src.x+8, this.src.x-8};
+				double [] ypoints = {this.src.y, this.src.y+8, this.src.y+8};
+				gc.save();
+//		        rotate(gc,rotation*60-120,this.src.x,this.src.y); 
+				oldRotation = Math.toRadians(Math.toDegrees(oldRotation) + 270);
+		        if (oldRotation >= 6.05 && oldRotation < 6.43) rotate(gc,270,this.src.x,this.src.y);	
+		        else if(oldRotation >=5.54 && oldRotation <6.05) rotate(gc,240,this.src.x,this.src.y);
+		        else if(oldRotation >=4.97 && oldRotation <5.54) rotate(gc,210,this.src.x,this.src.y);
+		        else if(oldRotation >=4.32 && oldRotation <4.97) rotate(gc,180,this.src.x,this.src.y);
+		        else if(oldRotation >=3.686 && oldRotation <4.32) rotate(gc,150,this.src.x,this.src.y);
+		        else if(oldRotation >=3.45 && oldRotation <3.686) rotate(gc,120,this.src.x,this.src.y);
+		        else if(oldRotation >=2.97 && oldRotation <3.45) rotate(gc,90,this.src.x,this.src.y);
+		        else if(oldRotation >=2.30 && oldRotation <2.97) rotate(gc,60,this.src.x,this.src.y);
+		        else if(oldRotation >=2.00 && oldRotation <2.30) rotate(gc,30,this.src.x,this.src.y);
+		        else if(oldRotation >=6.43 && oldRotation <7.023) rotate(gc,300,this.src.x,this.src.y);
+		        else if(oldRotation >=7.023 && oldRotation <7.473) rotate(gc,330,this.src.x,this.src.y);
+		        gc.fillPolygon(xpoints, ypoints, 3);
+				gc.restore();
+			}else {
+				double [] xpoints = {X, X+8, X-8};
+				double [] ypoints = {Y, Y+8, Y+8};
+				gc.save();
+//		        rotate(gc,rotation*60-120,X,Y); 
+				if (rotation >= 6.05 && rotation < 6.43) rotate(gc,270,X,Y);	
+		        else if(rotation >=5.54 && rotation <6.05) rotate(gc,240,X,Y);
+		        else if(rotation >=4.97 && rotation <5.54) rotate(gc,210,X,Y);
+		        else if(rotation >=4.32 && rotation <4.97) rotate(gc,180,X,Y);
+		        else if(rotation >=3.686 && rotation <4.32) rotate(gc,150,X,Y);
+		        else if(rotation >=3.45 && rotation <3.686) rotate(gc,120,X,Y);
+		        else if(rotation >=2.97 && rotation <3.45) rotate(gc,90,X,Y);
+		        else if(rotation >=2.30 && rotation <2.97) rotate(gc,60,X,Y);
+		        else if(rotation >=2.00 && rotation <2.30) rotate(gc,30,X,Y);
+		        else if(rotation >=6.43 && rotation <7.023) rotate(gc,300,X,Y);
+		        else if(rotation >=7.023 && rotation <7.473) rotate(gc,330,X,Y);
+		        gc.fillPolygon(xpoints, ypoints, 3);
+				gc.restore();
+			}
 		}
 		
 		private void rotate(GraphicsContext gc, double angle, double px, double py) {

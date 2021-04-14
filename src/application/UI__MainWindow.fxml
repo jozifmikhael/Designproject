@@ -152,7 +152,7 @@
                                  <children>
                                     <Pane fx:id="toolPanel" layoutX="89.0" layoutY="-98.0" prefHeight="323.0" prefWidth="125.0" rotate="90.0" style="-fx-background-color: #e8e8e8;" styleClass="pane" AnchorPane.leftAnchor="89.0">
                                        <children>
-                                          <Button layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Node (1)" textFill="WHITE">
+                                          <Button fx:id="tool1" layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Node (1)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
@@ -171,7 +171,7 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Button>
-                                          <Button fx:id="editButton1" layoutX="14.0" layoutY="80.0" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Module (2)" textFill="WHITE">
+                                          <Button fx:id="tool2" layoutX="14.0" layoutY="80.0" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Module (2)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
@@ -190,7 +190,7 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Button>
-                                          <Button fx:id="previewButton1" layoutX="14.0" layoutY="140.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Sensor (3)" textFill="WHITE">
+                                          <Button fx:id="tool3" layoutX="14.0" layoutY="140.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Sensor (3)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
@@ -206,7 +206,7 @@
                                                 </DropShadow>
                                              </effect>
                                           </Button>
-                                          <Button fx:id="previewButton11" layoutX="14.0" layoutY="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Actuat (4)" textFill="WHITE">
+                                          <Button fx:id="tool4" layoutX="14.0" layoutY="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Actuat (4)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
@@ -222,7 +222,7 @@
                                                 </DropShadow>
                                              </effect>
                                           </Button>
-                                          <Button fx:id="previewButton111" layoutX="14.0" layoutY="260.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Edge (5)" textFill="WHITE">
+                                          <Button fx:id="tool5" layoutX="14.0" layoutY="260.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="95.0" styleClass="buttonSmallLeft" text="Edge (5)" textFill="WHITE">
                                              <effect>
                                                 <DropShadow offsetX="6.0" offsetY="6.0">
                                                    <color>
@@ -261,7 +261,7 @@
                   <items>
                     <MenuItem mnemonicParsing="false" text="Close" />
                         <MenuItem fx:id="newJSONMenu" mnemonicParsing="false" onAction="#newJSON" text="Create New" />
-                        <MenuItem fx:id="loadJSON" mnemonicParsing="false" onAction="#loadJson" text="Load Previous" />
+                        <MenuItem fx:id="loadJSON" mnemonicParsing="false" onAction="#loadJSON" text="Load Previous" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">

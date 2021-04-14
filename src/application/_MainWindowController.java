@@ -176,7 +176,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     private Canvas graphArea;
-    
+
     @FXML
     private MenuItem addSensorMenu;
     
@@ -215,6 +215,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
     @FXML
     private Button previewButton;
+    @FXML
+    private Button tool1;
+    @FXML
+    private Button tool2;
+    @FXML
+    private Button tool3;
+    @FXML
+    private Button tool4;
+    @FXML
+    private Button tool5;
     
     @FXML
     private TreeView<String> treeView;
@@ -300,7 +310,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
 		switch (event.getCode()){
-//			case C	: System.out.println(event.isControlDown()?"C+Ctrl":"C-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Copy Selected
+			case S	: System.out.println(event.isControlDown()?"S+Ctrl":"No ctrl-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+			case O	: System.out.println(event.isControlDown()?"O+Ctrl":"No ctrl-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+			case C	: System.out.println(event.isControlDown()?"C+Ctrl":"C-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Copy Selected
 //			case V	: System.out.println(event.isControlDown()?"C+Ctrl":"V-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Copy Selected
 //			case Z 	: System.out.println(event.isControlDown()?"C+Ctrl":"Z-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Undo Last Action
 			default : keySetSuccess=InteractionState.trySetKey(event.getCode());
@@ -310,6 +322,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case ESCAPE	: _SpecHandler.deselectAll(); break;
 			case F5		: System.out.println("Unimplemented save tool"); break; // Save File
 			case DELETE : System.out.println("Unimplemented delete tool"); break; // Copy Selected
+			case S		: flushFile(); break;
+			case O		: loadJSON(); break;
 			case E		: System.out.println("Unimplemented edit tool"); break; // Copy Selected
 			case C		: System.out.println("Unimplemented copy tool"); break; // Copy Selected
 			case V		: System.out.println("Unimplemented paste tool"); break; // Paste Selected
@@ -385,6 +399,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case LEFT_BTN:
 				if(draggingNode!=null && draggingNode.isTemp) draggingNode.pop();
 				draggingNode=null;
+				selEdge = _SpecHandler.getEdge(mEvent);
+				selNode = _SpecHandler.getNode(mEvent);
 				Spec newSimObject = null;
 				switch(InteractionState.getSetKey()) {
 					case DIGIT1 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
@@ -447,13 +463,37 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     int simTime = 1000;
     int simGranu = 10;
     
+    //TODO Change Parse[X] to be methods of the respective classes
+	//i.e. a "[X]Spec fromJSON(JSONObject){}"
+	//like existing "JSONObject toJSON(this)"
 	@FXML
-    void startSim(ActionEvent event) throws Exception {
+	void loadJSON() {
+		Stage stage = new Stage();
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Open JSON File");
+		chooser.setInitialDirectory(new File("saves"));
+		File selectedFile = chooser.showOpenDialog(stage);
+		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
+	}
+
+	@FXML
+    void flushFile(){
+		Stage stage = new Stage();
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Load JSON File");
+		chooser.setInitialDirectory(new File("saves"));
+		File selectedFile = chooser.showOpenDialog(stage);
+		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
     	String policy = setParamsController.policyType;
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
     	String centralNode = getCentralNode();
     	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
+    }
+    
+	@FXML
+    void startSim(ActionEvent event) throws Exception {
+		flushFile();
 //		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
 //     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
 //        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
@@ -462,7 +502,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //        stage.setTitle("Output");
 //        stage.showAndWait();
     }
-
+	
 	@FXML
     void newJSON(ActionEvent event) throws IOException {
 		FXMLLoader root = new FXMLLoader(getClass().getResource("SaveFileBox.fxml"));
@@ -474,31 +514,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		String reqName=SaveFileController.jsonDestinationFileName;
 		if(reqName!=null) selectedJSON=reqName + ".json";
 		System.out.println("Trying to save to "+ selectedJSON);
-		writeJSON();
+//		writeJSON();
     }
 	
-	void writeJSON() {
-		//TODO change this so that the meta-specs are actually inside the SetupJSONParser
-		//and we only set from here on change
-		//So ideally just JSONHandler.writeJSON();
-		
-//     	
-	}
-	
-	//TODO Change Parse[X] to be methods of the respective classes
-	//i.e. a "[X]Spec fromJSON(JSONObject){}"
-	//like existing "JSONObject toJSON(this)"
 	@FXML
-	void loadJson(ActionEvent event) throws FileNotFoundException, IOException, ParseException {
-		Stage stage = new Stage();
-		FileChooser chooser = new FileChooser();
-		chooser.setTitle("Open JSON File");
-		chooser.setInitialDirectory(new File("saves"));
-		File selectedFile = chooser.showOpenDialog(stage);
-		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
-	}
-	
-    @FXML
     void showOutput() {
         try {
             FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
@@ -529,9 +548,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			    }
 			});
 			
-			stage.setOnCloseRequest(e -> stage.close());
+			stage.setOnCloseRequest(e -> {
+				printDebug("close request found");
+				stage.close();
+			});
 			stage.showAndWait();
-			return controller.spec;
+			return controller.getSpec();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
