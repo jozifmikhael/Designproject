@@ -241,7 +241,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		scrollPane.setPannable(false);
+//		scrollPane.setPannable(false);
 //		scrollPane.setOnScroll(new EventHandler<ScrollEvent>() {
 //            @Override
 //            public void handle(ScrollEvent event) {
@@ -252,6 +252,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //        });
 		printDebug("initialize function ran");
 	}
+	
+//
+//	@FXML
+//    private void something(ScrollEvent mEvent) throws IOException {
+//		printDebug("Handled a scroll");
+//	}
 	
 	public void setupListeners(Stage parentStage, Scene scene) {
 			ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
@@ -282,14 +288,14 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	    }
 
 	private void redrawNodes() {
-		printDebug("In redraw");
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
 		
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
+		scrollPane.setPannable((_SpecHandler.getSelected()==null));
 	}
-
+	
 	@Override
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
@@ -424,6 +430,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void mouseScrollHandler(ScrollEvent event) {
     	_SpecHandler.shiftPositionsByZoom(event);
     	redrawNodes();
+    	event.consume();
     }
     
 	private void screenSizeChangeHandler() {

@@ -28,9 +28,9 @@
                <children>
                   <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="658.0" prefWidth="1224.0">
                     <content>
-                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0">
+                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="2000.0" prefWidth="2000.0">
                            <children>
-                              <Canvas fx:id="topoField" height="10000.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="10000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
+                              <Canvas fx:id="topoField" height="2000.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" onScrollFinished="#mouseScrollHandler" onScrollStarted="#mouseScrollHandler" onZoom="#mouseScrollHandler" onZoomFinished="#mouseScrollHandler" onZoomStarted="#mouseScrollHandler" width="2000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
                            </children>
                         </AnchorPane>
                     </content>

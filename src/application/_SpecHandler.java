@@ -134,6 +134,7 @@ public class _SpecHandler {
 //			d.x -= (d.x - event.getX()) * (1 - zoomFactor / preZoom);
 //			d.y -= (d.y - event.getY()) * (1 - zoomFactor / preZoom);
 //		}
+
 	}
 	
 	public static NodeSpec getNode(MouseEvent mEvent) {
@@ -274,6 +275,7 @@ public class _SpecHandler {
 				try {
 					printDebug();
 					if (f.getGenericType() instanceof ParameterizedType) {
+						printDebug(f.getName());
 						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
 						JSONArray newSet = new JSONArray();
 						if(f.getGenericType().toString().contains("_SpecHandler$")) {
@@ -868,23 +870,21 @@ public class _SpecHandler {
 			gc.beginPath();
 			gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
 			gc.setLineWidth(this.selected ? 10.0 : 1.0);
-
-			
-			gc.stroke();
-			gc.setStroke(Color.BLACK);
-			gc.setLineWidth(1.0);
-			gc.setFill(Color.BLACK);
 			double drawSrcX = this.direction==1?dst.x:src.x;
 			double drawDstX = this.direction==1?src.x:dst.x;
 			double drawSrcY = this.direction==1?dst.y:src.y;
 			double drawDstY = this.direction==1?src.y:dst.y;
+			gc.moveTo(drawSrcX, drawSrcY);
+            gc.lineTo(drawDstX, drawDstY);
+			gc.stroke();
+			gc.setStroke(Color.BLACK);
+			gc.setLineWidth(1.0);
+			gc.setFill(Color.BLACK);
+			
 			double distancex = drawSrcX - drawDstX;
 			double distancey = drawSrcY - drawDstY;
-			double distance = Math.sqrt(distancex*distancex+distancey*distancey);
-			double rotation = -Math.atan2(distancex, distancey);
-		    rotation = Math.toRadians(Math.toDegrees(rotation) + 270);
+			double rotation = Math.toDegrees(-Math.atan2(distancex, distancey)+(3*Math.PI/4));
 			double m = (drawSrcY - drawDstY)/(drawSrcX - drawDstX);
-			
 			double X = Math.round((float)(drawSrcX+Math.cos(rotation)*this.dst.sz/2));
 			double Y = Math.round((float)(drawSrcY+Math.sin(rotation)*this.dst.sz/2));
 			
@@ -892,7 +892,7 @@ public class _SpecHandler {
 			double [] ypoints = {Y, Y+8, Y+8};
 
 	        gc.save();
-		//rotate(gc,rotate*60-120,X,Y);//? 
+	        
 	        if (rotation >= 6.05 && rotation < 6.43) rotate(gc,270,X,Y);	
 	        else if(rotation >=5.54 && rotation <6.05) rotate(gc,240,X,Y);
 	        else if(rotation >=4.97 && rotation <5.54) rotate(gc,210,X,Y);
