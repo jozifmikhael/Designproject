@@ -133,7 +133,7 @@
                   </Label>
                   <Pane layoutX="29.0" layoutY="109.0" prefHeight="153.0" prefWidth="442.0" styleClass="pane">
                      <children>
-                        <ChoiceBox fx:id="device_name_Spec" layoutX="193.0" layoutY="28.0" prefHeight="25.0" prefWidth="200.0" styleClass="sensorNodeNamecbwidth" />
+                        <ChoiceBox fx:id="deviceSpec_name" layoutX="193.0" layoutY="28.0" prefHeight="25.0" prefWidth="200.0" styleClass="sensorNodeNamecbwidth" />
                         <TextField fx:id="latency" layoutX="193.0" layoutY="68.0" prefHeight="25.0" prefWidth="200.0" text="6.0" />
                         <TextField fx:id="name" layoutX="193.0" layoutY="108.0" prefHeight="25.0" prefWidth="200.0" text="sensor1" />
                         <Label layoutX="33.0" layoutY="33.0" text="Parent Node">

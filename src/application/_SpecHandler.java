@@ -869,21 +869,24 @@ public class _SpecHandler {
 			gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
 			gc.setLineWidth(this.selected ? 10.0 : 1.0);
 
-//			double drawSrcX = this.direction==1?dst.x:
+			
 			gc.stroke();
 			gc.setStroke(Color.BLACK);
 			gc.setLineWidth(1.0);
 			gc.setFill(Color.BLACK);
-			
-			double distancex = this.dst.x - this.src.x;
-			double distancey = this.dst.y - this.src.y;
+			double drawSrcX = this.direction==1?dst.x:src.x;
+			double drawDstX = this.direction==1?src.x:dst.x;
+			double drawSrcY = this.direction==1?dst.y:src.y;
+			double drawDstY = this.direction==1?src.y:dst.y;
+			double distancex = drawSrcX - drawDstX;
+			double distancey = drawSrcY - drawDstY;
 			double distance = Math.sqrt(distancex*distancex+distancey*distancey);
 			double rotation = -Math.atan2(distancex, distancey);
 		    rotation = Math.toRadians(Math.toDegrees(rotation) + 270);
-			double m = (this.dst.y - this.src.y)/(this.dst.x - this.src.x);
+			double m = (drawSrcY - drawDstY)/(drawSrcX - drawDstX);
 			
-			double X = Math.round((float)(this.dst.x+Math.cos(rotation)*this.dst.sz/2));
-			double Y = Math.round((float)(this.dst.y+Math.sin(rotation)*this.dst.sz/2));
+			double X = Math.round((float)(drawSrcX+Math.cos(rotation)*this.dst.sz/2));
+			double Y = Math.round((float)(drawSrcY+Math.sin(rotation)*this.dst.sz/2));
 			
 			double [] xpoints = {X, X+8, X-8};
 			double [] ypoints = {Y, Y+8, Y+8};

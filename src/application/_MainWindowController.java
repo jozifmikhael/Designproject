@@ -285,7 +285,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		printDebug("In redraw");
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-//		
+		
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
 	}
