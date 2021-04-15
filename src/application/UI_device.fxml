@@ -28,7 +28,6 @@
                         <TextField fx:id="rate" layoutX="396.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" />
                         <TextField fx:id="apower" layoutX="396.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" />
                         <TextField fx:id="ipower" layoutX="396.0" layoutY="150.0" prefHeight="25.0" prefWidth="110.0" />
-                        <TextField fx:id="latency" layoutX="396.0" layoutY="190.0" prefHeight="25.0" prefWidth="110.0" />
                         <Label layoutX="28.0" layoutY="35.0" text="Name">
                            <font>
                               <Font size="14.0" />
@@ -70,11 +69,6 @@
                            </font>
                         </Label>
                         <Label layoutX="291.0" layoutY="155.0" text="Idle Power">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="291.0" layoutY="195.0" text="Uplink Latency">
                            <font>
                               <Font size="14.0" />
                            </font>

@@ -20,13 +20,17 @@
                   <Pane layoutX="29.0" layoutY="111.0" prefHeight="126.0" prefWidth="442.0" styleClass="pane">
                      <children>
                         <TextField fx:id="name" layoutX="164.0" layoutY="25.0" prefHeight="25.0" prefWidth="245.0" />
-                        <TextField fx:id="UpLinklatency" layoutX="167.0" layoutY="71.0" prefHeight="25.0" prefWidth="245.0" />
                         <Label layoutX="28.0" layoutY="30.0" text="Actuator Name:">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <Label layoutX="31.0" layoutY="76.0" text="Latency:">
+                        <Label layoutX="31.0" layoutY="76.0" text="Parent">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="srcLabel" alignment="CENTER" layoutX="167.0" layoutY="71.0" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #efefef; -fx-border-color: #ffa200;" text="Parent" textAlignment="CENTER">
                            <font>
                               <Font size="14.0" />
                            </font>

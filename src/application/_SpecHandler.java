@@ -138,6 +138,7 @@ public class _SpecHandler {
 
 	public static EdgeSpec makeNewEdgeSelection(MouseEvent mEvent) {
 		if(selectedEdge!=null) selectedEdge.isSelected=false;
+		printDebug("In makeNewEdgeSelection");
 		selectedEdge=null; selectedObject=null;
 		for(NodeSpec n : _SpecHandler.nodesList) {
 			for(EdgeSpec e : n.edgesList) {
@@ -208,7 +209,6 @@ public class _SpecHandler {
 				
 		Spec copy() {return new Spec(this.toJSON());};
 		Spec pop() {return this;}
-		Spec reinit() {return this;}
 		public Spec() {}
 		
 		public Spec(JSONObject obj) {
@@ -262,6 +262,10 @@ public class _SpecHandler {
 				}
 			}			
 			return obj;
+		}
+		public Spec reinit() {
+			// TODO Auto-generated method stub
+			return this;
 		}
 	}
 	
@@ -337,7 +341,7 @@ public class _SpecHandler {
 				nodesList.add(this);
 			return this;
 		}
-		Spec reinit() {
+		public NodeSpec reinit() {
 			this.edgesList = new ArrayList<EdgeSpec>();
 			this.isSelected=false;
 			this.isTemp = false;
@@ -404,6 +408,12 @@ public class _SpecHandler {
 		Spec setPos(MouseEvent mEvent) {
 			this.x = mEvent.getX();
 			this.y = mEvent.getY();
+			return this;
+		}
+		
+		Spec setPos(double x, double y) {
+			this.x = x;
+			this.y = y;
 			return this;
 		}
 		
@@ -612,7 +622,7 @@ public class _SpecHandler {
 			this.tupleMappings = new ArrayList<TupleSpec>(_tupleMappings);
 			this.add();
 		}
-		ModuleSpec reinit() {
+		public ModuleSpec reinit() {
 			this.tupleMappings = new ArrayList<TupleSpec>();
 			this.edgesList = new ArrayList<EdgeSpec>();
 			this.isSelected=false;
@@ -847,6 +857,8 @@ public class _SpecHandler {
 			this.periodicity = periodicity;
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
+			
+			this.reinit();
 		}
 		public Spec setSelected() {
 			deselectAll();
@@ -868,20 +880,25 @@ public class _SpecHandler {
 
 		EdgeSpec copy() {return new EdgeSpec(this.toJSON());};
 
-		EdgeSpec reinit() {
+		public EdgeSpec reinit() {
+			printDebug("in edge reinit");
+			if(this.src==null||this.dst==null) {
+				for(NodeSpec n : nodesList) {
+					if(n.name.equals(this.srcName))this.src = n;
+					if(n.name.equals(this.dstName))this.dst = n;
+				}
+			}
 			return this.add();
 		}
 		EdgeSpec add() {
-			for(NodeSpec n : nodesList) {
-				if(n.name.equals(this.srcName))this.src = n;
-				if(n.name.equals(this.dstName))this.dst = n;
-			}
+			printDebug("Adding edge to " + this.src.name);
 			this.src.edgesList.add(this);
 			return this;
 		}
 
 		@Override
 		Spec pop() {
+			printDebug("Popping link ");
 			this.src.edgesList.remove(this);
 			return this;
 		}
@@ -1086,7 +1103,7 @@ public class _SpecHandler {
 			return null;
 		}
 		
-		TupleSpec reinit() {
+		public TupleSpec reinit() {
 			if(this.parent==null) {
 				for(NodeSpec n : nodesList) if(n.name.equals("parentName")) this.parent=(ModuleSpec) n;
 			}

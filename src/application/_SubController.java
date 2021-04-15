@@ -25,6 +25,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
@@ -199,7 +200,6 @@ public abstract class _SubController {
 		printDebug("Finished parsing");
 		return spec;
 	}
-
 	public Spec getSpec() {
 		this.specPrev=null;
 		return spec;

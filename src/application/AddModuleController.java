@@ -14,7 +14,6 @@ import javafx.scene.control.TextField;
 
 public class AddModuleController extends _SubController{
 	ObservableList<TupleSpec> tupleData = FXCollections.observableArrayList();
-	ObservableList<EdgeSpec> nodeData = FXCollections.observableArrayList();
 	@FXML
 	TextField inTuple_TupleSpec;
 	@FXML
@@ -23,8 +22,6 @@ public class AddModuleController extends _SubController{
 	TextField fractionalSensitivity_TupleSpec;
 	@FXML
 	TableView TupleSpec;
-	@FXML
-	TableView NodeSpec;
 	@Override
 	void initDefaultObjects() {
 		if(this.spec==null) spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>(), new ArrayList<EdgeSpec>());
@@ -32,9 +29,6 @@ public class AddModuleController extends _SubController{
 		printDebug();
 		tupleData.addAll(((ModuleSpec)this.spec).tupleMappings);
 		TupleSpec.setItems(tupleData);
-		nodeData.add(new EdgeSpec());
-////		nodeData.addAll(((ModuleSpec)this.spec).edgesList);
-		NodeSpec.setItems(nodeData);
 		printDebug("Leaving mod extended init");
 	}
 	

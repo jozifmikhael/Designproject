@@ -29,7 +29,7 @@
                <children>
                   <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="635.0" prefWidth="1224.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
                     <content>
-                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0" styleClass="menuFont">
+                      <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0" styleClass="accordion">
                            <children>
                               <Canvas fx:id="topoField" height="634.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="1224.0" AnchorPane.bottomAnchor="9366.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="8776.0" AnchorPane.topAnchor="0.0" />
                            </children>
@@ -145,9 +145,9 @@
                         </Label>
                      </children>
                   </AnchorPane>
-                  <Accordion layoutX="-84.0" layoutY="164.0" prefHeight="165.0" prefWidth="327.0" rotate="-90.0" styleClass="maketransparent">
+                  <Accordion fx:id="toolbar" layoutX="-84.0" layoutY="164.0" prefHeight="165.0" prefWidth="327.0" rotate="-90.0">
                     <panes>
-                      <TitledPane alignment="TOP_CENTER" prefHeight="378.0" prefWidth="327.0" styleClass="maketransparent" text="Node Toolbar">
+                      <TitledPane fx:id="toolpane" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="378.0" prefWidth="327.0" rotate="180.0" styleClass="maketransparent" text="Node Toolbar">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="207.0" style="-fx-background-color: transparent;">
                                  <children>

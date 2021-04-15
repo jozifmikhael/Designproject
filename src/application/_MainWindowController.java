@@ -35,11 +35,13 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.Scene;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
@@ -116,7 +118,12 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeView;
 
-public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{	
+public class _MainWindowController implements Initializable, EventHandler<KeyEvent>{
+	@FXML
+	private Accordion toolbar;
+	@FXML
+	private TitledPane toolpane;
+	
 	@FXML
     private TextField deviceField;
 	
@@ -240,8 +247,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //            }
 //        });
 		printDebug("initialize function ran");
-		tool1.setSelected(true);
-		printDebug("Set triggered");
 	}
 	
 //
@@ -252,6 +257,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	public void setupListeners(Stage parentStage, Scene scene) {
 		scrollPane.setPannable(false);
+		toolbar.setExpandedPane(toolpane);
+		toolbar.setFocusTraversable(false);
 		ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
 		frontPane.widthProperty().addListener(stageSizeListener);
 		frontPane.heightProperty().addListener(stageSizeListener);
@@ -455,8 +462,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 							selNode = _SpecHandler.makeNewNodeSelection(mEvent);
 							if(selNode==null || linkSrcNode==null) break;
 							EdgeSpec newLink = linkSrcNode.newLinkTo(selNode);
+							newLink.setSelected();
 							setupController(newLink.type);
-							newLink.setSelected();			
 						} break;
 						default : {} // Nothing
 					}
@@ -585,9 +592,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		_SpecHandler.pruneLinks();
 		redrawNodes();
 	}
+    
+    Spec setupControllerFromMenu(String type) {
+    	return ((NodeSpec)setupController(type)).setPos(gc.getCanvas().getWidth()*0.5, gc.getCanvas().getHeight()*0.5);
+    }
 
 	Spec setupController(String type) {
     	printDebug("Starting setupController with type " + type + ", '" + loadersList.get(type).toString()+"'");
+    	if (_SpecHandler.selectedNode != null){
+    		printDebug("Selected object is " + _SpecHandler.selectedNode.name);
+    	}else printDebug("Selected object is not a node");
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			Scene scene = new Scene(loader.load());
