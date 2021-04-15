@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.fxml.FXMLLoader;
@@ -41,6 +42,11 @@ public class Main extends Application {
 			
 			controller.setupListeners(primaryStage, scene);
 			primaryStage.setScene(scene);
+			
+			Image programIcon = new Image("file:icon.png");
+			primaryStage.getIcons().add(programIcon);
+			primaryStage.setTitle("iFogSim GUI");
+
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

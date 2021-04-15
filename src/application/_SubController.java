@@ -192,7 +192,7 @@ public abstract class _SubController {
 	final public Spec init(Spec s) {
 		if(s!=null) {
 			spec=s;
-			specPrev=new _SpecHandler.Spec(s.toJSON());
+			specPrev=s.copy();
 		}
 		initDefaultObjects();
 		parseChildrenOf(ap);

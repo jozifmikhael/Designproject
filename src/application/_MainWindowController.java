@@ -84,28 +84,6 @@ import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.Cloudlet;
 //import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 //import java.text.DecimalFormat;
-
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.power.PowerHost;
-import org.cloudbus.cloudsim.power.PowerDatacenter;
-import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
-import org.cloudbus.cloudsim.sdn.overbooking.BwProvisionerOverbooking;
-import org.cloudbus.cloudsim.sdn.overbooking.PeProvisionerOverbooking;
-import org.fog.application.AppEdge;
-import org.fog.application.AppLoop;
-import org.fog.application.selectivity.FractionalSelectivity;
-import org.fog.entities.Actuator;
-import org.fog.entities.FogBroker;
-import org.fog.entities.FogDevice;
-import org.fog.entities.FogDeviceCharacteristics;
-import org.fog.entities.Sensor;
-import org.fog.entities.Tuple;
-//import org.fog.placement.Controller;
 import org.fog.placement.ModuleMapping;
 import org.fog.placement.ModulePlacementEdgewards;
 import org.fog.placement.ModulePlacementMapping;
@@ -262,6 +240,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //            }
 //        });
 		printDebug("initialize function ran");
+		tool1.setSelected(true);
+		printDebug("Set triggered");
 	}
 	
 //
@@ -310,12 +290,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	@Override
 	public void handle(KeyEvent event) {
 		boolean keySetSuccess=false;
-		switch (event.getCode()){
+		switch (event.getCode()) {
 			case S	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
 			case O	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
 			case E	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
 			case C	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
-//			case V	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
+			case V	: keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break;
 //			case Z 	: System.out.println(event.isControlDown()?"C+Ctrl":"Z-"); keySetSuccess=InteractionState.trySetKey(event.getCode(), event.isControlDown()); break; // Undo Last Action
 			default : keySetSuccess=InteractionState.trySetKey(event.getCode());
 		}
@@ -327,13 +307,73 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case S		: flushFile(); break;
 			case O		: loadJSON(); break;
 			case E		: editHandler(); break; // Edit Selected
-			case C		: System.out.println("Unimplemented copy tool"); break; // Copy Selected
-			case V		: System.out.println("Unimplemented paste tool"); break; // Paste Selected
+			case C		: copyHandler(); break; // Copy Selected
+			case V		: pasteHandler(); break; // Paste Selected
 			case Z		: System.out.println("Unimplemented undo tool"); break; // Undo Last
 			default : {}
 		}
+		tool1.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT1));
+		tool2.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT2));
+		tool3.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT3));
+		tool4.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT4));
+		tool5.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT5));
 		redrawNodes();
 	}
+
+	//Just need to call the undo Handler on the ctrlz click and go to where each action is happening and set the previous state and undocase, Panning is not done
+	// static int undoCases;
+	// static Spec tempSpec = null;
+	// static Spec undoSpec = null;
+	// static int undoSimTime;
+	// static int undoGranu;
+	// static String undoPolicy;
+	// static ArrayList<EdgeSpec> undoEdges = new ArrayList<EdgeSpec>();
+	// static double undoZoomFactor;
+	
+	// public void undoHandler() {
+	// 	switch(undoCases){
+	// 		case 1://	1, "Created Spec"
+	// 			undoSpec.pop();
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 2://	2, "Deleted Spec" have to do something to unprune links
+	// 			_SpecHandler.nodesList.add(undoSpec.copy());
+	// 			for(NodeSpec n : _SpecHandler.nodesList) {
+	// 				for(EdgeSpec e : undoEdges) if(e.src.equals(n))n.edgesList.add(e);
+	// 			}
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 3://	3, "Moved Node"
+	// 			tempSpec = undoSpec.copy();
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 4://	4, "Set SimTime"
+	// 			simTime = undoSimTime;
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 5://	5, "Set Granularity"
+	// 			simGranu = undoGranu;
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 6://	6, "Set Placement Policy"
+	// 			policy = undoPolicy;
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 7://	7, "Zoom"
+	// 			_SpecHandler.zoomFactor = undoZoomFactor;
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 8://	8, "Pan"
+	// 			undoCases = 0;
+	// 			break;
+	// 		case 9://	9, "Edit Spec"
+	// 			tempSpec = undoSpec.copy();
+	// 			undoCases = 0;
+	// 			break;
+	// 		default:
+	// 			break;
+	// 	}
+	// }
 	
 	public static enum InteractionState {
 	    LEFT_BTN, MIDDLE_BTN, RIGHT_BTN, NONE;
@@ -364,6 +404,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	@FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
+//		printDebug(mEvent.getClickCount());
 		_SpecHandler.deselectAll();
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
@@ -372,6 +413,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 				selNode = _SpecHandler.getNode(mEvent);
 				if (selNode!=null) selNode.setSelected();
 				else if(selEdge!=null) selEdge.setSelected();
+				if(mEvent.getClickCount()>1) editHandler();
 				switch(InteractionState.getSetKey()) {
 					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
 					case DIGIT1 : draggingNode=(selNode==null)?new NodeSpec("device", mEvent):selNode; break;// Select Device Placer
@@ -432,7 +474,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	@FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
-    	if (draggingNode != null&&!draggingNode.selected) draggingNode.setSelected();
+    	if (draggingNode != null&&!draggingNode.isSelected) draggingNode.setSelected();
     	if(draggingNode != null) {
     		draggingNode.setPos(mEvent);
 			redrawNodes();
@@ -465,9 +507,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     int simTime = 1000;
     int simGranu = 10;
     
-    //TODO Change Parse[X] to be methods of the respective classes
-	//i.e. a "[X]Spec fromJSON(JSONObject){}"
-	//like existing "JSONObject toJSON(this)"
 	@FXML
 	void loadJSON() {
 		Stage stage = new Stage();
@@ -523,7 +562,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void showOutput() {
         try {
             FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-            Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+            Scene scene = new Scene(addNewNodeLoader.load(),1560,850);
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.setTitle("Output");
@@ -561,16 +600,33 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		}
     }
     
+    int copyNum=1;
+    NodeSpec copyBuffer=null;
     @FXML
     void copyHandler() {
-    	
+    	NodeSpec selectedNode = _SpecHandler.getSelectedNode();
+    	if(selectedNode == null) return;
+    	copyBuffer=selectedNode.copy();
+    	copyNum=0;
+    	printDebug(copyBuffer.toString());
+    }
+    
+    @FXML
+    void pasteHandler() {
+    	printDebug("Trying to paste... #" + copyNum);
+    	copyNum++;
+    	copyBuffer.name=copyBuffer.name+" - Copy_"+copyNum;
+    	copyBuffer.x+=copyBuffer.sz*0.5;
+    	copyBuffer.y+=copyBuffer.sz*0.5;
+    	copyBuffer.add();
     }
     
     @FXML
     void editHandler() {
-    	Spec selectedNode = (Spec)_SpecHandler.getSelected();
-    	if(selectedNode == null) return;
-    	setupController(selectedNode.type);
+    	printDebug("In edit handler");
+    	Spec selectedObject = (Spec)_SpecHandler.getSelected();
+    	if(selectedObject == null) return;
+    	setupController(selectedObject.type);
 		_SpecHandler.pruneLinks();
 		redrawNodes();
     }

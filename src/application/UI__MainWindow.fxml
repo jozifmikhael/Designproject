@@ -27,11 +27,11 @@
          <children>
           <AnchorPane fx:id="backPane" layoutX="-1.0" layoutY="23.0" minHeight="0.0" minWidth="0.0" prefHeight="634.0" prefWidth="934.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="658.0" prefWidth="1224.0">
+                  <ScrollPane fx:id="scrollPane" pannable="true" prefHeight="635.0" prefWidth="1224.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
                     <content>
                       <AnchorPane fx:id="frontPane" minHeight="0.0" minWidth="0.0" prefHeight="10000.0" prefWidth="10000.0" styleClass="menuFont">
                            <children>
-                              <Canvas fx:id="topoField" height="657.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="1224.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
+                              <Canvas fx:id="topoField" height="634.0" onMouseDragged="#mouseMoveHandler" onMousePressed="#mouseClickHandler" onMouseReleased="#mouseReleaseHandler" onScroll="#mouseScrollHandler" width="1224.0" AnchorPane.bottomAnchor="9366.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="8776.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                     </content>
@@ -124,7 +124,7 @@
                         </InnerShadow>
                      </effect>
                   </AnchorPane>
-                  <AnchorPane layoutX="922.0" layoutY="43.0" prefHeight="596.0" prefWidth="276.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom" AnchorPane.bottomAnchor="19.0" AnchorPane.rightAnchor="26.0">
+                  <AnchorPane layoutX="922.0" layoutY="43.0" prefHeight="596.0" prefWidth="276.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom" AnchorPane.bottomAnchor="19.0" AnchorPane.rightAnchor="26.0" AnchorPane.topAnchor="43.0">
                      <children>
                         <TreeView layoutX="7.0" layoutY="36.0" prefHeight="540.0" prefWidth="267.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="35.0" />
                      </children>
@@ -136,7 +136,7 @@
                         </InnerShadow>
                      </effect>
                   </AnchorPane>
-                  <AnchorPane layoutX="922.0" layoutY="42.0" prefHeight="37.0" prefWidth="276.0" styleClass="treeviewtoplabel" AnchorPane.bottomAnchor="579.0" AnchorPane.rightAnchor="26.0">
+                  <AnchorPane layoutX="922.0" layoutY="42.0" prefHeight="37.0" prefWidth="276.0" styleClass="treeviewtoplabel" AnchorPane.rightAnchor="26.0" AnchorPane.topAnchor="42.0">
                      <children>
                         <Label layoutX="53.0" layoutY="6.0" prefHeight="25.0" style="-fx-text-fill: white;" styleClass="outline" text="Preview of Placements" textAlignment="CENTER" textFill="#ffa200">
                            <font>
@@ -153,7 +153,7 @@
                                  <children>
                                     <Pane fx:id="toolPanel" layoutX="108.6" layoutY="-98.0" prefHeight="331.0" prefWidth="125.0" rotate="90.0" style="-fx-background-color: #e8e8e8;" styleClass="pane" AnchorPane.leftAnchor="89.0">
                                        <children>
-                                          <ToggleButton fx:id="tool1" layoutX="11.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Node (1)">
+                                          <ToggleButton fx:id="tool1" layoutX="11.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Node (1)">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -171,6 +171,10 @@
                                                    </input>
                                                 </DropShadow>
                                              </effect>
+                                             <styleClass>
+                                                <String fx:value="toggle-button" />
+                                                <String fx:value="buttonSmallLeft" />
+                                             </styleClass>
                                           </ToggleButton>
                                           <ToggleButton fx:id="tool2" layoutX="11.0" layoutY="80.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="buttonSmallLeft" text="Module (2)">
                                              <font>

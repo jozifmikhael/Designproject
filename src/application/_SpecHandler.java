@@ -99,10 +99,11 @@ public class _SpecHandler {
 	
 	static GraphicsContext gc = null;
 	
+	static Color selectColor = Color.web("#0091ff", 1);
 	static Color deviceColor = Color.web("#ffa200", 1);//Color.RED; //Theme Orange
 	static Color moduleColor = Color.web("#ffdd00", 1);//CYAN; //Yellowish Orange
 	static Color sensorColor = Color.web("#bce105", 1);//.PINK; //GREEN #33dc04
-	static Color actuatorColor = Color.web("#05e1aa", 1); //YELLOW; #04b1dc
+	static Color actuatorColor = Color.web("#a0f3de", 1); //YELLOW; #04b1dc
 	static Color transpColor = Color.TRANSPARENT;
 	static List<Color> validColors = Arrays.asList(deviceColor, moduleColor, sensorColor, actuatorColor, transpColor);
 	static Color _errorColor = Color.RED;
@@ -170,24 +171,31 @@ public class _SpecHandler {
 	
 	public static void deselectAll() {
 		for(NodeSpec n : nodesList) {
-			n.selected = false;
-			for(EdgeSpec e: n.edgesList) e.selected = false;
+			n.isSelected = false;
+			for(EdgeSpec e: n.edgesList) e.isSelected = false;
 		}
 	}
 	
-	public static Spec getSelected() {
-		for (NodeSpec n : nodesList) {
-			if (n.selected) return n;
-			for(EdgeSpec e : n.edgesList) {
-				if(e.selected) return e;
-			}
-		}
+	public static NodeSpec getSelectedNode() {
+		for (NodeSpec n : nodesList) if (n.isSelected) return n;
 		return null;
+	}
+	
+	public static EdgeSpec getSelectedEdge() {
+		for (NodeSpec n : nodesList) for(EdgeSpec e : n.edgesList) if(e.isSelected) return e;
+		return null;
+	}
+	
+	public static Spec getSelected() {
+		Spec sel = getSelectedEdge();
+		if(sel==null) sel = getSelectedNode();
+		printDebug(sel==null);
+		return sel;
 	}
 	
 	public static Spec getSelected(String _type) {
 		for (Spec n : nodesList) {
-			if (n.selected && n.type.equals(_type)) {
+			if (n.isSelected && n.type.equals(_type)) {
 				return n;
 			}
 		}
@@ -206,15 +214,15 @@ public class _SpecHandler {
 	}
 	public static class Spec {
 		protected boolean isTemp = false;
-		public boolean selected = false;
+		public boolean isSelected = false;
 		public String type;
 		
 		Spec setSelected() {
 			deselectAll();
-			this.selected = true;
+			this.isSelected = true;
 			return this;
 		}
-		
+		Spec copy() {return new Spec(this.toJSON());};
 		Spec pop() {return this;}
 		Spec add() {return this;}
 		public Spec() {}
@@ -330,8 +338,9 @@ public class _SpecHandler {
 		public NodeSpec(String name, String type) {
 			this(0, 0, name, type);
 		}
-		
-		Spec add() {
+
+		NodeSpec copy() {return new NodeSpec(this.toJSON());};
+		NodeSpec add() {
 			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
 				nodesList.add(this);
 			return this;
@@ -347,7 +356,7 @@ public class _SpecHandler {
 		@Override
 		public String toString() {
 			return "x=" + x + ", y=" + y + ", sz=" + sz + ", nodeColor=" + nodeColor + ", name=" + name + ", type="
-					+ type + ", selected=" + selected;
+					+ type + ", selected=" + isSelected;
 		}
 		
 		Spec setColor() {
@@ -377,18 +386,16 @@ public class _SpecHandler {
 //	        ds1.setOffsetY(3.0f);
 //	        ds1.setOffsetX(3.0f);
 //	        ds1.setColor(Color.LIGHTGREY);//web("#dbd7ce", 0.92));
-			if (validColors.contains(this.nodeColor))
-				gc.setFill(this.nodeColor);
-			else
-				gc.setFill(_errorColor);
+			if (validColors.contains(this.nodeColor)) gc.setFill(this.nodeColor);
+			else gc.setFill(_errorColor);
 			gc.fillOval(this.x - 0.5 * this.sz * zoomFactor, this.y - 0.5 * this.sz * zoomFactor, this.sz * zoomFactor,
 					this.sz * zoomFactor);
 			if (nodeColor != transpColor) {
 				gc.setStroke(Color.BLACK);
 				gc.setLineWidth(1.0);
 				gc.strokeText(this.name, this.x, this.y + 0.4 * fontSize);
-				gc.setStroke(this.selected ? Color.web("#3297FD", 1) : Color.BLACK);
-				gc.setLineWidth(this.selected ? 3.0 : 3.0);
+				gc.setStroke(this.isSelected ? Color.web("#0091ff", 1) : Color.BLACK);
+				gc.setLineWidth(this.isSelected ? 5.0 : 3.0);
 				gc.strokeOval(this.x - 0.5 * this.sz * zoomFactor, this.y - 0.5 * this.sz * zoomFactor,
 						this.sz * zoomFactor, this.sz * zoomFactor);
 //				gc.setEffect(ds1);
@@ -450,10 +457,25 @@ public class _SpecHandler {
 		
 		@Override
         public String toString() {
-            return "selected="+ selected +",pe=" + pe + ",mips=" + mips + ",ram=" + ram + ",level=" + level + ",rate=" + rate
+            return "selected="+ isSelected +",pe=" + pe + ",mips=" + mips + ",ram=" + ram + ",level=" + level + ",rate=" + rate
                     + ",ipower=" + ipower + ",apower=" + apower + ",upbw=" + upbw + ",downbw=" + downbw + ",x=" + x
                     + ",y=" + y + ",name=" + name;
         }
+		
+		DeviceSpec copy() {return new DeviceSpec(this.toJSON());};
+		DeviceSpec add() {
+			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
+				nodesList.add(this);
+			printDebug("Deserializing device...");
+			return this;
+		}
+
+		DeviceSpec pop() {
+			nodesList.remove(this);
+			this.isTemp = true;
+			pruneLinks();
+			return this;
+		}
 		
 		public FogDevice addToApp() {
 			List<Pe> peList = new ArrayList<Pe>();
@@ -594,6 +616,8 @@ public class _SpecHandler {
 			this.tupleMappings = new ArrayList<TupleSpec>(_tupleMappings);
 			this.add();
 		}
+
+		ModuleSpec copy() {return new ModuleSpec(this.toJSON());};
 		public ModuleSpec(JSONObject a) {super(a);}
 		public Application addToApp(Application application) {
 			application.addAppModule(this.name, this.ram, this.mips, this.size, this.bandwidth);
@@ -670,6 +694,7 @@ public class _SpecHandler {
 			this.distType = distType;
 		}
 
+		SensorSpec copy() {return new SensorSpec(this.toJSON());};
 		public Sensor addToApp(int userId, String appId, Application application) {
 			Distribution dist;
 			switch (this.distType){
@@ -762,6 +787,7 @@ public class _SpecHandler {
 
 		public ActuatSpec(JSONObject a) {super(a);}
 
+		ActuatSpec copy() {return new ActuatSpec(this.toJSON());};
 		@Override
 		public String toString() {
 			return "x=" + x + ",y=" + y + ",sz=" + sz + ",nodeColor=" + nodeColor + ",name=" + name + ",type=" + type;
@@ -801,7 +827,7 @@ public class _SpecHandler {
 			put("moduleactuat", 2);
 			put("modulemodule", 3);
 		}};
-
+		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String tupleType, double periodicity,
 				double cpuLength, double newLength, int direction, String type) {
 			this.src = src;
@@ -830,7 +856,8 @@ public class _SpecHandler {
 			this.srcName="-";
 			this.dstName="-";
 		}
-		
+
+		EdgeSpec copy() {return new EdgeSpec(this.toJSON());};
 		@Override
 		Spec add() {
 			for(NodeSpec n : nodesList) {
@@ -849,15 +876,15 @@ public class _SpecHandler {
 
 		void draw(GraphicsContext gc) {
             gc.beginPath();
-            gc.setStroke(this.selected ? Color.BLUE : Color.BLACK);
-            gc.setLineWidth(this.selected ? 10.0 : 1.0);
+            gc.setStroke(this.isSelected ? selectColor : Color.BLACK);
+            gc.setLineWidth(this.isSelected ? 3.0 : 1.0);
             gc.moveTo(this.dst.x, this.dst.y);
             gc.lineTo(this.src.x, this.src.y);
             gc.stroke();
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(1.0);
-            gc.setFill(Color.BLACK);
-
+            gc.setFill(this.isSelected ? selectColor : Color.BLACK);
+            
             double distancex = this.src.x - this.dst.x;
             double distancey = this.src.y - this.dst.y;
             double rotation = -Math.atan2(distancex, distancey);
@@ -865,22 +892,22 @@ public class _SpecHandler {
             rotation = Math.toRadians(Math.toDegrees(rotation) + 90);
             double X = Math.round((float)(this.dst.x+Math.cos(rotation)*this.dst.sz/2));
             double Y = Math.round((float)(this.dst.y+Math.sin(rotation)*this.dst.sz/2));
-
+            gc.save();
             if (this.src.isTemp) {
                 double [] xpoints = {this.src.x, this.src.x+8, this.src.x-8};
                 double [] ypoints = {this.src.y, this.src.y+8, this.src.y+8};
-                gc.save();
+                
                 rotate(gc,Math.toDegrees(oldRotation) + 180,this.src.x,this.src.y);
+                gc.strokePolygon(xpoints, ypoints, 3);
                 gc.fillPolygon(xpoints, ypoints, 3);
-                gc.restore();
-            }else {
+            } else {
                 double [] xpoints = {X, X+8, X-8};
                 double [] ypoints = {Y, Y+8, Y+8};
                 gc.save();
                 rotate(gc,Math.toDegrees(rotation) + 270,X,Y);
                 gc.fillPolygon(xpoints, ypoints, 3);
-                gc.restore();
             }
+            gc.restore();
         }
 
 		
@@ -1033,6 +1060,7 @@ public class _SpecHandler {
 			this.fractionalSensitivity = fractionalSensitivity;
 		}
 
+		TupleSpec copy() {return new TupleSpec(this.toJSON());};
 		public TupleSpec(JSONObject a) {super(a);}
 
 		@Override

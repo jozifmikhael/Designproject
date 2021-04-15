@@ -88,6 +88,25 @@
 
 }
 
+.toggle-button:selected {
+-fx-background-color: #fec158;
+  -fx-background-radius: 15px ,15px, 15px, 15px;
+  -fx-font-size: 14px;
+  -fx-text-fill: white;
+  -fx-font-weight: bold;
+  -fx-border-radius: 15px;
+  -fx-border-color: white;
+}
+
+.toggle-button:selected:focused {
+  -fx-background-color: #fec158;
+  -fx-background-radius: 15px ,15px, 15px, 15px;
+  -fx-font-size: 14px;
+  -fx-text-fill: white;
+  -fx-font-weight: bold;
+  -fx-border-radius: 15px;
+  -fx-border-color: white;
+}
 
 
 .buttonGrey:pressed { 

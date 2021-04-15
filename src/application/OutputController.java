@@ -71,7 +71,7 @@ public class OutputController implements Initializable{
 
     @FXML
     private MenuItem saveTuple;
-
+	
     @FXML
     private Canvas graphArea;
 
@@ -79,13 +79,16 @@ public class OutputController implements Initializable{
     private StackedAreaChart<?, ?> EnergyConsumption;
 
     @FXML
+    private CategoryAxis lineXAxis;
+    
+    @FXML
     private AnchorPane backPane1;
 
     @FXML
     private Canvas graphArea1;
 
     @FXML
-    private LineChart<?, ?> NetworkUsage;
+    private LineChart<Number, Number> NetworkUsage;
 
     @FXML
     private TableView<TupleSpec> tupleTable;
@@ -170,7 +173,7 @@ public class OutputController implements Initializable{
 			e.printStackTrace();
        } 
     }
-
+	
 	public class TupleMetrics{
 		String tupleType;
 		String tupleSRC;
@@ -263,7 +266,7 @@ public class OutputController implements Initializable{
         xAxis.setLabel("Time");
         yAxis.setLabel("Energy Consumption");
         EnergyConsumption.setTitle("Time vs Energy Consumption");
-        
+        EnergyConsumption.setCreateSymbols(false);
         for(Energy energylist : Energylist) {
         	XYChart.Series temp = new XYChart.Series();
         	temp.setName(energylist.name);
@@ -275,7 +278,6 @@ public class OutputController implements Initializable{
         for(int i= 0; i<seriesList.size(); i++) {
         	EnergyConsumption.getData().add(seriesList.get(i));
         }
-        
 	}
 	
 	@FXML
@@ -284,7 +286,7 @@ public class OutputController implements Initializable{
 	    final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Time");
         yAxis.setLabel("Network Usage");
-        NetworkUsage.setCreateSymbols(false);
+        NetworkUsage.setCreateSymbols(false);;
         NetworkUsage.getStyleClass().add("thick-chart");
         NetworkUsage.setTitle("Time vs Network Usage");
         XYChart.Series series = new XYChart.Series();
@@ -331,12 +333,12 @@ public class OutputController implements Initializable{
         xAxis.setLabel("Time");
         yAxis.setLabel("Network Usage");
         barChart.setTitle("CPU Execution Delays");
+        barChart.setLegendVisible(false);
         XYChart.Series series = new XYChart.Series();
         series.getData().add(new XYChart.Data("PLAYER_GAME_STATE",1.171428573130893));
         series.getData().add(new XYChart.Data("EEG",4.099993792751119));
         series.getData().add(new XYChart.Data("CONCENTRATION",1.171428573130893));
         series.getData().add(new XYChart.Data("_SENSOR",0.566240448301607));
-        series.getData().add(new XYChart.Data("GLOBAL_GAME_STATE",0.04575000214585016));
         series.getData().add(new XYChart.Data("GLOBAL_GAME_STATE",0.04575000214585016));
         barChart.getData().add(series);
 		ObservableList<TupleSpec> tempData = FXCollections.observableArrayList();
@@ -365,7 +367,7 @@ public class OutputController implements Initializable{
         tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-0", 0, 0.2668171658911005));
         tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-1", 0, 0.2668171658911005));
         tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-2", 0, 0.2668171658911005));
-
+        
     	tupleTable.setItems(tempData);
     	typleCol.setCellValueFactory(new PropertyValueFactory <>("tupleType"));
     	typleCol.setCellFactory(TextFieldTableCell.forTableColumn());
