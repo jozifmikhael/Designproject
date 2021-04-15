@@ -468,6 +468,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 
 	}
     
+	static EdgeSpec newLink = null;
+
 	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws Exception {
 		printDebug("In mouseReleaseHandler");
@@ -490,8 +492,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 								linkSrcNode.edgesList.add(new EdgeSpec(linkSrcNode, selNode, 0, "", 0, 0, 0, 0, ""));
 								break;
 							}
-							EdgeSpec newLink = linkSrcNode.newLinkTo(selNode);
-							setupController(newLink.type);
+							_SpecHandler.deselectAll();
+							newLink = linkSrcNode.newLinkTo(selNode);
+							selEdge = newLink;
+							if(newLink!=null) setupController(newLink.type);
 						} break;
 						default : {} // Nothing
 					}
@@ -583,13 +587,15 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		}
 	}
 	
+	File selectedFile = null;
+	
 	@FXML
     void saveFileHandler(){
 		Stage stage = new Stage();
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Save JSON File");
 		chooser.setInitialDirectory(new File("saves"));
-		File selectedFile = chooser.showOpenDialog(stage);
+		selectedFile = chooser.showOpenDialog(stage);
     	String policy = setParamsController.policyType;
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
@@ -600,7 +606,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
 	@FXML
     void startSim(ActionEvent event) throws Exception {
-		saveFileHandler();
+		if (selectedFile != null) _SpecHandler.writeJSON(selectedFile.getAbsoluteFile());
 		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
@@ -657,7 +663,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			return null;
 		}
     }
-    
+    String copyBaseName=null;
     int copyNum=1;
     NodeSpec copyBuffer=null;
     @FXML
@@ -670,12 +676,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
     @FXML
     void pasteHandler() {
-    	printDebug("Trying to paste... #" + copyNum);
-    	copyNum++;
-    	copyBuffer.name=copyBuffer.name+" - Copy_"+copyNum;
-    	copyBuffer.x+=copyBuffer.sz*0.5;
-    	copyBuffer.y+=copyBuffer.sz*0.5;
-    	((NodeSpec)copyBuffer.reinit()).add();
+    	if(++copyNum==1) copyBaseName=copyBuffer.name+"-Copy";
+    	else copyBuffer.name=copyBaseName+copyNum;
+    	((NodeSpec)copyBuffer.reinit()).add().setPos(xCenter, yCenter);
     }
     
     @FXML
@@ -730,9 +733,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void setParams(ActionEvent event) {
     	try {
     		List<String> placementPolicyList = new ArrayList<String>();
-    		placementPolicyList.add("Profit Aware Policy");
-        	placementPolicyList.add("Quality of Service");
-        	placementPolicyList.add("Lowest Power Usage");
+    		placementPolicyList.add("Cloud-Only");
+        	placementPolicyList.add("Edgewards");
         	
         	FXMLLoader dataFXML = new FXMLLoader(getClass().getResource("setSimParamsBox.fxml"));
 			Scene scene = new Scene(dataFXML.load(),414,210);
@@ -747,23 +749,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
     
-    void testmethod() {
-    	double testgran = org.fog.utils.Config.RESOURCE_MGMT_INTERVAL;
-    	int testsimtime = org.fog.utils.Config.MAX_SIMULATION_TIME;
-    	String testtopnode = org.fog.utils.Config.TOP_NODE;
-    	System.out.print("TEST Maxtime: " + testsimtime);
-    	System.out.print("\n TEST Gran: " + testgran);
-    	System.out.print("\n TEST Top Node: " + testtopnode);
-    }
-    
     //TODO Fix this
     public String getCentralNode() {
 //    	for(NodeSpec nodes)
     	return "cloud";
     }
     
-    void startPreview() throws Exception {
-    	vrgame.createFogSimObjects(false, "Edgeward", 10, 10000);
+    void startPreview() {
+    	try {
+			vrgame.createFogSimObjects(false, "Edgeward", 10, 10000);
+		} catch (Exception e) {}
     	TreeItem<String> devices = new TreeItem<>("Devices");
 		for(placementObject o : ModulePlacement.placementList) {
     		TreeItem<String> parent1 = new TreeItem<>(o.device);

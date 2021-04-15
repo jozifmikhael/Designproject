@@ -445,7 +445,8 @@ public class _SpecHandler {
 		
 		EdgeSpec newLinkTo(NodeSpec newDst) {
 			if(newDst==null) return null;
-			for(EdgeSpec edge : this.edgesList) if(edge.dst.equals(newDst)) return null;
+			if(newDst==this) return null;
+			for(EdgeSpec edge : this.edgesList) if(edge.dst.equals(newDst) && edge.dst.type.equals("device")) return null;
 			EdgeSpec e = new EdgeSpec(this, newDst);
 			this.edgesList.add(e);
 			return e;
@@ -851,7 +852,6 @@ public class _SpecHandler {
 		}
 
 		public EdgeSpec add() {
-			printDebug("Adding edge to " + this.src.name);
 			this.src.edgesList.add(this);
 			return this;
 		}

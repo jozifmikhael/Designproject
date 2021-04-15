@@ -15,9 +15,7 @@ public class AddEdgeFullController extends _SubController{
 	
 	@Override
     void initDefaultObjects() {
-		if(this.spec==null) {
-			spec = new EdgeSpec(_MainWindowController.linkSrcNode, _MainWindowController.selNode);
-		}
+		if(this.spec==null) spec = _MainWindowController.newLink;
 		srcLabel.setText(_MainWindowController.linkSrcNode.name);
 		dstLabel.setText(_MainWindowController.selNode.name);		
     }
