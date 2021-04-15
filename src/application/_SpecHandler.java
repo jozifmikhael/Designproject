@@ -162,13 +162,19 @@ public class _SpecHandler {
 				}
 			}
 		}
-		if(selectedEdge!=null) selectedEdge.isSelected=true;
+		if(selectedEdge!=null) {
+			selectedEdge.isSelected=true;
+			printDebug("found new edge");
+		}
 		return selectedEdge;
 	}
 
 	public static void makeNewSelection(MouseEvent mEvent) {
+		deselectAll();
 		makeNewEdgeSelection(mEvent);
 		makeNewNodeSelection(mEvent);
+		if(selectedNode==null) selectedObject=selectedEdge;
+		if(selectedEdge==null) selectedObject=selectedNode;
 	}
 	
 	public static void deselectAll() {
@@ -185,11 +191,11 @@ public class _SpecHandler {
 	
 	public static void pruneLinks() {
 		for (NodeSpec n : nodesList)
-			n.edgesList = (ArrayList<EdgeSpec>) n.edgesList.stream().filter(e -> e.dst != null)
-					.collect(Collectors.toList());
-		for (NodeSpec n : nodesList)
-			n.edgesList = (ArrayList<EdgeSpec>) n.edgesList.stream().filter(e -> !e.dst.isTemp)
-					.collect(Collectors.toList());
+			n.edgesList = (ArrayList<EdgeSpec>) n.edgesList.stream()
+			.filter(e -> !(e.dst==null))
+			.filter(e -> !e.dst.isTemp)
+			.filter(e -> !e.dst.equals(e.src))
+			.collect(Collectors.toList());
 	}
 	
 	public static ArrayList<NodeSpec> getLinkableNodes(ArrayList<String> types, String _type) {
@@ -263,9 +269,14 @@ public class _SpecHandler {
 			}			
 			return obj;
 		}
+		
 		public Spec reinit() {
+			return null;
+			
+		}
+		public Spec add() {
 			// TODO Auto-generated method stub
-			return this;
+			return null;
 		}
 	}
 	
@@ -336,18 +347,20 @@ public class _SpecHandler {
 		}
 
 		NodeSpec copy() {return new NodeSpec(this.toJSON());};
-		NodeSpec add() {
+		public NodeSpec add() {
 			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
 				nodesList.add(this);
 			return this;
 		}
+		@Override
 		public NodeSpec reinit() {
 			this.edgesList = new ArrayList<EdgeSpec>();
 			this.isSelected=false;
 			this.isTemp = false;
+			this.setPos(x+0.5*this.sz, y+0.5*this.sz);
 			this.sz = R + R;
 			this.setColor();
-			return this.add();
+			return this;
 		}
 		NodeSpec pop() {
 			nodesList.remove(this);
@@ -405,19 +418,19 @@ public class _SpecHandler {
 			}
 		}
 		
-		Spec setPos(MouseEvent mEvent) {
+		NodeSpec setPos(MouseEvent mEvent) {
 			this.x = mEvent.getX();
 			this.y = mEvent.getY();
 			return this;
 		}
 		
-		Spec setPos(double x, double y) {
+		NodeSpec setPos(double x, double y) {
 			this.x = x;
 			this.y = y;
 			return this;
 		}
 		
-		Spec setPos(NodeSpec _node) {
+		NodeSpec setPos(NodeSpec _node) {
 			this.x = _node.x;
 			this.y = _node.y;
 			return this;
@@ -471,9 +484,10 @@ public class _SpecHandler {
         }
 		
 		DeviceSpec copy() {return new DeviceSpec(this.toJSON());};
-		DeviceSpec add() {
-			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
+		public DeviceSpec add() {
+			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name)))) {
 				nodesList.add(this);
+			}
 			return this;
 		}
 
@@ -521,87 +535,6 @@ public class _SpecHandler {
 			
 			fogdevice.setLevel(this.level);
 			return fogdevice;
-		}
-
-		public int getPe() {
-			return pe;
-		}
-
-		public void setPe(int pe) {
-			this.pe = pe;
-		}
-
-		public long getMips() {
-			return mips;
-		}
-
-		public void setMips(long mips) {
-			this.mips = mips;
-		}
-
-		public int getRam() {
-			return ram;
-		}
-
-		public void setRam(int ram) {
-			this.ram = ram;
-		}
-
-		public int getLevel() {
-			return level;
-		}
-
-		public void setLevel(int level) {
-			this.level = level;
-		}
-
-		public double getRate() {
-			return rate;
-		}
-
-		public void setRate(double rate) {
-			this.rate = rate;
-		}
-
-		public double getIpower() {
-			return ipower;
-		}
-
-		public void setIpower(double ipower) {
-			this.ipower = ipower;
-		}
-
-		public double getApower() {
-			return apower;
-		}
-
-		public void setApower(double apower) {
-			this.apower = apower;
-		}
-
-		public double getLatency() {
-			return latency;
-		}
-
-		public void setLatency(double latency) {
-			this.latency = latency;
-		}
-		//TODO Only have the one box for upbw/downbw
-		//just assign equiv in the background?
-		public long getUpbw() {
-			return upbw;
-		}
-
-		public void setUpbw(long upbw) {
-			this.upbw = upbw;
-		}
-
-		public long getDownbw() {
-			return downbw;
-		}
-
-		public void setDownbw(long downbw) {
-			this.downbw = downbw;
 		}
 	}
 	
@@ -857,9 +790,14 @@ public class _SpecHandler {
 			this.periodicity = periodicity;
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
-			
-			this.reinit();
 		}
+		
+		public EdgeSpec(NodeSpec src, NodeSpec dst) {
+			this(src, dst, 2.0, "", 0, 0, 0, 1, "");
+		}
+		
+		public EdgeSpec(JSONObject a) {super(a);}
+		
 		public Spec setSelected() {
 			deselectAll();
 			selectedEdge=this;
@@ -867,19 +805,9 @@ public class _SpecHandler {
 			this.isSelected=true;
 			return this;
 		}
-		public EdgeSpec(NodeSpec src, NodeSpec dst) {
-			this(src, dst, 2.0, "", 0, 0, 0, 1, "");
-		}
-				
-		public EdgeSpec(JSONObject a) {super(a);}
 		
-		public EdgeSpec() {
-			this.srcName="-";
-			this.dstName="-";
-		}
-
 		EdgeSpec copy() {return new EdgeSpec(this.toJSON());};
-
+		
 		public EdgeSpec reinit() {
 			printDebug("in edge reinit");
 			if(this.src==null||this.dst==null) {
@@ -890,7 +818,7 @@ public class _SpecHandler {
 			}
 			return this.add();
 		}
-		EdgeSpec add() {
+		public EdgeSpec add() {
 			printDebug("Adding edge to " + this.src.name);
 			this.src.edgesList.add(this);
 			return this;
@@ -898,15 +826,15 @@ public class _SpecHandler {
 
 		@Override
 		Spec pop() {
-			printDebug("Popping link ");
 			this.src.edgesList.remove(this);
+			this.isTemp=true;
 			return this;
 		}
 
 		void draw(GraphicsContext gc) {
             gc.beginPath();
             gc.setStroke(this.isSelected ? selectColor : Color.BLACK);
-            gc.setLineWidth(this.isSelected ? 3.0 : 1.0);
+            gc.setLineWidth(this.isSelected ? 30.0 : 1.0);
             gc.moveTo(this.dst.x, this.dst.y);
             gc.lineTo(this.src.x, this.src.y);
             gc.stroke();
@@ -981,97 +909,7 @@ public class _SpecHandler {
 
 		@Override
 		public String toString() {
-			return "srcName=" + srcName + ",dstName=" + dstName + ",edgeType=" + edgeType + ",latency=" + latency
-					+ ",tupleType=" + tupleType + ",periodicity=" + periodicity + ",cpuLength=" + cpuLength
-					+ ",nwLength=" + nwLength + ",direction=" + direction;
-		}
-
-		public String getSrcName() {
-			return srcName;
-		}
-		
-		public void setSrcName(String srcName) {
-			this.srcName = srcName;
-		}
-
-		public String getDstName() {
-			return dstName;
-		}
-
-		public void setDstName(String dstName) {
-			this.dstName = dstName;
-		}
-
-		public Spec getSrc() {
-			return src;
-		}
-		
-		public void setSrc(NodeSpec src) {
-			this.src = src;
-		}
-		
-		public Spec getDst() {
-			return dst;
-		}
-		
-		public void setDst(NodeSpec dst) {
-			this.dst = dst;
-		}
-		
-		public String getEdgeType() {
-			return edgeType+"";
-		}
-		
-		public void setEdgeType(int edgeType) {
-			this.edgeType = edgeType;
-		}
-		
-		public String getLatency() {
-			return latency+"";
-		}
-		
-		public void setLatency(double latency) {
-			this.latency = latency;
-		}
-		
-		public String getTupleType() {
-			return tupleType;
-		}
-		
-		public void setTupleType(String tupleType) {
-			this.tupleType = tupleType;
-		}
-		
-		public String getPeriodicity() {
-			return periodicity+"";
-		}
-		
-		public void setPeriodicity(double periodicity) {
-			this.periodicity = periodicity;
-		}
-		
-		public String getCpuLength() {
-			return cpuLength+"";
-		}
-		
-		public void setCpuLength(double cpuLength) {
-			this.cpuLength = cpuLength;
-		}
-		
-		public String getNwLength() {
-			return nwLength+"";
-		}
-		
-		public void setNwLength(double nwLength) {
-			this.nwLength = nwLength;
-		}
-		
-		public String getDirection() {
-			return direction+"";
-		}
-		
-		public void setDirection(int direction) {
-			this.direction = direction;
+			return "srcName=" + srcName + ",dstName=" + dstName + ",latency=" + latency + ",isSelected=" + isSelected + ",isTemp=" + isTemp;
 		}
 	}
 		
@@ -1098,7 +936,7 @@ public class _SpecHandler {
 			return this;
 		}
 
-		TupleSpec add() {
+		public TupleSpec add() {
 			if(this.parent!=null) this.parent.tupleMappings.add(this);
 			return null;
 		}

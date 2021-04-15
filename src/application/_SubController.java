@@ -66,7 +66,7 @@ public abstract class _SubController {
 	@FXML
     public AnchorPane ap;
 	Spec spec;
-	Spec specPrev;
+	static Spec specPrev;
 	String thisType;
 	
 	final public static Field getField(Object targetObject, String fieldName) {
@@ -156,7 +156,8 @@ public abstract class _SubController {
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
-			} else if (selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
+			} 
+			else if (selChild.getClass().getSimpleName().toString().equals("ChoiceBox")) {
         		ObservableList<String> tempNames = FXCollections.observableArrayList();
             	ChoiceBox<String> selBox = (ChoiceBox) selChild;
             	if(selBox.getId().contains("Spec")) {
@@ -177,31 +178,33 @@ public abstract class _SubController {
 	@FXML
 	Spec saveSpecHandler() {
 		((Stage) saveButton.getScene().getWindow()).close();
-		printDebug("Saving: " + this.spec.toString());
+		if(this.spec!=null) printDebug("Saving: " + this.spec.toString());
+		specPrev=null;
 		return this.spec;
 	}
 	final public void recover() {
 		printDebug("Recovering...");
-		printDebug("SpecC:"+spec.toString());
-		spec.pop();
+		if(spec!=null) spec.pop();
 		if(specPrev!=null && !specPrev.isTemp) {
-			specPrev.reinit();
-			printDebug("SpecP:"+specPrev.toString());
+			specPrev.reinit().add();
+			specPrev=null;
 		}
 		spec=specPrev;
+		((Stage)saveButton.getScene().getWindow()).close();
 	}
 	final public Spec init(Spec s) {
+		specPrev=null;
 		if(s!=null) {
 			spec=s;
 			specPrev=s.copy();
 		}
 		initDefaultObjects();
 		parseChildrenOf(ap);
-		printDebug("Finished parsing");
+		printDebug("Finished parsing: " + spec.toString());
 		return spec;
 	}
 	public Spec getSpec() {
-		this.specPrev=null;
+		specPrev=null;
 		return spec;
 	}
 }

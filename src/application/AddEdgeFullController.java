@@ -17,9 +17,4 @@ public class AddEdgeFullController extends _SubController{
 		if(this.spec==null) spec = new EdgeSpec(_MainWindowController.linkSrcNode, _MainWindowController.selNode);
 		
     }
-	
-	@FXML
-	void dynamicListPop() {
-		
-	}
 }

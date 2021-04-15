@@ -121,15 +121,15 @@
 
 .choice-box .context-menu {
     -fx-pref-width: 155;
-    -fx-background-color: #e8e8e8;
+    -fx-background-color: #ffa200;
     -fx-background-radius: 15px, 0px, 15px, 15px;
 }
 
  // #ffa200
 .titled-pane > .title
 {
-    //-fx-background-color: #e8e8e8;
-    -fx-border-color: transparent;
+    -fx-border-color: #ffa200;
+    -fx-background-color: #ffa200;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
 }
@@ -147,7 +147,7 @@
 
 }
 .accordion .titled-pane .title {
-    -fx-background-color: transparent ;
+    -fx-background-color: #ffa200;
 }
 
 .accordion .titled-pane > *.content{

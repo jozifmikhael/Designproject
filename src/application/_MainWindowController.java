@@ -52,6 +52,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.canvas.*;
 import javafx.beans.value.ChangeListener;
@@ -289,10 +290,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
-		
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
 		scrollPane.setPannable(false);
+//		_SpecHandler.nodesList.forEach(n->printDebug(n.edgesList.size() +":"+ n.edgesList.toString()));
 	}
 	
 	@Override
@@ -412,17 +413,20 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	@FXML
 	private void mouseClickHandler(MouseEvent mEvent) {
-//		printDebug(mEvent.getClickCount());
-		_SpecHandler.deselectAll();
+		printDebug("In mouseClickHandler");
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
 				_SpecHandler.makeNewSelection(mEvent);
 				selEdge = _SpecHandler.selectedEdge;
 				selNode = _SpecHandler.selectedNode;
+
+//		    	printDebug(_SpecHandler.selectedObject==(null));
+//		    	printDebug(_SpecHandler.selectedEdge==(null));
+//		    	printDebug(_SpecHandler.selectedNode==(null));
 				if(mEvent.getClickCount()>1) editHandler();
 				switch(InteractionState.getSetKey()) {
-					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
+					case ESCAPE : draggingNode=selNode; break;
 					case DIGIT1 : draggingNode=(selNode==null)?new NodeSpec("device", mEvent):selNode; break;// Select Device Placer
 					case DIGIT2 : draggingNode=(selNode==null)?new NodeSpec("module", mEvent):selNode; break;// Select Module Placer
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
@@ -443,11 +447,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case NONE: System.out.println("_MainWindowController.java: ClickHandler Error - State NONE"); break;
 			default: System.out.println("_MainWindowController.java: ClickHandler Error - State Default"); break;
         }
+
+//    	printDebug(_SpecHandler.selectedObject==(null));
+//    	printDebug(_SpecHandler.selectedEdge==(null));
+//    	printDebug(_SpecHandler.selectedNode==(null));
         redrawNodes();
+
 	}
     
 	@FXML
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
+		printDebug("In mouseReleaseHandler");
 		switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				if(draggingNode!=null && draggingNode.isTemp) {
@@ -459,14 +469,18 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 						case DIGIT3 : newSimObject = (NodeSpec)setupController("sensor"); break;
 						case DIGIT4 : newSimObject = (NodeSpec)setupController("actuat"); break;
 						case DIGIT5 : {
+							if(linkSrcNode==null) break;
 							selNode = _SpecHandler.makeNewNodeSelection(mEvent);
-							if(selNode==null || linkSrcNode==null) break;
+							if(selNode==null) break;
 							EdgeSpec newLink = linkSrcNode.newLinkTo(selNode);
-							newLink.setSelected();
 							setupController(newLink.type);
 						} break;
 						default : {} // Nothing
 					}
+
+//			    	printDebug("release e "+_SpecHandler.selectedObject==(null));
+//			    	printDebug("release e "+_SpecHandler.selectedEdge==(null));
+//			    	printDebug("release e "+_SpecHandler.selectedNode==(null));
 					if (newSimObject!=null) ((NodeSpec)newSimObject).setPos(mEvent);
 				}
 				draggingNode=null;
@@ -480,6 +494,10 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			default:
 			break;
 		}
+//		printDebug("MRel End");
+//    	printDebug(_SpecHandler.selectedObject==(null));
+//    	printDebug(_SpecHandler.selectedEdge==(null));
+//    	printDebug(_SpecHandler.selectedNode==(null));
     	redrawNodes();
 	}
 	
@@ -492,7 +510,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	}
     }
 	
-    private void screenPanHandler() {
+    @FXML
+	void editHandler() {
+		if(_SpecHandler.selectedObject==null) return;
+		printDebug("In editHandler");
+		setupController(_SpecHandler.selectedObject.type);
+		_SpecHandler.pruneLinks();
+		redrawNodes();
+	}
+
+	private void screenPanHandler() {
 		// TODO Shift the position of everything
 		
 	}
@@ -583,44 +610,33 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
     
-    @FXML
-	void editHandler() {
-		Spec selectedObject = _SpecHandler.selectedObject;
-		if(_SpecHandler.selectedObject == null) return;
-		printDebug("In Edge Handler: "+selectedObject.toJSON());
-		setupController(selectedObject.type);
-		_SpecHandler.pruneLinks();
-		redrawNodes();
-	}
-    
     Spec setupControllerFromMenu(String type) {
     	return ((NodeSpec)setupController(type)).setPos(gc.getCanvas().getWidth()*0.5, gc.getCanvas().getHeight()*0.5);
     }
 
 	Spec setupController(String type) {
     	printDebug("Starting setupController with type " + type + ", '" + loadersList.get(type).toString()+"'");
-    	if (_SpecHandler.selectedNode != null){
-    		printDebug("Selected object is " + _SpecHandler.selectedNode.name);
-    	}else printDebug("Selected object is not a node");
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
 			Scene scene = new Scene(loader.load());
 			Stage stage = new Stage();
 			stage.setScene(scene);
+	        stage.initModality(Modality.APPLICATION_MODAL);
 			_SubController controller = (_SubController)loader.getController();
 			controller.init(_SpecHandler.selectedObject);
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
-			    	case 27: controller.recover(); stage.close(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
+			    	case 27: controller.recover(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
 			    	case 116: printDebug(controller.spec.toJSON()); break; 
 			        default:  {}//printDebug(event.getCode().getCode()+"");
 			    }
 			});
 			stage.setOnCloseRequest(e -> {
-				printDebug("close request found");
-				stage.close();
+				printDebug("Close request found");
+				controller.recover();
 			});
 			stage.showAndWait();
+			redrawNodes();
 			return controller.getSpec();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -645,7 +661,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	copyBuffer.name=copyBuffer.name+" - Copy_"+copyNum;
     	copyBuffer.x+=copyBuffer.sz*0.5;
     	copyBuffer.y+=copyBuffer.sz*0.5;
-    	copyBuffer.add();
+    	((NodeSpec)copyBuffer.reinit()).add();
     }
     
     @FXML
