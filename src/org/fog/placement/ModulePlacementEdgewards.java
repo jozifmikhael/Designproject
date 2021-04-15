@@ -68,6 +68,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 		}
 		
 		List<List<Integer>> leafToRootPaths = getLeafToRootPaths();
+		if(leafToRootPaths == null) return;
 		for(List<Integer> path : leafToRootPaths){
 			//System.out.println("--ModulePlacementEdgewards.java: Path="+path);
 			for(Integer i : path) {
@@ -477,6 +478,7 @@ public class ModulePlacementEdgewards extends ModulePlacement{
 			if(device.getLevel() == 0)
 				cloud = device;
 		}
+		if(cloud == null) return null;
 		return getPaths(cloud.getId());
 	}
 	

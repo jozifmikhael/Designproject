@@ -456,7 +456,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	}
     
 	@FXML
-    private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
+    private void mouseReleaseHandler(MouseEvent mEvent) throws Exception {
 		printDebug("In mouseReleaseHandler");
 		switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
@@ -472,12 +472,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 							if(linkSrcNode==null) break;
 							selNode = _SpecHandler.makeNewNodeSelection(mEvent);
 							if(selNode==null) break;
+							if(!_SpecHandler.allowableLinks.containsKey(linkSrcNode.type+selNode.type))break;
+							if(_SpecHandler.allowableLinks.get(linkSrcNode.type+selNode.type) == 0) {
+								linkSrcNode.edgesList.add(new EdgeSpec(linkSrcNode, selNode, 0, "", 0, 0, 0, 0, ""));
+								break;
+							}
 							EdgeSpec newLink = linkSrcNode.newLinkTo(selNode);
 							setupController(newLink.type);
 						} break;
 						default : {} // Nothing
 					}
-
 //			    	printDebug("release e "+_SpecHandler.selectedObject==(null));
 //			    	printDebug("release e "+_SpecHandler.selectedEdge==(null));
 //			    	printDebug("release e "+_SpecHandler.selectedNode==(null));
@@ -498,6 +502,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //    	printDebug(_SpecHandler.selectedObject==(null));
 //    	printDebug(_SpecHandler.selectedEdge==(null));
 //    	printDebug(_SpecHandler.selectedNode==(null));
+		_SpecHandler.pruneLinks();
+		startPreview();
     	redrawNodes();
 	}
 	
@@ -567,12 +573,13 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
     	String centralNode = getCentralNode();
-    	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy, centralNode);
+    	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy);
     }
     
 	@FXML
     void startSim(ActionEvent event) throws Exception {
-		flushFile();
+		_SpecHandler.writeJSON("test9.json", 10, 10000, "Edgewards");
+//		flushFile();
 //		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
 //     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
 //        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
@@ -748,8 +755,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     	return "cloud";
     }
     
-    @FXML
-    void startPreview(ActionEvent event) throws Exception {
+    void startPreview() throws Exception {
     	vrgame.createFogSimObjects(false, "Edgeward", 10, 10000);
     	TreeItem<String> devices = new TreeItem<>("Devices");
 		for(placementObject o : ModulePlacement.placementList) {

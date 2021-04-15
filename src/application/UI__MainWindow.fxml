@@ -126,7 +126,7 @@
                   </AnchorPane>
                   <AnchorPane layoutX="922.0" layoutY="43.0" prefHeight="596.0" prefWidth="276.0" style="-fx-background-color: #e8e8e8;" styleClass="panebottom" AnchorPane.bottomAnchor="19.0" AnchorPane.rightAnchor="26.0" AnchorPane.topAnchor="43.0">
                      <children>
-                        <TreeView layoutX="7.0" layoutY="36.0" prefHeight="540.0" prefWidth="267.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="35.0" />
+                        <TreeView fx:id="treeView" layoutX="7.0" layoutY="36.0" prefHeight="540.0" prefWidth="267.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="35.0" />
                      </children>
                      <effect>
                         <InnerShadow offsetX="6.0" offsetY="6.0">

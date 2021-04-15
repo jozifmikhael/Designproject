@@ -39,10 +39,10 @@
                   </Label>
                   <Pane layoutX="34.0" layoutY="110.0" prefHeight="168.0" prefWidth="544.0" styleClass="pane">
                      <children>
-                        <TextField fx:id="tupleType" layoutX="136.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" text="EEG" />
-                        <TextField fx:id="periodicity" layoutX="137.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" text="0.0" />
-                        <TextField fx:id="cpuLength" layoutX="395.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" text="3500.0" />
-                        <TextField fx:id="nwLength" layoutX="395.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" text="500.0" />
+                        <TextField fx:id="tupleType" layoutX="136.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="periodicity" layoutX="137.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="cpuLength" layoutX="395.0" layoutY="70.0" prefHeight="25.0" prefWidth="110.0" />
+                        <TextField fx:id="nwLength" layoutX="395.0" layoutY="110.0" prefHeight="25.0" prefWidth="110.0" />
                         <Label layoutX="28.0" layoutY="35.0" text="Source">
                            <font>
                               <Font size="14.0" />
@@ -86,12 +86,6 @@
                         </InnerShadow>
                      </effect>
                   </Pane>
-               </children>
-            </AnchorPane>
-         </children>
-      </AnchorPane>
-   </center>
-</BorderPane>                  </Pane>
                </children>
             </AnchorPane>
          </children>

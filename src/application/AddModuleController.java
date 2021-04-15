@@ -3,7 +3,7 @@ package application;
 import static application.scratch.printDebug;
 
 import java.util.ArrayList;
-import application._SpecHandler.EdgeSpec;
+
 import application._SpecHandler.ModuleSpec;
 import application._SpecHandler.TupleSpec;
 import javafx.collections.FXCollections;
@@ -24,8 +24,8 @@ public class AddModuleController extends _SubController{
 	TableView TupleSpec;
 	@Override
 	void initDefaultObjects() {
-		if(this.spec==null) spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 0, 0, 0, 0, new ArrayList<TupleSpec>(), new ArrayList<EdgeSpec>());
-		tupleData.add(new TupleSpec("-", "-", 0.0, (ModuleSpec) spec));
+		if(this.spec==null) spec = new ModuleSpec("node"+_SpecHandler.nodesList.size(), thisType, 10, 10, 100, 100, new ArrayList<TupleSpec>());
+		tupleData.add(new TupleSpec("-", "-", 1.0, (ModuleSpec) spec));
 		printDebug();
 		tupleData.addAll(((ModuleSpec)this.spec).tupleMappings);
 		TupleSpec.setItems(tupleData);

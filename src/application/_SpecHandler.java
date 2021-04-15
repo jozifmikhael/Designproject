@@ -195,6 +195,7 @@ public class _SpecHandler {
 			.filter(e -> !(e.dst==null))
 			.filter(e -> !e.dst.isTemp)
 			.filter(e -> !e.dst.equals(e.src))
+			.filter(e -> !(e.edgeType == -2))
 			.collect(Collectors.toList());
 	}
 	
@@ -546,12 +547,12 @@ public class _SpecHandler {
 		public ArrayList<TupleSpec> tupleMappings;
 		
 		public ModuleSpec(String name, String nodeName, int ram, long bandwidth, long size, int mips,
-				ArrayList<TupleSpec> _tupleMappings,
-				ArrayList<EdgeSpec> nodeMappings) {
+				ArrayList<TupleSpec> _tupleMappings) {
 			super(name, "module");
 			this.ram = ram;
 			this.bandwidth = bandwidth;
 			this.size = size;
+			this.mips = mips;
 			this.tupleMappings = new ArrayList<TupleSpec>(_tupleMappings);
 			this.add();
 		}
@@ -620,7 +621,6 @@ public class _SpecHandler {
 	}
 	
 	public static class SensorSpec extends NodeSpec {
-		double latency;
 		public double deterministicValue;
 		public double normalMean;
 		public double normalStdDev;
@@ -629,16 +629,17 @@ public class _SpecHandler {
 		public String distType;
 		public SensorSpec(JSONObject a) {super(a);}
 
-		public SensorSpec(String name, String parent, double latency, double deterministicValue, double normalMean,
-				double normalStdDev, double uniformMax, double uniformMin, String distType) {
+		public SensorSpec(String name, double deterministicValue, double normalMean, double normalStdDev, double uniformMax,
+				double uniformMin) {
 			super(name, "sensor");
-			this.latency = latency;
 			this.deterministicValue = deterministicValue;
 			this.normalMean = normalMean;
 			this.normalStdDev = normalStdDev;
 			this.uniformMax = uniformMax;
 			this.uniformMin = uniformMin;
-			this.distType = distType;
+			if(deterministicValue != 0)this.distType = "Deterministic";
+			else if(normalMean != 0)this.distType = "Normal";
+			else if(uniformMax != 0)this.distType = "Uniform";
 		}
 
 		SensorSpec copy() {return new SensorSpec(this.toJSON());};
@@ -662,17 +663,9 @@ public class _SpecHandler {
 
 		@Override
 		public String toString() {
-			return "latency=" + latency + ", deterministicValue=" + deterministicValue + ", normalMean=" + normalMean
+			return "deterministicValue=" + deterministicValue + ", normalMean=" + normalMean
 					+ ", normalStdDev=" + normalStdDev + ", uniformMax=" + uniformMax + ", uniformMin=" + uniformMin
 					+ ", distType=" + distType;
-		}
-
-		public double getLatency() {
-			return latency;
-		}
-		
-		public void setLatency(double latency) {
-			this.latency = latency;
 		}
 		
 		public double getDeterministicValue() {
@@ -753,6 +746,16 @@ public class _SpecHandler {
 		}
 	}
 	
+	static Map<String, Integer> allowableLinks = new HashMap<String, Integer>(){{
+		put("devicedevice", -1);
+		put("sensordevice", -1);
+		put("deviceactuat", -1);
+		put("moduledevice", 0);
+		put("sensormodule", 1);
+		put("moduleactuat", 2);
+		put("modulemodule", 3);
+	}};
+	
 	public static class EdgeSpec extends Spec {
 		NodeSpec src;
 		NodeSpec dst;
@@ -765,15 +768,7 @@ public class _SpecHandler {
 		public double cpuLength;
 		public double nwLength;
 		public int direction = 1;
-		static Map<String, Integer> allowableLinks = new HashMap<String, Integer>(){{
-			put("devicedevice", -1);
-			put("sensordevice", -1);
-			put("deviceactuat", -1);
-			put("moduledevice", 0);
-			put("sensormodule", 1);
-			put("moduleactuat", 2);
-			put("modulemodule", 3);
-		}};
+		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String tupleType, double periodicity,
 				double cpuLength, double newLength, int direction, String type) {
 			this.src = src;
@@ -784,7 +779,6 @@ public class _SpecHandler {
 			if(this.dst.type.equals("actuat")) this.direction=2;
 			this.dstName = dst.name;
 			this.srcName = src.name;
-			
 			this.latency = latency;
 			this.tupleType = tupleType;
 			this.periodicity = periodicity;
@@ -826,6 +820,7 @@ public class _SpecHandler {
 
 		@Override
 		Spec pop() {
+			pruneLinks();
 			this.src.edgesList.remove(this);
 			this.isTemp=true;
 			return this;
@@ -1034,8 +1029,7 @@ public class _SpecHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void writeJSON(String jsonFileName, int simGranularity, int simTotLength, String placementPolicy,
-			String topLvNode) {
+	public static void writeJSON(String jsonFileName, int simGranularity, int simTotLength, String placementPolicy) {
 		JSONObject obj = new JSONObject();
 		JSONArray devicesJSONObj = new JSONArray();
 		JSONArray modulesJSONObj = new JSONArray();
@@ -1056,7 +1050,7 @@ public class _SpecHandler {
 		// TODO colors + zoomlv need to be in here as well
 		metaList.put("simGranularity", simGranularity);
 		metaList.put("simDuration", simTotLength);
-		metaList.put("topLevelNode", topLvNode);
+//		metaList.put("topLevelNode", topLvNode);
 		metaList.put("placementPolicy", placementPolicy);
 
 		obj.put("meta", metaList);
