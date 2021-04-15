@@ -313,7 +313,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			case ESCAPE	: _SpecHandler.deselectAll(); break;
 			case F5		: System.out.println("Unimplemented save tool"); break; // Save File
 			case DELETE : System.out.println("Unimplemented delete tool"); break; // Copy Selected
-			case S		: flushFile(); break;
+			case S		: saveHandler(); break;
 			case O		: loadJSON(); break;
 			case E		: editHandler(); break; // Edit Selected
 			case C		: copyHandler(); break; // Copy Selected
@@ -560,33 +560,32 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		File selectedFile = chooser.showOpenDialog(stage);
 		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
 	}
-
+	
 	@FXML
-    void flushFile(){
+    void saveHandler(){
 		Stage stage = new Stage();
 		FileChooser chooser = new FileChooser();
-		chooser.setTitle("Load JSON File");
+		chooser.setTitle("Save JSON File");
 		chooser.setInitialDirectory(new File("saves"));
 		File selectedFile = chooser.showOpenDialog(stage);
-		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
     	String policy = setParamsController.policyType;
     	int time = setParamsController.simulationTime;
     	int granularity = setParamsController.granularityMetric;
     	String centralNode = getCentralNode();
-    	_SpecHandler.writeJSON(selectedJSON, time, granularity, policy);
+    	printDebug("In save handler");
+		if (selectedFile != null) _SpecHandler.writeJSON(selectedFile.getAbsoluteFile());
     }
     
 	@FXML
     void startSim(ActionEvent event) throws Exception {
-		_SpecHandler.writeJSON("test9.json", 10, 10000, "Edgewards");
-//		flushFile();
-//		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
-//     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-//        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
-//        Stage stage = new Stage();
-//        stage.setScene(scene);
-//        stage.setTitle("Output");
-//        stage.showAndWait();
+		saveHandler();
+		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
+     	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
+        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Output");
+        stage.showAndWait();
     }
 	
 	@FXML

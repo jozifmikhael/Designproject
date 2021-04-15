@@ -135,7 +135,7 @@ public class _SpecHandler {
 		if(selectedNode!=null) selectedNode.isSelected=true;
 		return selectedNode;
 	}
-
+	
 	public static EdgeSpec makeNewEdgeSelection(MouseEvent mEvent) {
 		if(selectedEdge!=null) selectedEdge.isSelected=false;
 		printDebug("In makeNewEdgeSelection");
@@ -171,10 +171,9 @@ public class _SpecHandler {
 
 	public static void makeNewSelection(MouseEvent mEvent) {
 		deselectAll();
-		makeNewEdgeSelection(mEvent);
 		makeNewNodeSelection(mEvent);
-		if(selectedNode==null) selectedObject=selectedEdge;
-		if(selectedEdge==null) selectedObject=selectedNode;
+		if(selectedObject!=null) return;
+		makeNewEdgeSelection(mEvent);
 	}
 	
 	public static void deselectAll() {
@@ -817,16 +816,15 @@ public class _SpecHandler {
 			this.src.edgesList.add(this);
 			return this;
 		}
-
 		@Override
 		Spec pop() {
-			pruneLinks();
 			this.src.edgesList.remove(this);
 			this.isTemp=true;
 			return this;
 		}
 
 		void draw(GraphicsContext gc) {
+			printDebug(this.toJSON());
             gc.beginPath();
             gc.setStroke(this.isSelected ? selectColor : Color.BLACK);
             gc.setLineWidth(this.isSelected ? 30.0 : 1.0);
@@ -1029,7 +1027,8 @@ public class _SpecHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void writeJSON(String jsonFileName, int simGranularity, int simTotLength, String placementPolicy) {
+	public static void writeJSON(File file2) {
+		printDebug("In writeJSON");
 		JSONObject obj = new JSONObject();
 		JSONArray devicesJSONObj = new JSONArray();
 		JSONArray modulesJSONObj = new JSONArray();
@@ -1045,13 +1044,13 @@ public class _SpecHandler {
 				case "actuat": actuatsJSONObj.add(n.toJSON()); break;
 			}
 		}
-
+		printDebug("Added jsons to lists");
 		JSONObject metaList = new JSONObject();
 		// TODO colors + zoomlv need to be in here as well
-		metaList.put("simGranularity", simGranularity);
-		metaList.put("simDuration", simTotLength);
-//		metaList.put("topLevelNode", topLvNode);
-		metaList.put("placementPolicy", placementPolicy);
+//		metaList.put("simGranularity", simGranularity);
+//		metaList.put("simDuration", simTotLength);
+////		metaList.put("topLevelNode", topLvNode);
+//		metaList.put("placementPolicy", placementPolicy);
 
 		obj.put("meta", metaList);
 		obj.put("edges", edgesJSONObj);
@@ -1059,10 +1058,12 @@ public class _SpecHandler {
 		obj.put("modules", modulesJSONObj);
 		obj.put("sensors", sensorsJSONObj);
 		obj.put("actuats", actuatsJSONObj);
+		printDebug("Added lists to json");
 
 		try {
-			printDebug("Writing to " + jsonFileName);
-			FileWriter file = new FileWriter(jsonFileName, false);
+			printDebug("Writing to " + file2);
+			FileWriter file = new FileWriter(file2, false);
+			printDebug(obj.toJSONString());
 			file.write(obj.toJSONString().replaceAll(",", ",\n"));
 			file.flush();
 			file.close();

@@ -145,13 +145,13 @@
                         </Label>
                      </children>
                   </AnchorPane>
-                  <Accordion fx:id="toolbar" focusTraversable="false" layoutX="-84.0" layoutY="164.0" prefHeight="165.0" prefWidth="327.0" rotate="-90.0">
+                  <Accordion fx:id="toolbar" focusTraversable="false" layoutX="-84.0" layoutY="164.0" pickOnBounds="false" prefHeight="165.0" prefWidth="327.0" rotate="-90.0">
                     <panes>
-                      <TitledPane fx:id="toolpane" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" focusTraversable="false" graphicTextGap="0.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="378.0" prefWidth="327.0" rotate="180.0" styleClass="maketransparent" text="Node Toolbar">
+                      <TitledPane fx:id="toolpane" alignment="TOP_CENTER" contentDisplay="TEXT_ONLY" focusTraversable="false" graphicTextGap="0.0" nodeOrientation="RIGHT_TO_LEFT" pickOnBounds="false" prefHeight="378.0" prefWidth="327.0" rotate="180.0" styleClass="maketransparent" text="Node Toolbar">
                         <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="207.0" style="-fx-background-color: transparent;">
+                          <AnchorPane minHeight="0.0" minWidth="0.0" pickOnBounds="false" prefHeight="180.0" prefWidth="207.0" style="-fx-background-color: transparent;">
                                  <children>
-                                    <Pane fx:id="toolPanel" layoutX="108.6" layoutY="-98.0" prefHeight="331.0" prefWidth="125.0" rotate="90.0" style="-fx-background-color: #e8e8e8;" styleClass="pane" AnchorPane.leftAnchor="89.0">
+                                    <Pane fx:id="toolPanel" layoutX="108.6" layoutY="-98.0" pickOnBounds="false" prefHeight="331.0" prefWidth="125.0" rotate="90.0" style="-fx-background-color: #e8e8e8;" styleClass="pane" AnchorPane.leftAnchor="89.0">
                                        <children>
                                           <ToggleButton fx:id="tool1" focusTraversable="false" layoutX="11.0" layoutY="20.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Node (1)">
                                              <font>
