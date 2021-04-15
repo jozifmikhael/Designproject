@@ -97,6 +97,10 @@ public class _SpecHandler {
 	static int fontSize = 16;
 	static String font = "monospaced";
 	
+	static Spec selectedObject	  = null;
+	static NodeSpec selectedNode = null;
+	static EdgeSpec selectedEdge = null;
+	
 	static GraphicsContext gc = null;
 	
 	static Color selectColor = Color.web("#0091ff", 1);
@@ -118,18 +122,23 @@ public class _SpecHandler {
     	nodesList.forEach((d)->{d.x-=(d.x-event.getX())*2*(1-zoomRatio); d.y-=(d.y-event.getY())*2*(1-zoomRatio);});
 	}
 	
-	public static NodeSpec getNode(MouseEvent mEvent) {
-		Spec selNode = null;
-		for (NodeSpec n : nodesList)
+	public static NodeSpec makeNewNodeSelection(MouseEvent mEvent) {
+		if(selectedNode!=null) selectedNode.isSelected=false;
+		selectedNode=null; selectedObject=null;
+		for (NodeSpec n : nodesList) {
 			if (Math.pow(Math.pow(n.x - mEvent.getX(), 2) + Math.pow(n.y - mEvent.getY(), 2), 0.5) <= 0.5 * n.sz
-					* zoomFactor)
-				selNode = n;
-		if (selNode == null)
-			return null;
-		return (NodeSpec) selNode.setSelected();
+					* zoomFactor) {
+				selectedNode=n;
+				selectedObject=selectedNode;
+			}
+		}
+		if(selectedNode!=null) selectedNode.isSelected=true;
+		return selectedNode;
 	}
 
-	public static EdgeSpec getEdge(MouseEvent mEvent) {
+	public static EdgeSpec makeNewEdgeSelection(MouseEvent mEvent) {
+		if(selectedEdge!=null) selectedEdge.isSelected=false;
+		selectedEdge=null; selectedObject=null;
 		for(NodeSpec n : _SpecHandler.nodesList) {
 			for(EdgeSpec e : n.edgesList) {
 				if(e.dst == null || e.src == null) continue;
@@ -138,8 +147,8 @@ public class _SpecHandler {
 						||(mEvent.getX() <= e.dst.x && mEvent.getX() >= e.src.x && mEvent.getY() <= e.src.y && mEvent.getY() >= e.dst.y)
 						||(mEvent.getX() <= e.src.x && mEvent.getX() >= e.dst.x && mEvent.getY() <= e.dst.y && mEvent.getY() >= e.src.y)) {
 					double m = (e.src.y - e.dst.y)/(e.src.x - e.dst.x);
-					if(e.src.x - e.dst.x == 0 && Math.abs(mEvent.getX() - e.dst.x) <= 10) return (EdgeSpec) e.setSelected();
-					else if(e.src.y - e.dst.y == 0 && Math.abs(mEvent.getY() - e.dst.y) <= 10) return (EdgeSpec) e.setSelected();
+					if(e.src.x - e.dst.x == 0 && Math.abs(mEvent.getX() - e.dst.x) <= 10) {selectedEdge=e; selectedObject=selectedEdge;}
+					else if(e.src.y - e.dst.y == 0 && Math.abs(mEvent.getY() - e.dst.y) <= 10) {selectedEdge=e; selectedObject=selectedEdge;}
 					else {
 						double bLink = (e.dst.y - (m*e.dst.x));
 						double mTemp = -(1/m);
@@ -147,12 +156,25 @@ public class _SpecHandler {
 						double xLine = (bTemp - bLink)/(m - mTemp);
 						double yLine = m * xLine + bLink;
 						double distance = Math.sqrt(Math.pow(xLine - mEvent.getX(), 2) + Math.pow(yLine - mEvent.getY(),2));
-						if(distance <= 10) return (EdgeSpec) e.setSelected();
+						if(distance <= 10) {selectedEdge=e;  selectedObject=selectedEdge;}
 					}
 				}
 			}
 		}
-		return null;
+		if(selectedEdge!=null) selectedEdge.isSelected=true;
+		return selectedEdge;
+	}
+
+	public static void makeNewSelection(MouseEvent mEvent) {
+		makeNewEdgeSelection(mEvent);
+		makeNewNodeSelection(mEvent);
+	}
+	
+	public static void deselectAll() {
+		if(selectedObject!=null) selectedObject.isSelected=false;
+		selectedObject=null;
+		selectedNode=null;
+		selectedEdge=null;
 	}
 	
 	public static Spec getNode(String nodeName) {
@@ -169,39 +191,6 @@ public class _SpecHandler {
 					.collect(Collectors.toList());
 	}
 	
-	public static void deselectAll() {
-		for(NodeSpec n : nodesList) {
-			n.isSelected = false;
-			for(EdgeSpec e: n.edgesList) e.isSelected = false;
-		}
-	}
-	
-	public static NodeSpec getSelectedNode() {
-		for (NodeSpec n : nodesList) if (n.isSelected) return n;
-		return null;
-	}
-	
-	public static EdgeSpec getSelectedEdge() {
-		for (NodeSpec n : nodesList) for(EdgeSpec e : n.edgesList) if(e.isSelected) return e;
-		return null;
-	}
-	
-	public static Spec getSelected() {
-		Spec sel = getSelectedEdge();
-		if(sel==null) sel = getSelectedNode();
-		printDebug(sel==null);
-		return sel;
-	}
-	
-	public static Spec getSelected(String _type) {
-		for (Spec n : nodesList) {
-			if (n.isSelected && n.type.equals(_type)) {
-				return n;
-			}
-		}
-		return null;
-	}
-	
 	public static ArrayList<NodeSpec> getLinkableNodes(ArrayList<String> types, String _type) {
 		return (ArrayList<NodeSpec>) nodesList.stream().filter(n->types.contains(_type)).collect(Collectors.toList());
 	}
@@ -216,15 +205,10 @@ public class _SpecHandler {
 		protected boolean isTemp = false;
 		public boolean isSelected = false;
 		public String type;
-		
-		Spec setSelected() {
-			deselectAll();
-			this.isSelected = true;
-			return this;
-		}
+				
 		Spec copy() {return new Spec(this.toJSON());};
 		Spec pop() {return this;}
-		Spec add() {return this;}
+		Spec reinit() {return this;}
 		public Spec() {}
 		
 		public Spec(JSONObject obj) {
@@ -242,7 +226,7 @@ public class _SpecHandler {
 							if (f.getGenericType() instanceof ParameterizedType) {
 								Type[] params = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
 								printDebug("Found ArrayList of types " + params[0].getTypeName());
-								obj.keySet().forEach(o -> printDebug(o + ":" + obj.get(o)));
+//								obj.keySet().forEach(o -> printDebug(o + ":" + obj.get(o)));
 								printDebug("-Finished ArrayList");
 							} else printDebug("Error, ArrayList found but is not instanceof ParameterizedType"); break;
 						}
@@ -276,9 +260,7 @@ public class _SpecHandler {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
-			printDebug("JSON Obj.toString()" + obj.toString());
-			
+			}			
 			return obj;
 		}
 	}
@@ -290,6 +272,14 @@ public class _SpecHandler {
 		Color nodeColor;
 		public String name;
 		public ArrayList<EdgeSpec> edgesList = null;
+		
+		public Spec setSelected() {
+			deselectAll();
+			selectedNode=this;
+			selectedObject=selectedNode;
+			this.isSelected=true;
+			return this;
+		}
 		
 		public ArrayList<EdgeSpec> getEdgesList() {
 			return edgesList;
@@ -318,9 +308,11 @@ public class _SpecHandler {
 			this.name = name;
 			this.type = type;
 			this.edgesList = new ArrayList<EdgeSpec>();
-			this.setSelected();
 			this.setColor();
 			this.add();
+			this.setSelected();
+			selectedNode=this;
+			selectedObject=selectedNode;
 		}
 		
 		public NodeSpec(String type, MouseEvent mEvent) {
@@ -345,7 +337,14 @@ public class _SpecHandler {
 				nodesList.add(this);
 			return this;
 		}
-
+		Spec reinit() {
+			this.edgesList = new ArrayList<EdgeSpec>();
+			this.isSelected=false;
+			this.isTemp = false;
+			this.sz = R + R;
+			this.setColor();
+			return this.add();
+		}
 		NodeSpec pop() {
 			nodesList.remove(this);
 			this.isTemp = true;
@@ -449,7 +448,6 @@ public class _SpecHandler {
 			this.latency = latency;
 			this.upbw = upbw;
 			this.downbw = downbw;
-			this.setSelected();
 			this.add();
 		}
 		
@@ -466,7 +464,6 @@ public class _SpecHandler {
 		DeviceSpec add() {
 			if (!(nodesList.stream().anyMatch(a -> a.name.equals(this.name))))
 				nodesList.add(this);
-			printDebug("Deserializing device...");
 			return this;
 		}
 
@@ -604,7 +601,6 @@ public class _SpecHandler {
 		public int mips;
 		public int ram;
 		public ArrayList<TupleSpec> tupleMappings;
-		public ArrayList<EdgeSpec> moduleMappings;
 		
 		public ModuleSpec(String name, String nodeName, int ram, long bandwidth, long size, int mips,
 				ArrayList<TupleSpec> _tupleMappings,
@@ -616,7 +612,15 @@ public class _SpecHandler {
 			this.tupleMappings = new ArrayList<TupleSpec>(_tupleMappings);
 			this.add();
 		}
-
+		ModuleSpec reinit() {
+			this.tupleMappings = new ArrayList<TupleSpec>();
+			this.edgesList = new ArrayList<EdgeSpec>();
+			this.isSelected=false;
+			this.isTemp = false;
+			this.sz = R + R;
+			this.setColor();
+			return (ModuleSpec) this.add();
+		}
 		ModuleSpec copy() {return new ModuleSpec(this.toJSON());};
 		public ModuleSpec(JSONObject a) {super(a);}
 		public Application addToApp(Application application) {
@@ -827,7 +831,6 @@ public class _SpecHandler {
 			put("moduleactuat", 2);
 			put("modulemodule", 3);
 		}};
-		
 		public EdgeSpec(NodeSpec src, NodeSpec dst, double latency, String tupleType, double periodicity,
 				double cpuLength, double newLength, int direction, String type) {
 			this.src = src;
@@ -845,7 +848,13 @@ public class _SpecHandler {
 			this.cpuLength = cpuLength;
 			this.nwLength = newLength;
 		}
-		
+		public Spec setSelected() {
+			deselectAll();
+			selectedEdge=this;
+			selectedObject=selectedEdge;
+			this.isSelected=true;
+			return this;
+		}
 		public EdgeSpec(NodeSpec src, NodeSpec dst) {
 			this(src, dst, 2.0, "", 0, 0, 0, 1, "");
 		}
@@ -858,14 +867,17 @@ public class _SpecHandler {
 		}
 
 		EdgeSpec copy() {return new EdgeSpec(this.toJSON());};
-		@Override
-		Spec add() {
+
+		EdgeSpec reinit() {
+			return this.add();
+		}
+		EdgeSpec add() {
 			for(NodeSpec n : nodesList) {
 				if(n.name.equals(this.srcName))this.src = n;
 				if(n.name.equals(this.dstName))this.dst = n;
 			}
 			this.src.edgesList.add(this);
-			return null;
+			return this;
 		}
 
 		@Override
@@ -1059,7 +1071,7 @@ public class _SpecHandler {
 			this.outTuple = outTuple;
 			this.fractionalSensitivity = fractionalSensitivity;
 		}
-
+		
 		TupleSpec copy() {return new TupleSpec(this.toJSON());};
 		public TupleSpec(JSONObject a) {super(a);}
 
@@ -1068,13 +1080,18 @@ public class _SpecHandler {
 			this.parent.tupleMappings.remove(this);
 			return this;
 		}
-		
-		@Override
-		Spec add() {
-			for(NodeSpec n : nodesList){
-				
-			}
+
+		TupleSpec add() {
+			if(this.parent!=null) this.parent.tupleMappings.add(this);
 			return null;
+		}
+		
+		TupleSpec reinit() {
+			if(this.parent==null) {
+				for(NodeSpec n : nodesList) if(n.name.equals("parentName")) this.parent=(ModuleSpec) n;
+			}
+			
+			return this;
 		}
 
 		@Override

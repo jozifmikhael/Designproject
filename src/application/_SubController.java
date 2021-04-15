@@ -159,12 +159,13 @@ public abstract class _SubController {
         		ObservableList<String> tempNames = FXCollections.observableArrayList();
             	ChoiceBox<String> selBox = (ChoiceBox) selChild;
             	if(selBox.getId().contains("Spec")) {
-            		String reqNamesOfType = selBox.getId().split("_")[0].replace("Spec","");
-            		printDebug(reqNamesOfType);
-            		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqNamesOfType)).forEach(n->tempNames.add(n.name));
+            		String reqType = selBox.getId().split("_")[0].replace("Spec","");
+            		String reqField = selBox.getId().split("_")[1];
+            		printDebug("Choice box looking for Specs of type "+reqType+" -> "+reqField);
+            		_SpecHandler.nodesList.stream().filter(n->n.type.equals(reqType)).forEach(n->tempNames.add(n.name));
             		selBox.setItems(tempNames);
             		if(tempNames.size()>0) selBox.setValue(tempNames.get(0));
-            		selBox.setOnAction((event) -> setField(spec, selBox.getId().split("_")[1], selBox.getSelectionModel().getSelectedItem().toString()));
+            		selBox.setOnAction((event) -> setField(spec, reqField, selBox.getSelectionModel().getSelectedItem().toString()));
             	}
             }
 		}
@@ -174,9 +175,8 @@ public abstract class _SubController {
 	
 	@FXML
 	Spec saveSpecHandler() {
-		ap.getChildren().stream().forEach(c->printDebug(c.getId()));
 		((Stage) saveButton.getScene().getWindow()).close();
-		printDebug(this.spec.toString());
+		printDebug("Saving: " + this.spec.toString());
 		return this.spec;
 	}
 	final public void recover() {
@@ -184,7 +184,7 @@ public abstract class _SubController {
 		printDebug("SpecC:"+spec.toString());
 		spec.pop();
 		if(specPrev!=null && !specPrev.isTemp) {
-			specPrev.add();
+			specPrev.reinit();
 			printDebug("SpecP:"+specPrev.toString());
 		}
 		spec=specPrev;

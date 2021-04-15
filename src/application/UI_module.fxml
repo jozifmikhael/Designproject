@@ -158,9 +158,9 @@
                               </TableView>
                            </children>
                         </VBox>
-                        <TextField fx:id="TupleSpec_inTuple" layoutX="131.0" layoutY="55.0" prefHeight="25.0" prefWidth="175.0" />
-                        <TextField fx:id="TupleSpec_outTuple" layoutX="131.0" layoutY="95.0" prefHeight="25.0" prefWidth="175.0" />
-                        <TextField fx:id="TupleSpec_fractionalSensitivity" layoutX="130.0" layoutY="135.0" prefHeight="25.0" prefWidth="82.0" />
+                        <TextField fx:id="inTuple_TupleSpec" layoutX="131.0" layoutY="55.0" prefHeight="25.0" prefWidth="175.0" />
+                        <TextField fx:id="outTuple_TupleSpec" layoutX="131.0" layoutY="95.0" prefHeight="25.0" prefWidth="175.0" />
+                        <TextField fx:id="fractionalSensitivity_TupleSpec" layoutX="130.0" layoutY="135.0" prefHeight="25.0" prefWidth="82.0" />
                         <Button fx:id="deleteTupleSpec" layoutX="271.0" layoutY="134.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" styleClass="buttonsmall" text="-">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
@@ -177,7 +177,7 @@
                               </DropShadow>
                            </effect>
                         </Button>
-                        <Button fx:id="addTupleSpec" layoutX="226.0" layoutY="134.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" styleClass="buttonsmall" text="+">
+                        <Button fx:id="addTupleSpec" layoutX="226.0" layoutY="134.0" mnemonicParsing="false" onAction="#addTupleMap" prefHeight="25.0" prefWidth="25.0" styleClass="buttonsmall" text="+">
                            <effect>
                               <DropShadow offsetX="6.0" offsetY="6.0">
                                  <input>

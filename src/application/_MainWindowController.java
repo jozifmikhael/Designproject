@@ -251,32 +251,33 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //	}
 	
 	public void setupListeners(Stage parentStage, Scene scene) {
-			ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
-    		frontPane.widthProperty().addListener(stageSizeListener);
-    		frontPane.heightProperty().addListener(stageSizeListener);
-	    	
-	    	//TODO Do the other menu items like this
+		scrollPane.setPannable(false);
+		ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue)->screenSizeChangeHandler();
+		frontPane.widthProperty().addListener(stageSizeListener);
+		frontPane.heightProperty().addListener(stageSizeListener);
+    	
+    	//TODO Do the other menu items like this
 //	      	addDeviceMenu.setOnAction(e->setupController("device"));
 //	     	addModuleMenu.setOnAction(e->setupController("module"));
 //	      	addSensorMenu.setOnAction(e->setupController("sensor"));
 //	     	addActuatorMenu.setOnAction(e->setupController("actuat"));
 //	     	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
-	    	
-	    	gc=topoField.getGraphicsContext2D();
-	    	gc.setTextAlign(TextAlignment.CENTER);
-	    	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
-	    	_SpecHandler.gc=this.gc;
-	    	
-	    	scene.setOnKeyPressed(this);
-	 		
-	 		Stream.of("Edgewards", "Cloud-Only").forEach(
-	 				s->PolicyChoiceMain.getItems().add(s));
-	 		PolicyChoiceMain.setValue(PolicyChoiceMain.getItems().get(0));
-	 		
-	 		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
-	 				s->loadersList.put(s, getClass().getResource("UI_"+s+".fxml")));
-	 		printDebug("setupListeners ran\n");
-	    }
+    	
+    	gc=topoField.getGraphicsContext2D();
+    	gc.setTextAlign(TextAlignment.CENTER);
+    	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));
+    	_SpecHandler.gc=this.gc;
+    	
+    	scene.setOnKeyPressed(this);
+ 		
+ 		Stream.of("Edgewards", "Cloud-Only").forEach(
+ 				s->PolicyChoiceMain.getItems().add(s));
+ 		PolicyChoiceMain.setValue(PolicyChoiceMain.getItems().get(0));
+ 		
+ 		Stream.of("device", "module", "sensor", "actuat", "edgeFull", "edgeSimple").forEach(
+ 				s->loadersList.put(s, getClass().getResource("UI_"+s+".fxml")));
+ 		printDebug("setupListeners ran\n");
+    }
 
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
@@ -284,7 +285,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
-		scrollPane.setPannable((_SpecHandler.getSelected()==null));
+		scrollPane.setPannable(false);
 	}
 	
 	@Override
@@ -409,10 +410,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
 				draggingNode=null;
-				selEdge = _SpecHandler.getEdge(mEvent);
-				selNode = _SpecHandler.getNode(mEvent);
-				if (selNode!=null) selNode.setSelected();
-				else if(selEdge!=null) selEdge.setSelected();
+				_SpecHandler.makeNewSelection(mEvent);
+				selEdge = _SpecHandler.selectedEdge;
+				selNode = _SpecHandler.selectedNode;
 				if(mEvent.getClickCount()>1) editHandler();
 				switch(InteractionState.getSetKey()) {
 					case ESCAPE : draggingNode=selNode; _SpecHandler.deselectAll(); break;
@@ -421,6 +421,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 					case DIGIT3 : draggingNode=(selNode==null)?new NodeSpec("sensor", mEvent):selNode; break;// Select Sensor Placer
 					case DIGIT4 : draggingNode=(selNode==null)?new NodeSpec("actuat", mEvent):selNode; break;// Select Actuat Placer
 					case DIGIT5 : {
+						_SpecHandler.deselectAll();
+						redrawNodes();
 						if(selNode==null) return;
 						linkSrcNode=selNode;
 						draggingNode=new NodeSpec("linker", mEvent);
@@ -441,24 +443,26 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     private void mouseReleaseHandler(MouseEvent mEvent) throws IOException {
 		switch(InteractionState.getMouseState(mEvent)) {
 			case LEFT_BTN:
-				if(draggingNode!=null && draggingNode.isTemp) draggingNode.pop();
-				draggingNode=null;
-				selEdge = _SpecHandler.getEdge(mEvent);
-				selNode = _SpecHandler.getNode(mEvent);
-				Spec newSimObject = null;
-				switch(InteractionState.getSetKey()) {
-					case DIGIT1 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("device"); break;
-					case DIGIT2 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("module"); break;
-					case DIGIT3 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("sensor"); break;
-					case DIGIT4 : newSimObject = (selNode!=null)?null:(NodeSpec)setupController("actuat"); break;
-					case DIGIT5 : {
-						selNode = _SpecHandler.getNode(mEvent);			
-						if(selNode==null || linkSrcNode==null) break;
-						setupController(linkSrcNode.newLinkTo(selNode).type);
-					} break;
-					default : {} // Nothing
+				if(draggingNode!=null && draggingNode.isTemp) {
+					draggingNode.pop();
+					Spec newSimObject = null;
+					switch(InteractionState.getSetKey()) {
+						case DIGIT1 : newSimObject = (NodeSpec)setupController("device"); break;
+						case DIGIT2 : newSimObject = (NodeSpec)setupController("module"); break;
+						case DIGIT3 : newSimObject = (NodeSpec)setupController("sensor"); break;
+						case DIGIT4 : newSimObject = (NodeSpec)setupController("actuat"); break;
+						case DIGIT5 : {
+							selNode = _SpecHandler.makeNewNodeSelection(mEvent);
+							if(selNode==null || linkSrcNode==null) break;
+							EdgeSpec newLink = linkSrcNode.newLinkTo(selNode);
+							setupController(newLink.type);
+							newLink.setSelected();			
+						} break;
+						default : {} // Nothing
+					}
+					if (newSimObject!=null) ((NodeSpec)newSimObject).setPos(mEvent);
 				}
-				if (newSimObject!=null) ((NodeSpec)newSimObject.setSelected()).setPos(mEvent);
+				draggingNode=null;
 			break;
 			case MIDDLE_BTN:
 			break;
@@ -474,7 +478,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 	
 	@FXML
     private void mouseMoveHandler(MouseEvent mEvent) {
-    	if (draggingNode != null&&!draggingNode.isSelected) draggingNode.setSelected();
+//    	if (draggingNode != null&&!draggingNode.isSelected) draggingNode.setSelected();
     	if(draggingNode != null) {
     		draggingNode.setPos(mEvent);
 			redrawNodes();
@@ -572,7 +576,17 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         }
     }
     
-    Spec setupController(String type) {
+    @FXML
+	void editHandler() {
+		Spec selectedObject = _SpecHandler.selectedObject;
+		if(_SpecHandler.selectedObject == null) return;
+		printDebug("In Edge Handler: "+selectedObject.toJSON());
+		setupController(selectedObject.type);
+		_SpecHandler.pruneLinks();
+		redrawNodes();
+	}
+
+	Spec setupController(String type) {
     	printDebug("Starting setupController with type " + type + ", '" + loadersList.get(type).toString()+"'");
 		FXMLLoader loader = new FXMLLoader(loadersList.get(type));
 		try {
@@ -580,12 +594,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			Stage stage = new Stage();
 			stage.setScene(scene);
 			_SubController controller = (_SubController)loader.getController();
-			controller.init(_SpecHandler.getSelected());
+			controller.init(_SpecHandler.selectedObject);
 			stage.addEventHandler(KeyEvent.KEY_PRESSED,  (event) -> {
 			    switch(event.getCode().getCode()) {
 			    	case 27: controller.recover(); stage.close(); break; //Esc->Canceled action->If editing, reset the node to prev vals, if new, pop the node
-			    	case 116: printDebug(controller.spec.toJSON()); break;
-			        default:  {printDebug(event.getCode().getCode()+"");}
+			    	case 116: printDebug(controller.spec.toJSON()); break; 
+			        default:  {}//printDebug(event.getCode().getCode()+"");
 			    }
 			});
 			stage.setOnCloseRequest(e -> {
@@ -604,9 +618,8 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     NodeSpec copyBuffer=null;
     @FXML
     void copyHandler() {
-    	NodeSpec selectedNode = _SpecHandler.getSelectedNode();
-    	if(selectedNode == null) return;
-    	copyBuffer=selectedNode.copy();
+    	if(_SpecHandler.selectedNode == null) return;
+    	copyBuffer=_SpecHandler.selectedNode.copy();
     	copyNum=0;
     	printDebug(copyBuffer.toString());
     }
@@ -622,18 +635,9 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     }
     
     @FXML
-    void editHandler() {
-    	printDebug("In edit handler");
-    	Spec selectedObject = (Spec)_SpecHandler.getSelected();
-    	if(selectedObject == null) return;
-    	setupController(selectedObject.type);
-		_SpecHandler.pruneLinks();
-		redrawNodes();
-    }
-    
-    @FXML
     void deleteHandler() {
-    	_SpecHandler.getSelected().pop();
+    	if(_SpecHandler.selectedObject==null) return;
+    	_SpecHandler.selectedObject.pop();
 		redrawNodes();
     }
     
