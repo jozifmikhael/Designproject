@@ -276,7 +276,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		tool3.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT3); refreshBtns();});
 		tool4.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT4); refreshBtns();});
 		tool5.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT5); refreshBtns();});
-    	
+		InteractionState.trySetKey(KeyCode.DIGIT1); refreshBtns();
     	gc=topoField.getGraphicsContext2D();
     	gc.setTextAlign(TextAlignment.CENTER);
     	gc.setFont(new Font(_SpecHandler.font, _SpecHandler.fontSize));

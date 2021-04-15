@@ -110,7 +110,7 @@
                       </TitledPane>
                     </panes>
                   </Accordion>
-                  <Button fx:id="saveButton" layoutX="289.0" layoutY="28.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Save Sensor">
+                  <Button fx:id="saveButton" defaultButton="true" layoutX="289.0" layoutY="28.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Save Sensor">
                      <effect>
                         <DropShadow offsetX="6.0" offsetY="6.0">
                            <input>

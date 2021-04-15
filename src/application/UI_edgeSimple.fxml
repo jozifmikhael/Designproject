@@ -15,7 +15,7 @@
    <center>
       <AnchorPane fx:id="ap" prefHeight="139.0" prefWidth="414.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="saveButton" layoutX="289.0" layoutY="28.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Set Latency">
+            <Button fx:id="saveButton" defaultButton="true" layoutX="289.0" layoutY="28.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Set Latency">
                <effect>
                   <DropShadow offsetX="6.0" offsetY="6.0">
                      <color>

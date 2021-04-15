@@ -44,7 +44,7 @@
                         </InnerShadow>
                      </effect>
                   </Pane>
-                  <Button fx:id="saveButton" layoutX="289.0" layoutY="29.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Save Actuator">
+                  <Button fx:id="saveButton" defaultButton="true" layoutX="289.0" layoutY="29.0" mnemonicParsing="false" onAction="#saveSpecHandler" prefHeight="52.0" prefWidth="182.0" text="Save Actuator">
                      <effect>
                         <DropShadow offsetX="6.0" offsetY="6.0">
                            <input>
