@@ -491,6 +491,17 @@ public class _SpecHandler {
 			return this;
 		}
 
+		@Override
+		public DeviceSpec reinit() {
+			this.edgesList = new ArrayList<EdgeSpec>();
+			this.isSelected=false;
+			this.isTemp = false;
+			this.setPos(x+0.5*this.sz, y+0.5*this.sz);
+			this.sz = R + R;
+			this.setColor();
+			return (DeviceSpec) this.add();
+		}
+
 		DeviceSpec pop() {
 			nodesList.remove(this);
 			this.isTemp = true;
@@ -555,6 +566,7 @@ public class _SpecHandler {
 			this.tupleMappings = new ArrayList<TupleSpec>(_tupleMappings);
 			this.add();
 		}
+
 		public ModuleSpec reinit() {
 			this.tupleMappings = new ArrayList<TupleSpec>();
 			this.edgesList = new ArrayList<EdgeSpec>();
@@ -564,6 +576,7 @@ public class _SpecHandler {
 			this.setColor();
 			return (ModuleSpec) this.add();
 		}
+
 		ModuleSpec copy() {return new ModuleSpec(this.toJSON());};
 		public ModuleSpec(JSONObject a) {super(a);}
 		public Application addToApp(Application application) {
@@ -639,6 +652,15 @@ public class _SpecHandler {
 			if(deterministicValue != 0)this.distType = "Deterministic";
 			else if(normalMean != 0)this.distType = "Normal";
 			else if(uniformMax != 0)this.distType = "Uniform";
+		}
+
+		public SensorSpec reinit() {
+			this.edgesList = new ArrayList<EdgeSpec>();
+			this.isSelected=false;
+			this.isTemp = false;
+			this.sz = R + R;
+			this.setColor();
+			return (SensorSpec) this.add();
 		}
 
 		SensorSpec copy() {return new SensorSpec(this.toJSON());};
@@ -726,6 +748,15 @@ public class _SpecHandler {
 
 		public ActuatSpec(JSONObject a) {super(a);}
 
+		public ActuatSpec reinit() {
+			this.edgesList = new ArrayList<EdgeSpec>();
+			this.isSelected=false;
+			this.isTemp = false;
+			this.sz = R + R;
+			this.setColor();
+			return (ActuatSpec) this.add();
+		}
+
 		ActuatSpec copy() {return new ActuatSpec(this.toJSON());};
 		@Override
 		public String toString() {
@@ -809,8 +840,9 @@ public class _SpecHandler {
 					if(n.name.equals(this.dstName))this.dst = n;
 				}
 			}
-			return this.add();
+			return this;
 		}
+
 		public EdgeSpec add() {
 			printDebug("Adding edge to " + this.src.name);
 			this.src.edgesList.add(this);
@@ -936,10 +968,9 @@ public class _SpecHandler {
 		
 		public TupleSpec reinit() {
 			if(this.parent==null) {
-				for(NodeSpec n : nodesList) if(n.name.equals("parentName")) this.parent=(ModuleSpec) n;
+				for(NodeSpec n : nodesList) if(n.name.equals(this.parentName)) this.parent=(ModuleSpec) n;
 			}
-			
-			return this;
+			return (TupleSpec)this.add();
 		}
 
 		@Override
@@ -1008,20 +1039,48 @@ public class _SpecHandler {
 	        JSONObject jsonFileObject = (JSONObject) jsonParser.parse(reader);
 			printDebug("Loaded Json: " + file.getName());
 	        for(Object jObj : (JSONArray) jsonFileObject.get("devices")) {
-				nodesList.add(new DeviceSpec((JSONObject) jObj));
+	        	DeviceSpec d = new DeviceSpec((JSONObject) jObj);
+	        	d.reinit();
+	        	if(((JSONObject)jObj).get("edgesList") == null) continue;
+	        	for(Object jEdge : (JSONArray) ((JSONObject)jObj).get("edgesList")) {
+	        		EdgeSpec e = new EdgeSpec((JSONObject) jEdge);
+	        		d.edgesList.add(e);
+	        	}
 			}
 	        for(Object jObj : (JSONArray) jsonFileObject.get("modules")) {
-				nodesList.add(new DeviceSpec((JSONObject) jObj));
+	        	ModuleSpec m = new ModuleSpec((JSONObject) jObj);
+	        	m.reinit();
+	        	if(((JSONObject)jObj).get("tupleMappings") == null) continue;
+	        	for(Object jObject : (JSONArray) ((JSONObject)jObj).get("tupleMappings")) {
+	        		TupleSpec t = new TupleSpec((JSONObject) jObject);
+	        		t.reinit();
+	        	}
+	        	if(((JSONObject)jObj).get("edgesList") == null) continue;
+	        	for(Object jEdge : (JSONArray) ((JSONObject)jObj).get("edgesList")) {
+	        		EdgeSpec e = new EdgeSpec((JSONObject) jEdge);
+	        		m.edgesList.add(e);
+	        	}
 			}
 	        for(Object jObj : (JSONArray) jsonFileObject.get("sensors")) {
-				nodesList.add(new DeviceSpec((JSONObject) jObj));
+	        	SensorSpec s = new SensorSpec((JSONObject) jObj);
+	        	s.reinit();
+	        	if(((JSONObject)jObj).get("edgesList") == null) continue;
+	        	for(Object jEdge : (JSONArray) ((JSONObject)jObj).get("edgesList")) {
+	        		EdgeSpec e = new EdgeSpec((JSONObject) jEdge);
+	        		s.edgesList.add(e);
+	        	}
 			}
 	        for(Object jObj : (JSONArray) jsonFileObject.get("actuats")) {
-				nodesList.add(new DeviceSpec((JSONObject) jObj));
+	        	ActuatSpec a = new ActuatSpec((JSONObject) jObj);
+	        	a.reinit();
+	        	if(((JSONObject)jObj).get("edgesList") == null) continue;
+	        	for(Object jEdge : (JSONArray) ((JSONObject)jObj).get("edgesList")) {
+	        		EdgeSpec e = new EdgeSpec((JSONObject) jEdge);
+	        		a.edgesList.add(e);
+	        	}
 			}
-	        nodesList.forEach(n->n.edgesList.forEach(e->e.add()));
+	        nodesList.forEach(n->n.edgesList.forEach(e->e.reinit()));
 		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
