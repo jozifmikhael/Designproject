@@ -270,6 +270,12 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 //	      	addSensorMenu.setOnAction(e->setupController("sensor"));
 //	     	addActuatorMenu.setOnAction(e->setupController("actuat"));
 //	     	addEdgeMenu.setOnAction(e->setupController("edgeFull"));
+
+		tool1.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT1); refreshBtns();});
+		tool2.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT2); refreshBtns();});
+		tool3.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT3); refreshBtns();});
+		tool4.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT4); refreshBtns();});
+		tool5.setOnAction(e->{InteractionState.trySetKey(KeyCode.DIGIT5); refreshBtns();});
     	
     	gc=topoField.getGraphicsContext2D();
     	gc.setTextAlign(TextAlignment.CENTER);
@@ -287,12 +293,23 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
  		printDebug("setupListeners ran\n");
     }
 
+	private void refreshBtns() {
+
+		tool1.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT1));
+		tool2.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT2));
+		tool3.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT3));
+		tool4.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT4));
+		tool5.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT5));
+		
+	}
+
 	private void redrawNodes() {
 		gc.setFill(Color.WHITE);
 		gc.fillRect(0, 0, topoField.getWidth(), topoField.getHeight());
 		_SpecHandler.nodesList.forEach(n->n.drawLink());
 		_SpecHandler.nodesList.forEach(n->n.drawNode());
-		scrollPane.setPannable(false);
+		 _SpecHandler.drawBorder();
+//		scrollPane.setPannable(false);
 //		_SpecHandler.nodesList.forEach(n->printDebug(n.edgesList.size() +":"+ n.edgesList.toString()));
 	}
 	
@@ -312,20 +329,16 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		switch (InteractionState.getSetKey()){
 			case ESCAPE	: _SpecHandler.deselectAll(); break;
 			case F5		: System.out.println("Unimplemented save tool"); break; // Save File
-			case DELETE : System.out.println("Unimplemented delete tool"); break; // Copy Selected
-			case S		: saveHandler(); break;
-			case O		: loadJSON(); break;
+			case DELETE : deleteHandler(); break; // Copy Selected
+			case S		: saveFileHandler(); break;
+			case O		: loadFileHandler(); break;
 			case E		: editHandler(); break; // Edit Selected
 			case C		: copyHandler(); break; // Copy Selected
 			case V		: pasteHandler(); break; // Paste Selected
-			case Z		: System.out.println("Unimplemented undo tool"); break; // Undo Last
+//			case Z		: System.out.println("Unimplemented undo tool"); break; // Undo Last
 			default : {}
 		}
-		tool1.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT1));
-		tool2.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT2));
-		tool3.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT3));
-		tool4.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT4));
-		tool5.setSelected(InteractionState.getSetKey().equals(KeyCode.DIGIT5));
+		refreshBtns();
 		redrawNodes();
 	}
 
@@ -551,18 +564,27 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     int simTime = 1000;
     int simGranu = 10;
     
+    @FXML
+    void clearHandler() {
+    	_SpecHandler.nodesList.removeAll(_SpecHandler.nodesList);
+    	redrawNodes();
+    }
+    
 	@FXML
-	void loadJSON() {
+	void loadFileHandler() {
 		Stage stage = new Stage();
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Open JSON File");
 		chooser.setInitialDirectory(new File("saves"));
 		File selectedFile = chooser.showOpenDialog(stage);
-		if (selectedFile != null) _SpecHandler.loadJSON(selectedFile);
+		if (selectedFile != null) {
+			clearHandler();
+			_SpecHandler.loadJSON(selectedFile);
+		}
 	}
 	
 	@FXML
-    void saveHandler(){
+    void saveFileHandler(){
 		Stage stage = new Stage();
 		FileChooser chooser = new FileChooser();
 		chooser.setTitle("Save JSON File");
@@ -578,7 +600,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     
 	@FXML
     void startSim(ActionEvent event) throws Exception {
-		saveHandler();
+		saveFileHandler();
 		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
         Scene scene = new Scene(addNewNodeLoader.load(),900,600);
@@ -586,20 +608,6 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
         stage.setScene(scene);
         stage.setTitle("Output");
         stage.showAndWait();
-    }
-	
-	@FXML
-    void newJSON(ActionEvent event) throws IOException {
-		FXMLLoader root = new FXMLLoader(getClass().getResource("SaveFileBox.fxml"));
-		Scene scene = new Scene(root.load(),414,139);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		stage.setTitle("Save File");
-		stage.showAndWait();
-		String reqName=SaveFileController.jsonDestinationFileName;
-		if(reqName!=null) selectedJSON=reqName + ".json";
-		System.out.println("Trying to save to "+ selectedJSON);
-//		writeJSON();
     }
 	
 	@FXML

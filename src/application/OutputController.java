@@ -54,6 +54,7 @@ public class OutputController implements Initializable{
 	private static List<Double> timeNetworkList = new ArrayList<Double>();
 	private static List<Double> NetworkUsageList = new ArrayList<Double>();
 	private List<TupleMetrics> tupleList = new ArrayList<TupleMetrics>();
+	private List<TupleDelay> tupleDelayList = new ArrayList<TupleDelay>();
 	public List<XYChart.Series> seriesList = new ArrayList<XYChart.Series>();
 	
 	static String sourceFile="output.json";
@@ -178,16 +179,32 @@ public class OutputController implements Initializable{
 		String tupleType;
 		String tupleSRC;
 		String tupleDEST;
+		String tupleSRCDev;
+		String tupleDESTDev;
 		double tupleLatency;
+		double average;
 		
-		TupleMetrics(String tupleType, String tupleSRC, String tupleDEST, double tupleLatency){
+		TupleMetrics(String tupleType, String tupleSRC, String tupleDEST, double tupleLatency, double average, String tupleSRCDev, String tupleDESTDev){
 			this.tupleType = tupleType;
 			this.tupleSRC = tupleSRC;
 			this.tupleDEST = tupleDEST;	
 			this.tupleLatency = tupleLatency;
+			this.tupleSRCDev = tupleSRCDev;
+			this.tupleDESTDev = tupleDESTDev;
+			this.average = average;
 		}
 	}
     
+	public class TupleDelay{
+		String name;
+		double delay;
+		
+		TupleDelay(String tupleType, double delay){
+			this.name = tupleType;
+			this.delay = delay;
+		}
+	}
+	
 	@FXML
     void ParseEnergy() throws IOException, ParseException {
     	JSONParser jsonParser = new JSONParser();
@@ -221,6 +238,16 @@ public class OutputController implements Initializable{
         JSONArray tuples = (JSONArray) nodeList.get("tuples");
         tuples.forEach(l -> parseTuples((JSONObject) l));
 	}
+	
+	@FXML
+	void ParsingTupleDelay() throws IOException, ParseException {
+		JSONParser jsonParser = new JSONParser();
+		FileReader reader = new FileReader(sourceFile);
+        Object obj = jsonParser.parse(reader);
+        JSONObject nodeList = (JSONObject) obj;
+        JSONArray tuples = (JSONArray) nodeList.get("tupleDelays");
+        tuples.forEach(l -> parseTupleDelay((JSONObject) l));
+	}
     
 	private static void parseNodeData(JSONObject link) {
 		String nodeName = (String) link.get("name");
@@ -250,12 +277,22 @@ public class OutputController implements Initializable{
 		NetworkUsageList.add(networkUsage);
 	}
 	
+	private void parseTupleDelay(JSONObject link){
+		String name = (String) link.get("name");
+		double delay = (double) (link.get("delay"));
+		TupleDelay tupleOBJ = new TupleDelay(name, delay);
+		tupleDelayList.add(tupleOBJ);
+	}
+	
 	private void parseTuples(JSONObject link){
 		String tupleType = (String) link.get("tupleType");
 		String tupleSCR = (String) link.get("tupleSCR");
 		String tupleDEST = (String) link.get("tupleDEST");
 		double TupleLatency = (double) link.get("TupleLatency");
-		TupleMetrics tupleOBJ = new TupleMetrics(tupleType, tupleSCR, tupleDEST, TupleLatency);
+		String tupleSRCDev = (String) link.get("tupleSCRDev");
+		String tupleDESTDev = (String) link.get("tupleDESTDev");
+		double average = (double) link.get("average");
+		TupleMetrics tupleOBJ = new TupleMetrics(tupleType, tupleSCR, tupleDEST, TupleLatency, average, tupleSRCDev, tupleDESTDev);
 		tupleList.add(tupleOBJ);
 	}
 	
@@ -335,11 +372,14 @@ public class OutputController implements Initializable{
         barChart.setTitle("CPU Execution Delays");
         barChart.setLegendVisible(false);
         XYChart.Series series = new XYChart.Series();
-        series.getData().add(new XYChart.Data("PLAYER_GAME_STATE",1.171428573130893));
-        series.getData().add(new XYChart.Data("EEG",4.099993792751119));
-        series.getData().add(new XYChart.Data("CONCENTRATION",1.171428573130893));
-        series.getData().add(new XYChart.Data("_SENSOR",0.566240448301607));
-        series.getData().add(new XYChart.Data("GLOBAL_GAME_STATE",0.04575000214585016));
+        for (int i = 0; i < tupleDelayList.size(); i++) {
+        	series.getData().add(new XYChart.Data(tupleDelayList.get(i).name,tupleDelayList.get(i).delay));
+        }
+//        series.getData().add(new XYChart.Data("PLAYER_GAME_STATE",1.171428573130893));
+//        series.getData().add(new XYChart.Data("EEG",4.099993792751119));
+//        series.getData().add(new XYChart.Data("CONCENTRATION",1.171428573130893));
+//        series.getData().add(new XYChart.Data("_SENSOR",0.566240448301607));
+//        series.getData().add(new XYChart.Data("GLOBAL_GAME_STATE",0.04575000214585016));
         barChart.getData().add(series);
 		ObservableList<TupleSpec> tempData = FXCollections.observableArrayList();
 //		String tupleType;
@@ -356,18 +396,21 @@ public class OutputController implements Initializable{
 //		_SENSOR ---> 0.566240448301607
 //		GLOBAL_GAME_STATE ---> 0.04575000214585016
 		TextParser t = new TextParser();
-		tempData.add(t.new TupleSpec("PLAYER_GAME_STATE ", "Concentration-Calculator", "Connector", "Gateway-0", "Cloud", 0, 0.09056122448938758));
-        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor0", "mobile-0", 0, 5.003540903540709));
-        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor1", "mobile-1", 0, 5.003540903540709));
-        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor2", "mobile-2", 0, 5.003540903540709));
-        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor0", "mobile-0", 0, 8.81658119658707));
-        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor1", "mobile-1", 0, 8.81658119658707));
-        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor2", "mobile-2", 0, 8.81658119658707));
-        tempData.add(t.new TupleSpec("CONCENTRATION ", "concentration_calculator", "client", "gateway-0", "mobile-0", 0, 0.30730012210177815));
-        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-0", 0, 0.2668171658911005));
-        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-1", 0, 0.2668171658911005));
-        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-2", 0, 0.2668171658911005));
-        
+//		tempData.add(t.new TupleSpec("PLAYER_GAME_STATE ", "Concentration-Calculator", "Connector", "Gateway-0", "Cloud", 0, 0.09056122448938758));
+//        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor0", "mobile-0", 0, 5.003540903540709));
+//        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor1", "mobile-1", 0, 5.003540903540709));
+//        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor2", "mobile-2", 0, 5.003540903540709));
+//        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor0", "mobile-0", 0, 8.81658119658707));
+//        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor1", "mobile-1", 0, 8.81658119658707));
+//        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor2", "mobile-2", 0, 8.81658119658707));
+//        tempData.add(t.new TupleSpec("CONCENTRATION ", "concentration_calculator", "client", "gateway-0", "mobile-0", 0, 0.30730012210177815));
+//        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-0", 0, 0.2668171658911005));
+//        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-1", 0, 0.2668171658911005));
+//        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-2", 0, 0.2668171658911005));
+		for (int i = 0; i < tupleList.size(); i++) {
+			TupleMetrics tupleMetric = tupleList.get(i);
+        	tempData.add(t.new TupleSpec(tupleMetric.tupleType, tupleMetric.tupleSRC, tupleMetric.tupleDEST, tupleMetric.tupleSRCDev, tupleMetric.tupleDESTDev, 0, tupleMetric.average));
+        }
     	tupleTable.setItems(tempData);
     	typleCol.setCellValueFactory(new PropertyValueFactory <>("tupleType"));
     	typleCol.setCellFactory(TextFieldTableCell.forTableColumn());

@@ -182,7 +182,12 @@ public class _SpecHandler {
 		selectedNode=null;
 		selectedEdge=null;
 	}
-	
+	public static void drawBorder() {
+        gc.setStroke(Color.LIGHTGREY);
+        gc.setLineWidth(10.0);
+        double w = gc.getCanvas().getWidth(); double l = gc.getCanvas().getHeight();
+        gc.strokeRect(0, 0, w, l);
+    }
 	public static Spec getNode(String nodeName) {
 		for(NodeSpec n : nodesList) if(n.name.equals(nodeName)) return n;
 		return null;
@@ -409,13 +414,15 @@ public class _SpecHandler {
 			if (nodeColor != transpColor) {
 				gc.setStroke(Color.BLACK);
 				gc.setLineWidth(1.0);
-				gc.strokeText(this.name, this.x, this.y + 0.4 * fontSize);
+				if(zoomFactor < 0.4) gc.strokeText("...", this.x, this.y + 0.4 * fontSize);
+	            else gc.strokeText(this.name, this.x, this.y + 0.4 * fontSize);
 				gc.setStroke(this.isSelected ? Color.web("#0091ff", 1) : Color.BLACK);
 				gc.setLineWidth(this.isSelected ? 5.0 : 3.0);
 				gc.strokeOval(this.x - 0.5 * this.sz * zoomFactor, this.y - 0.5 * this.sz * zoomFactor,
 						this.sz * zoomFactor, this.sz * zoomFactor);
 //				gc.setEffect(ds1);
 			}
+			
 		}
 		
 		NodeSpec setPos(MouseEvent mEvent) {

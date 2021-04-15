@@ -14,7 +14,9 @@ public class TextParser {
 	private List<NodeSpecs> nodesList = new ArrayList<NodeSpecs>();
 	private List<EnergySpec> energiesList = new ArrayList<EnergySpec>();
 	private List<NetworkSpec> networkingList = new ArrayList<NetworkSpec>();
-	
+	private List<TupleDelaySpec> tupleList = new ArrayList<TupleDelaySpec>();
+	filterableTuples filter = new filterableTuples();
+
 	public void getNodespec(String line) throws NumberFormatException, IOException {
 		
 		double cost;
@@ -50,6 +52,20 @@ public class TextParser {
 		NetworkSpec w = addNetwork(time, networkUsage);	
 	}
 	
+	public void setTupleDelay(String line) {
+		String stParts[] = line.split(" ");
+		String name = stParts[0];
+		double delay = Double.parseDouble(stParts[1]);
+		TupleDelaySpec t = addTupleDelay(name, delay);
+		
+	}
+
+	private TupleDelaySpec addTupleDelay(String name, double delay) {
+		TupleDelaySpec t = new TupleDelaySpec(name, delay);
+		tupleList.add(t);
+		return t;
+	}
+
 	public NodeSpecs addNode(String nodeName) {
 		NodeSpecs node = new NodeSpecs(nodeName);
 		node.nodeName = nodeName;
@@ -110,6 +126,15 @@ public class TextParser {
 			for(TupleSpec t : this.localList) System.out.println(t.tupleArrivTime - t.tupleSentTime);
 			return this;
 		}
+		public double printAverage(String name) {
+			double avg=0;
+			for(TupleSpec t : this.localList) {
+				if(t.tupleSrc.equals(name)) avg+=(t.tupleArrivTime-t.tupleSentTime);
+			}
+//				
+//			System.out.println(avg);
+			return avg;
+		}
 		public filterableTuples printAverage() {
 			double avg=0;
 			for(TupleSpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
@@ -134,6 +159,25 @@ public class TextParser {
 	//filterableTuples newQuery = new filterableTuples;
 	//newQuery.ofType("PLAYER_GAME_STATE").ofDst("wherever");
 	
+	class TupleDelaySpec{
+		String name;
+		double delay;
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			TupleDelaySpec t = this;
+			JSONObject obj = new JSONObject();
+			obj.put("name", t.name);
+			obj.put("delay", t.delay);
+			return obj;
+		}
+		
+		public TupleDelaySpec(String name, double delay) {
+			this.name = name;		
+			this.delay = delay;			
+		}
+	}
+
 	public class TupleSpec{
 		public String getTupleSrcDev() {
 			return tupleSrcDev;
@@ -197,6 +241,7 @@ public class TextParser {
 		double tupleNWLatency;
 		double tupleSentTime;
 		double tupleArrivTime;
+		double average;
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
@@ -205,7 +250,10 @@ public class TextParser {
 			obj.put("tupleType", t.tupleType);
 			obj.put("tupleSRC", t.tupleSrc);
 			obj.put("tupleDEST", t.tupleDst);
+			obj.put("tupleSrcDev", t.tupleSrcDev);
+			obj.put("tupleDstDev", t.tupleDstDev);
 			obj.put("tupleNWLatency", t.tupleNWLatency);
+			obj.put("average", t.average);
 			return obj;
 		}
 		public TupleSpec(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
@@ -215,6 +263,7 @@ public class TextParser {
 			this.tupleSentTime = sentTime;
 			this.tupleArrivTime = arrivalTime;
 			this.tupleNWLatency = arrivalTime-sentTime;
+			this.average = filter.printAverage(this.tupleSrc);
 			globalTuplesList.add(this);
 		}
 		public TupleSpec(String tupleType, String tupleSRC, String tupleDEST, String srcdev, String dstdev, double sentTime, double arrivalTime) {
@@ -226,6 +275,7 @@ public class TextParser {
 			this.tupleNWLatency = arrivalTime-sentTime;
 			this.tupleSrcDev=srcdev;
 			this.tupleDstDev=dstdev;
+			this.average = filter.printAverage(this.tupleSrc);
 			globalTuplesList.add(this);
 		}
 	}
@@ -301,13 +351,13 @@ public class TextParser {
 		JSONArray nodeJList = new JSONArray();
 		JSONArray energyJList = new JSONArray();
 		JSONArray networkJList = new JSONArray();
-		
+		JSONArray tupleDelayList = new JSONArray();
 		
 		for (TupleSpec t:globalTuplesList) tupleJList.add(t.toJSON());
 		for (NodeSpecs n:nodesList) nodeJList.add(n.toJSON());
 		for (EnergySpec e:energiesList) energyJList.add(e.toJSON());
 		for (NetworkSpec w:networkingList) networkJList.add(w.toJSON());
-		
+		for (TupleDelaySpec t : tupleList)	tupleDelayList.add(t.toJSON());
 //		System.out.println("Tuples:\n"+tuplesList.toString()+"\n");
 //		System.out.println("Nodes:\n"+nodesList.toString()+"\n");
 //		System.out.println("Energy:\n"+energiesList.toString()+"\n");
@@ -317,7 +367,7 @@ public class TextParser {
 		obj.put("nodes", nodeJList);
 		obj.put("listEnergy", energyJList);
 		obj.put("listNetwork", networkJList);
-		
+		obj.put("tupleDelays", tupleDelayList);
 		try {
 			FileWriter file = new FileWriter(jsonFileName, true);
 			file.write(obj.toJSONString().replaceAll(",", ",\n"));

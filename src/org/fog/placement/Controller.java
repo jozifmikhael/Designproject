@@ -288,6 +288,12 @@ public class Controller extends SimEntity{
 		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
 			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
 			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
+			String tupleLine = tupleType + " "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
+			try {
+				textfile.setTupleDelay(tupleLine);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		System.out.println("Calculated total time with delays: " + totalLoopTime);
