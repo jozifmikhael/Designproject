@@ -632,8 +632,7 @@ public class FogDevice extends PowerDatacenter {
 		Tuple tuple = (Tuple)ev.getData();
 		//System.out.println(CloudSim.clock() +" : tuple arrived "+tuple.getTupleType() + " Source " + CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination())); 
 		tuple.setArrivalTime(CloudSim.clock());
-		textParserObj.logTuple(tuple.getTupleType(), CloudSim.getEntityName(ev.getSource()), CloudSim.getEntityName(ev.getDestination()), tuple.getsendTime(), tuple.getArrivalTime());
-		
+		textParserObj.logTuple(tuple.getTupleType(), CloudSim.getEntityName(ev.getSource()), CloudSim.getEntityName(ev.getDestination()), tuple.getSrcModuleName(),tuple.getDestModuleName(),tuple.getsendTime(), tuple.getArrivalTime());
 		Logger.debug(getName(), "Received tuple "+tuple.getCloudletId()+"with tupleType = "+tuple.getTupleType()+"\t| Source : "+
 		CloudSim.getEntityName(ev.getSource())+"|Dest : "+CloudSim.getEntityName(ev.getDestination()));
 		send(ev.getSource(), CloudSim.getMinTimeBetweenEvents(), FogEvents.TUPLE_ACK);

@@ -289,8 +289,10 @@ public class Controller extends SimEntity{
 			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
 			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
 			String tupleLine = tupleType + " "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
+			System.out.println("Tuple Line: "+tupleLine);
 			try {
 				textfile.setTupleDelay(tupleLine);
+				System.out.println("set tuple delay");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -56,8 +56,8 @@ public class TextParser {
 		String stParts[] = line.split(" ");
 		String name = stParts[0];
 		double delay = Double.parseDouble(stParts[1]);
+		System.out.println("TP "+stParts[0]+" "+stParts[1]);
 		TupleDelaySpec t = addTupleDelay(name, delay);
-		
 	}
 
 	private TupleDelaySpec addTupleDelay(String name, double delay) {
@@ -279,8 +279,8 @@ public class TextParser {
 			globalTuplesList.add(this);
 		}
 	}
-	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
-		this.new TupleSpec(tupleType, tupleSRC, tupleDEST, sentTime, arrivalTime);
+	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, String tupleSrcDev, String tupleDstDev,double sentTime, double arrivalTime) {
+		this.new TupleSpec(tupleType, tupleSrcDev, tupleDstDev, tupleSRC, tupleDEST, sentTime, arrivalTime);
 	}
 	
 	class NodeSpecs{
@@ -363,11 +363,12 @@ public class TextParser {
 //		System.out.println("Energy:\n"+energiesList.toString()+"\n");
 //		System.out.println("Network:\n"+networkingList.toString()+"\n");
 		
-//		obj.put("tuples", tupleJList);
+		obj.put("tuples", tupleJList);
 		obj.put("nodes", nodeJList);
 		obj.put("listEnergy", energyJList);
 		obj.put("listNetwork", networkJList);
 		obj.put("tupleDelays", tupleDelayList);
+		
 		try {
 			FileWriter file = new FileWriter(jsonFileName, true);
 			file.write(obj.toJSONString().replaceAll(",", ",\n"));
