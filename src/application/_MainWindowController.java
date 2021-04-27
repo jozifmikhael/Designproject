@@ -585,6 +585,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 			clearHandler();
 			_SpecHandler.loadJSON(selectedFile);
 		}
+		redrawNodes();
 	}
 	
 	File selectedFile = null;

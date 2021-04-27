@@ -260,13 +260,24 @@ public class _SpecHandler {
 					if (f.getGenericType() instanceof ParameterizedType) {
 						printDebug(f.getName());
 						ArrayList<?> arrRef = (ArrayList<?>) f.get(this);
-						if(arrRef == null) continue;
+						if(arrRef == null) {
+							printDebug(f.getName() + " is null");
+							continue;
+						}
 						JSONArray newSet = new JSONArray();
 						if(f.getGenericType().toString().contains("_SpecHandler$")) {
+							printDebug("Adding a new spec entry");
+							printDebug(arrRef.size());
 							arrRef.forEach(a->newSet.add(((Spec)a).toJSON()));
-						}else arrRef.forEach(a->newSet.add(a+""));
+						}else{
+							printDebug("Adding a new non-spec entry");
+							arrRef.forEach(a->newSet.add(a+""));
+						}
 						obj.put(f.getName(), newSet);
-					}else obj.put(cFields[i].getName(), cFields[i].get(this).toString());
+					}else{
+						printDebug(cFields[i].getName());
+						obj.put(cFields[i].getName(), cFields[i].get(this).toString());
+					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -587,17 +598,18 @@ public class _SpecHandler {
 
 		ModuleSpec copy() {return new ModuleSpec(this.toJSON());};
 		public ModuleSpec(JSONObject a) {super(a);}
+		
 		public Application addToApp(Application application) {
 			application.addAppModule(this.name, this.ram, this.mips, this.size, this.bandwidth);
-			for (TupleSpec tupleMaps : this.tupleMappings)
-				application.addTupleMapping(this.name, tupleMaps.getInTuple(), tupleMaps.getOutTuple(),
-						new FractionalSelectivity(tupleMaps.getFractionalSensitivity()));
+			for (TupleSpec tupleMap : this.tupleMappings)
+				application.addTupleMapping(this.name, tupleMap.inTuple, tupleMap.outTuple,
+						new FractionalSelectivity(tupleMap.fractionalSensitivity));
 			return application;
 		}
 		@Override
 		public String toString() {
 			return "ram=" + ram + ", bandwidth=" + bandwidth + ", size=" + size + ", mips=" + mips + ", x=" + x + ", y="
-					+ y + ", name=" + name;
+					+ y + ", name=" + name + ", tuplemappings [ " + tupleMappings.toString() + "]";
 		}
 		public int getRam() {
 			return ram;
@@ -952,6 +964,7 @@ public class _SpecHandler {
 		public String parentName;
 		ModuleSpec parent;
 		public TupleSpec(String inTuple, String outTuple, double fractionalSensitivity, ModuleSpec parent) {
+			this.type = "tupleEdge";
 			this.parent = parent;
 			this.parentName = parent.name;
 			this.inTuple = inTuple;
@@ -979,43 +992,49 @@ public class _SpecHandler {
 			}
 			return (TupleSpec)this.add();
 		}
+//
+//		@Override
+//		public String toString() {
+//			return "inTuple=" + inTuple + ",outTuple=" + outTuple + ",fractionalSensitivity="
+//					+ fractionalSensitivity;
+//		}
 
 		@Override
 		public String toString() {
-			return "inTuple=" + inTuple + ",outTuple=" + outTuple + ",fractionalSensitivity="
-					+ fractionalSensitivity;
+			return "TupleSpec [inTuple=" + inTuple + ", outTuple=" + outTuple + ", fractionalSensitivity="
+					+ fractionalSensitivity + ", parentName=" + parentName + "]";
 		}
 
 		public String getInTuple() {
 			return inTuple;
 		}
-		
+
 		public void setInTuple(String inTuple) {
 			this.inTuple = inTuple;
 		}
-		
-		public String getHostModuleName() {
-			return parentName;
-		}
-		
-		public void setHostModuleName(String hostModuleName) {
-			this.parentName = hostModuleName;
-		}
-		
+
 		public String getOutTuple() {
 			return outTuple;
 		}
-		
+
 		public void setOutTuple(String outTuple) {
 			this.outTuple = outTuple;
 		}
-		
+
 		public double getFractionalSensitivity() {
 			return fractionalSensitivity;
 		}
-		
+
 		public void setFractionalSensitivity(double fractionalSensitivity) {
 			this.fractionalSensitivity = fractionalSensitivity;
+		}
+
+		public String getParentName() {
+			return parentName;
+		}
+
+		public void setParentName(String parentName) {
+			this.parentName = parentName;
 		}
 	}
 	
@@ -1125,7 +1144,7 @@ public class _SpecHandler {
 		obj.put("sensors", sensorsJSONObj);
 		obj.put("actuats", actuatsJSONObj);
 		printDebug("Added lists to json");
-
+		
 		try {
 			printDebug("Writing to " + file2);
 			FileWriter file = new FileWriter(file2, false);

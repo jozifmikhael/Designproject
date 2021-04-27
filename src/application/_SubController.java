@@ -140,6 +140,7 @@ public abstract class _SubController {
 	                }
 					selCol.setOnEditCommit(t -> cellEditHandler((CellEditEvent<?, ?>)t));
 				}
+				selTable.getItems().remove(0);
 			}
 			else if (selChild.getClass().getSimpleName().toString().equals("TextField")) {
 //				printDebug("Found a textField with ID " + selChild.getId());
