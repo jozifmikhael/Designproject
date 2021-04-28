@@ -285,18 +285,18 @@ public class Controller extends SimEntity{
 //			System.out.println(tupleTyple + " ---> "+TimeKeeper.getInstance().getEmitTimes());
 //		}
 		
-		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
-			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
-			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
-			String tupleLine = tupleType + " "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
-			System.out.println("Tuple Line: "+tupleLine);
-			try {
-				textfile.setTupleDelay(tupleLine);
-				System.out.println("set tuple delay");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+//		for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){
+//			System.out.println(tupleType + " ---> "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType));
+//			totalLoopTime+=TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
+//			String tupleLine = tupleType + " "+TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().get(tupleType);
+//			System.out.println("Tuple Line: "+tupleLine);
+//			try {
+//				textfile.setTupleDelay(tupleLine);
+//				System.out.println("set tuple delay");
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 		System.out.println("Calculated total time with delays: " + totalLoopTime);
 		System.out.println("=========================================");

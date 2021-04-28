@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 
-import org.fog.test.perfeval.TextParser.TupleSpec;
+import org.fog.test.perfeval.TextParser.TupleDelaySpec;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,6 +42,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.util.converter.DoubleStringConverter;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -54,6 +55,7 @@ public class OutputController implements Initializable{
 	private static List<Double> timeNetworkList = new ArrayList<Double>();
 	private static List<Double> NetworkUsageList = new ArrayList<Double>();
 	private List<TupleMetrics> tupleList = new ArrayList<TupleMetrics>();
+	private List<TupleDelayBarGraph> tupleDelayList = new ArrayList<TupleDelayBarGraph>();
 	public List<XYChart.Series> seriesList = new ArrayList<XYChart.Series>();
 	
 	static String sourceFile="output.json";
@@ -91,28 +93,28 @@ public class OutputController implements Initializable{
     private LineChart<Number, Number> NetworkUsage;
 
     @FXML
-    private TableView<TupleSpec> tupleTable;
+    private TableView<TupleMetrics> tupleTable;
 
     @FXML
-    private TableColumn<TupleSpec, String> checkCol;
+    private TableColumn<TupleMetrics, String> checkCol;
     
     @FXML
-    private TableColumn<TupleSpec, String> sourceDevCol;
+    private TableColumn<TupleMetrics, String> sourceDevCol;
 
     @FXML
-    private TableColumn<TupleSpec, String> sourceModCol;
+    private TableColumn<TupleMetrics, String> sourceModCol;
 
     @FXML
-    private TableColumn<TupleSpec, String> destDevCol;
+    private TableColumn<TupleMetrics, String> destDevCol;
 
     @FXML
-    private TableColumn<TupleSpec, String> destModCol;
+    private TableColumn<TupleMetrics, String> destModCol;
 
     @FXML
-    private TableColumn<TupleSpec, String> typleCol;
+    private TableColumn<TupleMetrics, String> typleCol;
 
     @FXML
-    private TableColumn<TupleSpec, String> timeCol;
+    private TableColumn<TupleMetrics, Double> timeCol;
 
     @FXML
     private ChoiceBox<?> sourceChoiceBox;
@@ -175,19 +177,98 @@ public class OutputController implements Initializable{
     }
 	
 	public class TupleMetrics{
-		String tupleType;
-		String tupleSRC;
-		String tupleDEST;
-		double tupleLatency;
+		@Override
+		public String toString() {
+			return "tupleType=" + tupleType + ",tupleSRC=" + tupleSRC + ",tupleDEST=" + tupleDEST + ",tupleSRCDev="
+					+ tupleSRCDev + ",tupleDESTDev=" + tupleDESTDev + ",tupleNWLatency=" + tupleNWLatency + ",average="
+					+ average;
+		}
+
+		public String getTupleType() {
+			return tupleType;
+		}
+
+		public void setTupleType(String tupleType) {
+			this.tupleType = tupleType;
+		}
+
+		public String getTupleSRC() {
+			return tupleSRC;
+		}
+
+		public void setTupleSRC(String tupleSRC) {
+			this.tupleSRC = tupleSRC;
+		}
+
+		public String getTupleDEST() {
+			return tupleDEST;
+		}
+
+		public void setTupleDEST(String tupleDEST) {
+			this.tupleDEST = tupleDEST;
+		}
+
+		public String getTupleSRCDev() {
+			return tupleSRCDev;
+		}
+
+		public void setTupleSRCDev(String tupleSRCDev) {
+			this.tupleSRCDev = tupleSRCDev;
+		}
+
+		public String getTupleDESTDev() {
+			return tupleDESTDev;
+		}
+
+		public void setTupleDESTDev(String tupleDESTDev) {
+			this.tupleDESTDev = tupleDESTDev;
+		}
+
+		public double getTupleNWLatency() {
+			return tupleNWLatency;
+		}
+
+		public void setTupleNWLatency(double tupleNWLatency) {
+			this.tupleNWLatency = tupleNWLatency;
+		}
+
+		public double getAverage() {
+			return average;
+		}
+
+		public void setAverage(double average) {
+			this.average = average;
+		}
+
+		public String tupleType;
+		public String tupleSRC;
+		public String tupleDEST;
+		public String tupleSRCDev;
+		public String tupleDESTDev;
+		public double tupleNWLatency;
+		public double average;
 		
-		TupleMetrics(String tupleType, String tupleSRC, String tupleDEST, double tupleLatency){
+		TupleMetrics(String tupleType, String tupleSRCDev, String tupleDESTDev,String tupleSRC, String tupleDEST, double tupleNWLatency, double average){
 			this.tupleType = tupleType;
 			this.tupleSRC = tupleSRC;
 			this.tupleDEST = tupleDEST;	
-			this.tupleLatency = tupleLatency;
+			this.tupleNWLatency = tupleNWLatency;
+			this.tupleSRCDev = tupleSRCDev;
+			this.tupleDESTDev = tupleDESTDev;
+			this.average = average;
 		}
 	}
     
+	public class TupleDelayBarGraph{
+		String name;
+		double delay;
+		
+		TupleDelayBarGraph(String tupleType, double delay){
+			this.name = tupleType;
+			this.delay = delay;
+		}
+	}
+	
 	@FXML
     void ParseEnergy() throws IOException, ParseException {
     	JSONParser jsonParser = new JSONParser();
@@ -252,10 +333,13 @@ public class OutputController implements Initializable{
 	
 	private void parseTuples(JSONObject link){
 		String tupleType = (String) link.get("tupleType");
-		String tupleSCR = (String) link.get("tupleSCR");
+		String tupleSCR = (String) link.get("tupleSRC");
 		String tupleDEST = (String) link.get("tupleDEST");
-		double TupleLatency = (double) link.get("TupleLatency");
-		TupleMetrics tupleOBJ = new TupleMetrics(tupleType, tupleSCR, tupleDEST, TupleLatency);
+		double tupleNWLatency = (double) link.get("tupleNWLatency");
+		String tupleSRCDev = (String) link.get("tupleSrcDev");
+		String tupleDESTDev = (String) link.get("tupleDstDev");
+		double average = (double) link.get("average");
+		TupleMetrics tupleOBJ = new TupleMetrics(tupleType, tupleSRCDev, tupleDESTDev,tupleSCR, tupleDEST, tupleNWLatency, average);
 		tupleList.add(tupleOBJ);
 	}
 	
@@ -320,13 +404,16 @@ public class OutputController implements Initializable{
 		try {
 			ParseEnergy();
 			ParseNetwork();
+			ParsingTuples();
 			psParseLatency();
+						
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	
 	private void psParseLatency() {
 		final NumberAxis xAxis = new NumberAxis();
 	    final NumberAxis yAxis = new NumberAxis();
@@ -334,54 +421,31 @@ public class OutputController implements Initializable{
         yAxis.setLabel("Network Usage");
         barChart.setTitle("CPU Execution Delays");
         barChart.setLegendVisible(false);
-        XYChart.Series series = new XYChart.Series();
-        series.getData().add(new XYChart.Data("PLAYER_GAME_STATE",1.171428573130893));
-        series.getData().add(new XYChart.Data("EEG",4.099993792751119));
-        series.getData().add(new XYChart.Data("CONCENTRATION",1.171428573130893));
-        series.getData().add(new XYChart.Data("_SENSOR",0.566240448301607));
-        series.getData().add(new XYChart.Data("GLOBAL_GAME_STATE",0.04575000214585016));
+        System.out.println(tupleDelayList.toString());
+        XYChart.Series series = new XYChart.Series();  
+        for (int i = 0; i < tupleDelayList.size(); i++) {
+        	series.getData().add(new XYChart.Data(tupleDelayList.get(i).name,tupleDelayList.get(i).delay));
+        }
         barChart.getData().add(series);
-		ObservableList<TupleSpec> tempData = FXCollections.observableArrayList();
-//		String tupleType;
-//		String tupleSrc; 
-//		String tupleDst;
-//		double tupleNWLatency;
-//		double tupleSentTime;
-//		double tupleArrivTime;
-//	    checkCol sourceDevCol sourceModCol destDevCol destModCol typleCol timeCol
-		//String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime
-//		PLAYER_GAME_STATE ---> 1.171428573130893
-//		EEG ---> 4.099993792751119
-//		CONCENTRATION ---> 0.12893009140234982
-//		_SENSOR ---> 0.566240448301607
-//		GLOBAL_GAME_STATE ---> 0.04575000214585016
-		TextParser t = new TextParser();
-		tempData.add(t.new TupleSpec("PLAYER_GAME_STATE ", "concentration_calculator", "connector", "gateway", "cloud", 0, 0.09056122448938758));
-        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor0", "mobile-0", 0, 5.003540903540709));
-        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor1", "mobile-1", 0, 5.003540903540709));
-        tempData.add(t.new TupleSpec("EEG ", "EEG", "client", "sensor2", "mobile-2", 0, 5.003540903540709));
-        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor0", "mobile-0", 0, 8.81658119658707));
-        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor1", "mobile-1", 0, 8.81658119658707));
-        tempData.add(t.new TupleSpec("_SENSOR ", "EEG", "Client", "sensor2", "mobile-2", 0, 8.81658119658707));
-        tempData.add(t.new TupleSpec("CONCENTRATION ", "concentration_calculator", "client", "gateway-0", "mobile-0", 0, 0.30730012210177815));
-        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-0", 0, 0.2668171658911005));
-        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-1", 0, 0.2668171658911005));
-        tempData.add(t.new TupleSpec("GLOBAL_GAME_STATE ", "connector", "client", "cloud", "mobile-2", 0, 0.2668171658911005));
-        
+		ObservableList<TupleMetrics> tempData = FXCollections.observableArrayList();
+		for (int i = 0; i < tupleList.size(); i++) {
+        	tempData.add(tupleList.get(i));
+        }
     	tupleTable.setItems(tempData);
     	typleCol.setCellValueFactory(new PropertyValueFactory <>("tupleType"));
     	typleCol.setCellFactory(TextFieldTableCell.forTableColumn());
-//    	timeCol.setCellValueFactory(new PropertyValueFactory <>("arrivalTime"));
+    	timeCol.setCellValueFactory(new PropertyValueFactory <>("average"));
 //    	timeCol.setCellFactory(TextFieldTableCell.forTableColumn());
-    	destModCol.setCellValueFactory(new PropertyValueFactory <>("tupleDst"));
+    	destModCol.setCellValueFactory(new PropertyValueFactory <>("tupleDEST"));
     	destModCol.setCellFactory(TextFieldTableCell.forTableColumn());
-    	sourceModCol.setCellValueFactory(new PropertyValueFactory <>("tupleSrc"));
+    	sourceModCol.setCellValueFactory(new PropertyValueFactory <>("tupleSRC"));
     	sourceModCol.setCellFactory(TextFieldTableCell.forTableColumn());
-    	timeCol.setCellValueFactory(new PropertyValueFactory <>("tupleNWLatency"));
-    	timeCol.setCellFactory(TextFieldTableCell.forTableColumn());
-    	destDevCol.setCellValueFactory(new PropertyValueFactory <>("tupleDstDev"));
+//    	timeCol.setCellValueFactory(new PropertyValueFactory <>("tupleNWLatency"));
+//    	timeCol.setCellValueFactory(new PropertyValueFactory <>("tupleNWLatency"));
+    	timeCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+    	destDevCol.setCellValueFactory(new PropertyValueFactory <>("tupleDESTDev"));
         destDevCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        sourceDevCol.setCellValueFactory(new PropertyValueFactory <>("tupleSrcDev"));
+        sourceDevCol.setCellValueFactory(new PropertyValueFactory <>("tupleSRCDev"));
         sourceDevCol.setCellFactory(TextFieldTableCell.forTableColumn());
 	}
 }
