@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.fog.test.perfeval.TextParser.TupleDelaySpec;
 import org.fog.utils.TimeKeeper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -49,6 +50,40 @@ public class TextParser {
 		NetworkSpec w = addNetwork(time, networkUsage);	
 	}
 	
+	public void setTupleDelay(String line) {
+		String stParts[] = line.split(" ");
+		String name = stParts[0];
+		double delay = Double.parseDouble(stParts[1]);
+		//TODO
+		System.out.println("TP "+stParts[0]+" "+stParts[1]);
+		TupleDelaySpec t = addTupleDelay(name, delay);
+	}
+
+	private TupleDelaySpec addTupleDelay(String name, double delay) {
+		TupleDelaySpec t = new TupleDelaySpec(name, delay);
+		tupleList.add(t);
+		return t;
+	}
+	
+	class TupleDelaySpec{
+		String name;
+		double delay;
+		
+		@SuppressWarnings("unchecked")
+		JSONObject toJSON() {
+			TupleDelaySpec t = this;
+			JSONObject obj = new JSONObject();
+			obj.put("name", t.name);
+			obj.put("delay", t.delay);
+			return obj;
+		}
+		
+		public TupleDelaySpec(String name, double delay) {
+			this.name = name;		
+			this.delay = delay;			
+		}
+	}
+	
 	public NetworkSpec addNetwork(double time, double networkUsage) {
 		NetworkSpec network = new NetworkSpec(time, networkUsage);
 		networkingList.add(network);
@@ -56,14 +91,14 @@ public class TextParser {
 	}
 	
 	public static double sum = 0.0;
-	static List<TupleDelaySpec> globalTuplesList = new ArrayList<TupleDelaySpec>();
+	static List<TupleMetricSpec> globalTuplesList = new ArrayList<TupleMetricSpec>();
 	public class filterableTuples{
-		List<TupleDelaySpec> localList;
+		List<TupleMetricSpec> localList;
 		public filterableTuples() {
-			this.localList = new ArrayList<TupleDelaySpec>();
+			this.localList = new ArrayList<TupleMetricSpec>();
 			this.localList.addAll(globalTuplesList);
 		}
-		public filterableTuples updateTo(List<TupleDelaySpec> newList) {
+		public filterableTuples updateTo(List<TupleMetricSpec> newList) {
 			localList = newList;
 			return this;
 		}
@@ -93,11 +128,11 @@ public class TextParser {
 					.collect(Collectors.toList()));
 		}
 		public filterableTuples printNWLatencies() {
-			for(TupleDelaySpec t : this.localList) System.out.println(t.tupleArrivTime - t.tupleSentTime);
+			for(TupleMetricSpec t : this.localList) System.out.println(t.tupleArrivTime - t.tupleSentTime);
 			return this;
 		}
 		public double getAverage(String name, String type) {	
-			for(TupleDelaySpec t : globalTuplesList) {	
+			for(TupleMetricSpec t : globalTuplesList) {	
 				if(t.tupleSrcDev.equals(name)) 	
 					if(t.tupleType.equals(type))	
 						for(String tupleType : TimeKeeper.getInstance().getTupleTypeToAverageCpuTime().keySet()){	
@@ -108,22 +143,22 @@ public class TextParser {
 		}
 		public filterableTuples printAverage() {
 			double avg=0;
-			for(TupleDelaySpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
+			for(TupleMetricSpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
 			System.out.println(avg);
 			return this;
 		}
 		public filterableTuples printVariance() {
 			double avg=0;
-			for(TupleDelaySpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
+			for(TupleMetricSpec t : this.localList) avg+=(t.tupleArrivTime-t.tupleSentTime);
 			avg/=this.localList.size();
 			double var=0;
-			for(TupleDelaySpec t : this.localList) var+=Math.pow((t.tupleArrivTime-t.tupleSentTime-avg),2);
+			for(TupleMetricSpec t : this.localList) var+=Math.pow((t.tupleArrivTime-t.tupleSentTime-avg),2);
 			System.out.println(var/this.localList.size());
 			return this;
 		}
 		public filterableTuples printStrs() {
 			double avg=0;
-			for(TupleDelaySpec t : this.localList) System.out.println(t.toString());
+			for(TupleMetricSpec t : this.localList) System.out.println(t.toString());
 			return this;
 		}
 	}
@@ -132,7 +167,7 @@ public class TextParser {
 	
 
 
-	public class TupleDelaySpec{
+	public class TupleMetricSpec{
 		public String getTupleSrcDev() {
 			return tupleSrcDev;
 		}
@@ -199,7 +234,7 @@ public class TextParser {
 		
 		@SuppressWarnings("unchecked")
 		JSONObject toJSON() {
-			TupleDelaySpec t = this;
+			TupleMetricSpec t = this;
 			JSONObject obj = new JSONObject();
 			obj.put("tupleType", t.tupleType);
 			obj.put("tupleSRC", t.tupleSrc);
@@ -210,7 +245,7 @@ public class TextParser {
 			obj.put("average", t.average);
 			return obj;
 		}
-		public TupleDelaySpec(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
+		public TupleMetricSpec(String tupleType, String tupleSRC, String tupleDEST, double sentTime, double arrivalTime) {
 			this.tupleType = tupleType;
 			this.tupleSrc = tupleSRC;
 			this.tupleDst = tupleDEST;
@@ -220,7 +255,7 @@ public class TextParser {
 			this.average = filter.getAverage(this.tupleSrc,this.tupleType);
 			globalTuplesList.add(this);
 		}
-		public TupleDelaySpec(String tupleType, String tupleSRC, String tupleDEST, String srcdev, String dstdev, double sentTime, double arrivalTime) {
+		public TupleMetricSpec(String tupleType, String tupleSRC, String tupleDEST, String srcdev, String dstdev, double sentTime, double arrivalTime) {
 			this.tupleType = tupleType;
 			this.tupleSrc = tupleSRC;
 			this.tupleDst = tupleDEST;
@@ -234,7 +269,7 @@ public class TextParser {
 		}
 	}
 	public void logTuple(String tupleType, String tupleSRC, String tupleDEST, String tupleSrcDev, String tupleDstDev,double sentTime, double arrivalTime) {
-		this.new TupleDelaySpec(tupleType, tupleSrcDev, tupleDstDev, tupleSRC, tupleDEST, sentTime, arrivalTime);
+		this.new TupleMetricSpec(tupleType, tupleSrcDev, tupleDstDev, tupleSRC, tupleDEST, sentTime, arrivalTime);
 	}
 	
 	class NodeSpecs{
@@ -307,7 +342,7 @@ public class TextParser {
 		JSONArray networkJList = new JSONArray();
 		JSONArray tupleDelayList = new JSONArray();
 		
-		for (TupleDelaySpec t:globalTuplesList) tupleJList.add(t.toJSON());
+		for (TupleMetricSpec t:globalTuplesList) tupleJList.add(t.toJSON());
 		for (NodeSpecs n:nodesList) nodeJList.add(n.toJSON());
 		for (EnergySpec e:energiesList) energyJList.add(e.toJSON());
 		for (NetworkSpec w:networkingList) networkJList.add(w.toJSON());

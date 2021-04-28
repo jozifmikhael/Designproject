@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 
-import org.fog.test.perfeval.TextParser.TupleDelaySpec;
+import org.fog.test.perfeval.TextParser.TupleMetricSpec;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -306,7 +306,26 @@ public class OutputController implements Initializable{
         JSONArray tuples = (JSONArray) nodeList.get("tuples");
         tuples.forEach(l -> parseTuples((JSONObject) l));
 	}
-    
+	
+	@FXML
+	void ParsingTupleDelay() throws IOException, ParseException {
+		JSONParser jsonParser = new JSONParser();
+		FileReader reader = new FileReader(sourceFile);
+        Object obj = jsonParser.parse(reader);
+        JSONObject nodeList = (JSONObject) obj;
+        JSONArray tuples = (JSONArray) nodeList.get("tupleDelays");
+        tuples.forEach(l -> parseTupleDelay((JSONObject) l));
+	}
+	
+	private void parseTupleDelay(JSONObject link){
+		String name = (String) link.get("name");
+		double delay = (double) (link.get("delay"));
+		System.out.println("parse tuple delay name:" +name+"delay"+delay);
+		TupleDelayBarGraph tupleOBJ = new TupleDelayBarGraph(name, delay);
+		tupleDelayList.add(tupleOBJ);
+		System.out.println(tupleDelayList.size());
+	}
+	
 	private static void parseNodeData(JSONObject link) {
 		String nodeName = (String) link.get("name");
 		nodeList.add(nodeName);
@@ -431,6 +450,7 @@ public class OutputController implements Initializable{
 			ParseEnergy();
 			ParseNetwork();
 			ParsingTuples();
+			ParsingTupleDelay();
 			psParseLatency();
 			energyMetrics();
 		} catch (IOException | ParseException e) {
