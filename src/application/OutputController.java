@@ -36,6 +36,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -124,11 +125,14 @@ public class OutputController implements Initializable{
 
     @FXML
     private Button addButton;
+    
+    @FXML	
+    private TextArea metricsBox;
 
 	public static class Energy{
-		String name;
+		static String name;
 		private List<Double> timeList = new ArrayList<Double>();
-		private List<Double> EnergyConsumptionList = new ArrayList<Double>();
+		private static List<Double> EnergyConsumptionList = new ArrayList<Double>();
 		
 		Energy(String name, List<Double> timeList, List<Double> EnergyConsumptionList) {
 			this.name = name;
@@ -364,6 +368,28 @@ public class OutputController implements Initializable{
         }
 	}
 	
+	void energyMetrics() {	
+		String metricsAppend = "";	
+		for(Energy energylist : Energylist) {	
+			double avgEnergy = 0;	
+			double maxEnergy = 0;	
+			double totalEnergy = 0;	
+			String name = null;	
+			 for (double e : Energy.EnergyConsumptionList) {	
+				 totalEnergy = totalEnergy + e;	
+				 if (maxEnergy < e) {	
+					 maxEnergy = e;	
+				 }	
+				 avgEnergy = totalEnergy / Energy.EnergyConsumptionList.size();	
+				 name = Energy.name;				 	
+			 }	
+			 String metrics = "Name: " + name + " Avg: " + avgEnergy + " Max: " + maxEnergy + " Total: " + totalEnergy;	
+			 System.out.println(metrics);	
+			 metricsAppend =  metrics;	
+			 metricsBox.appendText(metricsAppend + "\n");	
+		 }	
+	}
+	
 	@FXML
 	void NetworkLineChart() {
 		final NumberAxis xAxis = new NumberAxis();
@@ -406,7 +432,7 @@ public class OutputController implements Initializable{
 			ParseNetwork();
 			ParsingTuples();
 			psParseLatency();
-						
+			energyMetrics();
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

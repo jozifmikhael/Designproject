@@ -24,3 +24,7 @@
   -fx-border-color: white;
   -fx-background-radius: 10px;
 }
+
+.text-area .content {
+ -fx-background-color: #e8e8e8 ;
+}

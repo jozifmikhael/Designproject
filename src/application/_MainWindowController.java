@@ -610,7 +610,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
 		if (selectedFile != null) _SpecHandler.writeJSON(selectedFile.getAbsoluteFile());
 		vrgame.createFogSimObjects(true, "Edgeward", 10, 10000);
      	FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-        Scene scene = new Scene(addNewNodeLoader.load(),900,600);
+        Scene scene = new Scene(addNewNodeLoader.load(),1560,977);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Output");
@@ -621,7 +621,7 @@ public class _MainWindowController implements Initializable, EventHandler<KeyEve
     void showOutput() {
         try {
             FXMLLoader addNewNodeLoader = new FXMLLoader(getClass().getResource("SimOutputBox.fxml"));
-            Scene scene = new Scene(addNewNodeLoader.load(),1560,850);
+            Scene scene = new Scene(addNewNodeLoader.load(),1560,977);
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.setTitle("Output");
